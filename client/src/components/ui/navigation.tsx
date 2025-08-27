@@ -3,7 +3,6 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
   Home, 
-  Upload, 
   Wand2, 
   Database, 
   Eye, 
@@ -13,14 +12,13 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { path: "/", label: "Dashboard", icon: Home, shortLabel: "Home" },
-  { path: "/upload", label: "Upload", icon: Upload, shortLabel: "Upload" },
-  { path: "/generator", label: "Generator", icon: Wand2, shortLabel: "Gen" },
-  { path: "/library", label: "Library", icon: Database, shortLabel: "Lib" },
-  { path: "/preview", label: "Preview", icon: Eye, shortLabel: "View" },
-  { path: "/status", label: "Status", icon: BarChart3, shortLabel: "Stats" },
-  { path: "/modules", label: "Modules", icon: Settings, shortLabel: "Mods" },
+  { path: "/", label: "Command Center", icon: Home, shortLabel: "Home" },
+  { path: "/generator", label: "God Generator", icon: Wand2, shortLabel: "Gen" },
+  { path: "/library", label: "Neural Library", icon: Database, shortLabel: "Lib" },
   { path: "/expansion", label: "AI Expansion", icon: Brain, shortLabel: "AI" },
+  { path: "/preview", label: "Reality Preview", icon: Eye, shortLabel: "View" },
+  { path: "/status", label: "System Matrix", icon: BarChart3, shortLabel: "Stats" },
+  { path: "/modules", label: "Core Modules", icon: Settings, shortLabel: "Mods" },
 ];
 
 export default function Navigation() {

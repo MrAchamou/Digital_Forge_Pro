@@ -20,7 +20,6 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
-      <Route path="/upload" component={Upload} />
       <Route path="/generator" component={Generator} />
       <Route path="/library" component={Library} />
       <Route path="/preview" component={Preview} />
