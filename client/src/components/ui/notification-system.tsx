@@ -83,7 +83,7 @@ export default function NotificationSystem() {
 
   const remainingPercentage = libraryStats 
     ? (libraryStats.effectsRemaining / libraryStats.totalDescriptions) * 100 
-    : 0;
+    : 100; 0;
 
   return (
     <>
