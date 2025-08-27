@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +39,16 @@ interface LibraryStats {
 interface SystemHealth {
   overall: number;
   modules: Record<string, { status: string; performance: number; uptime: string }>;
+  ai?: {
+    confidence: number;
+  };
 }
+
+// Mock data for resource usage and module counts if they are not fetched
+const averageResourceUsage = { overall: 75.5 }; // Example data
+const onlineModules = 5; // Example data
+const totalModules = 6; // Example data
+
 
 export default function Dashboard() {
   const { data: stats } = useQuery<LibraryStats>({
@@ -80,7 +88,7 @@ export default function Dashboard() {
         </p>
         <div className="flex justify-center items-center mt-6 space-x-4">
           <Badge className={`${getHealthBgColor(health?.overall || 0)} text-white px-4 py-2`}>
-            System Health: {health?.overall || 0}%
+            System Health: {health?.overall !== undefined ? health.overall.toFixed(1) : 'N/A'}%
           </Badge>
           <Badge className="bg-forge-electric text-white px-4 py-2">
             {stats?.expansionRate > 0 ? 'AI Expansion Active' : 'Quantum Standby'}
@@ -126,7 +134,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-3xl font-bold text-white">
-              {stats?.averageGenerationTime || 0}ms
+              {stats?.averageGenerationTime !== undefined ? stats.averageGenerationTime.toFixed(1) : 'N/A'}ms
             </div>
             <div className="text-sm text-gray-300">Avg Processing Time</div>
             <div className="flex items-center gap-2">
@@ -150,7 +158,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-3xl font-bold text-white">
-              {stats?.expansionRate.toFixed(1) || 0}
+              {stats?.expansionRate !== undefined ? stats.expansionRate.toFixed(1) : 'N/A'}
             </div>
             <div className="text-sm text-gray-300">Expansion Rate/Hour</div>
             <div className="flex items-center gap-2">
@@ -174,7 +182,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-3xl font-bold text-white">
-              {health?.overall || 0}%
+              {health?.overall !== undefined ? health.overall.toFixed(1) : 'N/A'}%
             </div>
             <div className="text-sm text-gray-300">Overall Health</div>
             <div className="flex items-center gap-2">
@@ -206,7 +214,7 @@ export default function Dashboard() {
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
-            
+
             <Link to="/expansion">
               <Button className="w-full bg-gradient-to-r from-forge-purple to-forge-plasma text-white hover:shadow-lg transform hover:-translate-y-1 transition-all">
                 <Brain className="w-4 h-4 mr-2" />
@@ -214,7 +222,7 @@ export default function Dashboard() {
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
-            
+
             <Link to="/library">
               <Button className="w-full bg-gradient-to-r from-forge-plasma to-forge-gold text-white hover:shadow-lg transform hover:-translate-y-1 transition-all">
                 <Database className="w-4 h-4 mr-2" />

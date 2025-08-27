@@ -15,6 +15,31 @@ import Library from "@/pages/library";
 import Modules from "@/pages/modules";
 import Navigation from "@/components/ui/navigation";
 import ParticleBackground from "@/components/ui/particle-background";
+import { useEffect } from "react";
+
+// Global error handler
+const useGlobalErrorHandler = () => {
+  useEffect(() => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('Unhandled promise rejection:', event.reason);
+      // Prevent the default browser behavior
+      event.preventDefault();
+    };
+
+    const handleError = (event: ErrorEvent) => {
+      console.error('Global error:', event.error);
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener('error', handleError);
+
+    return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener('error', handleError);
+    };
+  }, []);
+};
+
 
 function Router() {
   return (
@@ -32,6 +57,8 @@ function Router() {
 }
 
 function App() {
+  useGlobalErrorHandler();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

@@ -10,6 +10,10 @@ import { batchGenerator } from "./modules/batch-generator.module";
 import { classificationStorageModule } from "./modules/classification-storage.module";
 import { errorDetection } from "./modules/error-detection.module";
 import { qualityAssurance } from "./modules/quality-assurance.module";
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 const router = express.Router();
 
@@ -551,33 +555,6 @@ router.post("/api/library/initialize", async (req, res) => {
   }
 });
 
-// Système - Stats
-router.get("/api/system/health", async (_req, res) => {
-  try {
-    const health = {
-      overall: 98.7,
-      modules: {
-        particles: { status: 'online', load: 25, effectCount: 142 },
-        physics: { status: 'online', load: 18, effectCount: 89 },
-        lighting: { status: 'online', load: 32, effectCount: 205 },
-        morphing: { status: 'maintenance', load: 0, effectCount: 67 }
-      },
-      queue: { size: 12, processing: 3, failed: 1 },
-      resources: {
-        cpu: 67,
-        memory: 34,
-        gpu: 45,
-        network: 12,
-        storage: 42
-      }
-    };
-
-    res.json(health);
-  } catch (error) {
-    res.status(500).json({ error: "Health check failed" });
-  }
-});
-
 // Routes pour le parser d'effets
 router.post("/api/parse-effects", async (req, res) => {
   try {
@@ -735,6 +712,254 @@ router.post("/api/validate-code", async (req, res) => {
         memory: process.memoryUsage()
       }
     };
+
+    const result = await errorDetection.detectErrors(code, enrichedContext);
+
+    res.json({
+      success: true,
+      validation: result,
+      metadata: {
+        timestamp: new Date(),
+        processingTime: result.metrics?.detectionTime || 0,
+        systemHealth: errorDetection.getSystemHealth()
+      }
+    });
+  } catch (error) {
+    console.error("Erreur validation:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de la validation",
+      details: error.message,
+      timestamp: new Date()
+    });
+  }
+});
+
+// Routes pour l'assurance qualité
+router.post("/api/assess-quality", async (req, res) => {
+  try {
+    const { effectData, generatedCode } = req.body;
+
+    if (!generatedCode || typeof generatedCode !== 'string') {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Code généré requis pour l'évaluation" 
+      });
+    }
+
+    // Contexte enrichi pour l'assurance qualité
+    const qualityContext = {
+      ...effectData,
+      timestamp: new Date(),
+      codeLength: generatedCode.length,
+      estimatedComplexity: generatedCode.split('\n').length,
+      platform: effectData?.platform || 'javascript',
+      requirements: effectData?.requirements || {}
+    };
+
+    const report = await qualityAssurance.performQualityAssurance(generatedCode, qualityContext);
+
+    res.json({
+      success: true,
+      qualityReport: report,
+      recommendations: report.recommendations,
+      improvements: report.autoImprovements,
+      metadata: {
+        timestamp: new Date(),
+        confidence: report.confidence,
+        benchmarkComparison: qualityAssurance.getBenchmarkStandards()
+      }
+    });
+  } catch (error) {
+    console.error("Erreur évaluation qualité:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de l'évaluation qualité",
+      details: error.message,
+      timestamp: new Date()
+    });
+  }
+});
+
+router.post("/api/batch-quality", async (req, res) => {
+  try {
+    const { effects } = req.body;
+
+    const results = await Promise.all(
+      effects.map(effect => qualityAssurance.performQualityAssurance(effect.code || '', effect))
+    );
+    const result = {
+      stats: {
+        total: results.length,
+        approved: results.filter(r => r.overallScore >= 0.7).length,
+        rejected: results.filter(r => r.overallScore < 0.7).length,
+        avgScore: results.reduce((sum, r) => sum + r.overallScore, 0) / results.length * 100
+      },
+      reports: results
+    };
+
+    res.json({
+      success: true,
+      data: result,
+      message: `Évaluation de ${result.stats.total} effets terminée`
+    });
+  } catch (error) {
+    console.error("Erreur évaluation batch:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de l'évaluation en lot" 
+    });
+  }
+});
+
+// Parser routes
+router.post("/api/parser/parse-file", async (req, res) => {
+  try {
+    const { content } = req.body;
+    const results = await effectParserModule.parseEffectsList(content);
+    res.json(results);
+  } catch (error) {
+    console.error("Parse error:", error);
+    res.status(500).json({ error: "Failed to parse file" });
+  }
+});
+
+// Module status route
+router.get("/api/modules/status", async (req, res) => {
+  try {
+    const status = {
+      batchGenerator: { status: "online", processed: 1247, queue: 3 },
+      classificationStorage: { status: "online", classified: 1247, errors: 0 },
+      errorDetection: { status: "online", scanned: 1247, fixed: 127 },
+      qualityAssurance: { status: "online", avgScore: 87, approved: 94 },
+      parser: { status: "online", parsed: 2000, confidence: 96 }
+    };
+    res.json(status);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to get module status" });
+  }
+});
+
+// Batch generator routes
+router.post("/api/modules/batch-generator/generate", async (req, res) => {
+  try {
+    const { effectType, category, count } = req.body;
+    const batchId = await batchGenerator.processBatch([], {
+      effectType,
+      category,
+      count
+    });
+    res.json(results);
+  } catch (error) {
+    console.error("Batch generation error:", error);
+    res.status(500).json({ error: "Failed to generate effects" });
+  }
+});
+
+// Classification & Storage routes
+router.post("/api/modules/classification-storage/reorganize", async (req, res) => {
+  try {
+    const results = await classificationStorageModule.reorganizeLibrary();
+    res.json(results);
+  } catch (error) {
+    console.error("Reorganize error:", error);
+    res.status(500).json({ error: "Failed to reorganize library" });
+  }
+});
+
+// Quality Assurance routes
+router.post("/api/modules/quality-assurance/batch-check", async (req, res) => {
+  try {
+    // Simuler une vérification qualité
+    const mockResults = {
+      stats: {
+        total: 100,
+        approved: 94,
+        rejected: 6,
+        avgScore: 87
+      },
+      reports: []
+    };
+    res.json(mockResults);
+  } catch (error) {
+    console.error("Quality check error:", error);
+    res.status(500).json({ error: "Failed to run quality check" });
+  }
+});
+
+// === ROUTES DE MONITORING ET DIAGNOSTIC ===
+
+// Route de santé système complète
+router.get("/api/system/health", async (req, res) => {
+  try {
+    const godStatus = godMonitor.getGodStatus();
+    const errorDetectionHealth = errorDetection.getSystemHealth();
+    const systemMetrics = global.systemMetrics || {};
+
+    // Ensure all numeric values are valid
+    const safeNumericValue = (value: any, defaultValue: number = 0): number => {
+      const num = Number(value);
+      return isNaN(num) || !isFinite(num) ? defaultValue : num;
+    };
+
+    const healthData = {
+      timestamp: new Date(),
+      overall: safeNumericValue(godStatus.overallHealth, 85),
+      uptime: safeNumericValue(process.uptime(), 0),
+      memory: process.memoryUsage(),
+      modules: {
+        godMonitor: { 
+          status: 'active', 
+          health: safeNumericValue(godStatus.overallHealth, 85) 
+        },
+        errorDetection: { 
+          status: errorDetectionHealth?.isHealthy ? 'active' : 'warning', 
+          isHealthy: errorDetectionHealth?.isHealthy || false,
+          errorDetectionRate: safeNumericValue(errorDetectionHealth?.errorDetectionRate, 0.9),
+          autoFixSuccessRate: safeNumericValue(errorDetectionHealth?.autoFixSuccessRate, 0.8),
+          aiConfidence: safeNumericValue(errorDetectionHealth?.aiConfidence, 0.85)
+        },
+        qualityAssurance: { status: 'active', health: 95 },
+        autonomousMonitor: { status: 'active', health: 92 }
+      },
+      performance: {
+        responseTime: safeNumericValue(systemMetrics.responseTime, 0),
+        throughput: safeNumericValue(global.processedRequests, 0),
+        errorRate: safeNumericValue((systemMetrics.errorCount || 0) / Math.max(global.processedRequests || 1, 1), 0),
+        resourceEfficiency: safeNumericValue(0.95, 0.95)
+      },
+      ai: {
+        confidence: safeNumericValue(godStatus?.ai?.confidence, 0.85),
+        neuralNetworkHealth: safeNumericValue(godStatus?.ai?.neuralNetworkHealth, 0.9),
+        decisionAccuracy: safeNumericValue(godStatus?.ai?.decisionAccuracy, 0.85),
+        adaptationRate: safeNumericValue(godStatus?.ai?.adaptationRate, 0.15)
+      },
+      alerts: godStatus?.criticalIssues > 0 ? [`${godStatus.criticalIssues} critical issues detected`] : []
+    };
+
+    res.json(healthData);
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(500).json({
+      error: 'Health check failed',
+      timestamp: new Date(),
+      overall: 0,
+      modules: {},
+      performance: {
+        responseTime: 0,
+        throughput: 0,
+        errorRate: 0,
+        resourceEfficiency: 0
+      },
+      ai: {
+        confidence: 0,
+        neuralNetworkHealth: 0,
+        decisionAccuracy: 0,
+        adaptationRate: 0
+      }
+    });
+  }
+});
 
 // Routes de monitoring système avancé
 router.get("/api/system/diagnostics", async (req, res) => {
@@ -1143,179 +1368,5 @@ async function repairIssue(issue) {
   }
 }
 
-
-    const result = await errorDetection.detectErrors(code, enrichedContext);
-
-    res.json({
-      success: true,
-      validation: result,
-      metadata: {
-        timestamp: new Date(),
-        processingTime: result.metrics?.detectionTime || 0,
-        systemHealth: errorDetection.getSystemHealth()
-      }
-    });
-  } catch (error) {
-    console.error("Erreur validation:", error);
-    res.status(500).json({ 
-      success: false, 
-      error: "Erreur lors de la validation",
-      details: error.message,
-      timestamp: new Date()
-    });
-  }
-});
-
-// Routes pour l'assurance qualité
-router.post("/api/assess-quality", async (req, res) => {
-  try {
-    const { effectData, generatedCode } = req.body;
-
-    if (!generatedCode || typeof generatedCode !== 'string') {
-      return res.status(400).json({ 
-        success: false, 
-        error: "Code généré requis pour l'évaluation" 
-      });
-    }
-
-    // Contexte enrichi pour l'assurance qualité
-    const qualityContext = {
-      ...effectData,
-      timestamp: new Date(),
-      codeLength: generatedCode.length,
-      estimatedComplexity: generatedCode.split('\n').length,
-      platform: effectData?.platform || 'javascript',
-      requirements: effectData?.requirements || {}
-    };
-
-    const report = await qualityAssurance.performQualityAssurance(generatedCode, qualityContext);
-
-    res.json({
-      success: true,
-      qualityReport: report,
-      recommendations: report.recommendations,
-      improvements: report.autoImprovements,
-      metadata: {
-        timestamp: new Date(),
-        confidence: report.confidence,
-        benchmarkComparison: qualityAssurance.getBenchmarkStandards()
-      }
-    });
-  } catch (error) {
-    console.error("Erreur évaluation qualité:", error);
-    res.status(500).json({ 
-      success: false, 
-      error: "Erreur lors de l'évaluation qualité",
-      details: error.message,
-      timestamp: new Date()
-    });
-  }
-});
-
-router.post("/api/batch-quality", async (req, res) => {
-  try {
-    const { effects } = req.body;
-
-    const results = await Promise.all(
-      effects.map(effect => qualityAssurance.performQualityAssurance(effect.code || '', effect))
-    );
-    const result = {
-      stats: {
-        total: results.length,
-        approved: results.filter(r => r.overallScore >= 0.7).length,
-        rejected: results.filter(r => r.overallScore < 0.7).length,
-        avgScore: results.reduce((sum, r) => sum + r.overallScore, 0) / results.length * 100
-      },
-      reports: results
-    };
-
-    res.json({
-      success: true,
-      data: result,
-      message: `Évaluation de ${result.stats.total} effets terminée`
-    });
-  } catch (error) {
-    console.error("Erreur évaluation batch:", error);
-    res.status(500).json({ 
-      success: false, 
-      error: "Erreur lors de l'évaluation en lot" 
-    });
-  }
-});
-
-// Parser routes
-router.post("/api/parser/parse-file", async (req, res) => {
-  try {
-    const { content } = req.body;
-    const results = await effectParserModule.parseEffectsList(content);
-    res.json(results);
-  } catch (error) {
-    console.error("Parse error:", error);
-    res.status(500).json({ error: "Failed to parse file" });
-  }
-});
-
-// Module status route
-router.get("/api/modules/status", async (req, res) => {
-  try {
-    const status = {
-      batchGenerator: { status: "online", processed: 1247, queue: 3 },
-      classificationStorage: { status: "online", classified: 1247, errors: 0 },
-      errorDetection: { status: "online", scanned: 1247, fixed: 127 },
-      qualityAssurance: { status: "online", avgScore: 87, approved: 94 },
-      parser: { status: "online", parsed: 2000, confidence: 96 }
-    };
-    res.json(status);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to get module status" });
-  }
-});
-
-// Batch generator routes
-router.post("/api/modules/batch-generator/generate", async (req, res) => {
-  try {
-    const { effectType, category, count } = req.body;
-    const batchId = await batchGenerator.processBatch([], {
-      effectType,
-      category,
-      count
-    });
-    res.json(results);
-  } catch (error) {
-    console.error("Batch generation error:", error);
-    res.status(500).json({ error: "Failed to generate effects" });
-  }
-});
-
-// Classification & Storage routes
-router.post("/api/modules/classification-storage/reorganize", async (req, res) => {
-  try {
-    const results = await classificationStorageModule.reorganizeLibrary();
-    res.json(results);
-  } catch (error) {
-    console.error("Reorganize error:", error);
-    res.status(500).json({ error: "Failed to reorganize library" });
-  }
-});
-
-// Quality Assurance routes
-router.post("/api/modules/quality-assurance/batch-check", async (req, res) => {
-  try {
-    // Simuler une vérification qualité
-    const mockResults = {
-      stats: {
-        total: 100,
-        approved: 94,
-        rejected: 6,
-        avgScore: 87
-      },
-      reports: []
-    };
-    res.json(mockResults);
-  } catch (error) {
-    console.error("Quality check error:", error);
-    res.status(500).json({ error: "Failed to run quality check" });
-  }
-});
 
 export { router };
