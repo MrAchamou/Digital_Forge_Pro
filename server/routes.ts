@@ -114,7 +114,7 @@ router.get('/health/god-status', async (req, res) => {
     res.json(completeStatus);
   } catch (error) {
     console.error('Erreur health check:', error);
-    res.status(500).json({ error: 'Health check failed', details: error.message });
+    res.status(500).json({ error: 'Health check failed', details: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -130,7 +130,7 @@ router.post('/health/force-optimization', async (req, res) => {
       timestamp: new Date()
     });
   } catch (error) {
-    res.status(500).json({ error: 'Optimization failed', details: error.message });
+    res.status(500).json({ error: 'Optimization failed', details: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -139,7 +139,7 @@ router.get('/health/emergency-diagnostic', async (req, res) => {
     const emergencyReport = await godMonitor.performEmergencyDiagnostic();
     res.json(emergencyReport);
   } catch (error) {
-    res.status(500).json({ error: 'Emergency diagnostic failed', details: error.message });
+    res.status(500).json({ error: 'Emergency diagnostic failed', details: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -269,7 +269,7 @@ router.post('/generate', async (req, res) => {
 
     res.status(500).json({
       error: 'Generation failed',
-      details: error.message,
+      details: error instanceof Error ? error.message : String(error),
       requestId,
       autoRepairAttempted: true,
       timestamp: new Date()
@@ -333,7 +333,7 @@ router.post('/upload', upload.array('files'), async (req, res) => {
         results.push({
           fileName: file.originalname,
           success: false,
-          error: fileError.message
+          error: fileError instanceof Error ? fileError.message : String(fileError)
         });
       }
     }
@@ -351,7 +351,7 @@ router.post('/upload', upload.array('files'), async (req, res) => {
     console.error(`Upload processing error:`, error);
     res.status(500).json({
       error: 'Upload processing failed',
-      details: error.message,
+      details: error instanceof Error ? error.message : String(error),
       requestId
     });
   }
@@ -402,7 +402,7 @@ router.post('/system/auto-repair', async (req, res) => {
           issue: issue.type,
           action: 'failed',
           success: false,
-          error: repairError.message
+          error: repairError instanceof Error ? repairError.message : String(repairError)
         });
       }
     }
@@ -428,7 +428,7 @@ router.post('/system/auto-repair', async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Échec de l'auto-réparation",
-      details: error.message,
+      details: error instanceof Error ? error.message : String(error),
       requestId,
       timestamp: new Date()
     });
@@ -485,7 +485,7 @@ router.post('/system/deep-scan', async (req, res) => {
     console.error(`❌ [${requestId}] Erreur scan profond:`, error);
     res.status(500).json({
       error: 'Deep scan failed',
-      details: error.message,
+      details: error instanceof Error ? error.message : String(error),
       requestId
     });
   }
@@ -521,7 +521,7 @@ async function detectSystemIssues() {
           type: 'module_failure',
           severity: 'critical',
           module: moduleName,
-          details: error.message
+          details: error instanceof Error ? error.message : String(error)
         });
       }
     }
@@ -554,7 +554,7 @@ async function detectSystemIssues() {
       issues.push({
         type: 'filesystem_error',
         severity: 'high',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       });
     }
 
@@ -562,7 +562,7 @@ async function detectSystemIssues() {
     issues.push({
       type: 'system_scan_error',
       severity: 'critical',
-      details: error.message
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 
@@ -602,7 +602,7 @@ async function executeAutoRepair(issue, requestId) {
         return { 
           action: 'module_reload_failed', 
           success: false, 
-          details: reloadError.message 
+          details: reloadError instanceof Error ? reloadError.message : String(reloadError) 
         };
       }
 
@@ -637,7 +637,7 @@ async function executeAutoRepair(issue, requestId) {
         return { 
           action: 'cleanup_failed', 
           success: false, 
-          details: cleanupError.message 
+          details: cleanupError instanceof Error ? cleanupError.message : String(cleanupError) 
         };
       }
 
@@ -701,7 +701,7 @@ async function performAutoRepair(error, requestBody, requestId) {
 
   } catch (repairError) {
     console.error(`❌ [${requestId}] Auto-repair failed:`, repairError);
-    return { success: false, reason: repairError.message };
+    return { success: false, reason: repairError instanceof Error ? repairError.message : String(repairError) };
   }
 }
 
@@ -771,7 +771,7 @@ router.post('/system/optimize', async (req, res) => {
       timestamp: new Date()
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 

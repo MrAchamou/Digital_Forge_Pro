@@ -40,12 +40,12 @@ export class DependencyChecker {
     return issues;
   }
 
-  private static async getSolution(command: string): Promise<string> {
-    const solutions = {
-      'tsx': 'npm install tsx --save-dev',
-      'tsc': 'npm install typescript --save-dev',
-      'vite': 'npm install vite --save-dev',
-      'drizzle-kit': 'npm install drizzle-kit --save-dev'
+  private static getSolution(command: string): string {
+    const solutions: Record<string, string> = {
+      'tsx': 'npm install -g tsx',
+      'tsc': 'npm install -g typescript',
+      'vite': 'npm install vite',
+      'drizzle-kit': 'npm install drizzle-kit'
     };
 
     return solutions[command] || `npm install ${command}`;

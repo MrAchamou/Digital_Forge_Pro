@@ -163,3 +163,67 @@ export interface SystemHealth {
     storage: number;
   };
 }
+
+// Need to define Json type if it's not globally available
+// For example, if using `pg-types` or similar for JSON handling:
+// import { type Json } from 'type'; // Adjust import path as necessary
+// For now, assuming `any` or a placeholder if not defined elsewhere
+type Json = any;
+
+// Corrected and expanded interface definitions based on schema and common usage
+
+export interface Effect {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  category: string;
+  platform: string;
+  code: string;
+  parameters: Json;
+  metadata: Json;
+  performance: string;
+  tags: string[];
+  complexity: number;
+  rating: number | null;
+  downloads: number | null;
+  version: string;
+  createdAt: Date | null;
+}
+
+export interface InsertEffect {
+  name: string;
+  description: string;
+  type: string;
+  category: string;
+  platform: string;
+  code: string;
+  parameters: Json;
+  metadata: Json;
+  performance: string;
+  tags: string[];
+  complexity: number;
+  version: string;
+}
+
+export interface Job {
+  id: string;
+  description: string;
+  platform: string;
+  options: Json;
+  status: string;
+  progress: number;
+  result: Json;
+  error: string | null;
+  estimatedTime: number | null;
+  actualTime: number | null;
+  createdAt: Date;
+  completedAt: Date | null;
+}
+
+export interface InsertJob {
+  description: string;
+  platform: string;
+  options: Json;
+  estimatedTime: number | null;
+}
