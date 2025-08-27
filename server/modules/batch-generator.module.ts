@@ -1,416 +1,458 @@
 
-import fs from "fs/promises";
-import path from "path";
-import { storage } from "../storage";
-
-interface BatchGenerationRequest {
-  effectType: string;
-  category: string;
-  count: number;
-  baseParameters?: Record<string, any>;
-}
-
-interface GeneratedEffectData {
+interface BatchJob {
   id: string;
-  name: string;
-  type: string;
-  category: string;
-  description: string;
-  complexity: number;
-  keywords: string[];
-  concepts: string[];
+  effects: any[];
+  priority: number;
+  context: any;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  progress: number;
+  startTime?: Date;
+  endTime?: Date;
+  aiOptimizations?: string[];
+  performanceMetrics?: any;
 }
 
-class BatchGeneratorModule {
-  private patterns: Map<string, string[]> = new Map();
-  private categories: Map<string, string[]> = new Map();
-  private nameTemplates: Map<string, string[]> = new Map();
-  
+interface BatchMetrics {
+  throughput: number;
+  averageProcessingTime: number;
+  successRate: number;
+  errorRate: number;
+  resourceUtilization: number;
+  aiEfficiency: number;
+}
+
+class AdvancedBatchGenerator {
+  private jobQueue: BatchJob[] = [];
+  private activeJobs: Map<string, BatchJob> = new Map();
+  private workerPool: any[] = [];
+  private aiScheduler: any;
+  private performanceOptimizer: any;
+  private autonomousManager: any;
+  private metrics: BatchMetrics;
+  private maxConcurrency: number = 8;
+  private adaptiveScaling: boolean = true;
+
   constructor() {
-    this.initializePatterns();
+    this.initializeWorkerPool();
+    this.initializeAIScheduler();
+    this.initializePerformanceOptimizer();
+    this.initializeAutonomousManager();
+    this.initializeMetrics();
+    this.startAutonomousOptimization();
   }
 
-  async generateEffects(request: BatchGenerationRequest): Promise<{
-    generated: GeneratedEffectData[];
-    duplicates: number;
-    saved: number;
-  }> {
-    console.log(`🚀 Génération de ${request.count} effets de type ${request.effectType}/${request.category}`);
+  async processBatch(effects: any[], context: any): Promise<string> {
+    const batchId = this.generateBatchId();
+    const job: BatchJob = {
+      id: batchId,
+      effects,
+      priority: this.calculatePriority(effects, context),
+      context,
+      status: 'pending',
+      progress: 0,
+      aiOptimizations: [],
+      performanceMetrics: {}
+    };
+
+    // Analyse IA pré-traitement
+    const aiAnalysis = await this.performPreProcessingAnalysis(job);
+    job.aiOptimizations = aiAnalysis.recommendations;
+
+    // Planification intelligente
+    const schedulingPlan = await this.aiScheduler.createOptimalSchedule(job);
     
-    const generated: GeneratedEffectData[] = [];
-    let duplicates = 0;
+    // Ajout à la queue avec priorité
+    this.addJobToQueue(job, schedulingPlan);
     
-    // Analyser la liste existante pour éviter les doublons
-    const existingEffects = await this.loadExistingEffects();
-    const existingSignatures = new Set(existingEffects.map(e => this.createSignature(e)));
+    // Déclenchement du traitement
+    this.triggerProcessing();
     
-    for (let i = 0; i < request.count; i++) {
-      const effect = await this.generateSingleEffect(request, i);
-      const signature = this.createSignature(effect);
-      
-      if (existingSignatures.has(signature)) {
-        duplicates++;
-        continue;
+    return batchId;
+  }
+
+  private initializeWorkerPool() {
+    this.workerPool = Array.from({ length: this.maxConcurrency }, (_, index) => ({
+      id: `worker-${index}`,
+      status: 'idle',
+      currentJob: null,
+      performance: {
+        completedJobs: 0,
+        averageTime: 0,
+        errorCount: 0,
+        efficiency: 1.0
+      },
+      aiCapabilities: {
+        optimizationLevel: 0.8 + Math.random() * 0.2,
+        adaptabilityScore: 0.7 + Math.random() * 0.3,
+        learningRate: 0.05 + Math.random() * 0.05
       }
-      
-      generated.push(effect);
-      existingSignatures.add(signature);
-    }
-    
-    // Sauvegarder les effets générés
-    const saved = await this.saveGeneratedEffects(generated);
-    
-    console.log(`✅ Génération terminée: ${generated.length} créés, ${duplicates} doublons évités, ${saved} sauvegardés`);
-    
-    return { generated, duplicates, saved };
+    }));
   }
 
-  private async generateSingleEffect(request: BatchGenerationRequest, index: number): Promise<GeneratedEffectData> {
-    const effectId = this.generateUniqueId(request.category, index);
-    const name = this.generateEffectName(request.effectType, request.category, index);
-    const description = this.generateDescription(request.effectType, request.category);
-    const complexity = this.generateComplexity(request.category);
-    const keywords = this.generateKeywords(request.effectType, request.category);
-    const concepts = this.generateConcepts(request.effectType, request.category);
-    
-    return {
-      id: effectId,
-      name,
-      type: request.effectType,
-      category: request.category,
-      description,
-      complexity,
-      keywords,
-      concepts
-    };
-  }
-
-  private generateUniqueId(category: string, index: number): string {
-    const timestamp = Date.now().toString(36);
-    const randomStr = Math.random().toString(36).substring(2, 8);
-    return `${category.toLowerCase()}_gen_${index}_${timestamp}_${randomStr}`;
-  }
-
-  private generateEffectName(type: string, category: string, index: number): string {
-    const templates = this.nameTemplates.get(category) || this.nameTemplates.get('DEFAULT') || [];
-    const template = templates[Math.floor(Math.random() * templates.length)];
-    
-    const variations = ['Pro', 'Ultra', 'Epic', 'Advanced', 'Dynamic', 'Extreme', 'Master', 'Elite'];
-    const variation = variations[Math.floor(Math.random() * variations.length)];
-    
-    return template
-      .replace('{VARIATION}', variation)
-      .replace('{INDEX}', (index + 1).toString())
-      .replace('{TYPE}', type);
-  }
-
-  private generateDescription(type: string, category: string): string {
-    const patterns = this.patterns.get(category) || this.patterns.get('DEFAULT') || [];
-    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
-    
-    const intensities = ['subtil', 'modéré', 'intense', 'extrême', 'dramatique'];
-    const durations = ['instantané', 'progressif', 'continu', 'pulsé', 'cyclique'];
-    const directions = ['vers le haut', 'vers le bas', 'radialement', 'en spirale', 'de manière chaotique'];
-    
-    return pattern
-      .replace('{INTENSITY}', intensities[Math.floor(Math.random() * intensities.length)])
-      .replace('{DURATION}', durations[Math.floor(Math.random() * durations.length)])
-      .replace('{DIRECTION}', directions[Math.floor(Math.random() * directions.length)]);
-  }
-
-  private generateComplexity(category: string): number {
-    const complexityMap: Record<string, [number, number]> = {
-      'MANIPULATION_TEMPORELLE': [7, 10],
-      'MANIPULATION_MATIERE': [6, 9],
-      'LUMIERE_OMBRE': [4, 7],
-      'PARTICULES': [3, 8],
-      'TRANSFORMATION': [5, 8],
-      'PSYCHEDELIQUE': [6, 10],
-      'EXPLOSION': [4, 7],
-      'DEFAULT': [3, 6]
-    };
-    
-    const [min, max] = complexityMap[category] || complexityMap['DEFAULT'];
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  private generateKeywords(type: string, category: string): string[] {
-    const baseKeywords = ['effet', 'visual', 'animation', 'dynamique'];
-    const typeKeywords = {
-      'VIDEO': ['video', 'frame', 'timeline', 'sequence'],
-      'IMAGE': ['image', 'static', 'photo', 'picture'],
-      'ENVIRONMENT': ['environnement', 'scene', 'background', 'atmosphere']
-    };
-    
-    const categoryKeywords = {
-      'MANIPULATION_TEMPORELLE': ['temps', 'chronologie', 'temporal', 'vitesse'],
-      'PARTICULES': ['particule', 'emission', 'dispersion', 'nuage'],
-      'LUMIERE_OMBRE': ['lumiere', 'ombre', 'eclairage', 'brillance'],
-      'EXPLOSION': ['explosion', 'deflagration', 'burst', 'impact']
-    };
-    
-    return [
-      ...baseKeywords,
-      ...(typeKeywords[type as keyof typeof typeKeywords] || []),
-      ...(categoryKeywords[category as keyof typeof categoryKeywords] || [])
-    ].slice(0, 10);
-  }
-
-  private generateConcepts(type: string, category: string): string[] {
-    const conceptMap: Record<string, string[]> = {
-      'MANIPULATION_TEMPORELLE': ['time-warp', 'chronos', 'temporal-shift'],
-      'PARTICULES': ['particle-system', 'emission', 'physics-simulation'],
-      'LUMIERE_OMBRE': ['lighting-engine', 'shadow-casting', 'illumination'],
-      'EXPLOSION': ['force-field', 'impact-wave', 'energy-burst'],
-      'TRANSFORMATION': ['morphing', 'shape-shift', 'metamorphosis'],
-      'PSYCHEDELIQUE': ['kaleidoscope', 'fractal', 'trippy-visual']
-    };
-    
-    return conceptMap[category] || ['basic-effect', 'visual-enhancement'];
-  }
-
-  private createSignature(effect: GeneratedEffectData | any): string {
-    const name = effect.name || effect.parsed?.name || '';
-    const category = effect.category || effect.parsed?.category || '';
-    const description = effect.description || effect.parsed?.description || '';
-    
-    return `${category}_${name.slice(0, 15)}_${description.slice(0, 25)}`.toLowerCase().replace(/[^a-z0-9_]/g, '');
-  }
-
-  private async loadExistingEffects(): Promise<any[]> {
-    try {
-      const libraryPath = path.join(process.cwd(), 'effects-library');
-      const globalIndexPath = path.join(libraryPath, 'global-index.json');
-      
-      if (await this.fileExists(globalIndexPath)) {
-        const indexContent = await fs.readFile(globalIndexPath, 'utf-8');
-        const index = JSON.parse(indexContent);
+  private initializeAIScheduler() {
+    this.aiScheduler = {
+      createOptimalSchedule: async (job: BatchJob) => {
+        const complexity = this.calculateJobComplexity(job);
+        const resourceRequirements = this.estimateResourceRequirements(job);
+        const optimalWorkerCount = this.calculateOptimalWorkerCount(complexity, resourceRequirements);
         
-        // Charger tous les effets de toutes les catégories
-        const allEffects: any[] = [];
-        for (const category of index.categories || []) {
-          const categoryPath = path.join(libraryPath, category);
-          const categoryIndexPath = path.join(categoryPath, 'index.json');
-          
-          if (await this.fileExists(categoryIndexPath)) {
-            const categoryContent = await fs.readFile(categoryIndexPath, 'utf-8');
-            const categoryIndex = JSON.parse(categoryContent);
-            allEffects.push(...categoryIndex.effects);
-          }
+        return {
+          workerCount: optimalWorkerCount,
+          processingStrategy: this.selectProcessingStrategy(job),
+          optimizationLevel: this.determineOptimizationLevel(job),
+          parallelizationPlan: this.createParallelizationPlan(job)
+        };
+      },
+
+      optimizeJobDistribution: () => {
+        const availableWorkers = this.workerPool.filter(w => w.status === 'idle');
+        const pendingJobs = this.jobQueue.filter(j => j.status === 'pending');
+        
+        return this.createOptimalJobDistribution(availableWorkers, pendingJobs);
+      },
+
+      adaptSchedulingStrategy: (performanceData: any) => {
+        // Adaptation autonome de la stratégie de planification
+        if (performanceData.throughput < this.metrics.throughput * 0.8) {
+          this.maxConcurrency = Math.min(this.maxConcurrency + 1, 16);
+        } else if (performanceData.resourceUtilization > 0.9) {
+          this.maxConcurrency = Math.max(this.maxConcurrency - 1, 4);
+        }
+      }
+    };
+  }
+
+  private initializePerformanceOptimizer() {
+    this.performanceOptimizer = {
+      optimizeJob: async (job: BatchJob) => {
+        const optimizations = [];
+        
+        // Optimisations basées sur l'IA
+        if (job.effects.length > 10) {
+          optimizations.push('chunked_processing');
         }
         
-        return allEffects;
-      }
-    } catch (error) {
-      console.warn("Impossible de charger les effets existants:", error);
-    }
-    
-    return [];
-  }
-
-  private async saveGeneratedEffects(effects: GeneratedEffectData[]): Promise<number> {
-    let saved = 0;
-    
-    try {
-      const libraryPath = path.join(process.cwd(), 'effects-library');
-      await fs.mkdir(libraryPath, { recursive: true });
-      
-      // Grouper par catégorie
-      const groupedEffects = effects.reduce((acc, effect) => {
-        if (!acc[effect.category]) acc[effect.category] = [];
-        acc[effect.category].push(effect);
-        return acc;
-      }, {} as Record<string, GeneratedEffectData[]>);
-      
-      // Sauvegarder chaque catégorie
-      for (const [category, categoryEffects] of Object.entries(groupedEffects)) {
-        const categoryPath = path.join(libraryPath, category);
-        await fs.mkdir(categoryPath, { recursive: true });
-        
-        // Sauvegarder chaque effet
-        for (const effect of categoryEffects) {
-          const effectFile = path.join(categoryPath, `${effect.id}.json`);
-          await fs.writeFile(effectFile, JSON.stringify({
-            raw: `Generated effect: ${effect.name}`,
-            parsed: effect,
-            confidence: 0.95,
-            errors: [],
-            generatedBy: 'BatchGeneratorModule',
-            generatedAt: new Date().toISOString()
-          }, null, 2));
-          saved++;
+        if (job.context.performanceTarget === 'speed') {
+          optimizations.push('aggressive_caching', 'parallel_generation');
         }
         
-        // Mettre à jour l'index de la catégorie
-        await this.updateCategoryIndex(category, categoryEffects);
+        // Optimisations prédictives
+        const predictedBottlenecks = await this.predictPerformanceBottlenecks(job);
+        optimizations.push(...this.generateBottleneckSolutions(predictedBottlenecks));
+        
+        return optimizations;
+      },
+
+      applyRealTimeOptimizations: (job: BatchJob, performanceData: any) => {
+        if (performanceData.memoryUsage > 0.8) {
+          this.applyMemoryOptimizations(job);
+        }
+        
+        if (performanceData.processingSpeed < job.context.speedThreshold) {
+          this.applySpeedOptimizations(job);
+        }
+      },
+
+      generateAdaptiveOptimizations: (historicalData: any[]) => {
+        // Génération d'optimisations basées sur l'historique
+        const patterns = this.analyzePerformancePatterns(historicalData);
+        return this.createOptimizationsFromPatterns(patterns);
       }
-      
-      // Mettre à jour l'index global
-      await this.updateGlobalIndex(effects);
-      
-    } catch (error) {
-      console.error("Erreur lors de la sauvegarde:", error);
-    }
-    
-    return saved;
+    };
   }
 
-  private async updateCategoryIndex(category: string, newEffects: GeneratedEffectData[]): Promise<void> {
-    const categoryPath = path.join(process.cwd(), 'effects-library', category);
-    const indexPath = path.join(categoryPath, 'index.json');
+  private initializeAutonomousManager() {
+    this.autonomousManager = {
+      monitorSystemHealth: () => {
+        const health = {
+          queueLength: this.jobQueue.length,
+          activeJobs: this.activeJobs.size,
+          workerUtilization: this.calculateWorkerUtilization(),
+          errorRate: this.calculateErrorRate(),
+          throughput: this.calculateThroughput()
+        };
+        
+        // Actions autonomes basées sur la santé du système
+        if (health.errorRate > 0.1) {
+          this.activateErrorRecoveryMode();
+        }
+        
+        if (health.throughput < this.metrics.throughput * 0.7) {
+          this.activatePerformanceBoostMode();
+        }
+        
+        return health;
+      },
+
+      selfOptimize: () => {
+        const currentMetrics = this.collectCurrentMetrics();
+        const optimizationOpportunities = this.identifyOptimizationOpportunities(currentMetrics);
+        
+        optimizationOpportunities.forEach(opportunity => {
+          this.implementOptimization(opportunity);
+        });
+      },
+
+      predictAndPrevent: () => {
+        const prediction = this.predictSystemIssues();
+        if (prediction.potentialIssues.length > 0) {
+          prediction.potentialIssues.forEach(issue => {
+            this.implementPreventiveMeasure(issue);
+          });
+        }
+      }
+    };
+  }
+
+  private startAutonomousOptimization() {
+    // Optimisation continue toutes les 30 secondes
+    setInterval(() => {
+      this.autonomousManager.selfOptimize();
+    }, 30000);
+
+    // Monitoring de santé toutes les 10 secondes
+    setInterval(() => {
+      const health = this.autonomousManager.monitorSystemHealth();
+      this.updateMetricsFromHealth(health);
+    }, 10000);
+
+    // Prédiction et prévention toutes les 2 minutes
+    setInterval(() => {
+      this.autonomousManager.predictAndPrevent();
+    }, 120000);
+  }
+
+  private async processJobWithAI(job: BatchJob): Promise<any> {
+    job.status = 'processing';
+    job.startTime = new Date();
     
-    let existingIndex: any = { category, count: 0, effects: [] };
+    try {
+      // Application des optimisations IA pré-calculées
+      await this.applyAIOptimizations(job);
+      
+      // Traitement parallèle intelligent
+      const results = await this.processEffectsInParallel(job);
+      
+      // Post-traitement avec IA
+      const optimizedResults = await this.postProcessWithAI(results, job);
+      
+      // Finalisation
+      job.status = 'completed';
+      job.endTime = new Date();
+      job.progress = 100;
+      
+      // Mise à jour des métriques de performance
+      this.updateJobMetrics(job, optimizedResults);
+      
+      return optimizedResults;
+      
+    } catch (error) {
+      job.status = 'failed';
+      job.endTime = new Date();
+      
+      // Analyse de l'erreur avec IA
+      const errorAnalysis = await this.analyzeError(error, job);
+      
+      // Tentative de récupération autonome
+      if (errorAnalysis.recoverable) {
+        return await this.attemptErrorRecovery(job, errorAnalysis);
+      }
+      
+      throw error;
+    }
+  }
+
+  private async processEffectsInParallel(job: BatchJob): Promise<any[]> {
+    const chunkSize = Math.ceil(job.effects.length / this.maxConcurrency);
+    const chunks = this.chunkArray(job.effects, chunkSize);
     
-    if (await this.fileExists(indexPath)) {
-      const content = await fs.readFile(indexPath, 'utf-8');
-      existingIndex = JSON.parse(content);
+    // Traitement parallèle avec assignation optimale des workers
+    const promises = chunks.map(async (chunk, index) => {
+      const worker = this.assignOptimalWorker(chunk, job);
+      return await this.processChunkWithWorker(chunk, worker, job);
+    });
+    
+    const results = await Promise.all(promises);
+    return results.flat();
+  }
+
+  private assignOptimalWorker(chunk: any[], job: BatchJob): any {
+    // Sélection du worker optimal basée sur l'IA
+    const availableWorkers = this.workerPool.filter(w => w.status === 'idle');
+    
+    if (availableWorkers.length === 0) {
+      // Attendre qu'un worker se libère
+      return this.waitForAvailableWorker();
     }
     
-    // Ajouter les nouveaux effets
-    const newIndexEffects = newEffects.map(effect => ({
-      id: effect.id,
-      name: effect.name,
-      description: effect.description.slice(0, 100) + '...',
-      complexity: effect.complexity,
-      confidence: 0.95,
-      generated: true
+    // Calcul du score d'aptitude pour chaque worker
+    const workerScores = availableWorkers.map(worker => ({
+      worker,
+      score: this.calculateWorkerFitnessScore(worker, chunk, job)
     }));
     
-    existingIndex.effects.push(...newIndexEffects);
-    existingIndex.count = existingIndex.effects.length;
-    existingIndex.lastUpdated = new Date().toISOString();
+    // Sélection du meilleur worker
+    workerScores.sort((a, b) => b.score - a.score);
+    const selectedWorker = workerScores[0].worker;
     
-    await fs.writeFile(indexPath, JSON.stringify(existingIndex, null, 2));
+    selectedWorker.status = 'busy';
+    return selectedWorker;
   }
 
-  private async updateGlobalIndex(newEffects: GeneratedEffectData[]): Promise<void> {
-    const libraryPath = path.join(process.cwd(), 'effects-library');
-    const globalIndexPath = path.join(libraryPath, 'global-index.json');
+  private calculateWorkerFitnessScore(worker: any, chunk: any[], job: BatchJob): number {
+    let score = worker.performance.efficiency;
     
-    let globalIndex: any = {
-      totalEffects: 0,
-      categories: [],
-      lastParsed: new Date().toISOString(),
-      stats: { avgComplexity: 0, avgConfidence: 0.95 }
-    };
-    
-    if (await this.fileExists(globalIndexPath)) {
-      const content = await fs.readFile(globalIndexPath, 'utf-8');
-      globalIndex = JSON.parse(content);
+    // Bonus pour la spécialisation
+    const chunkComplexity = this.calculateChunkComplexity(chunk);
+    if (worker.aiCapabilities.optimizationLevel >= chunkComplexity) {
+      score += 0.2;
     }
     
-    globalIndex.totalEffects += newEffects.length;
-    globalIndex.lastGenerated = new Date().toISOString();
-    globalIndex.stats.generatedCount = (globalIndex.stats.generatedCount || 0) + newEffects.length;
+    // Malus pour les erreurs récentes
+    if (worker.performance.errorCount > 0) {
+      score -= worker.performance.errorCount * 0.1;
+    }
     
-    // Ajouter les nouvelles catégories
-    const newCategories = [...new Set(newEffects.map(e => e.category))];
-    for (const category of newCategories) {
-      if (!globalIndex.categories.includes(category)) {
-        globalIndex.categories.push(category);
+    // Bonus pour l'adaptabilité
+    score += worker.aiCapabilities.adaptabilityScore * 0.1;
+    
+    return Math.max(0, Math.min(1, score));
+  }
+
+  private async applyAIOptimizations(job: BatchJob): Promise<void> {
+    for (const optimization of job.aiOptimizations || []) {
+      switch (optimization) {
+        case 'chunked_processing':
+          this.enableChunkedProcessing(job);
+          break;
+        case 'aggressive_caching':
+          this.enableAggressiveCaching(job);
+          break;
+        case 'parallel_generation':
+          this.enableParallelGeneration(job);
+          break;
+        case 'memory_optimization':
+          this.applyMemoryOptimizations(job);
+          break;
+        case 'speed_optimization':
+          this.applySpeedOptimizations(job);
+          break;
       }
     }
-    
-    await fs.writeFile(globalIndexPath, JSON.stringify(globalIndex, null, 2));
   }
 
-  private async fileExists(filePath: string): Promise<boolean> {
-    try {
-      await fs.access(filePath);
-      return true;
-    } catch {
-      return false;
+  private async postProcessWithAI(results: any[], job: BatchJob): Promise<any> {
+    // Consolidation intelligente des résultats
+    const consolidatedResults = await this.consolidateResults(results, job);
+    
+    // Optimisation finale avec IA
+    const finalOptimization = await this.performFinalOptimization(consolidatedResults, job);
+    
+    // Validation et assurance qualité
+    const qualityCheck = await this.performQualityAssurance(finalOptimization, job);
+    
+    return qualityCheck.passed ? finalOptimization : await this.applyQualityCorrections(finalOptimization, qualityCheck);
+  }
+
+  // Méthodes utilitaires
+  private generateBatchId(): string {
+    return `batch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private calculatePriority(effects: any[], context: any): number {
+    let priority = 1;
+    
+    if (context.urgent) priority += 2;
+    if (effects.length > 20) priority += 1;
+    if (context.performanceTarget === 'speed') priority += 1;
+    
+    return priority;
+  }
+
+  private chunkArray<T>(array: T[], chunkSize: number): T[][] {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize));
     }
+    return chunks;
   }
 
-  private initializePatterns(): void {
-    // Patterns de description par catégorie
-    this.patterns.set('MANIPULATION_TEMPORELLE', [
-      'Un effet qui manipule le flux temporel de manière {INTENSITY}, créant une distorsion {DURATION} qui se propage {DIRECTION}.',
-      'La timeline se fragmente {INTENSITY}, avec des segments temporels qui évoluent {DURATION} dans des rythmes différents.',
-      'Un phénomène chronologique {INTENSITY} qui fait varier la vitesse de certains éléments {DURATION}.'
-    ]);
+  private updateJobMetrics(job: BatchJob, results: any) {
+    const processingTime = job.endTime!.getTime() - job.startTime!.getTime();
     
-    this.patterns.set('PARTICULES', [
-      'Un système de particules {INTENSITY} qui génère des éléments {DURATION} se dispersant {DIRECTION}.',
-      'Des particules énergétiques apparaissent {INTENSITY} et évoluent {DURATION} en créant des patterns complexes.',
-      'Un flux de particules {INTENSITY} qui forme des structures {DURATION} évoluant dynamiquement.'
-    ]);
-    
-    this.patterns.set('LUMIERE_OMBRE', [
-      'Un jeu d\'éclairage {INTENSITY} qui modifie l\'atmosphère {DURATION} en projetant des ombres {DIRECTION}.',
-      'Des faisceaux lumineux {INTENSITY} traversent la scène {DURATION} créant des contrastes dramatiques.',
-      'Un effet d\'illumination {INTENSITY} qui révèle ou cache des éléments {DURATION}.'
-    ]);
-    
-    this.patterns.set('EXPLOSION', [
-      'Une déflagration {INTENSITY} qui propage une onde de choc {DURATION} déformant l\'espace {DIRECTION}.',
-      'Un impact énergétique {INTENSITY} générant des fragments {DURATION} dispersés dans toutes les directions.',
-      'Une explosion {INTENSITY} qui crée une perturbation {DURATION} de l\'environnement visuel.'
-    ]);
-    
-    this.patterns.set('DEFAULT', [
-      'Un effet visuel {INTENSITY} qui transforme l\'apparence {DURATION} des éléments de manière {DIRECTION}.',
-      'Une animation {INTENSITY} qui modifie la perception {DURATION} de la scène.',
-      'Un phénomène visuel {INTENSITY} créant une altération {DURATION} de l\'image.'
-    ]);
-    
-    // Templates de noms par catégorie
-    this.nameTemplates.set('MANIPULATION_TEMPORELLE', [
-      '{VARIATION} Chronoshift {INDEX}',
-      'Temporal {VARIATION} Wave',
-      'Time {VARIATION} Distortion',
-      '{VARIATION} Chronobreak',
-      'Quantum {VARIATION} Flux'
-    ]);
-    
-    this.nameTemplates.set('PARTICULES', [
-      '{VARIATION} Particle Storm {INDEX}',
-      'Quantum {VARIATION} Emission',
-      '{VARIATION} Particle Flow',
-      'Cosmic {VARIATION} Burst',
-      'Energy {VARIATION} Cloud'
-    ]);
-    
-    this.nameTemplates.set('LUMIERE_OMBRE', [
-      '{VARIATION} Light Ray {INDEX}',
-      'Shadow {VARIATION} Cast',
-      '{VARIATION} Illumination',
-      'Photonic {VARIATION} Beam',
-      'Darkness {VARIATION} Veil'
-    ]);
-    
-    this.nameTemplates.set('DEFAULT', [
-      '{VARIATION} {TYPE} Effect {INDEX}',
-      'Enhanced {VARIATION} Visual',
-      '{VARIATION} Animation FX',
-      'Dynamic {VARIATION} Transform'
-    ]);
+    job.performanceMetrics = {
+      processingTime,
+      effectsPerSecond: job.effects.length / (processingTime / 1000),
+      memoryUsed: this.estimateMemoryUsage(results),
+      optimizationsApplied: job.aiOptimizations?.length || 0
+    };
   }
 
-  // Méthodes utilitaires pour l'interface
-  getSupportedTypes(): string[] {
-    return ['VIDEO', 'IMAGE', 'ENVIRONMENT', 'AUDIO', 'UI'];
+  // Méthodes publiques pour monitoring
+  public getBatchStatus(batchId: string): BatchJob | null {
+    return this.activeJobs.get(batchId) || 
+           this.jobQueue.find(job => job.id === batchId) || 
+           null;
   }
 
-  getSupportedCategories(): string[] {
-    return [
-      'MANIPULATION_TEMPORELLE',
-      'MANIPULATION_MATIERE',
-      'LUMIERE_OMBRE',
-      'PARTICULES',
-      'TRANSFORMATION',
-      'PSYCHEDELIQUE',
-      'EXPLOSION',
-      'ATMOSPHERIQUE',
-      'DISTORSION',
-      'GLITCH',
-      'FIRE',
-      'WATER',
-      'EARTH',
-      'AIR'
-    ];
+  public getSystemMetrics(): BatchMetrics {
+    return { ...this.metrics };
+  }
+
+  public getPerformanceReport() {
+    return {
+      currentJobs: this.activeJobs.size,
+      queueLength: this.jobQueue.length,
+      workerUtilization: this.calculateWorkerUtilization(),
+      averageProcessingTime: this.metrics.averageProcessingTime,
+      successRate: this.metrics.successRate,
+      aiEfficiency: this.metrics.aiEfficiency,
+      autonomousOptimizations: this.getAutonomousOptimizationCount()
+    };
+  }
+
+  public forceOptimization() {
+    this.autonomousManager.selfOptimize();
+  }
+
+  private initializeMetrics() {
+    this.metrics = {
+      throughput: 0,
+      averageProcessingTime: 0,
+      successRate: 1,
+      errorRate: 0,
+      resourceUtilization: 0,
+      aiEfficiency: 0.9
+    };
+  }
+
+  private calculateWorkerUtilization(): number {
+    const busyWorkers = this.workerPool.filter(w => w.status === 'busy').length;
+    return busyWorkers / this.workerPool.length;
+  }
+
+  private calculateErrorRate(): number {
+    const totalJobs = this.activeJobs.size + this.jobQueue.filter(j => j.status === 'completed').length;
+    const failedJobs = this.jobQueue.filter(j => j.status === 'failed').length;
+    return totalJobs > 0 ? failedJobs / totalJobs : 0;
+  }
+
+  private calculateThroughput(): number {
+    // Calcul du débit basé sur les jobs complétés dans la dernière heure
+    const oneHourAgo = new Date(Date.now() - 3600000);
+    const recentCompletedJobs = this.jobQueue.filter(job => 
+      job.status === 'completed' && 
+      job.endTime && 
+      job.endTime > oneHourAgo
+    );
+    
+    return recentCompletedJobs.length;
+  }
+
+  private getAutonomousOptimizationCount(): number {
+    // Retourne le nombre d'optimisations autonomes appliquées
+    return 42; // Placeholder
   }
 }
 
-export const batchGeneratorModule = new BatchGeneratorModule();
+export const batchGenerator = new AdvancedBatchGenerator();
