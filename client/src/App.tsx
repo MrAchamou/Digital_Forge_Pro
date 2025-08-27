@@ -4,13 +4,14 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
+import Upload from './pages/upload';
+import Preview from './pages/preview';
+import Status from './pages/status';
+import Expansion from './pages/expansion';
+import NotFound from './pages/not-found';
 import Dashboard from "@/pages/dashboard";
-import Upload from "@/pages/upload";
 import Generator from "@/pages/generator";
 import Library from "@/pages/library";
-import Preview from "@/pages/preview";
-import Status from "@/pages/status";
 import Modules from "@/pages/modules";
 import Navigation from "@/components/ui/navigation";
 import ParticleBackground from "@/components/ui/particle-background";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/preview" component={Preview} />
       <Route path="/status" component={Status} />
       <Route path="/modules" component={Modules} />
+      <Route path="/expansion" element={<Expansion />} />
       <Route component={NotFound} />
     </Switch>
   );

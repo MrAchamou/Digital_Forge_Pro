@@ -8,7 +8,8 @@ import {
   Database, 
   Eye, 
   BarChart3,
-  Settings
+  Settings,
+  Brain
 } from "lucide-react";
 
 const navItems = [
@@ -19,6 +20,7 @@ const navItems = [
   { path: "/preview", label: "Preview", icon: Eye, shortLabel: "View" },
   { path: "/status", label: "Status", icon: BarChart3, shortLabel: "Stats" },
   { path: "/modules", label: "Modules", icon: Settings, shortLabel: "Mods" },
+  { path: "/expansion", label: "AI Expansion", icon: Brain, shortLabel: "AI" },
 ];
 
 export default function Navigation() {

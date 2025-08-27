@@ -193,6 +193,79 @@ router.get("/library/structure", async (req, res) => {
   }
 });
 
+// Routes pour le module d'expansion
+router.get("/expansion/categories", async (req, res) => {
+  try {
+    const { libraryExpansionModule } = await import("./modules/library-expansion.module");
+    const categories = await libraryExpansionModule.getAvailableCategories();
+    res.json({ success: true, categories });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur récupération catégories" });
+  }
+});
+
+router.get("/expansion/types", async (req, res) => {
+  try {
+    const { libraryExpansionModule } = await import("./modules/library-expansion.module");
+    const types = await libraryExpansionModule.getAvailableTypes();
+    res.json({ success: true, types });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur récupération types" });
+  }
+});
+
+router.get("/expansion/library-stats", async (req, res) => {
+  try {
+    const { libraryExpansionModule } = await import("./modules/library-expansion.module");
+    const analysis = await libraryExpansionModule.analyzeLibrary();
+    res.json(analysis);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur récupération statistiques" });
+  }
+});
+
+router.get("/expansion/category-stats/:category", async (req, res) => {
+  try {
+    const { category } = req.params;
+    const { libraryExpansionModule } = await import("./modules/library-expansion.module");
+    const stats = await libraryExpansionModule.getCategoryStats(category);
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur récupération stats catégorie" });
+  }
+});
+
+router.post("/expansion/analyze-library", async (req, res) => {
+  try {
+    const { libraryExpansionModule } = await import("./modules/library-expansion.module");
+    const analysis = await libraryExpansionModule.analyzeLibrary();
+    res.json({ success: true, analysis });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur analyse bibliothèque" });
+  }
+});
+
+router.post("/expansion/expand", async (req, res) => {
+  try {
+    const { targetCategory, targetType, descriptionCount, creativeLevel, avoidDuplicates } = req.body;
+    
+    const { libraryExpansionModule } = await import("./modules/library-expansion.module");
+    
+    const result = await libraryExpansionModule.expandLibrary({
+      targetCategory,
+      targetType,
+      descriptionCount: parseInt(descriptionCount) || 5,
+      creativeLevel: creativeLevel || 'moderate',
+      avoidDuplicates: avoidDuplicates !== false
+    });
+    
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error("Erreur expansion:", error);
+    res.status(500).json({ error: "Erreur lors de l'expansion" });
+  }
+});
+
 // Recherche dans la bibliothèque
 router.get("/library/search", async (req, res) => {
   try {
