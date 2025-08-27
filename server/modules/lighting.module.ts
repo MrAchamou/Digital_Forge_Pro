@@ -472,3 +472,4 @@ export { AdvancedThreeLighting };
 }
 
 export const lighting = new AdvancedLightingSystem();
+export const lightingModule = lighting;
