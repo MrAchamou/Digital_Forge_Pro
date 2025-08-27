@@ -204,7 +204,51 @@ class AdvancedEffectSystem {
     return optimizedCode;
   }
 
-  private async enhanceRobustness(code: string, context: GenerationContext): Promise<string> {
+  public async generateAdvancedCode(concepts: any[], modules: any[], context?: any): Promise<string> {
+    const generationContext = {
+      robustness: context?.robustness || 'high',
+      optimization: context?.optimization || 'standard',
+      errorHandling: context?.errorHandling || 'basic',
+      monitoring: context?.monitoring || 'standard',
+      selfHealing: context?.selfHealing || false,
+      requestId: context?.requestId || 'unknown'
+    };
+
+    console.log(`⚡ [${generationContext.requestId}] Starting advanced code generation...`);
+
+    let baseCode = await this.generateCode(concepts, modules, generationContext);
+    
+    if (generationContext.robustness === 'maximum') {
+      baseCode = await this.enhanceRobustness(baseCode, generationContext);
+    }
+    
+    if (generationContext.selfHealing) {
+      baseCode = await this.addSelfHealingCapabilities(baseCode, generationContext);
+    }
+
+    return baseCode;
+  }
+
+  public async autoImproveCode(code: string, qualityReport: any): Promise<string> {
+    let improvedCode = code;
+
+    // Amélioration basée sur le rapport de qualité
+    if (qualityReport.metrics.codeComplexity < 70) {
+      improvedCode = await this.reduceComplexity(improvedCode);
+    }
+
+    if (qualityReport.metrics.readabilityScore < 80) {
+      improvedCode = await this.improveReadability(improvedCode);
+    }
+
+    if (qualityReport.metrics.performanceScore < 85) {
+      improvedCode = await this.optimizePerformance(improvedCode);
+    }
+
+    return improvedCode;
+  }
+
+  private async enhanceRobustness(code: string, context: any): Promise<string> {
     let robustCode = code;
     
     // Ajout de la gestion d'erreurs avancée
@@ -246,6 +290,98 @@ class AdvancedEffectSystem {
     // Ajout des mécanismes d'auto-réparation
     robustCode += this.generateSelfHealingMechanisms(context);
     
+    return robustCode;
+  }
+
+  private async addSelfHealingCapabilities(code: string, context: any): Promise<string> {
+    return code + `
+  // === SELF-HEALING CAPABILITIES ===
+  initializeSelfHealing() {
+    this.selfHealingActive = true;
+    this.healthCheckInterval = setInterval(() => {
+      this.performHealthCheck();
+    }, 10000);
+  }
+
+  performHealthCheck() {
+    const health = this.assessSystemHealth();
+    if (health.critical) {
+      this.executeCriticalRepair(health.issues);
+    }
+  }
+
+  executeCriticalRepair(issues) {
+    issues.forEach(issue => {
+      const repairStrategy = this.selectRepairStrategy(issue);
+      this.executeRepair(repairStrategy);
+    });
+  }
+`;
+  }
+
+  private async reduceComplexity(code: string): Promise<string> {
+    // Simplification du code complexe
+    return code.replace(/if\s*\([^)]+\)\s*{\s*if\s*\([^)]+\)/g, (match) => {
+      return match.replace(/{\s*if/, '&& (');
+    });
+  }
+
+  private async improveReadability(code: string): Promise<string> {
+    // Amélioration de la lisibilité
+    let readable = code;
+    
+    // Ajout de commentaires explicatifs
+    readable = readable.replace(/function\s+(\w+)/g, '// $1 function\n  function $1');
+    
+    // Amélioration de l'indentation
+    readable = readable.replace(/}\s*else\s*{/g, '} else {');
+    
+    return readable;
+  }
+
+  private async optimizePerformance(code: string): Promise<string> {
+    // Optimisation des performances
+    let optimized = code;
+    
+    // Cache des calculs coûteux
+    optimized = optimized.replace(
+      /(\w+)\s*=\s*Math\.(\w+)\([^)]+\)/g,
+      'if (!this._mathCache) this._mathCache = {};\n  if (!this._mathCache["$1"]) this._mathCache["$1"] = Math.$2($3);\n  $1 = this._mathCache["$1"]'
+    );
+    
+    return optimized;
+  }
+
+  private generateAutonomousMonitoring(context: any): string {
+    return `
+  // === AUTONOMOUS MONITORING ===
+  initializeMonitoring() {
+    this.monitoringActive = true;
+    this.performanceMetrics = new Map();
+    this.startMetricsCollection();
+  }
+
+  startMetricsCollection() {
+    setInterval(() => {
+      this.collectPerformanceMetrics();
+    }, 5000);
+  }
+
+  collectPerformanceMetrics() {
+    const metrics = {
+      fps: this.getCurrentFPS(),
+      memory: this.getMemoryUsage(),
+      renderTime: this.getRenderTime(),
+      timestamp: Date.now()
+    };
+    
+    this.performanceMetrics.set(Date.now(), metrics);
+    this.analyzePerformanceTrends();
+  }
+`;
+  }
+
+  private generateSelfHealingMechanisms(context: any): string {
     return robustCode;
   }
 

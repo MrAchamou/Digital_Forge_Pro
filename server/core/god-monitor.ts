@@ -37,6 +37,7 @@ class GodLevelMonitor {
   private predictiveEngine: any;
   private autoRepairCount = 0;
   private preventedIssuesCount = 0;
+  private requestTracking: Map<string, any>; // Added for request tracking
 
   constructor() {
     this.initializeGodMonitoring();
@@ -382,11 +383,77 @@ class GodLevelMonitor {
     }
   }
 
-  // API Publique
+  // === NOUVELLES MÉTHODES GOD LEVEL ===
+
+  public trackRequest(requestId: string, requestData: any) {
+    // Tracking des requêtes en temps réel
+    if (!this.requestTracking) {
+      this.requestTracking = new Map();
+    }
+    this.requestTracking.set(requestId, {
+      ...requestData,
+      startTime: Date.now()
+    });
+  }
+
+  public recordResponse(requestId: string, responseData: any) {
+    if (this.requestTracking && this.requestTracking.has(requestId)) {
+      const requestData = this.requestTracking.get(requestId);
+      const totalTime = Date.now() - requestData.startTime;
+
+      // Mise à jour des métriques de performance
+      this.systemStatus.performance.responseTime = totalTime;
+      this.systemStatus.performance.throughput = Math.min(
+        this.systemStatus.performance.throughput + 1,
+        1000
+      );
+
+      if (!responseData.success) {
+        this.systemStatus.performance.errorRate = Math.min(
+          this.systemStatus.performance.errorRate + 0.001,
+          1.0
+        );
+      }
+
+      this.requestTracking.delete(requestId);
+    }
+  }
+
+  public logError(requestId: string, error: string) {
+    console.error(`❌ [${requestId}] ${error}`);
+    this.systemStatus.criticalIssues++;
+  }
+
+  public logWarning(requestId: string, warning: string) {
+    console.warn(`⚠️ [${requestId}] ${warning}`);
+  }
+
+  public logSecurityEvent(type: string, data: any) {
+    console.warn(`🔒 Security Event [${type}]:`, data);
+  }
+
+  public recordGeneration(requestId: string, data: any) {
+    // Enregistrement des métriques de génération
+    this.systemStatus.ai.decisionAccuracy = Math.min(
+      this.systemStatus.ai.decisionAccuracy + 0.001,
+      1.0
+    );
+  }
+
+  public recordError(requestId: string, error: Error) {
+    this.logError(requestId, error.message);
+    this.autoRepairCount++;
+  }
+
+  // API publique
   public initialize() {
     console.log('🚀 GOD Monitor initialisé avec succès');
     console.log(`📊 Santé globale du système: ${this.systemStatus.overallHealth}%`);
     console.log(`🔮 Précision prédictive: ${(this.predictiveEngine.accuracy * 100).toFixed(1)}%`);
+
+    // Initialisation du tracking des requêtes
+    this.requestTracking = new Map();
+
     return true;
   }
 

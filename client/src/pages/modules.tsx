@@ -20,15 +20,52 @@ import {
   RefreshCw,
   Download,
   Upload,
-  Zap
+  Zap,
+  Cpu, 
+  Activity, 
+  Brain, 
+  Gauge, 
+  Wrench
 } from "lucide-react";
 
-export default function Modules() {
+// Import du hook de système (assurez-vous que le chemin est correct)
+// import { useSystemStatus } from '../hooks/use-system-status'; // Ceci est un exemple, ajustez si nécessaire
+
+// Mock du hook useSystemStatus s'il n'est pas disponible dans cet environnement
+const useSystemStatus = () => {
+  // Simuler un état de système pour que le code soit exécutable
+  return {
+    status: {
+      modules: [
+        { id: 'classification-storage', name: 'Classification & Storage', status: 'online', errors: 0, uptime: '99.9%' },
+        { id: 'error-detection', name: 'Error Detection', status: 'active', errors: 1, uptime: '99.5%' },
+        { id: 'quality-assurance', name: 'Quality Assurance', status: 'active', errors: 0, uptime: '99.8%' },
+        { id: 'parser', name: 'Parser', status: 'online', errors: 0, uptime: '99.9%' },
+      ],
+      cpuUsage: 65,
+      memoryUsage: 45,
+      networkTraffic: 100,
+      autoCorrections: 127,
+      detectedErrors: 3,
+    },
+    loading: false,
+    error: null,
+    forceOptimization: () => console.log("Forcing optimization..."),
+    triggerAutoRepair: () => console.log("Triggering auto-repair...")
+  };
+};
+
+
+export default function ModulesPage() {
   const { toast } = useToast();
   const [selectedType, setSelectedType] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [effectCount, setEffectCount] = useState("10");
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Utilisation du hook pour obtenir le statut du système et les nouvelles fonctionnalités
+  const { status: systemStatus, loading, error, forceOptimization, triggerAutoRepair } = useSystemStatus();
+
 
   // Query pour obtenir le statut des modules
   const { data: moduleStatus } = useQuery({
@@ -111,6 +148,12 @@ export default function Modules() {
     });
   };
 
+  // Trouver les statuts spécifiques des modules à partir de systemStatus
+  const classificationStatus = systemStatus?.modules?.find(m => m.id === 'classification-storage');
+  const errorDetectionStatus = systemStatus?.modules?.find(m => m.id === 'error-detection');
+  const qualityAssuranceStatus = systemStatus?.modules?.find(m => m.id === 'quality-assurance');
+  const parserStatus = systemStatus?.modules?.find(m => m.id === 'parser');
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Header */}
@@ -122,6 +165,43 @@ export default function Modules() {
           Contrôlez et configurez vos modules IA autonomes
         </p>
       </div>
+
+      {/* System Status Overview */}
+      <Card className="glass-morphism border-forge-purple/30 bg-transparent">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-forge-electric flex items-center gap-3">
+            <Gauge className="w-8 h-8" />
+            System Status Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">CPU Usage</p>
+              <p className="text-2xl font-bold text-forge-electric">{systemStatus?.cpuUsage || 0}%</p>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">Memory Usage</p>
+              <p className="text-2xl font-bold text-forge-electric">{systemStatus?.memoryUsage || 0}%</p>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">Network Traffic</p>
+              <p className="text-2xl font-bold text-forge-electric">{systemStatus?.networkTraffic || 0} Mbps</p>
+            </div>
+          </div>
+          <div className="mt-6 flex justify-center gap-4">
+            <Button onClick={forceOptimization} className="bg-gradient-to-r from-forge-electric to-forge-cyan hover:opacity-80">
+              <Wrench className="w-4 h-4 mr-2" />
+              Force Optimization
+            </Button>
+            <Button onClick={triggerAutoRepair} className="bg-gradient-to-r from-forge-purple to-forge-plasma hover:opacity-80">
+              <Shield className="w-4 h-4 mr-2" />
+              Trigger Auto-Repair
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
 
       {/* Library Initialization */}
       <div className="mb-8 p-6 bg-gray-800/50 rounded-lg border border-gray-700">
@@ -251,13 +331,13 @@ export default function Modules() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Statut:</span>
-                <Badge className="bg-green-500">Online</Badge>
+                <Badge className={classificationStatus?.status === 'online' ? "bg-green-500" : "bg-red-500"}>{classificationStatus?.status || 'offline'}</Badge>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Effets classés:</span>
-                <span className="text-forge-cyan">1,247</span>
+                <span className="text-forge-cyan">1,247</span> {/* Ce nombre devrait idéalement venir du système */}
               </div>
-              <Progress value={85} className="h-2" />
+              <Progress value={85} className="h-2" /> {/* Valeur de progression à déterminer */}
             </div>
             <Button
               onClick={() => reorganizeLibraryMutation.mutate()}
@@ -289,15 +369,15 @@ export default function Modules() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>IA locale:</span>
-                <Badge className="bg-green-500">Active</Badge>
+                <Badge className={errorDetectionStatus?.status === 'active' ? "bg-green-500" : "bg-red-500"}>{errorDetectionStatus?.status || 'inactive'}</Badge>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Erreurs détectées:</span>
-                <span className="text-red-400">3</span>
+                <span className="text-red-400">{systemStatus?.detectedErrors || 0}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Auto-corrections:</span>
-                <span className="text-green-400">127</span>
+                <span className="text-green-400">{systemStatus?.autoCorrections || 0}</span>
               </div>
             </div>
             <Button size="sm" className="w-full bg-forge-plasma hover:bg-forge-plasma/80">
@@ -319,11 +399,11 @@ export default function Modules() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Score moyen:</span>
-                <span className="text-forge-electric">87/100</span>
+                <span className="text-forge-electric">87/100</span> {/* À synchroniser avec les données réelles */}
               </div>
               <div className="flex justify-between text-sm">
                 <span>Approuvés:</span>
-                <span className="text-green-400">94%</span>
+                <span className="text-green-400">94%</span> {/* À synchroniser avec les données réelles */}
               </div>
               <Progress value={94} className="h-2" />
             </div>
@@ -357,11 +437,11 @@ export default function Modules() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Effets parsés:</span>
-                <span className="text-forge-cyan">2,000</span>
+                <span className="text-forge-cyan">2,000</span> {/* À synchroniser avec les données réelles */}
               </div>
               <div className="flex justify-between text-sm">
                 <span>Confiance moy.:</span>
-                <span className="text-green-400">96%</span>
+                <span className="text-green-400">96%</span> {/* À synchroniser avec les données réelles */}
               </div>
               <Progress value={100} className="h-2" />
             </div>
