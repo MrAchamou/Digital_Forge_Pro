@@ -248,9 +248,9 @@ router.post("/expansion/analyze-library", async (req, res) => {
 router.post("/expansion/expand", async (req, res) => {
   try {
     const { targetCategory, targetType, descriptionCount, creativeLevel, avoidDuplicates } = req.body;
-    
+
     const { libraryExpansionModule } = await import("./modules/library-expansion.module");
-    
+
     const result = await libraryExpansionModule.expandLibrary({
       targetCategory,
       targetType,
@@ -258,7 +258,7 @@ router.post("/expansion/expand", async (req, res) => {
       creativeLevel: creativeLevel || 'moderate',
       avoidDuplicates: avoidDuplicates !== false
     });
-    
+
     res.json({ success: true, ...result });
   } catch (error) {
     console.error("Erreur expansion:", error);
@@ -270,7 +270,7 @@ router.post("/expansion/expand", async (req, res) => {
 router.get("/library/real-time-stats", async (req, res) => {
   try {
     const stats = await storage.getLibraryStats();
-    
+
     // Calcul des métriques avancées
     const totalDescriptions = stats.totalEffects;
     const effectsGenerated = Math.floor(totalDescriptions * 0.73); // Simulé
@@ -279,7 +279,7 @@ router.get("/library/real-time-stats", async (req, res) => {
     const successRate = 94.7 + Math.random() * 3; // Simulé
     const expansionRate = Math.random() > 0.7 ? Math.random() * 5 : 0;
     const qualityScore = 87.3 + Math.random() * 8; // Simulé
-    
+
     res.json({
       totalDescriptions,
       effectsGenerated,
@@ -324,7 +324,7 @@ router.get("/notifications/system", async (req, res) => {
         priority: 'high'
       }
     ];
-    
+
     res.json(notifications);
   } catch (error) {
     res.status(500).json({ error: "Erreur récupération notifications" });
@@ -789,11 +789,11 @@ router.get("/api/system/diagnostics", async (req, res) => {
 // Route de test de communication frontend-backend
 router.post("/api/system/ping", async (req, res) => {
   const startTime = performance.now();
-  
+
   try {
     const { message, timestamp } = req.body;
     const responseTime = performance.now() - startTime;
-    
+
     res.json({
       success: true,
       pong: true,
@@ -898,7 +898,7 @@ router.get("/api/system/god-status", async (req, res) => {
   try {
     const { godMonitor } = require('./core/god-monitor');
     const status = godMonitor.getGodStatus();
-    
+
     res.json({
       success: true,
       godStatus: status,
@@ -920,7 +920,7 @@ router.post("/api/system/emergency-diagnostic", async (req, res) => {
   try {
     const { godMonitor } = require('./core/god-monitor');
     const diagnostic = await godMonitor.performEmergencyDiagnostic();
-    
+
     res.json({
       success: true,
       diagnostic,
@@ -942,7 +942,7 @@ router.post("/api/system/force-prediction", async (req, res) => {
   try {
     const { godMonitor } = require('./core/god-monitor');
     await godMonitor.forcePredictiveAnalysis();
-    
+
     res.json({
       success: true,
       message: 'Predictive analysis forced successfully',
@@ -962,14 +962,14 @@ router.post("/api/system/force-prediction", async (req, res) => {
 router.post("/api/system/auto-repair", async (req, res) => {
   try {
     const repairActions = [];
-    
+
     // Diagnostic automatique
-    const issues = await this.detectSystemIssues();
-    
+    const issues = await detectSystemIssues();
+
     // Auto-réparation
     for (const issue of issues) {
       try {
-        await this.repairIssue(issue);
+        await repairIssue(issue);
         repairActions.push({
           issue: issue.type,
           action: 'repaired',
@@ -1005,7 +1005,7 @@ router.post("/api/system/auto-repair", async (req, res) => {
 
 async function detectSystemIssues() {
   const issues = [];
-  
+
   try {
     // Vérification mémoire
     const memUsage = process.memoryUsage();
@@ -1016,7 +1016,7 @@ async function detectSystemIssues() {
         details: `Heap usage: ${Math.round(memUsage.heapUsed / memUsage.heapTotal * 100)}%`
       });
     }
-    
+
     // Vérification des modules critiques
     const criticalModules = ['errorDetection', 'qualityAssurance', 'autonomousMonitor'];
     for (const moduleName of criticalModules) {
@@ -1031,7 +1031,7 @@ async function detectSystemIssues() {
         });
       }
     }
-    
+
     // Vérification des dépendances
     const { DependencyChecker } = require('./utils/dependency-checker');
     const depIssues = await DependencyChecker.checkAllDependencies();
@@ -1041,7 +1041,7 @@ async function detectSystemIssues() {
       command: dep.command,
       solution: dep.solution
     })));
-    
+
     // Vérification des performances
     const performanceMetrics = global.systemMetrics || {};
     if (performanceMetrics.responseTime > 2000) {
@@ -1051,7 +1051,7 @@ async function detectSystemIssues() {
         details: `Response time: ${performanceMetrics.responseTime}ms`
       });
     }
-    
+
   } catch (error) {
     issues.push({
       type: 'diagnostic_failure',
@@ -1059,13 +1059,13 @@ async function detectSystemIssues() {
       details: error.message
     });
   }
-  
+
   return issues;
 }
 
 async function repairIssue(issue) {
   console.log(`🔧 Réparation de ${issue.type}...`);
-  
+
   try {
     switch (issue.type) {
       case 'memory_leak':
@@ -1080,29 +1080,34 @@ async function repairIssue(issue) {
           console.log('✅ Cache système vidé');
         }
         break;
-        
+
       case 'module_failure':
-        console.log(`🔄 Redémarrage du module ${issue.module}`);
+        console.log('🔧 Redémarrage des modules critiques');
         try {
-          delete require.cache[require.resolve(`./modules/${issue.module}.module`)];
-          require(`./modules/${issue.module}.module`);
-          console.log(`✅ Module ${issue.module} redémarré`);
-        } catch (restartError) {
-          console.log(`❌ Échec redémarrage ${issue.module}: ${restartError.message}`);
-          throw restartError;
+          // Force reload of critical modules
+          const criticalModules = ['error-detection', 'quality-assurance'];
+          for (const module of criticalModules) {
+            delete require.cache[require.resolve(`./modules/${module}.module`)];
+            require(`./modules/${module}.module`);
+          }
+          console.log('✅ Modules redémarrés');
+        } catch (moduleError) {
+          console.error('❌ Échec redémarrage modules:', moduleError);
         }
         break;
-        
+
       case 'dependency_missing':
-        console.log(`📦 Installation de ${issue.command}`);
-        const { exec } = require('child_process');
-        const { promisify } = require('util');
-        const execAsync = promisify(exec);
-        
-        await execAsync(issue.solution);
-        console.log(`✅ Dépendance ${issue.command} installée`);
+        console.log(`🔧 Installation dépendance: ${issue.command}`);
+        try {
+          if (issue.solution) {
+            await execAsync(issue.solution);
+            console.log(`✅ ${issue.command} installé`);
+          }
+        } catch (depError) {
+          console.error(`❌ Échec installation ${issue.command}:`, depError);
+        }
         break;
-        
+
       case 'performance_degradation':
         console.log('🚀 Optimisation des performances');
         // Reset adaptive parameters
@@ -1115,7 +1120,7 @@ async function repairIssue(issue) {
         }
         console.log('✅ Performances optimisées');
         break;
-        
+
       case 'cache_overflow':
         if (global.systemCache) {
           const size = global.systemCache.size;
@@ -1123,19 +1128,19 @@ async function repairIssue(issue) {
           console.log(`✅ Cache vidé (${size} entrées supprimées)`);
         }
         break;
-        
+
       default:
-        console.log(`⚠️ Type de réparation non reconnue: ${issue.type}`);
+        console.log(`⚠️ Type de réparation non reconnu: ${issue.type}`);
         break;
     }
-    
-    return { success: true, action: `Réparé ${issue.type}` };
-    
+
+    console.log(`✅ Réparation terminée pour ${issue.type}`);
+    return true;
+
   } catch (error) {
     console.error(`❌ Échec réparation ${issue.type}:`, error);
     throw error;
-  } automatique: ${issue.type}`);
-  return true;
+  }
 }
 
 

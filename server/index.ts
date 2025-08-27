@@ -1,8 +1,8 @@
-
 import express, { type Request, Response, NextFunction } from "express";
 import { setupVite, serveStatic, log } from "./vite";
 import { registerRoutes } from "./routes";
 import { DependencyChecker } from "./utils/dependency-checker";
+import { errorDetection } from './modules/error-detection.module';
 
 const app = express();
 app.use(express.json());
@@ -101,18 +101,25 @@ app.use((req, res, next) => {
     next();
   });
 
-  server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
-    console.log("🚀 Serveur démarré sur le port 5000");
-    console.log("🌐 Frontend disponible sur http://localhost:5000");
-    console.log("🔧 API disponible sur http://localhost:5000/api");
-    console.log("🧠 Système de monitoring GOD activé");
-    console.log("🛡️ Auto-réparation et prédiction intelligente en cours");
+  // Initialisation GOD Monitor
+  console.log('🧠 Démarrage du GOD Monitor...');
+  godMonitor.initialize();
 
-    // Diagnostic initial
-    setTimeout(async () => {
-      const initialStatus = godMonitor.getGodStatus();
-      console.log('📊 État initial du système GOD:', JSON.stringify(initialStatus, null, 2));
-    }, 5000);
+  // Démarrage de la surveillance automatique des erreurs
+  console.log('🔍 Initialisation de la surveillance automatique...');
+  setTimeout(async () => {
+    try {
+      await errorDetection.startContinuousFileMonitoring();
+      console.log('✅ Surveillance automatique des fichiers active');
+    } catch (error) {
+      console.error('❌ Erreur démarrage surveillance:', error);
+    }
+  }, 5000); // Attendre 5 secondes après le démarrage
+
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Serveur démarré sur http://0.0.0.0:${port}`);
+    console.log(`📊 Dashboard disponible sur http://0.0.0.0:${port}/api/system/health`);
+    console.log('🎯 Système GOD entièrement opérationnel');
+    console.log('🔍 Auto-détection et correction des erreurs: ACTIVE');
   });
 })();

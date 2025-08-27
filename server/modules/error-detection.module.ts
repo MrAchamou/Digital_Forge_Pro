@@ -755,7 +755,7 @@ class AdvancedErrorDetection {
   }
 
   private async suggestDependencyInstallation(command: string): Promise<string> {
-    const suggestions = {
+    const suggestions: Record<string, string> = {
       'tsx': 'Install TypeScript execution engine: npm install tsx --save-dev',
       'tsc': 'Install TypeScript compiler: npm install typescript --save-dev',
       'nodemon': 'Install development server: npm install nodemon --save-dev',
@@ -793,17 +793,7 @@ class AdvancedErrorDetection {
     };
   }
 
-  private async suggestDependencyInstallation(command: string): Promise<string> {
-    const suggestions = {
-      'tsx': 'npm install tsx --save-dev',
-      'tsc': 'npm install typescript --save-dev',
-      'nodemon': 'npm install nodemon --save-dev',
-      'vite': 'npm install vite --save-dev',
-      'drizzle-kit': 'npm install drizzle-kit --save-dev',
-      'esbuild': 'npm install esbuild --save-dev'
-    };
-    return suggestions[command] || `npm install ${command}`;
-  }
+  
 
   private async applyAutonomousFix(error: DetectedError, code: string): Promise<any> {
     try {
@@ -844,7 +834,73 @@ class AdvancedErrorDetection {
   private async detectPerformanceIssues(code: string, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
   private async detectSecurityIssues(code: string, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
   private async detectCompatibilityIssues(code: string, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
-  private async detectBuildErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
+  private async detectBuildErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> {
+    const errors: DetectedError[] = [];
+
+    try {
+      const consoleOutput = context.consoleOutput || context.stackTrace || '';
+      
+      // Détection spécifique des erreurs ESBuild Transform
+      const esbuildErrorPattern = /Transform failed with \d+ error[s]?:\n([^:]+):(\d+):(\d+): ERROR: (.+)/g;
+      let match;
+      while ((match = esbuildErrorPattern.exec(consoleOutput)) !== null) {
+        const filePath = match[1];
+        const line = parseInt(match[2]);
+        const column = parseInt(match[3]);
+        const errorMessage = match[4];
+
+        errors.push({
+          type: 'build',
+          subtype: 'esbuild_transform_error',
+          message: `ESBuild Transform Error: ${errorMessage}`,
+          line: line,
+          column: column,
+          severity: 'critical',
+          aiConfidence: 0.95,
+          autoFix: await this.generateESBuildFix(errorMessage, filePath, line, column),
+          solution: this.generateESBuildSolution(errorMessage),
+          timestamp: new Date()
+        });
+      }
+
+      // Détection d'erreurs de syntaxe génériques
+      const syntaxErrorPattern = /SyntaxError: (.+) at (.+):(\d+):(\d+)/g;
+      while ((match = syntaxErrorPattern.exec(consoleOutput)) !== null) {
+        errors.push({
+          type: 'build',
+          subtype: 'syntax_error',
+          message: `Syntax Error: ${match[1]}`,
+          line: parseInt(match[3]),
+          column: parseInt(match[4]),
+          severity: 'critical',
+          aiConfidence: 0.9,
+          autoFix: await this.generateSyntaxFix(match[1], match[2]),
+          timestamp: new Date()
+        });
+      }
+
+      // Détection d'erreurs TypeScript
+      const tsErrorPattern = /TS\d+: (.+) at (.+):(\d+):(\d+)/g;
+      while ((match = tsErrorPattern.exec(consoleOutput)) !== null) {
+        errors.push({
+          type: 'build',
+          subtype: 'typescript_error',
+          message: `TypeScript Error: ${match[1]}`,
+          line: parseInt(match[3]),
+          column: parseInt(match[4]),
+          severity: 'high',
+          aiConfidence: 0.88,
+          autoFix: await this.generateTypeScriptFix(match[1]),
+          timestamp: new Date()
+        });
+      }
+
+    } catch (error) {
+      console.error('Erreur détection build:', error);
+    }
+
+    return errors;
+  }
   private async detectEnvironmentErrors(context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
   private async detectRuntimeErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> {
     const errors: DetectedError[] = [];
@@ -943,6 +999,72 @@ class AdvancedErrorDetection {
   private extractLearningPoints(semanticAnalysis: any, contextualAnalysis: any): string[] { return []; }
 
   // === MÉTHODES DE GÉNÉRATION DE CORRECTIONS AVANCÉES ===
+
+  private async generateESBuildFix(errorMessage: string, filePath: string, line: number, column: number) {
+    return {
+      type: 'esbuild_transform_fix',
+      error: errorMessage,
+      location: { filePath, line, column },
+      suggestion: this.generateESBuildSolution(errorMessage),
+      autoRepairStrategy: this.inferESBuildRepairStrategy(errorMessage),
+      confidence: 0.92
+    };
+  }
+
+  private generateESBuildSolution(errorMessage: string): string {
+    const solutions: Record<string, string> = {
+      'Expected ";" but found': 'Add missing semicolon or fix syntax structure',
+      'Expected "}" but found': 'Fix bracket/brace matching - add missing closing brace',
+      'Expected ")" but found': 'Fix parentheses matching - add missing closing parenthesis',
+      'Unexpected token': 'Fix syntax error - remove or correct unexpected token',
+      'Unterminated string': 'Add missing quote to close string literal',
+      'Unterminated comment': 'Add missing comment closing markers',
+      'Invalid character': 'Remove or replace invalid characters'
+    };
+
+    for (const [pattern, solution] of Object.entries(solutions)) {
+      if (errorMessage.includes(pattern)) {
+        return solution;
+      }
+    }
+
+    return 'Fix syntax error based on ESBuild error message';
+  }
+
+  private inferESBuildRepairStrategy(errorMessage: string): string {
+    if (errorMessage.includes('Expected ";" but found "{"')) {
+      return 'function_structure_repair';
+    }
+    if (errorMessage.includes('Expected "}" but found')) {
+      return 'bracket_completion';
+    }
+    if (errorMessage.includes('Expected ")" but found')) {
+      return 'parentheses_completion';
+    }
+    if (errorMessage.includes('Unexpected token')) {
+      return 'token_removal';
+    }
+    return 'generic_syntax_repair';
+  }
+
+  private async generateSyntaxFix(errorMessage: string, filePath: string) {
+    return {
+      type: 'syntax_fix',
+      error: errorMessage,
+      filePath: filePath,
+      suggestion: 'Fix syntax error based on error message',
+      confidence: 0.85
+    };
+  }
+
+  private async generateTypeScriptFix(errorMessage: string) {
+    return {
+      type: 'typescript_fix',
+      error: errorMessage,
+      suggestion: 'Fix TypeScript type error',
+      confidence: 0.8
+    };
+  }
   private async generateTypeErrorFix(errorMessage: string, location: string) {
     return {
       type: 'type_error_fix',
@@ -1060,6 +1182,108 @@ clearTimeout(timeoutId);`,
       return `if (typeof fn === 'function') {\n  fn();\n} else {\n  console.error('Expected function, got:', typeof fn);\n}`;
     }
     return `// Add appropriate type checking based on context`;
+  }
+
+  // === DÉTECTION PROACTIVE DE FICHIERS ===
+
+  public async scanProjectFiles(): Promise<{ errors: DetectedError[], autoFixed: number }> {
+    const fs = require('fs');
+    const path = require('path');
+    const glob = require('glob');
+
+    const results = {
+      errors: [] as DetectedError[],
+      autoFixed: 0
+    };
+
+    try {
+      // Scanner tous les fichiers TypeScript/JavaScript
+      const files = [
+        ...glob.sync('server/**/*.ts'),
+        ...glob.sync('server/**/*.js'),
+        ...glob.sync('client/src/**/*.tsx'),
+        ...glob.sync('client/src/**/*.ts')
+      ];
+
+      for (const filePath of files) {
+        try {
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          const fileErrors = await this.detectErrors(fileContent, { 
+            filePath,
+            scanMode: true 
+          });
+
+          if (fileErrors.errors.length > 0) {
+            console.log(`🔍 Erreurs détectées dans ${filePath}: ${fileErrors.errors.length}`);
+            results.errors.push(...fileErrors.errors);
+            
+            // Auto-correction si possible
+            if (fileErrors.autoFixes?.fixed?.length > 0) {
+              console.log(`🔧 Auto-correction de ${fileErrors.autoFixes.fixed.length} erreurs dans ${filePath}`);
+              results.autoFixed += fileErrors.autoFixes.fixed.length;
+              
+              // Appliquer les corrections au fichier
+              if (fileErrors.autoFixes.improvedCode !== fileContent) {
+                fs.writeFileSync(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
+                console.log(`✅ Fichier ${filePath} auto-corrigé`);
+              }
+            }
+          }
+        } catch (fileError) {
+          console.error(`❌ Erreur lecture fichier ${filePath}:`, fileError);
+        }
+      }
+
+    } catch (error) {
+      console.error('❌ Erreur scan projet:', error);
+    }
+
+    return results;
+  }
+
+  public async startContinuousFileMonitoring() {
+    console.log('🔍 Démarrage de la surveillance continue des fichiers');
+    
+    // Scanner initial
+    await this.scanProjectFiles();
+    
+    // Scanner périodique (toutes les 5 minutes)
+    setInterval(async () => {
+      const results = await this.scanProjectFiles();
+      if (results.errors.length > 0) {
+        console.log(`🔍 Scan périodique: ${results.errors.length} erreurs trouvées, ${results.autoFixed} auto-corrigées`);
+      }
+    }, 5 * 60 * 1000);
+
+    // Surveillance en temps réel des changements de fichiers
+    const chokidar = require('chokidar');
+    const watcher = chokidar.watch(['server/**/*.ts', 'client/src/**/*.{ts,tsx}'], {
+      ignored: /node_modules/,
+      persistent: true
+    });
+
+    watcher.on('change', async (filePath: string) => {
+      console.log(`🔍 Fichier modifié: ${filePath} - Scan en cours...`);
+      try {
+        const fs = require('fs');
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const fileErrors = await this.detectErrors(fileContent, { filePath, realTimeCheck: true });
+        
+        if (fileErrors.errors.length > 0) {
+          console.log(`⚠️ ${fileErrors.errors.length} erreurs détectées dans ${filePath}`);
+          // Auto-correction immédiate si confidence élevée
+          if (fileErrors.autoFixes?.fixed?.length > 0) {
+            const highConfidenceFixes = fileErrors.autoFixes.fixed.filter(fix => fix.confidence > 0.9);
+            if (highConfidenceFixes.length > 0) {
+              fs.writeFileSync(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
+              console.log(`✅ ${highConfidenceFixes.length} erreurs auto-corrigées immédiatement dans ${filePath}`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`❌ Erreur scan temps réel ${filePath}:`, error);
+      }
+    });
   }
 
   // API publique
