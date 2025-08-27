@@ -474,8 +474,6 @@ class AdvancedErrorDetection {
           solution: 'Run npm install to fix package dependencies',
           timestamp: new Date()
         });
-      }stamp: new Date()
-        });
       }
 
       // Détection d'erreurs d'import/export
