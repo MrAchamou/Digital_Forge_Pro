@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { setupVite, serveStatic, log } from "./vite.js";
+import { setupVite, serveStatic, log } from "./vite";
 import { registerRoutes } from "./routes";
 import { DependencyChecker } from "./utils/dependency-checker";
 import { errorDetection } from './modules/error-detection.module';

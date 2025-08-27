@@ -1,0 +1,10 @@
+
+{
+  "watch": ["dist/server"],
+  "ext": "js",
+  "delay": "1000",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "exec": "node dist/server/index.js"
+}
