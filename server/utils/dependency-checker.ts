@@ -1,4 +1,5 @@
 
+
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -55,7 +56,7 @@ export class DependencyChecker {
   static async autoFixDependencies(): Promise<boolean> {
     try {
       console.log('🔍 Vérification des dépendances...');
-      const issues = await this.checkAllDependencies();es();
+      const issues = await this.checkAllDependencies();
 
       if (issues.length > 0) {
         console.log('⚠️ Dépendances manquantes détectées:');
@@ -92,7 +93,5 @@ export class DependencyChecker {
       return false;
     }
   }
-      return false;
-    }
-  }
 }
+
