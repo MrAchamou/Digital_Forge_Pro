@@ -1249,7 +1249,7 @@ class AdvancedErrorDetection {
   // Helper method to extract line number from stack trace
   private extractLineNumber(stackTrace: string): number | undefined {
     if (!stackTrace) return undefined;
-    const match = stackTrace.match(/at .* \(?:<anonymous>|eval).*?:(\d+):(\d+)\)/);
+    const match = stackTrace.match(/at .* \(?(?:<anonymous>|eval).*?:(\d+):(\d+)\)?/);
     if (match && match[1]) {
       return parseInt(match[1], 10);
     }
