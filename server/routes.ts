@@ -1,4 +1,3 @@
-
 import express from "express";
 import multer from "multer";
 import path from "path";
@@ -7,6 +6,10 @@ import { storage } from "./storage";
 import { multiFormatParser } from "./parser/multi-format-parser";
 import { effectParserModule } from "./parser/effect-parser.module";
 import { batchProcessor } from "./parser/batch-processor";
+import { batchGeneratorModule } from "./modules/batch-generator.module";
+import { classificationStorageModule } from "./modules/classification-storage.module";
+import { errorDetectionModule } from "./modules/error-detection.module";
+import { qualityAssuranceModule } from "./modules/quality-assurance.module";
 
 const router = express.Router();
 
@@ -21,6 +24,10 @@ const upload = multer({
   }
 });
 
+export function registerRoutes(app: any) {
+  app.use('/', router);
+}
+
 // === ROUTES PARSER 2.0 ===
 
 // Traitement massif de liste d'effets avec Parser 2.0
@@ -31,10 +38,10 @@ router.post("/parse/mass-effects", upload.single("effectsList"), async (req, res
     }
 
     console.log("🚀 Démarrage traitement massif avec Parser 2.0");
-    
+
     // Lancement du traitement en batch
     const jobId = await batchProcessor.processMassiveEffectsList(req.file.path);
-    
+
     res.json({
       success: true,
       message: "Traitement massif démarré avec Parser 2.0",
@@ -57,11 +64,11 @@ router.get("/parse/batch-status/:jobId", async (req, res) => {
   try {
     const jobId = req.params.jobId;
     const jobStatus = batchProcessor.getJobStatus(jobId);
-    
+
     if (!jobStatus) {
       return res.status(404).json({ error: "Job non trouvé" });
     }
-    
+
     res.json({
       jobId,
       status: jobStatus.status,
@@ -100,7 +107,7 @@ router.delete("/parse/batch-job/:jobId", async (req, res) => {
   try {
     const jobId = req.params.jobId;
     const cancelled = await batchProcessor.cancelJob(jobId);
-    
+
     if (cancelled) {
       res.json({ success: true, message: "Job annulé" });
     } else {
@@ -115,24 +122,24 @@ router.delete("/parse/batch-job/:jobId", async (req, res) => {
 router.post("/parse/single-effect", async (req, res) => {
   try {
     const { description } = req.body;
-    
+
     if (!description || description.trim().length < 10) {
       return res.status(400).json({ error: "Description trop courte" });
     }
 
     console.log("🔍 Analyse effet individuel avec Parser 2.0");
-    
+
     // Traitement avec le Parser 2.0
     const tempFile = `temp_${Date.now()}.txt`;
     const tempPath = path.join(process.cwd(), 'uploads', tempFile);
-    
+
     require('fs').writeFileSync(tempPath, description);
-    
+
     const results = await effectParserModule.parseEffectsList(tempPath);
-    
+
     // Nettoyage
     require('fs').unlinkSync(tempPath);
-    
+
     if (results.effects.length > 0) {
       res.json({
         success: true,
@@ -160,13 +167,13 @@ router.get("/library/structure", async (req, res) => {
   try {
     const fs = require('fs').promises;
     const libraryPath = path.join(process.cwd(), 'effects-library');
-    
+
     try {
       const globalIndex = await fs.readFile(
         path.join(libraryPath, 'global-index.json'), 
         'utf-8'
       );
-      
+
       const indexData = JSON.parse(globalIndex);
       res.json({
         success: true,
@@ -190,20 +197,20 @@ router.get("/library/structure", async (req, res) => {
 router.get("/library/search", async (req, res) => {
   try {
     const { query, category, complexity, limit = 20 } = req.query;
-    
+
     const fs = require('fs').promises;
     const searchIndexPath = path.join(process.cwd(), 'effects-library', 'search-indexes.json');
-    
+
     try {
       const indexData = JSON.parse(await fs.readFile(searchIndexPath, 'utf-8'));
-      
+
       let results: string[] = [];
-      
+
       // Recherche par catégorie
       if (category && indexData.byCategory[category as string]) {
         results = indexData.byCategory[category as string];
       }
-      
+
       // Recherche par complexité
       if (complexity && indexData.byComplexity[complexity as string]) {
         const complexityResults = indexData.byComplexity[complexity as string];
@@ -211,33 +218,33 @@ router.get("/library/search", async (req, res) => {
           ? results.filter(id => complexityResults.includes(id))
           : complexityResults;
       }
-      
+
       // Recherche textuelle
       if (query) {
         const queryStr = (query as string).toLowerCase();
         const keywordMatches: string[] = [];
-        
+
         Object.entries(indexData.byKeywords).forEach(([keyword, ids]) => {
           if (keyword.includes(queryStr)) {
             keywordMatches.push(...(ids as string[]));
           }
         });
-        
+
         results = results.length > 0
           ? results.filter(id => keywordMatches.includes(id))
           : keywordMatches;
       }
-      
+
       // Limitation des résultats
       const limitedResults = results.slice(0, parseInt(limit as string));
-      
+
       res.json({
         success: true,
         results: limitedResults,
         total: results.length,
         query: { query, category, complexity, limit }
       });
-      
+
     } catch {
       res.json({
         success: true,
@@ -256,15 +263,15 @@ router.get("/library/effect/:effectId", async (req, res) => {
   try {
     const { effectId } = req.params;
     const fs = require('fs').promises;
-    
+
     // Recherche dans toutes les catégories
     const libraryPath = path.join(process.cwd(), 'effects-library');
     const categories = await fs.readdir(libraryPath, { withFileTypes: true });
-    
+
     for (const category of categories) {
       if (category.isDirectory()) {
         const effectPath = path.join(libraryPath, category.name, `${effectId}.json`);
-        
+
         try {
           const effectData = await fs.readFile(effectPath, 'utf-8');
           res.json({
@@ -277,7 +284,7 @@ router.get("/library/effect/:effectId", async (req, res) => {
         }
       }
     }
-    
+
     res.status(404).json({ error: "Effet non trouvé" });
 
   } catch (error) {
@@ -336,7 +343,7 @@ router.post("/generate", async (req, res) => {
     }
 
     const result = await orchestrator.generateEffect(description, platform, options);
-    
+
     res.json({
       success: true,
       code: result.code,
@@ -362,7 +369,7 @@ router.post("/analyze", async (req, res) => {
     }
 
     const analysis = await orchestrator.analyzeDescription(description);
-    
+
     res.json({
       success: true,
       analysis
@@ -399,10 +406,201 @@ router.get("/system/health", async (req, res) => {
       },
       timestamp: new Date().toISOString()
     };
-    
+
     res.json(health);
   } catch (error) {
     res.status(500).json({ error: "Health check failed" });
+  }
+});
+
+// Routes pour le parser d'effets
+router.post("/api/parse-effects", async (req, res) => {
+  try {
+    const { description } = req.body;
+
+    if (!description || description.trim().length < 10) {
+      return res.status(400).json({ error: "Description trop courte" });
+    }
+
+    console.log("🔍 Analyse effet individuel avec Parser 2.0");
+
+    const tempFile = `temp_${Date.now()}.txt`;
+    const tempPath = path.join(process.cwd(), 'uploads', tempFile);
+
+    require('fs').writeFileSync(tempPath, description);
+
+    const results = await effectParserModule.parseEffectsList(tempPath);
+
+    require('fs').unlinkSync(tempPath);
+
+    if (results.effects.length > 0) {
+      res.json({
+        success: true,
+        effect: results.effects[0],
+        confidence: results.effects[0].confidence,
+        metadata: results.stats
+      });
+    } else {
+      res.status(400).json({ error: "Impossible de parser l'effet" });
+    }
+  } catch (error) {
+    console.error("Erreur parsing effets:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors du parsing des effets" 
+    });
+  }
+});
+
+// Routes pour le générateur en lot
+router.post("/api/batch-generate", async (req, res) => {
+  try {
+    const { effectType, category, count, baseParameters } = req.body;
+
+    const result = await batchGeneratorModule.generateEffects({
+      effectType,
+      category,
+      count: parseInt(count) || 10,
+      baseParameters
+    });
+
+    res.json({
+      success: true,
+      data: result,
+      message: `${result.generated.length} effets générés avec succès`
+    });
+  } catch (error) {
+    console.error("Erreur génération batch:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de la génération en lot" 
+    });
+  }
+});
+
+// Routes pour obtenir les options disponibles
+router.get("/api/batch-options", (req, res) => {
+  res.json({
+    types: batchGeneratorModule.getSupportedTypes(),
+    categories: batchGeneratorModule.getSupportedCategories()
+  });
+});
+
+// Routes pour la classification et stockage
+router.post("/api/classify-effect", async (req, res) => {
+  try {
+    const { effectData } = req.body;
+
+    const classification = await classificationStorageModule.classifyEffect(effectData);
+
+    res.json({
+      success: true,
+      classification
+    });
+  } catch (error) {
+    console.error("Erreur classification:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de la classification" 
+    });
+  }
+});
+
+router.post("/api/store-effect", async (req, res) => {
+  try {
+    const { effectData, classification } = req.body;
+
+    const result = await classificationStorageModule.storeEffect(effectData, classification);
+
+    res.json({
+      success: result.stored,
+      filePath: result.filePath,
+      errors: result.errors
+    });
+  } catch (error) {
+    console.error("Erreur stockage:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors du stockage" 
+    });
+  }
+});
+
+router.post("/api/reorganize-library", async (req, res) => {
+  try {
+    const result = await classificationStorageModule.reorganizeLibrary();
+
+    res.json({
+      success: true,
+      data: result,
+      message: `${result.moved} effets réorganisés`
+    });
+  } catch (error) {
+    console.error("Erreur réorganisation:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de la réorganisation" 
+    });
+  }
+});
+
+// Routes pour la détection d'erreurs
+router.post("/api/validate-code", async (req, res) => {
+  try {
+    const { code, context } = req.body;
+
+    const result = await errorDetectionModule.validateCode(code, context);
+
+    res.json({
+      success: true,
+      validation: result
+    });
+  } catch (error) {
+    console.error("Erreur validation:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de la validation" 
+    });
+  }
+});
+
+// Routes pour l'assurance qualité
+router.post("/api/assess-quality", async (req, res) => {
+  try {
+    const { effectData, generatedCode } = req.body;
+
+    const report = await qualityAssuranceModule.assessQuality(effectData, generatedCode);
+
+    res.json({
+      success: true,
+      qualityReport: report
+    });
+  } catch (error) {
+    console.error("Erreur évaluation qualité:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de l'évaluation qualité" 
+    });
+  }
+});
+
+router.post("/api/batch-quality", async (req, res) => {
+  try {
+    const { effects } = req.body;
+
+    const result = await qualityAssuranceModule.runBatchQuality(effects);
+
+    res.json({
+      success: true,
+      data: result,
+      message: `Évaluation de ${result.stats.total} effets terminée`
+    });
+  } catch (error) {
+    console.error("Erreur évaluation batch:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Erreur lors de l'évaluation en lot" 
+    });
   }
 });
 
