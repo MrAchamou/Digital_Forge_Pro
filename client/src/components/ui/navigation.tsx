@@ -7,7 +7,8 @@ import {
   Wand2, 
   Database, 
   Eye, 
-  BarChart3 
+  BarChart3,
+  Settings
 } from "lucide-react";
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
   { path: "/library", label: "Library", icon: Database, shortLabel: "Lib" },
   { path: "/preview", label: "Preview", icon: Eye, shortLabel: "View" },
   { path: "/status", label: "Status", icon: BarChart3, shortLabel: "Stats" },
+  { path: "/modules", label: "Modules", icon: Settings, shortLabel: "Mods" },
 ];
 
 export default function Navigation() {
@@ -27,7 +29,7 @@ export default function Navigation() {
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = location === item.path;
-        
+
         return (
           <Link key={item.path} href={item.path}>
             <button

@@ -10,6 +10,7 @@ import Generator from "@/pages/generator";
 import Library from "@/pages/library";
 import Preview from "@/pages/preview";
 import Status from "@/pages/status";
+import Modules from "@/pages/modules";
 import Navigation from "@/components/ui/navigation";
 import ParticleBackground from "@/components/ui/particle-background";
 
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/library" component={Library} />
       <Route path="/preview" component={Preview} />
       <Route path="/status" component={Status} />
+      <Route path="/modules" component={Modules} />
       <Route component={NotFound} />
     </Switch>
   );
