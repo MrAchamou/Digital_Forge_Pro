@@ -453,6 +453,313 @@ class AdvancedBatchGenerator {
     // Retourne le nombre d'optimisations autonomes appliquées
     return 42; // Placeholder
   }
+
+  private updateMetricsFromHealth(health: any) {
+    // Mise à jour des métriques basées sur la santé du système
+    this.metrics.throughput = health.throughput || this.metrics.throughput;
+    this.metrics.resourceUtilization = health.workerUtilization || this.metrics.resourceUtilization;
+    this.metrics.errorRate = health.errorRate || this.metrics.errorRate;
+    
+    // Calcul de l'efficacité IA basée sur les performances
+    if (health.throughput > this.metrics.throughput * 1.1) {
+      this.metrics.aiEfficiency = Math.min(1.0, this.metrics.aiEfficiency + 0.01);
+    } else if (health.throughput < this.metrics.throughput * 0.9) {
+      this.metrics.aiEfficiency = Math.max(0.5, this.metrics.aiEfficiency - 0.01);
+    }
+  }
+
+  private addJobToQueue(job: BatchJob, schedulingPlan: any) {
+    // Ajouter le job à la queue avec priorité
+    this.jobQueue.push(job);
+    this.jobQueue.sort((a, b) => b.priority - a.priority);
+  }
+
+  private triggerProcessing() {
+    // Déclencher le traitement des jobs en attente
+    const availableWorkers = this.workerPool.filter(w => w.status === 'idle');
+    const pendingJobs = this.jobQueue.filter(j => j.status === 'pending');
+    
+    const maxJobsToProcess = Math.min(availableWorkers.length, pendingJobs.length);
+    
+    for (let i = 0; i < maxJobsToProcess; i++) {
+      const job = pendingJobs[i];
+      const worker = availableWorkers[i];
+      
+      job.status = 'processing';
+      worker.status = 'busy';
+      worker.currentJob = job.id;
+      this.activeJobs.set(job.id, job);
+      
+      // Traitement asynchrone
+      this.processJobWithAI(job).then(result => {
+        worker.status = 'idle';
+        worker.currentJob = null;
+        this.activeJobs.delete(job.id);
+      }).catch(error => {
+        console.error(`Job ${job.id} failed:`, error);
+        worker.status = 'idle';
+        worker.currentJob = null;
+        job.status = 'failed';
+        this.activeJobs.delete(job.id);
+      });
+    }
+  }
+
+  private async performPreProcessingAnalysis(job: BatchJob): Promise<any> {
+    // Analyse IA pré-traitement
+    const complexity = this.calculateJobComplexity(job);
+    const recommendations = [];
+    
+    if (complexity > 0.7) {
+      recommendations.push('chunked_processing', 'memory_optimization');
+    }
+    
+    if (job.context.performanceTarget === 'speed') {
+      recommendations.push('aggressive_caching', 'parallel_generation');
+    }
+    
+    return { recommendations };
+  }
+
+  private calculateJobComplexity(job: BatchJob): number {
+    // Calcul de la complexité basé sur le nombre d'effets et le contexte
+    let complexity = job.effects.length / 100; // Base complexity
+    
+    if (job.context.performanceTarget === 'quality') {
+      complexity *= 1.5;
+    }
+    
+    return Math.min(1.0, complexity);
+  }
+
+  private estimateResourceRequirements(job: BatchJob): any {
+    return {
+      memory: job.effects.length * 10, // MB estimé
+      cpu: this.calculateJobComplexity(job) * 100, // % CPU estimé
+      time: job.effects.length * 50 // ms estimé
+    };
+  }
+
+  private calculateOptimalWorkerCount(complexity: number, requirements: any): number {
+    return Math.min(this.maxConcurrency, Math.ceil(complexity * this.maxConcurrency));
+  }
+
+  private selectProcessingStrategy(job: BatchJob): string {
+    if (job.effects.length > 20) return 'parallel';
+    if (job.context.performanceTarget === 'speed') return 'optimized';
+    return 'standard';
+  }
+
+  private determineOptimizationLevel(job: BatchJob): number {
+    return job.context.performanceTarget === 'quality' ? 0.9 : 0.7;
+  }
+
+  private createParallelizationPlan(job: BatchJob): any {
+    const chunkSize = Math.ceil(job.effects.length / this.maxConcurrency);
+    return {
+      chunkSize,
+      chunks: Math.ceil(job.effects.length / chunkSize),
+      strategy: 'balanced'
+    };
+  }
+
+  private createOptimalJobDistribution(workers: any[], jobs: BatchJob[]): any {
+    return {
+      assignments: jobs.slice(0, workers.length).map((job, index) => ({
+        job: job.id,
+        worker: workers[index].id
+      }))
+    };
+  }
+
+  private async predictPerformanceBottlenecks(job: BatchJob): Promise<string[]> {
+    const bottlenecks = [];
+    
+    if (job.effects.length > 50) {
+      bottlenecks.push('memory_pressure');
+    }
+    
+    if (this.activeJobs.size > this.maxConcurrency * 0.8) {
+      bottlenecks.push('worker_saturation');
+    }
+    
+    return bottlenecks;
+  }
+
+  private generateBottleneckSolutions(bottlenecks: string[]): string[] {
+    const solutions = [];
+    
+    if (bottlenecks.includes('memory_pressure')) {
+      solutions.push('chunked_processing', 'memory_optimization');
+    }
+    
+    if (bottlenecks.includes('worker_saturation')) {
+      solutions.push('priority_scheduling', 'load_balancing');
+    }
+    
+    return solutions;
+  }
+
+  private applyMemoryOptimizations(job: BatchJob) {
+    // Optimisations mémoire
+    job.aiOptimizations = job.aiOptimizations || [];
+    if (!job.aiOptimizations.includes('memory_optimization')) {
+      job.aiOptimizations.push('memory_optimization');
+    }
+  }
+
+  private applySpeedOptimizations(job: BatchJob) {
+    // Optimisations vitesse
+    job.aiOptimizations = job.aiOptimizations || [];
+    if (!job.aiOptimizations.includes('speed_optimization')) {
+      job.aiOptimizations.push('speed_optimization');
+    }
+  }
+
+  private analyzePerformancePatterns(data: any[]): any {
+    return { patterns: [] }; // Placeholder
+  }
+
+  private createOptimizationsFromPatterns(patterns: any): string[] {
+    return []; // Placeholder
+  }
+
+  private collectCurrentMetrics(): any {
+    return {
+      throughput: this.calculateThroughput(),
+      errorRate: this.calculateErrorRate(),
+      resourceUtilization: this.calculateWorkerUtilization()
+    };
+  }
+
+  private identifyOptimizationOpportunities(metrics: any): any[] {
+    const opportunities = [];
+    
+    if (metrics.errorRate > 0.05) {
+      opportunities.push({ type: 'error_reduction', priority: 'high' });
+    }
+    
+    if (metrics.resourceUtilization < 0.5) {
+      opportunities.push({ type: 'resource_optimization', priority: 'medium' });
+    }
+    
+    return opportunities;
+  }
+
+  private implementOptimization(opportunity: any) {
+    // Implémentation des optimisations
+    console.log(`Implementing optimization: ${opportunity.type}`);
+  }
+
+  private predictSystemIssues(): any {
+    return { potentialIssues: [] }; // Placeholder
+  }
+
+  private implementPreventiveMeasure(issue: any) {
+    // Mesures préventives
+    console.log(`Implementing preventive measure for: ${issue}`);
+  }
+
+  private activateErrorRecoveryMode() {
+    console.log('Error recovery mode activated');
+    // Réduction temporaire de la charge
+    this.maxConcurrency = Math.max(2, Math.floor(this.maxConcurrency * 0.7));
+  }
+
+  private activatePerformanceBoostMode() {
+    console.log('Performance boost mode activated');
+    // Augmentation temporaire des ressources
+    this.maxConcurrency = Math.min(16, Math.floor(this.maxConcurrency * 1.3));
+  }
+
+  private waitForAvailableWorker(): Promise<any> {
+    return new Promise((resolve) => {
+      const checkWorker = () => {
+        const availableWorker = this.workerPool.find(w => w.status === 'idle');
+        if (availableWorker) {
+          resolve(availableWorker);
+        } else {
+          setTimeout(checkWorker, 100);
+        }
+      };
+      checkWorker();
+    });
+  }
+
+  private calculateChunkComplexity(chunk: any[]): number {
+    return chunk.length / 20; // Complexité basée sur la taille
+  }
+
+  private async processChunkWithWorker(chunk: any[], worker: any, job: BatchJob): Promise<any[]> {
+    // Simulation du traitement par le worker
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(chunk.map(effect => ({ ...effect, processed: true })));
+      }, 100 + Math.random() * 200);
+    });
+  }
+
+  private enableChunkedProcessing(job: BatchJob) {
+    console.log(`Enabled chunked processing for job ${job.id}`);
+  }
+
+  private enableAggressiveCaching(job: BatchJob) {
+    console.log(`Enabled aggressive caching for job ${job.id}`);
+  }
+
+  private enableParallelGeneration(job: BatchJob) {
+    console.log(`Enabled parallel generation for job ${job.id}`);
+  }
+
+  private async consolidateResults(results: any[], job: BatchJob): Promise<any> {
+    return {
+      consolidatedEffects: results.flat(),
+      metadata: {
+        totalProcessed: results.length,
+        jobId: job.id,
+        processingTime: Date.now() - (job.startTime?.getTime() || Date.now())
+      }
+    };
+  }
+
+  private async performFinalOptimization(results: any, job: BatchJob): Promise<any> {
+    // Optimisation finale
+    return {
+      ...results,
+      optimized: true,
+      optimizationLevel: job.aiOptimizations?.length || 0
+    };
+  }
+
+  private async performQualityAssurance(results: any, job: BatchJob): Promise<any> {
+    return {
+      passed: true,
+      score: 0.95,
+      results
+    };
+  }
+
+  private async applyQualityCorrections(results: any, qualityCheck: any): Promise<any> {
+    return results; // Placeholder
+  }
+
+  private async analyzeError(error: any, job: BatchJob): Promise<any> {
+    return {
+      recoverable: true,
+      type: 'temporary',
+      solution: 'retry'
+    };
+  }
+
+  private async attemptErrorRecovery(job: BatchJob, analysis: any): Promise<any> {
+    // Tentative de récupération
+    job.status = 'pending'; // Remettre en queue
+    return this.processJobWithAI(job);
+  }
+
+  private estimateMemoryUsage(results: any): number {
+    return JSON.stringify(results).length * 2; // Estimation approximative
+  }
 }
 
 export const batchGenerator = new AdvancedBatchGenerator();

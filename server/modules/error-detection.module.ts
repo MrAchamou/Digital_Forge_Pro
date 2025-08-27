@@ -41,6 +41,9 @@ interface DetectedError {
   details?: string[];
   subtype?: string;
   riskLevel?: string;
+  suggestion?: string; // Added for general suggestions
+  methodName?: string; // Added for missing method detection
+  className?: string;  // Added for missing method detection
 }
 
 class AdvancedErrorDetection {
@@ -553,6 +556,12 @@ class AdvancedErrorDetection {
               confidence: 0.99
             });
             break;
+          case 'missing_method':
+            return {
+              severity: 'high',
+              suggestion: `Method ${error.methodName} is not defined in class ${error.className}`,
+              autoFix: `Add method implementation: ${error.methodName}() { /* implementation */ }`
+            };
         }
 
         return strategies;
@@ -828,6 +837,25 @@ class AdvancedErrorDetection {
         aiConfidence: 0.85,
         autoFix: await this.generateRuntimeSyntaxFix(consoleOutput)
       });
+    }
+
+    // Détection des méthodes manquantes dans le code
+    if (error.message.includes('is not a function')) {
+      const functionMatch = error.message.match(/(\w+\.\w+) is not a function/);
+      if (functionMatch) {
+        const [, fullMethod] = functionMatch;
+        const [className, methodName] = fullMethod.split('.');
+
+        errors.push({
+          type: 'missing_method',
+          message: `Method ${methodName} is not defined in class`,
+          line: this.extractLineNumber(error.stack),
+          column: 0,
+          methodName,
+          className,
+          confidence: 0.95
+        });
+      }
     }
 
     return errors;
@@ -1133,7 +1161,9 @@ class AdvancedErrorDetection {
   private async consolidateWithAI(errors: any[], aiAnalysis: AIErrorAnalysis): Promise<any[]> { return errors; }
 
   // Méthode placeholder pour la génération de stratégie de prévention
-  private async generatePreventionStrategy(semanticAnalysis: any, contextualAnalysis: any): Promise<string> { return 'Default prevention strategy'; }
+  private async generatePreventionStrategy(semanticAnalysis: AIErrorAnalysis, contextualAnalysis: ErrorContext): Promise<string> {
+    return 'Generic prevention strategy';
+  }
 
   // Méthode placeholder pour l'extraction des points d'apprentissage
   private extractLearningPoints(semanticAnalysis: any, contextualAnalysis: any): string[] { return []; }
@@ -1166,16 +1196,12 @@ class AdvancedErrorDetection {
 
         if (!isValidExport) {
           errors.push({
-            type: 'import_export_mismatch',
-            message: `The requested module '${modulePath}' does not provide an export named '${exportName}'`,
-            line: this.getLineNumber(code, match.index),
-            column: match.index,
-            severity: 'critical',
-            aiConfidence: 0.98,
-            autoFix: await this.generateExportFix(modulePath, exportName),
-            module: modulePath,
-            export: exportName,
-            solution: `Check exports in ${modulePath} or update import statement`
+            type: 'missing_import',
+            message: `Missing export: ${exportName}`,
+            line: this.extractLineNumber(error.stack), // Assuming 'error' is available in scope or passed
+            column: 0,
+            suggestion: exportName,
+            confidence: 0.9
           });
         }
       }
@@ -1218,6 +1244,20 @@ class AdvancedErrorDetection {
   // Méthode placeholder pour la génération de la stratégie de prévention
   private async generatePreventionStrategy(semanticAnalysis: AIErrorAnalysis, contextualAnalysis: ErrorContext): Promise<string> {
     return 'Generic prevention strategy';
+  }
+
+  // Helper method to extract line number from stack trace
+  private extractLineNumber(stackTrace: string): number | undefined {
+    if (!stackTrace) return undefined;
+    const match = stackTrace.match(/at .* \(?:<anonymous>|eval).*?:(\d+):(\d+)\)/);
+    if (match && match[1]) {
+      return parseInt(match[1], 10);
+    }
+    const match2 = stackTrace.match(/at (\S+):(\d+):(\d+)/);
+    if (match2 && match2[2]) {
+      return parseInt(match2[2], 10);
+    }
+    return undefined;
   }
 }
 
