@@ -70,7 +70,7 @@ export class DependencyChecker {
           await execAsync(issue.solution);
           console.log(`✅ ${issue.command} installé avec succès`);
         } catch (installError) {
-          console.log(`❌ Échec installation ${issue.command}:`, installError.message);
+          console.log(`❌ Échec installation ${issue.command}:`, (installError as Error).message);
           return false;
         }
       }

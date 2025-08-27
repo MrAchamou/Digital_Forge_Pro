@@ -265,7 +265,7 @@ router.post('/generate', async (req, res) => {
       console.error(`❌ [${requestId}] Auto-repair failed:`, repairError);
     }
 
-    godMonitor.recordError(requestId, error);
+    godMonitor.recordError(requestId, error as Error);
 
     res.status(500).json({
       error: 'Generation failed',
@@ -569,7 +569,7 @@ async function detectSystemIssues() {
   return issues;
 }
 
-async function executeAutoRepair(issue, requestId) {
+async function executeAutoRepair(issue: any, requestId: string) {
   console.log(`🔧 [${requestId}] Réparation: ${issue.type}`);
 
   switch (issue.type) {
@@ -650,7 +650,7 @@ async function executeAutoRepair(issue, requestId) {
   }
 }
 
-async function performAutoRepair(error, requestBody, requestId) {
+async function performAutoRepair(error: any, requestBody: any, requestId: string) {
   console.log(`🔧 [${requestId}] Tentative auto-réparation pour:`, error.message);
 
   try {
@@ -705,7 +705,7 @@ async function performAutoRepair(error, requestBody, requestId) {
   }
 }
 
-function generateSystemRecommendations(fileScan, quality, godStatus) {
+function generateSystemRecommendations(fileScan: any, quality: any, godStatus: any) {
   const recommendations = [];
 
   if (fileScan.errors.length > 10) {

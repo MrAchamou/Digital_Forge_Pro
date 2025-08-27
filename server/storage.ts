@@ -152,6 +152,9 @@ export class MemStorage implements IStorage {
       this.effects.set(id, {
         ...effect,
         id,
+        rating: effect.rating || 0,
+        downloads: effect.downloads || 0,
+        tags: effect.tags || [],
         createdAt: new Date()
       });
     });
@@ -217,6 +220,7 @@ export class MemStorage implements IStorage {
       id,
       rating: 0,
       downloads: 0,
+      tags: insertEffect.tags || [],
       createdAt: new Date()
     };
     this.effects.set(id, effect);
@@ -265,7 +269,7 @@ export class MemStorage implements IStorage {
     if (status) {
       jobs = jobs.filter(job => job.status === status);
     }
-    return jobs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return jobs.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
   async createJob(insertJob: InsertJob): Promise<Job> {
@@ -277,6 +281,7 @@ export class MemStorage implements IStorage {
       progress: 0,
       result: null,
       error: null,
+      estimatedTime: insertJob.estimatedTime || null,
       actualTime: null,
       createdAt: new Date(),
       completedAt: null
@@ -313,7 +318,7 @@ export class MemStorage implements IStorage {
   }
 
   async getUploads(): Promise<Upload[]> {
-    return Array.from(this.uploads.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return Array.from(this.uploads.values()).sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
   async createUpload(insertUpload: InsertUpload): Promise<Upload> {

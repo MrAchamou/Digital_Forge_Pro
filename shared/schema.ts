@@ -13,15 +13,15 @@ export const effects = pgTable("effects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  type: text("type").notNull(), // 'PARTICLE', 'PHYSICS', 'LIGHTING', 'MORPHING'
-  category: text("category").notNull(), // 'EXPLOSION', 'TRANSITION', 'AMBIENT', etc.
-  platform: text("platform").notNull(), // 'javascript', 'react', 'aftereffects', 'premiere'
+  type: text("type").notNull(),
+  category: text("category").notNull(),
+  platform: text("platform").notNull(),
   code: text("code").notNull(),
   parameters: jsonb("parameters").notNull(),
   metadata: jsonb("metadata").notNull(),
   tags: text("tags").array().notNull().default(sql`'{}'`),
-  complexity: integer("complexity").notNull().default(1), // 1-10
-  performance: text("performance").notNull().default('medium'), // 'low', 'medium', 'high'
+  complexity: integer("complexity").notNull().default(1),
+  performance: text("performance").notNull().default('medium'),
   rating: real("rating").default(0),
   downloads: integer("downloads").default(0),
   createdAt: timestamp("created_at").defaultNow(),
@@ -33,12 +33,12 @@ export const jobs = pgTable("jobs", {
   description: text("description").notNull(),
   platform: text("platform").notNull(),
   options: jsonb("options").notNull(),
-  status: text("status").notNull().default('queued'), // 'queued', 'processing', 'completed', 'failed'
-  progress: integer("progress").default(0), // 0-100
+  status: text("status").notNull().default('queued'),
+  progress: integer("progress").default(0),
   result: jsonb("result"),
   error: text("error"),
-  estimatedTime: integer("estimated_time"), // in seconds
-  actualTime: integer("actual_time"), // in seconds
+  estimatedTime: integer("estimated_time"),
+  actualTime: integer("actual_time"),
   createdAt: timestamp("created_at").defaultNow(),
   completedAt: timestamp("completed_at"),
 });
@@ -50,7 +50,7 @@ export const uploads = pgTable("uploads", {
   mimeType: text("mime_type").notNull(),
   size: integer("size").notNull(),
   path: text("path").notNull(),
-  status: text("status").notNull().default('processing'), // 'processing', 'completed', 'failed'
+  status: text("status").notNull().default('processing'),
   processedCount: integer("processed_count").default(0),
   totalCount: integer("total_count").default(0),
   errors: text("errors").array().default(sql`'{}'`),
@@ -109,7 +109,7 @@ export const insertSystemMetricsSchema = createInsertSchema(systemMetrics).omit(
   timestamp: true,
 });
 
-// Types
+// Unified types from schema inference
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
@@ -164,66 +164,13 @@ export interface SystemHealth {
   };
 }
 
-// Need to define Json type if it's not globally available
-// For example, if using `pg-types` or similar for JSON handling:
-// import { type Json } from 'type'; // Adjust import path as necessary
-// For now, assuming `any` or a placeholder if not defined elsewhere
-type Json = any;
-
-// Corrected and expanded interface definitions based on schema and common usage
-
-export interface Effect {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  category: string;
-  platform: string;
-  code: string;
-  parameters: Json;
-  metadata: Json;
-  performance: string;
-  tags: string[];
-  complexity: number;
-  rating: number | null;
-  downloads: number | null;
-  version: string;
-  createdAt: Date | null;
-}
-
-export interface InsertEffect {
-  name: string;
-  description: string;
-  type: string;
-  category: string;
-  platform: string;
-  code: string;
-  parameters: Json;
-  metadata: Json;
-  performance: string;
-  tags: string[];
-  complexity: number;
-  version: string;
-}
-
-export interface Job {
-  id: string;
-  description: string;
-  platform: string;
-  options: Json;
-  status: string;
-  progress: number;
-  result: Json;
-  error: string | null;
-  estimatedTime: number | null;
-  actualTime: number | null;
-  createdAt: Date;
-  completedAt: Date | null;
-}
-
-export interface InsertJob {
-  description: string;
-  platform: string;
-  options: Json;
-  estimatedTime: number | null;
+// Express extensions for custom properties
+declare global {
+  namespace Express {
+    interface Request {
+      requestId: string;
+      startTime: number;
+      files: any[];
+    }
+  }
 }
