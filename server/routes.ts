@@ -627,7 +627,7 @@ router.post("/api/batch-quality", async (req, res) => {
 });
 
 // Parser routes
-app.post("/api/parser/parse-file", async (req, res) => {
+router.post("/api/parser/parse-file", async (req, res) => {
   try {
     const { content } = req.body;
     const results = await effectParserModule.parseEffectsList(content);
@@ -639,7 +639,7 @@ app.post("/api/parser/parse-file", async (req, res) => {
 });
 
 // Module status route
-app.get("/api/modules/status", async (req, res) => {
+router.get("/api/modules/status", async (req, res) => {
   try {
     const status = {
       batchGenerator: { status: "online", processed: 1247, queue: 3 },
@@ -655,7 +655,7 @@ app.get("/api/modules/status", async (req, res) => {
 });
 
 // Batch generator routes
-app.post("/api/modules/batch-generator/generate", async (req, res) => {
+router.post("/api/modules/batch-generator/generate", async (req, res) => {
   try {
     const { effectType, category, count } = req.body;
     const results = await batchGeneratorModule.generateEffects({
@@ -671,7 +671,7 @@ app.post("/api/modules/batch-generator/generate", async (req, res) => {
 });
 
 // Classification & Storage routes
-app.post("/api/modules/classification-storage/reorganize", async (req, res) => {
+router.post("/api/modules/classification-storage/reorganize", async (req, res) => {
   try {
     const results = await classificationStorageModule.reorganizeLibrary();
     res.json(results);
@@ -682,7 +682,7 @@ app.post("/api/modules/classification-storage/reorganize", async (req, res) => {
 });
 
 // Quality Assurance routes
-app.post("/api/modules/quality-assurance/batch-check", async (req, res) => {
+router.post("/api/modules/quality-assurance/batch-check", async (req, res) => {
   try {
     // Simuler une vérification qualité
     const mockResults = {
