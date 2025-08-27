@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,6 +121,35 @@ export default function Modules() {
         <p className="text-gray-300 text-lg">
           Contrôlez et configurez vos modules IA autonomes
         </p>
+      </div>
+
+      {/* Library Initialization */}
+      <div className="mb-8 p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+        <h3 className="text-xl font-bold mb-4 text-forge-plasma">Bibliothèque d'Effets</h3>
+        <p className="text-gray-300 mb-4">
+          Initialiser la structure de la bibliothèque avec des effets d'exemple.
+        </p>
+        <button
+          onClick={async () => {
+            try {
+              const response = await fetch('/api/library/initialize', {
+                method: 'POST'
+              });
+              const result = await response.json();
+
+              if (result.success) {
+                alert('✅ Bibliothèque initialisée ! Vérifiez le dossier "effects-library" dans l\'arborescence.');
+              } else {
+                alert('❌ Erreur: ' + result.error);
+              }
+            } catch (error) {
+              alert('❌ Erreur de connexion');
+            }
+          }}
+          className="px-4 py-2 bg-forge-plasma text-black font-bold rounded hover:bg-forge-plasma/80 transition-colors"
+        >
+          Initialiser la Bibliothèque
+        </button>
       </div>
 
       {/* Batch Generator Module */}

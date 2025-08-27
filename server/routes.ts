@@ -392,7 +392,29 @@ router.get("/queue/stats", async (req, res) => {
   }
 });
 
-router.get("/system/health", async (req, res) => {
+// Initialisation de la bibliothèque
+router.post("/api/library/initialize", async (req, res) => {
+  try {
+    const { libraryInitializer } = await import('./utils/library-initializer');
+    await libraryInitializer.initializeLibrary();
+
+    res.json({
+      success: true,
+      message: "Bibliothèque initialisée avec succès !",
+      path: "effects-library",
+      sampleEffects: 3
+    });
+  } catch (error) {
+    console.error('Erreur initialisation bibliothèque:', error);
+    res.status(500).json({
+      success: false,
+      error: "Erreur lors de l'initialisation de la bibliothèque"
+    });
+  }
+});
+
+// Système - Stats
+router.get("/api/system/health", async (req, res) => {
   try {
     const health = {
       overall: 98.7,
