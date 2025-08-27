@@ -1,123 +1,60 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 import fs from "fs/promises";
 import path from "path";
-var EffectParserModule = /** @class */ (function () {
-    function EffectParserModule() {
+class EffectParserModule {
+    localAI;
+    patternMatcher;
+    contextAnalyzer;
+    qualityValidator;
+    constructor() {
         this.localAI = new LocalAIEngine();
         this.patternMatcher = new PatternMatcher();
         this.contextAnalyzer = new ContextAnalyzer();
         this.qualityValidator = new QualityValidator();
     }
-    EffectParserModule.prototype.parseEffectsList = function (filePath) {
-        return __awaiter(this, void 0, void 0, function () {
-            var fileContent, rawEffects, parsedEffects, stats, batchSize, i, batch, batchResults, _i, batchResults_1, result, category, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 7, , 8]);
-                        console.log("🚀 Parser 2.0 - Démarrage analyse massive...");
-                        return [4 /*yield*/, fs.readFile(filePath, 'utf-8')];
-                    case 1:
-                        fileContent = _a.sent();
-                        rawEffects = this.extractRawEffects(fileContent);
-                        console.log("\uD83D\uDCCA ".concat(rawEffects.length, " effets d\u00E9tect\u00E9s dans le fichier"));
-                        parsedEffects = [];
-                        stats = {
-                            total: rawEffects.length,
-                            successful: 0,
-                            failed: 0,
-                            categories: {}
-                        };
-                        batchSize = 50;
-                        i = 0;
-                        _a.label = 2;
-                    case 2:
-                        if (!(i < rawEffects.length)) return [3 /*break*/, 5];
-                        batch = rawEffects.slice(i, i + batchSize);
-                        return [4 /*yield*/, this.processBatch(batch, i)];
-                    case 3:
-                        batchResults = _a.sent();
-                        for (_i = 0, batchResults_1 = batchResults; _i < batchResults_1.length; _i++) {
-                            result = batchResults_1[_i];
-                            parsedEffects.push(result);
-                            if (result.confidence > 0.7) {
-                                stats.successful++;
-                                category = result.parsed.category;
-                                stats.categories[category] = (stats.categories[category] || 0) + 1;
-                            }
-                            else {
-                                stats.failed++;
-                            }
-                        }
-                        console.log("\u26A1 Batch ".concat(Math.floor(i / batchSize) + 1, "/").concat(Math.ceil(rawEffects.length / batchSize), " termin\u00E9"));
-                        _a.label = 4;
-                    case 4:
-                        i += batchSize;
-                        return [3 /*break*/, 2];
-                    case 5: 
-                    // Sauvegarde automatique des effets parsés
-                    return [4 /*yield*/, this.saveToLibrary(parsedEffects.filter(function (e) { return e.confidence > 0.7; }))];
-                    case 6:
-                        // Sauvegarde automatique des effets parsés
-                        _a.sent();
-                        console.log("✅ Parser 2.0 - Analyse terminée avec succès!");
-                        return [2 /*return*/, { effects: parsedEffects, stats: stats }];
-                    case 7:
-                        error_1 = _a.sent();
-                        console.error("❌ Parser 2.0 Error:", error_1);
-                        throw new Error("\u00C9chec du parsing: ".concat(error_1 instanceof Error ? error_1.message : 'Unknown error'));
-                    case 8: return [2 /*return*/];
+    async parseEffectsList(filePath) {
+        try {
+            console.log("🚀 Parser 2.0 - Démarrage analyse massive...");
+            const fileContent = await fs.readFile(filePath, 'utf-8');
+            const rawEffects = this.extractRawEffects(fileContent);
+            console.log(`📊 ${rawEffects.length} effets détectés dans le fichier`);
+            const parsedEffects = [];
+            const stats = {
+                total: rawEffects.length,
+                successful: 0,
+                failed: 0,
+                categories: {}
+            };
+            // Traitement par batch pour optimiser les performances
+            const batchSize = 50;
+            for (let i = 0; i < rawEffects.length; i += batchSize) {
+                const batch = rawEffects.slice(i, i + batchSize);
+                const batchResults = await this.processBatch(batch, i);
+                for (const result of batchResults) {
+                    parsedEffects.push(result);
+                    if (result.confidence > 0.7) {
+                        stats.successful++;
+                        const category = result.parsed.category;
+                        stats.categories[category] = (stats.categories[category] || 0) + 1;
+                    }
+                    else {
+                        stats.failed++;
+                    }
                 }
-            });
-        });
-    };
-    EffectParserModule.prototype.extractRawEffects = function (content) {
+                console.log(`⚡ Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(rawEffects.length / batchSize)} terminé`);
+            }
+            // Sauvegarde automatique des effets parsés
+            await this.saveToLibrary(parsedEffects.filter(e => e.confidence > 0.7));
+            console.log("✅ Parser 2.0 - Analyse terminée avec succès!");
+            return { effects: parsedEffects, stats };
+        }
+        catch (error) {
+            console.error("❌ Parser 2.0 Error:", error);
+            throw new Error(`Échec du parsing: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    extractRawEffects(content) {
         // Patterns de détection ultra-précis
-        var patterns = [
+        const patterns = [
             // Pattern numéroté (1. **Nom**, 2. **Nom**)
             /(\d+)\.\s*\*\*([^*]+)\*\*\s*\*\s*\*\*Type\s*:\*\*\s*([^\n]+)\s*\*\s*\*\*Catégorie\s*:\*\*\s*([^\n]+)\s*\*\s*\*\*Description\s*:\*\*\s*([^]+?)(?=\d+\.\s*\*\*|\n\n|\$)/gi,
             // Pattern alternatif avec tirets
@@ -125,10 +62,9 @@ var EffectParserModule = /** @class */ (function () {
             // Pattern simple ligne par ligne
             /^([A-Z][^:\n]+):\s*(.+)$/gm
         ];
-        var effects = [];
-        for (var _i = 0, patterns_1 = patterns; _i < patterns_1.length; _i++) {
-            var pattern = patterns_1[_i];
-            var match = void 0;
+        const effects = [];
+        for (const pattern of patterns) {
+            let match;
             while ((match = pattern.exec(content)) !== null) {
                 if (match[0].trim().length > 20) {
                     effects.push(match[0].trim());
@@ -137,100 +73,76 @@ var EffectParserModule = /** @class */ (function () {
         }
         // Si aucun pattern ne fonctionne, découpage par blocs
         if (effects.length === 0) {
-            var blocks = content.split(/\n\s*\n/).filter(function (block) {
-                return block.trim().length > 30 &&
-                    (block.includes('**') || block.includes('Type') || block.includes('Description'));
-            });
-            effects.push.apply(effects, blocks);
+            const blocks = content.split(/\n\s*\n/).filter(block => block.trim().length > 30 &&
+                (block.includes('**') || block.includes('Type') || block.includes('Description')));
+            effects.push(...blocks);
         }
-        return __spreadArray([], new Set(effects), true); // Supprime les doublons
-    };
-    EffectParserModule.prototype.processBatch = function (rawEffects, startIndex) {
-        return __awaiter(this, void 0, void 0, function () {
-            var results, i, rawEffect, globalIndex, parsed, error_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        results = [];
-                        i = 0;
-                        _a.label = 1;
-                    case 1:
-                        if (!(i < rawEffects.length)) return [3 /*break*/, 6];
-                        rawEffect = rawEffects[i];
-                        globalIndex = startIndex + i;
-                        _a.label = 2;
-                    case 2:
-                        _a.trys.push([2, 4, , 5]);
-                        return [4 /*yield*/, this.parseIndividualEffect(rawEffect, globalIndex)];
-                    case 3:
-                        parsed = _a.sent();
-                        results.push(parsed);
-                        return [3 /*break*/, 5];
-                    case 4:
-                        error_2 = _a.sent();
-                        results.push({
-                            raw: rawEffect,
-                            parsed: this.createFallbackEffect(rawEffect, globalIndex),
-                            confidence: 0.3,
-                            errors: [error_2 instanceof Error ? error_2.message : 'Parse error']
-                        });
-                        return [3 /*break*/, 5];
-                    case 5:
-                        i++;
-                        return [3 /*break*/, 1];
-                    case 6: return [2 /*return*/, results];
-                }
-            });
-        });
-    };
-    EffectParserModule.prototype.parseIndividualEffect = function (rawText, index) {
-        return __awaiter(this, void 0, void 0, function () {
-            var baseData, aiAnalysis, contextData, effectId, effectData, validationResult;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        baseData = this.patternMatcher.extractBaseData(rawText);
-                        return [4 /*yield*/, this.localAI.analyzeEffect(rawText)];
-                    case 1:
-                        aiAnalysis = _a.sent();
-                        contextData = this.contextAnalyzer.analyze(rawText, baseData);
-                        effectId = this.generateEffectId(baseData.name || "Effect_".concat(index), baseData.category);
-                        effectData = {
-                            id: effectId,
-                            name: baseData.name || aiAnalysis.suggestedName || "GeneratedEffect_".concat(index),
-                            type: this.normalizeType(baseData.type || aiAnalysis.type),
-                            category: this.normalizeCategory(baseData.category || aiAnalysis.category),
-                            subCategory: aiAnalysis.subCategory,
-                            description: baseData.description || aiAnalysis.enhancedDescription,
-                            complexity: aiAnalysis.complexity,
-                            keywords: __spreadArray(__spreadArray([], baseData.keywords, true), aiAnalysis.keywords, true),
-                            concepts: aiAnalysis.concepts,
-                            metadata: {
-                                estimatedGenTime: this.calculateGenTime(aiAnalysis.complexity),
-                                difficulty: this.mapComplexityToDifficulty(aiAnalysis.complexity),
-                                platform: ['javascript', 'web', 'canvas'],
-                                performance: this.assessPerformance(aiAnalysis.complexity, aiAnalysis.concepts)
-                            }
-                        };
-                        validationResult = this.qualityValidator.validate(effectData);
-                        return [2 /*return*/, {
-                                raw: rawText,
-                                parsed: effectData,
-                                confidence: validationResult.confidence,
-                                errors: validationResult.errors
-                            }];
-                }
-            });
-        });
-    };
-    EffectParserModule.prototype.generateEffectId = function (name, category) {
-        var cleanName = name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        var cleanCategory = category.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        var timestamp = Date.now().toString(36);
-        return "".concat(cleanCategory, "_").concat(cleanName, "_").concat(timestamp).slice(0, 50);
-    };
-    EffectParserModule.prototype.normalizeType = function (type) {
-        var typeMap = {
+        return [...new Set(effects)]; // Supprime les doublons
+    }
+    async processBatch(rawEffects, startIndex) {
+        const results = [];
+        for (let i = 0; i < rawEffects.length; i++) {
+            const rawEffect = rawEffects[i];
+            const globalIndex = startIndex + i;
+            try {
+                const parsed = await this.parseIndividualEffect(rawEffect, globalIndex);
+                results.push(parsed);
+            }
+            catch (error) {
+                results.push({
+                    raw: rawEffect,
+                    parsed: this.createFallbackEffect(rawEffect, globalIndex),
+                    confidence: 0.3,
+                    errors: [error instanceof Error ? error.message : 'Parse error']
+                });
+            }
+        }
+        return results;
+    }
+    async parseIndividualEffect(rawText, index) {
+        // Phase 1: Extraction des données de base
+        const baseData = this.patternMatcher.extractBaseData(rawText);
+        // Phase 2: Analyse sémantique avec IA locale
+        const aiAnalysis = await this.localAI.analyzeEffect(rawText);
+        // Phase 3: Analyse contextuelle
+        const contextData = this.contextAnalyzer.analyze(rawText, baseData);
+        // Phase 4: Génération de l'ID unique
+        const effectId = this.generateEffectId(baseData.name || `Effect_${index}`, baseData.category);
+        // Phase 5: Construction de l'objet final
+        const effectData = {
+            id: effectId,
+            name: baseData.name || aiAnalysis.suggestedName || `GeneratedEffect_${index}`,
+            type: this.normalizeType(baseData.type || aiAnalysis.type),
+            category: this.normalizeCategory(baseData.category || aiAnalysis.category),
+            subCategory: aiAnalysis.subCategory,
+            description: baseData.description || aiAnalysis.enhancedDescription,
+            complexity: aiAnalysis.complexity,
+            keywords: [...baseData.keywords, ...aiAnalysis.keywords],
+            concepts: aiAnalysis.concepts,
+            metadata: {
+                estimatedGenTime: this.calculateGenTime(aiAnalysis.complexity),
+                difficulty: this.mapComplexityToDifficulty(aiAnalysis.complexity),
+                platform: ['javascript', 'web', 'canvas'],
+                performance: this.assessPerformance(aiAnalysis.complexity, aiAnalysis.concepts)
+            }
+        };
+        // Phase 6: Validation qualité
+        const validationResult = this.qualityValidator.validate(effectData);
+        return {
+            raw: rawText,
+            parsed: effectData,
+            confidence: validationResult.confidence,
+            errors: validationResult.errors
+        };
+    }
+    generateEffectId(name, category) {
+        const cleanName = name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const cleanCategory = category.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const timestamp = Date.now().toString(36);
+        return `${cleanCategory}_${cleanName}_${timestamp}`.slice(0, 50);
+    }
+    normalizeType(type) {
+        const typeMap = {
             'vidéo': 'VIDEO',
             'video': 'VIDEO',
             'image': 'IMAGE',
@@ -240,16 +152,15 @@ var EffectParserModule = /** @class */ (function () {
             'ui': 'UI',
             'interface': 'UI'
         };
-        var normalized = type.toLowerCase().trim();
-        for (var _i = 0, _a = Object.entries(typeMap); _i < _a.length; _i++) {
-            var _b = _a[_i], key = _b[0], value = _b[1];
+        const normalized = type.toLowerCase().trim();
+        for (const [key, value] of Object.entries(typeMap)) {
             if (normalized.includes(key))
                 return value;
         }
         return 'VISUAL';
-    };
-    EffectParserModule.prototype.normalizeCategory = function (category) {
-        var categoryMap = {
+    }
+    normalizeCategory(category) {
+        const categoryMap = {
             'manipulation temporelle': 'MANIPULATION_TEMPORELLE',
             'temporal manipulation': 'MANIPULATION_TEMPORELLE',
             'manipulation matière': 'MANIPULATION_MATIERE',
@@ -264,20 +175,19 @@ var EffectParserModule = /** @class */ (function () {
             'psychédélique': 'PSYCHEDELIQUE',
             'psychedelic': 'PSYCHEDELIQUE'
         };
-        var normalized = category.toLowerCase().trim();
-        for (var _i = 0, _a = Object.entries(categoryMap); _i < _a.length; _i++) {
-            var _b = _a[_i], key = _b[0], value = _b[1];
+        const normalized = category.toLowerCase().trim();
+        for (const [key, value] of Object.entries(categoryMap)) {
             if (normalized.includes(key))
                 return value;
         }
         return 'GENERAL';
-    };
-    EffectParserModule.prototype.calculateGenTime = function (complexity) {
+    }
+    calculateGenTime(complexity) {
         // Temps en secondes basé sur la complexité
-        var baseTime = 30;
+        const baseTime = 30;
         return baseTime + (complexity * 15);
-    };
-    EffectParserModule.prototype.mapComplexityToDifficulty = function (complexity) {
+    }
+    mapComplexityToDifficulty(complexity) {
         if (complexity <= 3)
             return 'BEGINNER';
         if (complexity <= 6)
@@ -285,20 +195,20 @@ var EffectParserModule = /** @class */ (function () {
         if (complexity <= 8)
             return 'ADVANCED';
         return 'EXPERT';
-    };
-    EffectParserModule.prototype.assessPerformance = function (complexity, concepts) {
-        var heavyConcepts = ['particles', 'physics', 'lighting', '3d', 'realtime'];
-        var hasHeavyConcepts = concepts.some(function (c) { return heavyConcepts.includes(c.toLowerCase()); });
+    }
+    assessPerformance(complexity, concepts) {
+        const heavyConcepts = ['particles', 'physics', 'lighting', '3d', 'realtime'];
+        const hasHeavyConcepts = concepts.some(c => heavyConcepts.includes(c.toLowerCase()));
         if (complexity >= 8 || hasHeavyConcepts)
             return 'LOW';
         if (complexity >= 5)
             return 'MEDIUM';
         return 'HIGH';
-    };
-    EffectParserModule.prototype.createFallbackEffect = function (rawText, index) {
+    }
+    createFallbackEffect(rawText, index) {
         return {
-            id: "fallback_".concat(index, "_").concat(Date.now()),
-            name: "ParsedEffect_".concat(index),
+            id: `fallback_${index}_${Date.now()}`,
+            name: `ParsedEffect_${index}`,
             type: 'VISUAL',
             category: 'GENERAL',
             description: rawText.slice(0, 200) + '...',
@@ -312,153 +222,123 @@ var EffectParserModule = /** @class */ (function () {
                 performance: 'MEDIUM'
             }
         };
-    };
-    EffectParserModule.prototype.saveToLibrary = function (effects) {
-        return __awaiter(this, void 0, void 0, function () {
-            var libraryPath, groupedEffects, _i, _a, _b, category, categoryEffects, categoryPath, indexData, _c, categoryEffects_1, effect, effectFile, globalIndex, error_3;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
-                    case 0:
-                        _d.trys.push([0, 11, , 12]);
-                        libraryPath = path.join(process.cwd(), 'effects-library');
-                        return [4 /*yield*/, fs.mkdir(libraryPath, { recursive: true })];
-                    case 1:
-                        _d.sent();
-                        groupedEffects = effects.reduce(function (acc, effect) {
-                            var category = effect.parsed.category;
-                            if (!acc[category])
-                                acc[category] = [];
-                            acc[category].push(effect);
-                            return acc;
-                        }, {});
-                        _i = 0, _a = Object.entries(groupedEffects);
-                        _d.label = 2;
-                    case 2:
-                        if (!(_i < _a.length)) return [3 /*break*/, 9];
-                        _b = _a[_i], category = _b[0], categoryEffects = _b[1];
-                        categoryPath = path.join(libraryPath, category);
-                        return [4 /*yield*/, fs.mkdir(categoryPath, { recursive: true })];
-                    case 3:
-                        _d.sent();
-                        indexData = {
-                            category: category,
-                            count: categoryEffects.length,
-                            effects: categoryEffects.map(function (e) { return ({
-                                id: e.parsed.id,
-                                name: e.parsed.name,
-                                description: e.parsed.description.slice(0, 100) + '...',
-                                complexity: e.parsed.complexity,
-                                confidence: e.confidence
-                            }); }),
-                            lastUpdated: new Date().toISOString()
-                        };
-                        return [4 /*yield*/, fs.writeFile(path.join(categoryPath, 'index.json'), JSON.stringify(indexData, null, 2))];
-                    case 4:
-                        _d.sent();
-                        _c = 0, categoryEffects_1 = categoryEffects;
-                        _d.label = 5;
-                    case 5:
-                        if (!(_c < categoryEffects_1.length)) return [3 /*break*/, 8];
-                        effect = categoryEffects_1[_c];
-                        effectFile = path.join(categoryPath, "".concat(effect.parsed.id, ".json"));
-                        return [4 /*yield*/, fs.writeFile(effectFile, JSON.stringify(effect, null, 2))];
-                    case 6:
-                        _d.sent();
-                        _d.label = 7;
-                    case 7:
-                        _c++;
-                        return [3 /*break*/, 5];
-                    case 8:
-                        _i++;
-                        return [3 /*break*/, 2];
-                    case 9:
-                        globalIndex = {
-                            totalEffects: effects.length,
-                            categories: Object.keys(groupedEffects),
-                            lastParsed: new Date().toISOString(),
-                            stats: {
-                                avgComplexity: effects.reduce(function (sum, e) { return sum + e.parsed.complexity; }, 0) / effects.length,
-                                avgConfidence: effects.reduce(function (sum, e) { return sum + e.confidence; }, 0) / effects.length
-                            }
-                        };
-                        return [4 /*yield*/, fs.writeFile(path.join(libraryPath, 'global-index.json'), JSON.stringify(globalIndex, null, 2))];
-                    case 10:
-                        _d.sent();
-                        console.log("\uD83D\uDCBE ".concat(effects.length, " effets sauvegard\u00E9s dans la biblioth\u00E8que"));
-                        return [3 /*break*/, 12];
-                    case 11:
-                        error_3 = _d.sent();
-                        console.error("Erreur lors de la sauvegarde:", error_3);
-                        return [3 /*break*/, 12];
-                    case 12: return [2 /*return*/];
+    }
+    async saveToLibrary(effects) {
+        try {
+            // Création de la structure de dossiers
+            const libraryPath = path.join(process.cwd(), 'effects-library');
+            await fs.mkdir(libraryPath, { recursive: true });
+            // Groupement par catégorie
+            const groupedEffects = effects.reduce((acc, effect) => {
+                const category = effect.parsed.category;
+                if (!acc[category])
+                    acc[category] = [];
+                acc[category].push(effect);
+                return acc;
+            }, {});
+            // Sauvegarde par catégorie
+            for (const [category, categoryEffects] of Object.entries(groupedEffects)) {
+                const categoryPath = path.join(libraryPath, category);
+                await fs.mkdir(categoryPath, { recursive: true });
+                // Index de la catégorie
+                const indexData = {
+                    category,
+                    count: categoryEffects.length,
+                    effects: categoryEffects.map(e => ({
+                        id: e.parsed.id,
+                        name: e.parsed.name,
+                        description: e.parsed.description.slice(0, 100) + '...',
+                        complexity: e.parsed.complexity,
+                        confidence: e.confidence
+                    })),
+                    lastUpdated: new Date().toISOString()
+                };
+                await fs.writeFile(path.join(categoryPath, 'index.json'), JSON.stringify(indexData, null, 2));
+                // Sauvegarde de chaque effet
+                for (const effect of categoryEffects) {
+                    const effectFile = path.join(categoryPath, `${effect.parsed.id}.json`);
+                    await fs.writeFile(effectFile, JSON.stringify(effect, null, 2));
                 }
-            });
-        });
-    };
-    return EffectParserModule;
-}());
+            }
+            // Index global
+            const globalIndex = {
+                totalEffects: effects.length,
+                categories: Object.keys(groupedEffects),
+                lastParsed: new Date().toISOString(),
+                stats: {
+                    avgComplexity: effects.reduce((sum, e) => sum + e.parsed.complexity, 0) / effects.length,
+                    avgConfidence: effects.reduce((sum, e) => sum + e.confidence, 0) / effects.length
+                }
+            };
+            await fs.writeFile(path.join(libraryPath, 'global-index.json'), JSON.stringify(globalIndex, null, 2));
+            console.log(`💾 ${effects.length} effets sauvegardés dans la bibliothèque`);
+        }
+        catch (error) {
+            console.error("Erreur lors de la sauvegarde:", error);
+        }
+    }
+}
 // IA LOCALE INTÉGRÉE
-var LocalAIEngine = /** @class */ (function () {
-    function LocalAIEngine() {
-        this.neuralPatterns = new Map();
-        this.conceptVectors = new Map();
+class LocalAIEngine {
+    neuralPatterns = new Map();
+    conceptVectors = new Map();
+    constructor() {
         this.initializeNeuralPatterns();
         this.loadConceptVectors();
     }
-    LocalAIEngine.prototype.analyzeEffect = function (text) {
-        return __awaiter(this, void 0, void 0, function () {
-            var cleanText, semanticAnalysis, classification, concepts, complexity;
-            return __generator(this, function (_a) {
-                cleanText = this.preprocessText(text);
-                semanticAnalysis = this.performSemanticAnalysis(cleanText);
-                classification = this.classifyEffect(semanticAnalysis);
-                concepts = this.extractAdvancedConcepts(cleanText, classification);
-                complexity = this.calculateAIComplexity(concepts, semanticAnalysis);
-                return [2 /*return*/, {
-                        suggestedName: this.generateSmartName(concepts, classification),
-                        type: classification.type,
-                        category: classification.category,
-                        subCategory: classification.subCategory,
-                        enhancedDescription: this.enhanceDescription(cleanText, concepts),
-                        complexity: complexity,
-                        keywords: this.extractKeywords(cleanText, concepts),
-                        concepts: concepts
-                    }];
-            });
-        });
-    };
-    LocalAIEngine.prototype.preprocessText = function (text) {
+    async analyzeEffect(text) {
+        // Préprocessing du texte
+        const cleanText = this.preprocessText(text);
+        // Analyse sémantique multi-couches
+        const semanticAnalysis = this.performSemanticAnalysis(cleanText);
+        // Classification par réseau de neurones local
+        const classification = this.classifyEffect(semanticAnalysis);
+        // Extraction de concepts avancée
+        const concepts = this.extractAdvancedConcepts(cleanText, classification);
+        // Calcul de complexité basé sur l'IA
+        const complexity = this.calculateAIComplexity(concepts, semanticAnalysis);
+        return {
+            suggestedName: this.generateSmartName(concepts, classification),
+            type: classification.type,
+            category: classification.category,
+            subCategory: classification.subCategory,
+            enhancedDescription: this.enhanceDescription(cleanText, concepts),
+            complexity,
+            keywords: this.extractKeywords(cleanText, concepts),
+            concepts
+        };
+    }
+    preprocessText(text) {
         return text
             .toLowerCase()
             .replace(/[*#\-\d\.]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
-    };
-    LocalAIEngine.prototype.performSemanticAnalysis = function (text) {
-        var _this = this;
-        var words = text.split(' ');
-        var semanticScore = new Map();
+    }
+    performSemanticAnalysis(text) {
+        const words = text.split(' ');
+        const semanticScore = new Map();
         // Analyse des co-occurrences
-        for (var i = 0; i < words.length - 1; i++) {
-            var bigram = "".concat(words[i], "_").concat(words[i + 1]);
+        for (let i = 0; i < words.length - 1; i++) {
+            const bigram = `${words[i]}_${words[i + 1]}`;
             semanticScore.set(bigram, (semanticScore.get(bigram) || 0) + 1);
         }
         // Score sémantique global
-        var globalScore = words.reduce(function (score, word) {
-            return score + (_this.neuralPatterns.get(word) || 0);
+        const globalScore = words.reduce((score, word) => {
+            return score + (this.neuralPatterns.get(word) || 0);
         }, 0);
-        return { semanticScore: semanticScore, globalScore: globalScore, wordCount: words.length };
-    };
-    LocalAIEngine.prototype.classifyEffect = function (semanticAnalysis) {
+        return { semanticScore, globalScore, wordCount: words.length };
+    }
+    classifyEffect(semanticAnalysis) {
         // Classification basée sur les patterns neuronaux
-        var typeScores = {
+        const typeScores = {
             'VIDEO': 0,
             'IMAGE': 0,
             'ENVIRONMENT': 0,
             'AUDIO': 0,
             'UI': 0
         };
-        var categoryScores = {
+        const categoryScores = {
             'MANIPULATION_TEMPORELLE': 0,
             'MANIPULATION_MATIERE': 0,
             'LUMIERE_OMBRE': 0,
@@ -467,8 +347,7 @@ var LocalAIEngine = /** @class */ (function () {
             'PSYCHEDELIQUE': 0
         };
         // Algorithme de classification simplifié
-        for (var _i = 0, _a = semanticAnalysis.semanticScore; _i < _a.length; _i++) {
-            var _b = _a[_i], bigram = _b[0], count = _b[1];
+        for (const [bigram, count] of semanticAnalysis.semanticScore) {
             if (bigram.includes('temps') || bigram.includes('time')) {
                 categoryScores['MANIPULATION_TEMPORELLE'] += count * 2;
             }
@@ -479,19 +358,15 @@ var LocalAIEngine = /** @class */ (function () {
                 categoryScores['LUMIERE_OMBRE'] += count * 2;
             }
         }
-        var bestType = Object.entries(typeScores).reduce(function (a, b) {
-            return typeScores[a[0]] > typeScores[b[0]] ? a : b;
-        })[0] || 'VIDEO';
-        var bestCategory = Object.entries(categoryScores).reduce(function (a, b) {
-            return categoryScores[a[0]] > categoryScores[b[0]] ? a : b;
-        })[0] || 'GENERAL';
+        const bestType = Object.entries(typeScores).reduce((a, b) => typeScores[a[0]] > typeScores[b[0]] ? a : b)[0] || 'VIDEO';
+        const bestCategory = Object.entries(categoryScores).reduce((a, b) => categoryScores[a[0]] > categoryScores[b[0]] ? a : b)[0] || 'GENERAL';
         return { type: bestType, category: bestCategory };
-    };
-    LocalAIEngine.prototype.extractAdvancedConcepts = function (text, classification) {
-        var concepts = [];
+    }
+    extractAdvancedConcepts(text, classification) {
+        const concepts = [];
         // Concepts de base
-        var basicConcepts = ['visual', 'dynamic', 'interactive'];
-        concepts.push.apply(concepts, basicConcepts);
+        const basicConcepts = ['visual', 'dynamic', 'interactive'];
+        concepts.push(...basicConcepts);
         // Concepts spécialisés selon la classification
         if (classification.category === 'PARTICULES') {
             concepts.push('particles', 'emission', 'physics');
@@ -499,10 +374,10 @@ var LocalAIEngine = /** @class */ (function () {
         if (classification.category === 'LUMIERE_OMBRE') {
             concepts.push('lighting', 'shadows', 'glow');
         }
-        return __spreadArray([], new Set(concepts), true);
-    };
-    LocalAIEngine.prototype.calculateAIComplexity = function (concepts, semanticAnalysis) {
-        var complexity = 1;
+        return [...new Set(concepts)];
+    }
+    calculateAIComplexity(concepts, semanticAnalysis) {
+        let complexity = 1;
         // Complexité basée sur les concepts
         complexity += concepts.length * 0.5;
         // Complexité sémantique
@@ -510,17 +385,17 @@ var LocalAIEngine = /** @class */ (function () {
         // Complexité textuelle
         complexity += Math.min(semanticAnalysis.wordCount / 20, 3);
         return Math.min(Math.max(Math.round(complexity), 1), 10);
-    };
-    LocalAIEngine.prototype.generateSmartName = function (concepts, classification) {
-        var prefixes = ['Dynamic', 'Advanced', 'Epic', 'Pro', 'Ultra'];
-        var suffixes = ['Effect', 'FX', 'Visual', 'Animation'];
-        var prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-        var core = concepts[0] || classification.category.split('_')[0];
-        var suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-        return "".concat(prefix).concat(core.charAt(0).toUpperCase() + core.slice(1)).concat(suffix);
-    };
-    LocalAIEngine.prototype.enhanceDescription = function (text, concepts) {
-        var enhanced = text;
+    }
+    generateSmartName(concepts, classification) {
+        const prefixes = ['Dynamic', 'Advanced', 'Epic', 'Pro', 'Ultra'];
+        const suffixes = ['Effect', 'FX', 'Visual', 'Animation'];
+        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const core = concepts[0] || classification.category.split('_')[0];
+        const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+        return `${prefix}${core.charAt(0).toUpperCase() + core.slice(1)}${suffix}`;
+    }
+    enhanceDescription(text, concepts) {
+        let enhanced = text;
         // Enrichissement basé sur les concepts
         if (concepts.includes('particles')) {
             enhanced += " Utilise un système de particules avancé.";
@@ -529,117 +404,98 @@ var LocalAIEngine = /** @class */ (function () {
             enhanced += " Intègre des effets d'éclairage dynamiques.";
         }
         return enhanced;
-    };
-    LocalAIEngine.prototype.extractKeywords = function (text, concepts) {
-        var words = text.split(' ').filter(function (word) { return word.length > 3; });
-        var keywords = __spreadArray(__spreadArray([], words.slice(0, 10), true), concepts, true);
-        return __spreadArray([], new Set(keywords), true);
-    };
-    LocalAIEngine.prototype.initializeNeuralPatterns = function () {
+    }
+    extractKeywords(text, concepts) {
+        const words = text.split(' ').filter(word => word.length > 3);
+        const keywords = [...words.slice(0, 10), ...concepts];
+        return [...new Set(keywords)];
+    }
+    initializeNeuralPatterns() {
         // Patterns neuronaux pré-entraînés (version simplifiée)
-        var patterns = {
+        const patterns = {
             'explosion': 0.9, 'particule': 0.8, 'lumiere': 0.7,
             'temps': 0.9, 'transformation': 0.8, 'morphing': 0.7,
             'psychedelique': 0.6, 'effet': 0.5, 'visual': 0.6
         };
-        for (var _i = 0, _a = Object.entries(patterns); _i < _a.length; _i++) {
-            var _b = _a[_i], pattern = _b[0], weight = _b[1];
+        for (const [pattern, weight] of Object.entries(patterns)) {
             this.neuralPatterns.set(pattern, weight);
         }
-    };
-    LocalAIEngine.prototype.loadConceptVectors = function () {
+    }
+    loadConceptVectors() {
         // Vecteurs de concepts pour analyse sémantique
-        var vectors = {
+        const vectors = {
             'particles': [0.9, 0.2, 0.8, 0.1],
             'lighting': [0.1, 0.9, 0.3, 0.7],
             'morphing': [0.3, 0.1, 0.9, 0.4]
         };
-        for (var _i = 0, _a = Object.entries(vectors); _i < _a.length; _i++) {
-            var _b = _a[_i], concept = _b[0], vector = _b[1];
+        for (const [concept, vector] of Object.entries(vectors)) {
             this.conceptVectors.set(concept, vector);
         }
-    };
-    return LocalAIEngine;
-}());
-// PATTERN MATCHER AVANCÉ
-var PatternMatcher = /** @class */ (function () {
-    function PatternMatcher() {
     }
-    PatternMatcher.prototype.extractBaseData = function (text) {
-        var data = { keywords: [] };
+}
+// PATTERN MATCHER AVANCÉ
+class PatternMatcher {
+    extractBaseData(text) {
+        const data = { keywords: [] };
         // Extraction du nom
-        var nameMatch = text.match(/\*\*([^*]+)\*\*/);
+        const nameMatch = text.match(/\*\*([^*]+)\*\*/);
         if (nameMatch)
             data.name = nameMatch[1].trim();
         // Extraction du type
-        var typeMatch = text.match(/Type\s*:\*\*\s*([^\n*]+)/i);
+        const typeMatch = text.match(/Type\s*:\*\*\s*([^\n*]+)/i);
         if (typeMatch)
             data.type = typeMatch[1].trim();
         // Extraction de la catégorie
-        var categoryMatch = text.match(/Catégorie\s*:\*\*\s*([^\n*]+)/i);
+        const categoryMatch = text.match(/Catégorie\s*:\*\*\s*([^\n*]+)/i);
         if (categoryMatch)
             data.category = categoryMatch[1].trim();
         // Extraction de la description
-        var descMatch = text.match(/Description\s*:\*\*\s*([^]+?)(?=\n\n|\d+\.|\$)/i);
+        const descMatch = text.match(/Description\s*:\*\*\s*([^]+?)(?=\n\n|\d+\.|\$)/i);
         if (descMatch)
             data.description = descMatch[1].trim();
         // Extraction des mots-clés
-        var words = text.toLowerCase().match(/\b\w{4,}\b/g) || [];
-        data.keywords = __spreadArray([], new Set(words), true).slice(0, 15);
+        const words = text.toLowerCase().match(/\b\w{4,}\b/g) || [];
+        data.keywords = [...new Set(words)].slice(0, 15);
         return data;
-    };
-    return PatternMatcher;
-}());
-// ANALYSEUR CONTEXTUEL
-var ContextAnalyzer = /** @class */ (function () {
-    function ContextAnalyzer() {
     }
-    ContextAnalyzer.prototype.analyze = function (text, baseData) {
-        var context = {
+}
+// ANALYSEUR CONTEXTUEL
+class ContextAnalyzer {
+    analyze(text, baseData) {
+        const context = {
             technicalLevel: this.assessTechnicalLevel(text),
             visualComplexity: this.assessVisualComplexity(text),
             interactivity: this.assessInteractivity(text),
             performance: this.assessPerformanceNeeds(text)
         };
         return context;
-    };
-    ContextAnalyzer.prototype.assessTechnicalLevel = function (text) {
-        var technicalTerms = ['algorithm', 'shader', 'gpu', 'optimization', 'pipeline'];
-        var count = technicalTerms.filter(function (term) {
-            return text.toLowerCase().includes(term);
-        }).length;
-        return Math.min(count * 2, 10);
-    };
-    ContextAnalyzer.prototype.assessVisualComplexity = function (text) {
-        var complexityWords = ['complex', 'detailed', 'realistic', 'advanced', 'sophisticated'];
-        var count = complexityWords.filter(function (word) {
-            return text.toLowerCase().includes(word);
-        }).length;
-        return Math.min(count * 1.5, 10);
-    };
-    ContextAnalyzer.prototype.assessInteractivity = function (text) {
-        var interactiveWords = ['click', 'hover', 'interaction', 'responsive', 'dynamic'];
-        var count = interactiveWords.filter(function (word) {
-            return text.toLowerCase().includes(word);
-        }).length;
-        return Math.min(count * 2, 10);
-    };
-    ContextAnalyzer.prototype.assessPerformanceNeeds = function (text) {
-        var performanceWords = ['fast', 'smooth', 'optimized', 'efficient', 'real-time'];
-        var count = performanceWords.filter(function (word) {
-            return text.toLowerCase().includes(word);
-        }).length;
-        return Math.min(count * 1.5, 10);
-    };
-    return ContextAnalyzer;
-}());
-// VALIDATEUR QUALITÉ
-var QualityValidator = /** @class */ (function () {
-    function QualityValidator() {
     }
-    QualityValidator.prototype.validate = function (effectData) {
-        var errors = [];
-        var confidence = 1.0;
+    assessTechnicalLevel(text) {
+        const technicalTerms = ['algorithm', 'shader', 'gpu', 'optimization', 'pipeline'];
+        const count = technicalTerms.filter(term => text.toLowerCase().includes(term)).length;
+        return Math.min(count * 2, 10);
+    }
+    assessVisualComplexity(text) {
+        const complexityWords = ['complex', 'detailed', 'realistic', 'advanced', 'sophisticated'];
+        const count = complexityWords.filter(word => text.toLowerCase().includes(word)).length;
+        return Math.min(count * 1.5, 10);
+    }
+    assessInteractivity(text) {
+        const interactiveWords = ['click', 'hover', 'interaction', 'responsive', 'dynamic'];
+        const count = interactiveWords.filter(word => text.toLowerCase().includes(word)).length;
+        return Math.min(count * 2, 10);
+    }
+    assessPerformanceNeeds(text) {
+        const performanceWords = ['fast', 'smooth', 'optimized', 'efficient', 'real-time'];
+        const count = performanceWords.filter(word => text.toLowerCase().includes(word)).length;
+        return Math.min(count * 1.5, 10);
+    }
+}
+// VALIDATEUR QUALITÉ
+class QualityValidator {
+    validate(effectData) {
+        const errors = [];
+        let confidence = 1.0;
         // Validation du nom
         if (!effectData.name || effectData.name.length < 3) {
             errors.push("Nom d'effet invalide ou trop court");
@@ -651,7 +507,7 @@ var QualityValidator = /** @class */ (function () {
             confidence -= 0.3;
         }
         // Validation de la catégorie
-        var validCategories = [
+        const validCategories = [
             'MANIPULATION_TEMPORELLE', 'MANIPULATION_MATIERE', 'LUMIERE_OMBRE',
             'PARTICULES', 'TRANSFORMATION', 'PSYCHEDELIQUE', 'GENERAL'
         ];
@@ -671,9 +527,8 @@ var QualityValidator = /** @class */ (function () {
         }
         return {
             confidence: Math.max(confidence, 0.1),
-            errors: errors
+            errors
         };
-    };
-    return QualityValidator;
-}());
-export var effectParserModule = new EffectParserModule();
+    }
+}
+export const effectParserModule = new EffectParserModule();

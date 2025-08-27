@@ -1,17 +1,13 @@
-var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
-    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
-    return cooked;
-};
 import { sql } from "drizzle-orm";
 import { pgTable, text, varchar, integer, real, jsonb, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-export var users = pgTable("users", {
-    id: varchar("id").primaryKey().default(sql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["gen_random_uuid()"], ["gen_random_uuid()"])))),
+export const users = pgTable("users", {
+    id: varchar("id").primaryKey().default(sql `gen_random_uuid()`),
     username: text("username").notNull().unique(),
     password: text("password").notNull(),
 });
-export var effects = pgTable("effects", {
-    id: varchar("id").primaryKey().default(sql(templateObject_2 || (templateObject_2 = __makeTemplateObject(["gen_random_uuid()"], ["gen_random_uuid()"])))),
+export const effects = pgTable("effects", {
+    id: varchar("id").primaryKey().default(sql `gen_random_uuid()`),
     name: text("name").notNull(),
     description: text("description").notNull(),
     type: text("type").notNull(), // 'PARTICLE', 'PHYSICS', 'LIGHTING', 'MORPHING'
@@ -20,7 +16,7 @@ export var effects = pgTable("effects", {
     code: text("code").notNull(),
     parameters: jsonb("parameters").notNull(),
     metadata: jsonb("metadata").notNull(),
-    tags: text("tags").array().notNull().default(sql(templateObject_3 || (templateObject_3 = __makeTemplateObject(["'{}'"], ["'{}'"])))),
+    tags: text("tags").array().notNull().default(sql `'{}'`),
     complexity: integer("complexity").notNull().default(1), // 1-10
     performance: text("performance").notNull().default('medium'), // 'low', 'medium', 'high'
     rating: real("rating").default(0),
@@ -28,8 +24,8 @@ export var effects = pgTable("effects", {
     createdAt: timestamp("created_at").defaultNow(),
     version: text("version").notNull().default('1.0.0'),
 });
-export var jobs = pgTable("jobs", {
-    id: varchar("id").primaryKey().default(sql(templateObject_4 || (templateObject_4 = __makeTemplateObject(["gen_random_uuid()"], ["gen_random_uuid()"])))),
+export const jobs = pgTable("jobs", {
+    id: varchar("id").primaryKey().default(sql `gen_random_uuid()`),
     description: text("description").notNull(),
     platform: text("platform").notNull(),
     options: jsonb("options").notNull(),
@@ -42,8 +38,8 @@ export var jobs = pgTable("jobs", {
     createdAt: timestamp("created_at").defaultNow(),
     completedAt: timestamp("completed_at"),
 });
-export var uploads = pgTable("uploads", {
-    id: varchar("id").primaryKey().default(sql(templateObject_5 || (templateObject_5 = __makeTemplateObject(["gen_random_uuid()"], ["gen_random_uuid()"])))),
+export const uploads = pgTable("uploads", {
+    id: varchar("id").primaryKey().default(sql `gen_random_uuid()`),
     filename: text("filename").notNull(),
     originalName: text("original_name").notNull(),
     mimeType: text("mime_type").notNull(),
@@ -52,11 +48,11 @@ export var uploads = pgTable("uploads", {
     status: text("status").notNull().default('processing'), // 'processing', 'completed', 'failed'
     processedCount: integer("processed_count").default(0),
     totalCount: integer("total_count").default(0),
-    errors: text("errors").array().default(sql(templateObject_6 || (templateObject_6 = __makeTemplateObject(["'{}'"], ["'{}'"])))),
+    errors: text("errors").array().default(sql `'{}'`),
     createdAt: timestamp("created_at").defaultNow(),
 });
-export var systemMetrics = pgTable("system_metrics", {
-    id: varchar("id").primaryKey().default(sql(templateObject_7 || (templateObject_7 = __makeTemplateObject(["gen_random_uuid()"], ["gen_random_uuid()"])))),
+export const systemMetrics = pgTable("system_metrics", {
+    id: varchar("id").primaryKey().default(sql `gen_random_uuid()`),
     cpuUsage: real("cpu_usage").notNull(),
     memoryUsage: real("memory_usage").notNull(),
     gpuUsage: real("gpu_usage").notNull(),
@@ -69,17 +65,17 @@ export var systemMetrics = pgTable("system_metrics", {
     timestamp: timestamp("timestamp").defaultNow(),
 });
 // Insert schemas
-export var insertUserSchema = createInsertSchema(users).pick({
+export const insertUserSchema = createInsertSchema(users).pick({
     username: true,
     password: true,
 });
-export var insertEffectSchema = createInsertSchema(effects).omit({
+export const insertEffectSchema = createInsertSchema(effects).omit({
     id: true,
     createdAt: true,
     rating: true,
     downloads: true,
 });
-export var insertJobSchema = createInsertSchema(jobs).omit({
+export const insertJobSchema = createInsertSchema(jobs).omit({
     id: true,
     status: true,
     progress: true,
@@ -89,7 +85,7 @@ export var insertJobSchema = createInsertSchema(jobs).omit({
     createdAt: true,
     completedAt: true,
 });
-export var insertUploadSchema = createInsertSchema(uploads).omit({
+export const insertUploadSchema = createInsertSchema(uploads).omit({
     id: true,
     status: true,
     processedCount: true,
@@ -97,8 +93,7 @@ export var insertUploadSchema = createInsertSchema(uploads).omit({
     errors: true,
     createdAt: true,
 });
-export var insertSystemMetricsSchema = createInsertSchema(systemMetrics).omit({
+export const insertSystemMetricsSchema = createInsertSchema(systemMetrics).omit({
     id: true,
     timestamp: true,
 });
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7;
