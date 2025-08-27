@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { registerRoutes } from "./routes";
+import { DependencyChecker } from "./utils/dependency-checker";
 
 const app = express();
 app.use(express.json());
@@ -51,10 +52,17 @@ app.use((req, res, next) => {
   const { createServer } = await import('http');
   const server = createServer(app);
 
-  // importantly only setup vite in development and after
+  // Importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    // Vérifier et corriger les dépendances automatiquement
+    log("Vérification des dépendances...");
+    const dependenciesOk = await DependencyChecker.autoFixDependencies();
+    if (!dependenciesOk) {
+      log("❌ Impossible de résoudre les problèmes de dépendances", "error");
+      process.exit(1);
+    }
     await setupVite(app, server);
   } else {
     serveStatic(app);

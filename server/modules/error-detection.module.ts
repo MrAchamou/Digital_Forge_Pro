@@ -737,7 +737,9 @@ class AdvancedErrorDetection {
       'tsx': 'npm install tsx --save-dev',
       'tsc': 'npm install typescript --save-dev',
       'nodemon': 'npm install nodemon --save-dev',
-      'vite': 'npm install vite --save-dev'
+      'vite': 'npm install vite --save-dev',
+      'drizzle-kit': 'npm install drizzle-kit --save-dev',
+      'esbuild': 'npm install esbuild --save-dev'
     };
     return suggestions[command] || `npm install ${command}`;
   }
