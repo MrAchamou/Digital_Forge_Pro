@@ -73,7 +73,56 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
+
+  // Initialize GOD monitoring system
+  // Initialisation du système de monitoring GOD
+  import { godMonitor } from './core/god-monitor';
+  import { DependencyChecker } from './utils/dependency-checker';
+
+  // Vérification et auto-réparation des dépendances au démarrage
+  DependencyChecker.autoFixDependencies().then((success) => {
+    if (success) {
+      console.log('✅ Dépendances vérifiées et corrigées');
+    } else {
+      console.warn('⚠️ Certaines dépendances pourraient être manquantes');
+    }
+  });
+
+  // Initialisation des systèmes globaux
+  global.systemCache = new Map();
+  global.activeSessions = 0;
+  global.processedRequests = 0;
+  global.systemMetrics = {
+    responseTime: 0,
+    errorCount: 0
+  };
+
+  // Surveillance des métriques de base
+  app.use((req, res, next) => {
+    const startTime = Date.now();
+    global.activeSessions++;
+
+    res.on('finish', () => {
+      global.activeSessions--;
+      global.processedRequests++;
+      global.systemMetrics.responseTime = Date.now() - startTime;
+    });
+
+    next();
+  });
+
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
+    console.log("🚀 Serveur démarré sur le port 5000");
+    console.log("🌐 Frontend disponible sur http://localhost:5000");
+    console.log("🔧 API disponible sur http://localhost:5000/api");
+    console.log("🧠 Système de monitoring GOD activé");
+    console.log("🛡️ Auto-réparation et prédiction intelligente en cours");
+
+    // Diagnostic initial
+    setTimeout(async () => {
+      const initialStatus = godMonitor.getGodStatus();
+      console.log('📊 État initial du système GOD:', JSON.stringify(initialStatus, null, 2));
+    }, 5000);
   });
 })();

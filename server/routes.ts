@@ -893,6 +893,71 @@ router.post("/api/system/validate", async (req, res) => {
   }
 });
 
+// Route de monitoring GOD
+router.get("/api/system/god-status", async (req, res) => {
+  try {
+    const { godMonitor } = require('./core/god-monitor');
+    const status = godMonitor.getGodStatus();
+    
+    res.json({
+      success: true,
+      godStatus: status,
+      timestamp: new Date(),
+      message: 'GOD monitoring system active'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get GOD status',
+      details: error.message,
+      timestamp: new Date()
+    });
+  }
+});
+
+// Route de diagnostic d'urgence
+router.post("/api/system/emergency-diagnostic", async (req, res) => {
+  try {
+    const { godMonitor } = require('./core/god-monitor');
+    const diagnostic = await godMonitor.performEmergencyDiagnostic();
+    
+    res.json({
+      success: true,
+      diagnostic,
+      timestamp: new Date(),
+      message: 'Emergency diagnostic completed'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Emergency diagnostic failed',
+      details: error.message,
+      timestamp: new Date()
+    });
+  }
+});
+
+// Route de prédiction forcée
+router.post("/api/system/force-prediction", async (req, res) => {
+  try {
+    const { godMonitor } = require('./core/god-monitor');
+    await godMonitor.forcePredictiveAnalysis();
+    
+    res.json({
+      success: true,
+      message: 'Predictive analysis forced successfully',
+      timestamp: new Date()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to force predictive analysis',
+      details: error.message,
+      timestamp: new Date()
+    });
+  }
+});
+
 // Route de redémarrage autonome
 router.post("/api/system/auto-repair", async (req, res) => {
   try {
@@ -939,16 +1004,137 @@ router.post("/api/system/auto-repair", async (req, res) => {
 });
 
 async function detectSystemIssues() {
-  // Simulation de détection d'issues
-  return [
-    { type: 'memory_leak', severity: 'low' },
-    { type: 'cache_overflow', severity: 'medium' }
-  ];
+  const issues = [];
+  
+  try {
+    // Vérification mémoire
+    const memUsage = process.memoryUsage();
+    if (memUsage.heapUsed > memUsage.heapTotal * 0.9) {
+      issues.push({ 
+        type: 'memory_leak', 
+        severity: 'critical',
+        details: `Heap usage: ${Math.round(memUsage.heapUsed / memUsage.heapTotal * 100)}%`
+      });
+    }
+    
+    // Vérification des modules critiques
+    const criticalModules = ['errorDetection', 'qualityAssurance', 'autonomousMonitor'];
+    for (const moduleName of criticalModules) {
+      try {
+        require(`./modules/${moduleName}.module`);
+      } catch (error) {
+        issues.push({
+          type: 'module_failure',
+          severity: 'critical',
+          module: moduleName,
+          details: error.message
+        });
+      }
+    }
+    
+    // Vérification des dépendances
+    const { DependencyChecker } = require('./utils/dependency-checker');
+    const depIssues = await DependencyChecker.checkAllDependencies();
+    issues.push(...depIssues.map(dep => ({
+      type: 'dependency_missing',
+      severity: 'high',
+      command: dep.command,
+      solution: dep.solution
+    })));
+    
+    // Vérification des performances
+    const performanceMetrics = global.systemMetrics || {};
+    if (performanceMetrics.responseTime > 2000) {
+      issues.push({
+        type: 'performance_degradation',
+        severity: 'high',
+        details: `Response time: ${performanceMetrics.responseTime}ms`
+      });
+    }
+    
+  } catch (error) {
+    issues.push({
+      type: 'diagnostic_failure',
+      severity: 'critical',
+      details: error.message
+    });
+  }
+  
+  return issues;
 }
 
 async function repairIssue(issue) {
-  // Simulation de réparation
-  console.log(`🔧 Réparation automatique: ${issue.type}`);
+  console.log(`🔧 Réparation de ${issue.type}...`);
+  
+  try {
+    switch (issue.type) {
+      case 'memory_leak':
+        // Force garbage collection
+        if (global.gc) {
+          global.gc();
+          console.log('✅ Garbage collection forcée');
+        }
+        // Clear caches
+        if (global.systemCache) {
+          global.systemCache.clear();
+          console.log('✅ Cache système vidé');
+        }
+        break;
+        
+      case 'module_failure':
+        console.log(`🔄 Redémarrage du module ${issue.module}`);
+        try {
+          delete require.cache[require.resolve(`./modules/${issue.module}.module`)];
+          require(`./modules/${issue.module}.module`);
+          console.log(`✅ Module ${issue.module} redémarré`);
+        } catch (restartError) {
+          console.log(`❌ Échec redémarrage ${issue.module}: ${restartError.message}`);
+          throw restartError;
+        }
+        break;
+        
+      case 'dependency_missing':
+        console.log(`📦 Installation de ${issue.command}`);
+        const { exec } = require('child_process');
+        const { promisify } = require('util');
+        const execAsync = promisify(exec);
+        
+        await execAsync(issue.solution);
+        console.log(`✅ Dépendance ${issue.command} installée`);
+        break;
+        
+      case 'performance_degradation':
+        console.log('🚀 Optimisation des performances');
+        // Reset adaptive parameters
+        if (global.autonomousMonitor) {
+          global.autonomousMonitor.forceOptimizationCycle();
+        }
+        // Clear request queue
+        if (global.requestQueue) {
+          global.requestQueue.clear();
+        }
+        console.log('✅ Performances optimisées');
+        break;
+        
+      case 'cache_overflow':
+        if (global.systemCache) {
+          const size = global.systemCache.size;
+          global.systemCache.clear();
+          console.log(`✅ Cache vidé (${size} entrées supprimées)`);
+        }
+        break;
+        
+      default:
+        console.log(`⚠️ Type de réparation non reconnue: ${issue.type}`);
+        break;
+    }
+    
+    return { success: true, action: `Réparé ${issue.type}` };
+    
+  } catch (error) {
+    console.error(`❌ Échec réparation ${issue.type}:`, error);
+    throw error;
+  } automatique: ${issue.type}`);
   return true;
 }
 

@@ -816,11 +816,221 @@ class AdvancedErrorDetection {
   private async detectCompatibilityIssues(code: string, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
   private async detectBuildErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
   private async detectEnvironmentErrors(context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
-  private async detectRuntimeErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
+  private async detectRuntimeErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> {
+    const errors: DetectedError[] = [];
+
+    try {
+      // Détection d'erreurs de runtime spécifiques
+      const consoleOutput = context.consoleOutput || context.stackTrace || '';
+      
+      // Erreurs TypeError
+      const typeErrorPattern = /TypeError:\s+(.+)\s+at\s+(.+):(\d+):(\d+)/g;
+      let match;
+      while ((match = typeErrorPattern.exec(consoleOutput)) !== null) {
+        errors.push({
+          type: 'runtime',
+          subtype: 'type_error',
+          message: `TypeError: ${match[1]}`,
+          line: parseInt(match[3]),
+          column: parseInt(match[4]),
+          severity: 'critical',
+          aiConfidence: 0.95,
+          autoFix: await this.generateTypeErrorFix(match[1], match[2]),
+          stackTrace: match[0],
+          timestamp: new Date()
+        });
+      }
+
+      // Erreurs ReferenceError
+      const refErrorPattern = /ReferenceError:\s+(.+)\s+at\s+(.+):(\d+):(\d+)/g;
+      while ((match = refErrorPattern.exec(consoleOutput)) !== null) {
+        errors.push({
+          type: 'runtime',
+          subtype: 'reference_error',
+          message: `ReferenceError: ${match[1]}`,
+          line: parseInt(match[3]),
+          column: parseInt(match[4]),
+          severity: 'critical',
+          aiConfidence: 0.9,
+          autoFix: await this.generateReferenceErrorFix(match[1]),
+          stackTrace: match[0],
+          timestamp: new Date()
+        });
+      }
+
+      // Détection d'erreurs async/await
+      const asyncErrorPattern = /UnhandledPromiseRejectionWarning:\s+(.+)/g;
+      while ((match = asyncErrorPattern.exec(consoleOutput)) !== null) {
+        errors.push({
+          type: 'runtime',
+          subtype: 'unhandled_promise',
+          message: `Unhandled Promise Rejection: ${match[1]}`,
+          severity: 'high',
+          aiConfidence: 0.88,
+          autoFix: await this.generatePromiseErrorFix(match[1]),
+          solution: 'Add proper error handling to async operations',
+          timestamp: new Date()
+        });
+      }
+
+      // Détection d'erreurs de performance
+      if (context.executionTime > 5000) {
+        errors.push({
+          type: 'runtime',
+          subtype: 'performance_timeout',
+          message: `Execution timeout: ${context.executionTime}ms`,
+          severity: 'high',
+          aiConfidence: 0.85,
+          autoFix: await this.generatePerformanceOptimization(),
+          suggestion: 'Optimize slow operations or add timeout handling',
+          timestamp: new Date()
+        });
+      }
+
+      // Détection d'erreurs de mémoire
+      if (context.memoryUsage && context.memoryUsage > 100 * 1024 * 1024) { // 100MB
+        errors.push({
+          type: 'runtime',
+          subtype: 'memory_leak',
+          message: `High memory usage: ${Math.round(context.memoryUsage / 1024 / 1024)}MB`,
+          severity: 'medium',
+          aiConfidence: 0.8,
+          autoFix: await this.generateMemoryOptimization(),
+          suggestion: 'Check for memory leaks or optimize data structures',
+          timestamp: new Date()
+        });
+      }
+
+    } catch (error) {
+      console.error('Erreur détection runtime:', error);
+    }
+
+    return errors;
+  }
   private async predictFutureErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return []; }
   private async consolidateWithAI(errors: DetectedError[], aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> { return errors; }
   private async generatePreventionStrategy(semanticAnalysis: any, contextualAnalysis: any): Promise<string> { return 'Generic prevention'; }
   private extractLearningPoints(semanticAnalysis: any, contextualAnalysis: any): string[] { return []; }
+
+  // === MÉTHODES DE GÉNÉRATION DE CORRECTIONS AVANCÉES ===
+  private async generateTypeErrorFix(errorMessage: string, location: string) {
+    return {
+      type: 'type_error_fix',
+      error: errorMessage,
+      location: location,
+      suggestion: this.inferTypeErrorSolution(errorMessage),
+      code: this.generateTypeCheckCode(errorMessage),
+      confidence: 0.9
+    };
+  }
+
+  private async generateReferenceErrorFix(errorMessage: string) {
+    const variableName = errorMessage.match(/(\w+) is not defined/)?.[1];
+    return {
+      type: 'reference_error_fix',
+      variable: variableName,
+      suggestion: `Declare or import variable: ${variableName}`,
+      code: `// Check if ${variableName} is defined\nif (typeof ${variableName} === 'undefined') {\n  const ${variableName} = null; // Define with appropriate value\n}`,
+      confidence: 0.85
+    };
+  }
+
+  private async generatePromiseErrorFix(errorMessage: string) {
+    return {
+      type: 'promise_error_fix',
+      suggestion: 'Add proper error handling to async operations',
+      code: `
+// Add this pattern for async error handling
+try {
+  const result = await yourAsyncFunction();
+  // Handle success
+} catch (error) {
+  console.error('Async operation failed:', error);
+  // Handle error appropriately
+  throw error; // or handle gracefully
+}`,
+      confidence: 0.9
+    };
+  }
+
+  private async generatePerformanceOptimization() {
+    return {
+      type: 'performance_optimization',
+      suggestion: 'Optimize slow operations',
+      techniques: [
+        'Add caching for expensive operations',
+        'Use lazy loading for heavy resources',
+        'Implement timeout mechanisms',
+        'Consider pagination for large datasets'
+      ],
+      code: `
+// Example performance optimization
+const cache = new Map();
+const memoizedFunction = (input) => {
+  if (cache.has(input)) {
+    return cache.get(input);
+  }
+  const result = expensiveOperation(input);
+  cache.set(input, result);
+  return result;
+};`,
+      confidence: 0.8
+    };
+  }
+
+  private async generateMemoryOptimization() {
+    return {
+      type: 'memory_optimization',
+      suggestion: 'Optimize memory usage',
+      techniques: [
+        'Clear unused variables',
+        'Use WeakMap/WeakSet for temporary references',
+        'Implement proper cleanup in event listeners',
+        'Avoid circular references'
+      ],
+      code: `
+// Memory optimization patterns
+// 1. Clear large objects when done
+largeObject = null;
+
+// 2. Use WeakMap for temporary associations
+const weakMap = new WeakMap();
+
+// 3. Remove event listeners
+element.removeEventListener('click', handler);
+
+// 4. Clear intervals/timeouts
+clearInterval(intervalId);
+clearTimeout(timeoutId);`,
+      confidence: 0.85
+    };
+  }
+
+  private inferTypeErrorSolution(errorMessage: string): string {
+    if (errorMessage.includes('undefined')) {
+      return 'Check if variable is defined before use';
+    }
+    if (errorMessage.includes('null')) {
+      return 'Add null check before accessing properties';
+    }
+    if (errorMessage.includes('not a function')) {
+      return 'Verify that the variable is indeed a function';
+    }
+    if (errorMessage.includes('Cannot read property')) {
+      return 'Add optional chaining or null checks';
+    }
+    return 'Add proper type checking and validation';
+  }
+
+  private generateTypeCheckCode(errorMessage: string): string {
+    if (errorMessage.includes('undefined')) {
+      return `if (typeof variable !== 'undefined' && variable !== null) {\n  // Safe to use variable\n}`;
+    }
+    if (errorMessage.includes('not a function')) {
+      return `if (typeof fn === 'function') {\n  fn();\n} else {\n  console.error('Expected function, got:', typeof fn);\n}`;
+    }
+    return `// Add appropriate type checking based on context`;
+  }
 
   // API publique
   public getDetectionMetrics() {
