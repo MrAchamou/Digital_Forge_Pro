@@ -166,79 +166,110 @@ class AdvancedErrorDetection {
   private async detectSyntaxErrors(code: string, aiAnalysis: AIErrorAnalysis): Promise<DetectedError[]> {
     const errors: DetectedError[] = [];
 
-    try {
-      // Détection des parenthèses/crochets non fermés
-      const brackets = { '(': ')', '[': ']', '{': '}' };
-      const stack: string[] = [];
-      const lines = code.split('\n');
+    // Détection des parenthèses/crochets non fermés
+    const brackets = { '(': ')', '[': ']', '{': '}' };
+    const stack: string[] = [];
+    const lines = code.split('\n');
 
-      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-        const line = lines[lineIndex];
-        for (let charIndex = 0; charIndex < line.length; charIndex++) {
-          const char = line[charIndex];
-          if (char in brackets) {
-            stack.push(char);
-          } else if (Object.values(brackets).includes(char)) {
-            const last = stack.pop();
-            if (!last || brackets[last] !== char) {
-              errors.push({
-                type: 'syntax',
-                subtype: 'unmatched_bracket',
-                message: `Bracket mismatch: expected '${brackets[last] || ''}', found '${char}'`,
-                line: lineIndex + 1,
-                column: charIndex + 1,
-                severity: 'high',
-                aiConfidence: 0.95,
-                autoFix: await this.generateBracketFix(char, lineIndex, charIndex),
-                timestamp: new Date()
-              });
-            }
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+      const line = lines[lineIndex];
+      for (let charIndex = 0; charIndex < line.length; charIndex++) {
+        const char = line[charIndex];
+        if (char in brackets) {
+          stack.push(char);
+        } else if (Object.values(brackets).includes(char)) {
+          const last = stack.pop();
+          if (!last || brackets[last] !== char) {
+            errors.push({
+              type: 'syntax',
+              subtype: 'unmatched_bracket',
+              message: `Bracket mismatch: expected '${brackets[last] || ''}', found '${char}'`,
+              line: lineIndex + 1,
+              column: charIndex + 1,
+              severity: 'high',
+              aiConfidence: 0.95,
+              autoFix: await this.generateBracketFix(char, lineIndex, charIndex),
+              timestamp: new Date()
+            });
           }
         }
       }
+    }
 
-      // Détection des variables non déclarées
-      const variablePattern = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\s*[=\[\.]|\s*\()/g;
-      const declaredVars = new Set(['console', 'require', 'import', 'module', 'exports', 'Date', 'Promise', 'Map', 'Set', 'performance', 'setInterval', 'setTimeout', 'clearInterval', 'clearTimeout', 'Array', 'Object', 'JSON', 'Math', 'String', 'Number', 'Boolean', 'Error', 'RegExp']);
+    // Détection des variables non déclarées
+    const variablePattern = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\s*[=\[\.]|\s*\()/g;
+    const declaredVars = new Set(['console', 'require', 'import', 'module', 'exports', 'Date', 'Promise', 'Map', 'Set', 'performance', 'setInterval', 'setTimeout', 'clearInterval', 'clearTimeout', 'Array', 'Object', 'JSON', 'Math', 'String', 'Number', 'Boolean', 'Error', 'RegExp']);
 
-      let match;
-      while ((match = variablePattern.exec(code)) !== null) {
-        const varName = match[1];
-        if (!declaredVars.has(varName) && !code.includes(`let ${varName}`) && !code.includes(`const ${varName}`) && !code.includes(`var ${varName}`) && !code.includes(`function ${varName}`)) {
-          errors.push({
-            type: 'syntax',
-            subtype: 'undefined_variable',
-            message: `Variable '${varName}' may not be declared`,
-            line: this.getLineNumber(code, match.index),
-            column: match.index,
-            severity: 'medium',
-            aiConfidence: 0.8,
-            autoFix: await this.generateVariableDeclarationFix(varName),
-            suggestion: `Declare variable: const ${varName} = ...`,
-            timestamp: new Date()
-          });
-        }
+    let match;
+    while ((match = variablePattern.exec(code)) !== null) {
+      const varName = match[1];
+      if (!declaredVars.has(varName) && !code.includes(`let ${varName}`) && !code.includes(`const ${varName}`) && !code.includes(`var ${varName}`) && !code.includes(`function ${varName}`)) {
+        errors.push({
+          type: 'syntax',
+          subtype: 'undefined_variable',
+          message: `Variable '${varName}' may not be declared`,
+          line: this.getLineNumber(code, match.index),
+          column: match.index,
+          severity: 'medium',
+          aiConfidence: 0.8,
+          autoFix: await this.generateVariableDeclarationFix(varName),
+          suggestion: `Declare variable: const ${varName} = ...`,
+          timestamp: new Date()
+        });
+      }
+    }
+
+    // Détection des assignations doubles (erreur "= variable;")
+    const duplicateAssignmentLines = code.split('\n');
+    duplicateAssignmentLines.forEach((line, index) => {
+      const duplicateAssignmentMatch = line.match(/=\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*;\s*=\s*\1\s*;?/);
+      if (duplicateAssignmentMatch) {
+        errors.push({
+          type: 'syntax',
+          subtype: 'duplicate_assignment',
+          message: `Duplicate assignment detected: "${duplicateAssignmentMatch[0]}"`,
+          line: index + 1,
+          column: line.indexOf('='),
+          severity: 'high',
+          aiConfidence: 0.98,
+          autoFix: { type: 'remove_duplicate_assignment', position: match.index },
+          suggestion: `Remove duplicate assignment, use: "= ${duplicateAssignmentMatch[1]};" only once`,
+          timestamp: new Date()
+        });
       }
 
-      // Détection des points-virgules manquants
-      const statementPattern = /(?:^|\n)\s*(?:const|let|var|function|class|if|for|while|switch|try|throw|return)\s+[^;]*(?=\n|$)/g;
-      while ((match = statementPattern.exec(code)) !== null) {
-        if (!match[0].includes(';') && !match[0].includes('{')) {
-          errors.push({
-            type: 'syntax',
-            subtype: 'missing_semicolon',
-            message: 'Missing semicolon',
-            line: this.getLineNumber(code, match.index),
-            severity: 'low',
-            aiConfidence: 0.7,
-            autoFix: { type: 'add_semicolon', position: match.index + match[0].length },
-            timestamp: new Date()
-          });
-        }
+      // Détection des exports dupliqués
+      if (line.includes('export const') && line.includes('export const', line.indexOf('export const') + 1)) {
+        errors.push({
+          type: 'syntax',
+          subtype: 'duplicate_export',
+          message: 'Duplicate export statement detected',
+          line: index + 1,
+          column: 0,
+          severity: 'high',
+          aiConfidence: 0.95,
+          autoFix: { type: 'remove_duplicate_export', position: line.indexOf('export const') },
+          suggestion: 'Remove duplicate export statement',
+          timestamp: new Date()
+        });
       }
+    });
 
-    } catch (error) {
-      console.error('Erreur détection syntaxe:', error);
+    // Détection des points-virgules manquants
+    const statementPattern = /(?:^|\n)\s*(?:const|let|var|function|class|if|for|while|switch|try|throw|return)\s+[^;]*(?=\n|$)/g;
+    while ((match = statementPattern.exec(code)) !== null) {
+      if (!match[0].includes(';') && !match[0].includes('{')) {
+        errors.push({
+          type: 'syntax',
+          subtype: 'missing_semicolon',
+          message: 'Missing semicolon',
+          line: this.getLineNumber(code, match.index),
+          severity: 'low',
+          aiConfidence: 0.7,
+          autoFix: { type: 'add_semicolon', position: match.index + match[0].length },
+          timestamp: new Date()
+        });
+      }
     }
 
     return errors;

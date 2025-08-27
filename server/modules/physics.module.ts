@@ -529,4 +529,4 @@ import('@dimforge/rapier3d').then(RAPIER => {
 }
 
 export const physics = new AdvancedPhysicsSystem();
-export const physicsModule = physics; = physics;
+export const physicsModule = physics;

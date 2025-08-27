@@ -623,4 +623,3 @@ export { AdvancedThreeMorphing };
 
 export const morphing = new AdvancedMorphingSystem();
 export const morphingModule = morphing;
-export const morphingModule = morphing;
