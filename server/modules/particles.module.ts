@@ -773,5 +773,5 @@ class GPUParticleRenderer {
   }
 }
 
-export const particles = new AdvancedParticleSystem();
+export const particles = new AdvancedParticleModule();
 export const particlesModule = particles;
