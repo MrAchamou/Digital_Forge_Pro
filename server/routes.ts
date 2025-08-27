@@ -414,19 +414,24 @@ router.post("/api/library/initialize", async (req, res) => {
 });
 
 // Système - Stats
-router.get("/api/system/health", async (req, res) => {
+router.get("/api/system/health", async (_req, res) => {
   try {
     const health = {
       overall: 98.7,
       modules: {
-        particles: { status: "online", performance: 95.2 },
-        physics: { status: "online", performance: 92.8 },
-        lighting: { status: "online", performance: 88.4 },
-        morphing: { status: "online", performance: 91.1 },
-        parser: { status: "online", performance: 99.5 }, // Parser 2.0
-        batchProcessor: { status: "online", performance: 97.3 }
+        particles: { status: 'online', load: 25, effectCount: 142 },
+        physics: { status: 'online', load: 18, effectCount: 89 },
+        lighting: { status: 'online', load: 32, effectCount: 205 },
+        morphing: { status: 'maintenance', load: 0, effectCount: 67 }
       },
-      timestamp: new Date().toISOString()
+      queue: { size: 12, processing: 3, failed: 1 },
+      resources: {
+        cpu: 67,
+        memory: 34,
+        gpu: 45,
+        network: 12,
+        storage: 42
+      }
     };
 
     res.json(health);
