@@ -635,6 +635,9 @@ class AdvancedErrorDetection {
     
     // Détection d'erreurs "command not found"
     const commandNotFoundPattern = /sh:\s+\d+:\s+(\w+):\s+not\s+found/g;
+    
+    // Détection d'erreurs d'export/import
+    const exportErrorPattern = /The requested module '([^']+)' does not provide an export named '([^']+)'/g;
     let match;
     while ((match = commandNotFoundPattern.exec(context.consoleOutput || '')) !== null) {
       const missingCommand = match[1];
@@ -648,6 +651,25 @@ class AdvancedErrorDetection {
         autoFix: await this.generateDependencyFix(missingCommand),
         command: missingCommand,
         solution: await this.suggestDependencyInstallation(missingCommand)
+      });
+    }
+    
+    // Détection d'erreurs d'export/import
+    let exportMatch;
+    while ((exportMatch = exportErrorPattern.exec(context.consoleOutput || '')) !== null) {
+      const modulePath = exportMatch[1];
+      const exportName = exportMatch[2];
+      
+      errors.push({
+        type: 'import_export',
+        subtype: 'export_not_found',
+        message: `Export "${exportName}" not found in module "${modulePath}"`,
+        severity: 'critical',
+        aiConfidence: 0.98,
+        autoFix: await this.generateExportFix(modulePath, exportName),
+        module: modulePath,
+        export: exportName,
+        solution: `Check exports in ${modulePath} or update import statement`
       });
     }
     
@@ -787,6 +809,21 @@ class AdvancedErrorDetection {
     };
   }
 
+  private async generateExportFix(modulePath: string, exportName: string): Promise<any> {
+    return {
+      type: 'fix_import_export',
+      action: 'Check and fix export/import mismatch',
+      suggestions: [
+        `Verify exports in ${modulePath}`,
+        `Update import statement to use correct export name`,
+        `Check if export is default or named export`
+      ],
+      module: modulePath,
+      export: exportName,
+      confidence: 0.95
+    };
+  }
+
   private async suggestDependencyInstallation(command: string): Promise<string> {
     const suggestions = {
       'tsx': 'Install TypeScript executor: npm install tsx --save-dev',
@@ -795,7 +832,7 @@ class AdvancedErrorDetection {
       'vite': 'Install Vite bundler: npm install vite --save-dev'
     };
     
-    return suggestions[command] || `Install missing command: npm install ${command}`;
+    return suggestions[command] || `Install missing command: npm install ${command}`;s[command] || `Install missing command: npm install ${command}`;
   }
 
   private async detectMissingPackages(code: string, context: any): Promise<any[]> {

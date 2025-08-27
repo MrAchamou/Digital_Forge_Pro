@@ -6,7 +6,7 @@ import { storage } from "./storage";
 import { multiFormatParser } from "./parser/multi-format-parser";
 import { effectParserModule } from "./parser/effect-parser.module";
 import { batchProcessor } from "./parser/batch-processor";
-import { batchGeneratorModule } from "./modules/batch-generator.module";
+import { batchGenerator } from "./modules/batch-generator.module";
 import { classificationStorageModule } from "./modules/classification-storage.module";
 import { errorDetectionModule } from "./modules/error-detection.module";
 import { qualityAssuranceModule } from "./modules/quality-assurance.module";
@@ -484,7 +484,7 @@ router.post("/api/batch-generate", async (req, res) => {
   try {
     const { effectType, category, count, baseParameters } = req.body;
 
-    const result = await batchGeneratorModule.generateEffects({
+    const result = await batchGenerator.processBatch(req.body.effects || [], {
       effectType,
       category,
       count: parseInt(count) || 10,
@@ -508,8 +508,8 @@ router.post("/api/batch-generate", async (req, res) => {
 // Routes pour obtenir les options disponibles
 router.get("/api/batch-options", (req, res) => {
   res.json({
-    types: batchGeneratorModule.getSupportedTypes(),
-    categories: batchGeneratorModule.getSupportedCategories()
+    types: ['particles', 'physics', 'lighting', 'morphing'],
+    categories: ['visual', 'motion', 'interactive', 'atmospheric']
   });
 });
 
@@ -663,7 +663,7 @@ router.get("/api/modules/status", async (req, res) => {
 router.post("/api/modules/batch-generator/generate", async (req, res) => {
   try {
     const { effectType, category, count } = req.body;
-    const results = await batchGeneratorModule.generateEffects({
+    const batchId = await batchGenerator.processBatch([], {
       effectType,
       category,
       count
