@@ -1,4 +1,3 @@
-
 interface ErrorPattern {
   pattern: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
@@ -25,6 +24,25 @@ interface AIErrorAnalysis {
   learningPoints: string[];
 }
 
+// Interface for detected errors, to be used across detection methods
+interface DetectedError {
+  type: string;
+  message: string;
+  line?: number;
+  column?: number;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  aiConfidence: number;
+  autoFix?: any;
+  context?: any;
+  module?: string;
+  export?: string;
+  solution?: string;
+  command?: string;
+  details?: string[];
+  subtype?: string;
+  riskLevel?: string;
+}
+
 class AdvancedErrorDetection {
   private aiErrorPatterns: Map<string, ErrorPattern[]> = new Map();
   private errorHistory: Map<string, ErrorContext[]> = new Map();
@@ -45,7 +63,7 @@ class AdvancedErrorDetection {
 
   async detectErrors(code: string, context: any): Promise<any> {
     const startTime = performance.now();
-    
+
     // AI-Enhanced Multi-Layer Detection
     const aiAnalysis = await this.performAIAnalysis(code, context);
     const syntaxErrors = await this.detectSyntaxErrors(code, aiAnalysis);
@@ -53,16 +71,16 @@ class AdvancedErrorDetection {
     const performanceIssues = await this.detectPerformanceIssues(code, aiAnalysis);
     const securityVulnerabilities = await this.detectSecurityIssues(code, aiAnalysis);
     const compatibilityIssues = await this.detectCompatibilityIssues(code, aiAnalysis);
-    
+
     // Nouvelles détections avancées
     const dependencyErrors = await this.detectDependencyErrors(code, context, aiAnalysis);
     const buildErrors = await this.detectBuildErrors(code, context, aiAnalysis);
     const environmentErrors = await this.detectEnvironmentErrors(context, aiAnalysis);
     const runtimeErrors = await this.detectRuntimeErrors(code, context, aiAnalysis);
-    
+
     // Predictive Error Detection
     const predictedErrors = await this.predictFutureErrors(code, context, aiAnalysis);
-    
+
     // Consolidation avec IA
     const consolidatedResults = await this.consolidateWithAI([
       ...syntaxErrors,
@@ -79,11 +97,11 @@ class AdvancedErrorDetection {
 
     // Auto-correction autonome
     const autoFixResults = await this.performAutonomousCorrection(consolidatedResults, code);
-    
+
     // Mise à jour des métriques
     const detectionTime = performance.now() - startTime;
     this.updateMetrics(consolidatedResults, detectionTime);
-    
+
     return {
       errors: consolidatedResults,
       autoFixes: autoFixResults,
@@ -100,13 +118,13 @@ class AdvancedErrorDetection {
   private async performAIAnalysis(code: string, context: any): Promise<AIErrorAnalysis> {
     // Analyse sémantique avancée
     const semanticAnalysis = await this.neuralNetwork.analyzeSemantics(code);
-    
+
     // Analyse contextuelle
     const contextualAnalysis = await this.neuralNetwork.analyzeContext(context, semanticAnalysis);
-    
+
     // Prédiction de robustesse
     const robustnessScore = await this.predictionEngine.predictRobustness(code, context);
-    
+
     return {
       rootCause: semanticAnalysis.primaryConcerns[0] || 'unknown',
       impactAssessment: contextualAnalysis.impactScore,
@@ -118,13 +136,13 @@ class AdvancedErrorDetection {
 
   private async detectSyntaxErrors(code: string, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
     const errors = [];
-    
+
     // Détection avancée avec IA
     const aiPatterns = this.aiErrorPatterns.get('syntax') || [];
-    
+
     for (const pattern of aiPatterns) {
       const matches = await this.findAIPatternMatches(code, pattern, aiAnalysis);
-      
+
       for (const match of matches) {
         const error = {
           type: 'syntax',
@@ -136,45 +154,45 @@ class AdvancedErrorDetection {
           autoFix: pattern.autoFix ? await this.generateAutoFix(match, pattern) : null,
           context: match.context
         };
-        
+
         errors.push(error);
       }
     }
-    
+
     // Détection traditionnelle renforcée
     const traditionalErrors = await this.performTraditionalSyntaxCheck(code);
     errors.push(...traditionalErrors);
-    
+
     return this.deduplicateAndRank(errors);
   }
 
   private async detectLogicErrors(code: string, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
     const errors = [];
-    
+
     // Analyse de flux logique avec IA
     const flowAnalysis = await this.neuralNetwork.analyzeLogicFlow(code);
-    
+
     // Détection de conditions impossibles
     const impossibleConditions = await this.detectImpossibleConditions(code, flowAnalysis);
     errors.push(...impossibleConditions);
-    
+
     // Détection de boucles infinies potentielles
     const infiniteLoops = await this.detectPotentialInfiniteLoops(code, flowAnalysis);
     errors.push(...infiniteLoops);
-    
+
     // Détection d'incohérences logiques
     const logicInconsistencies = await this.detectLogicInconsistencies(code, flowAnalysis);
     errors.push(...logicInconsistencies);
-    
+
     return errors;
   }
 
   private async detectPerformanceIssues(code: string, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
     const issues = [];
-    
+
     // Analyse de complexité avec IA
     const complexityAnalysis = await this.neuralNetwork.analyzeComplexity(code);
-    
+
     if (complexityAnalysis.timeComplexity > 'O(n²)') {
       issues.push({
         type: 'performance',
@@ -185,27 +203,27 @@ class AdvancedErrorDetection {
         suggestion: 'Consider optimizing algorithm or using caching'
       });
     }
-    
+
     // Détection de fuites mémoire potentielles
     const memoryLeaks = await this.detectMemoryLeaks(code, complexityAnalysis);
     issues.push(...memoryLeaks);
-    
+
     // Détection de goulots d'étranglement
     const bottlenecks = await this.detectBottlenecks(code, complexityAnalysis);
     issues.push(...bottlenecks);
-    
+
     return issues;
   }
 
   private async detectSecurityIssues(code: string, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
     const vulnerabilities = [];
-    
+
     // Analyse de sécurité avec IA
     const securityPatterns = this.aiErrorPatterns.get('security') || [];
-    
+
     for (const pattern of securityPatterns) {
       const matches = await this.findSecurityVulnerabilities(code, pattern);
-      
+
       for (const match of matches) {
         vulnerabilities.push({
           type: 'security',
@@ -218,9 +236,30 @@ class AdvancedErrorDetection {
         });
       }
     }
-    
+
     return vulnerabilities;
   }
+
+  private async detectCompatibilityIssues(code: string, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
+    const issues: DetectedError[] = [];
+
+    // Placeholder for compatibility checks, e.g., browser compatibility, Node.js version compatibility
+    // Example: Checking for deprecated API usage
+    const deprecatedAPIPattern = /someDeprecatedAPI\(\)/g;
+    let match;
+    while ((match = deprecatedAPIPattern.exec(code)) !== null) {
+      issues.push({
+        type: 'compatibility',
+        message: 'Usage of deprecated API detected',
+        line: this.getLineNumber(code, match.index),
+        severity: 'medium',
+        aiConfidence: 0.8,
+        solution: 'Replace with modern alternative API'
+      });
+    }
+    return issues;
+  }
+
 
   private async performAutonomousCorrection(errors: any[], code: string): Promise<any> {
     const fixResults = {
@@ -229,20 +268,20 @@ class AdvancedErrorDetection {
       unfixable: [],
       improvedCode: code
     };
-    
+
     let currentCode = code;
-    
+
     // Tri des erreurs par priorité de correction
     const sortedErrors = errors.sort((a, b) => {
       const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
       return (severityOrder[b.severity] || 0) - (severityOrder[a.severity] || 0);
     });
-    
+
     for (const error of sortedErrors) {
       if (error.autoFix && error.aiConfidence > 0.7) {
         try {
           const fixResult = await this.applyAutonomousFix(error, currentCode);
-          
+
           if (fixResult.success) {
             currentCode = fixResult.fixedCode;
             fixResults.fixed.push({
@@ -250,7 +289,7 @@ class AdvancedErrorDetection {
               fix: fixResult.fix,
               confidence: fixResult.confidence
             });
-            
+
             // Apprentissage autonome
             await this.learningSystem.recordSuccessfulFix(error, fixResult);
           } else {
@@ -268,7 +307,7 @@ class AdvancedErrorDetection {
         }
       }
     }
-    
+
     fixResults.improvedCode = currentCode;
     return fixResults;
   }
@@ -276,14 +315,14 @@ class AdvancedErrorDetection {
   private async applyAutonomousFix(error: any, code: string): Promise<any> {
     // Stratégies de correction basées sur l'IA
     const fixStrategies = await this.autonomousHealer.generateFixStrategies(error, code);
-    
+
     for (const strategy of fixStrategies) {
       const result = await this.tryFixStrategy(strategy, error, code);
-      
+
       if (result.success) {
         // Validation de la correction
         const validationResult = await this.validateFix(result.fixedCode, error);
-        
+
         if (validationResult.isValid) {
           return {
             success: true,
@@ -294,7 +333,7 @@ class AdvancedErrorDetection {
         }
       }
     }
-    
+
     return {
       success: false,
       attemptedFix: fixStrategies[0],
@@ -322,7 +361,7 @@ class AdvancedErrorDetection {
         preventionStrategy: 'variable_declaration_check'
       }
     ]);
-    
+
     // Patterns de sécurité
     this.aiErrorPatterns.set('security', [
       {
@@ -418,14 +457,14 @@ class AdvancedErrorDetection {
           codeQuality: 0.85
         };
       },
-      
+
       analyzeContext: async (context: any, semantics: any) => {
         return {
           impactScore: 0.7,
           contextualRelevance: 0.8
         };
       },
-      
+
       analyzeLogicFlow: async (code: string) => {
         return {
           flowComplexity: 'medium',
@@ -433,7 +472,7 @@ class AdvancedErrorDetection {
           cyclomaticComplexity: 5
         };
       },
-      
+
       analyzeComplexity: async (code: string) => {
         return {
           timeComplexity: 'O(n)',
@@ -448,7 +487,7 @@ class AdvancedErrorDetection {
     this.autonomousHealer = {
       generateFixStrategies: async (error: any, code: string) => {
         const strategies = [];
-        
+
         switch (error.type) {
           case 'syntax':
             strategies.push({
@@ -500,8 +539,22 @@ class AdvancedErrorDetection {
               confidence: 0.8
             });
             break;
+          case 'import_export':
+            strategies.push({
+              name: 'fix_import_export',
+              action: 'check_module_exports',
+              confidence: 0.95
+            });
+            break;
+          case 'common_module_import_error':
+            strategies.push({
+              name: 'correct_module_import_name',
+              action: 'update_import_statement',
+              confidence: 0.99
+            });
+            break;
         }
-        
+
         return strategies;
       }
     };
@@ -516,7 +569,7 @@ class AdvancedErrorDetection {
           stabilityIndex: 0.85
         };
       },
-      
+
       predictFutureErrors: async (code: string, context: any) => {
         return [
           {
@@ -536,7 +589,7 @@ class AdvancedErrorDetection {
         // Enregistrement pour apprentissage futur
         console.log(`Learning from successful fix: ${error.type} -> ${fix.fix.name}`);
       },
-      
+
       improvePatterns: async () => {
         // Amélioration continue des patterns
         return true;
@@ -549,7 +602,7 @@ class AdvancedErrorDetection {
     setInterval(async () => {
       await this.performSystemHealthCheck();
     }, 30000);
-    
+
     // Optimisation des patterns toutes les 5 minutes
     setInterval(async () => {
       await this.learningSystem.improvePatterns();
@@ -563,12 +616,12 @@ class AdvancedErrorDetection {
       falsePositiveRate: this.calculateFalsePositiveRate(),
       performanceImpact: this.calculatePerformanceImpact()
     };
-    
+
     // Actions autonomes basées sur la santé
     if (systemHealth.falsePositiveRate > 0.1) {
       await this.adjustSensitivity();
     }
-    
+
     if (systemHealth.autoFixSuccessRate < 0.7) {
       await this.enhanceFixingCapabilities();
     }
@@ -632,16 +685,16 @@ class AdvancedErrorDetection {
 
   private async detectDependencyErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
     const errors = [];
-    
+
     // Détection d'erreurs "command not found"
     const commandNotFoundPattern = /sh:\s+\d+:\s+(\w+):\s+not\s+found/g;
-    
+
     // Détection d'erreurs d'export/import
     const exportErrorPattern = /The requested module '([^']+)' does not provide an export named '([^']+)'/g;
     let match;
     while ((match = commandNotFoundPattern.exec(context.consoleOutput || '')) !== null) {
       const missingCommand = match[1];
-      
+
       errors.push({
         type: 'dependency',
         subtype: 'command_not_found',
@@ -653,13 +706,13 @@ class AdvancedErrorDetection {
         solution: await this.suggestDependencyInstallation(missingCommand)
       });
     }
-    
+
     // Détection d'erreurs d'export/import
     let exportMatch;
     while ((exportMatch = exportErrorPattern.exec(context.consoleOutput || '')) !== null) {
       const modulePath = exportMatch[1];
       const exportName = exportMatch[2];
-      
+
       errors.push({
         type: 'import_export',
         subtype: 'export_not_found',
@@ -672,20 +725,20 @@ class AdvancedErrorDetection {
         solution: `Check exports in ${modulePath} or update import statement`
       });
     }
-    
+
     // Détection de packages manquants dans package.json
     if (code.includes('require(') || code.includes('import ')) {
       const packageErrors = await this.detectMissingPackages(code, context);
       errors.push(...packageErrors);
     }
-    
+
     return errors;
   }
 
   private async detectBuildErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
     const errors = [];
     const consoleOutput = context.consoleOutput || '';
-    
+
     // Détection d'erreurs de compilation TypeScript
     if (consoleOutput.includes('TSError') || consoleOutput.includes('TS2')) {
       errors.push({
@@ -698,7 +751,7 @@ class AdvancedErrorDetection {
         details: this.extractTypeScriptErrors(consoleOutput)
       });
     }
-    
+
     // Détection d'erreurs de build Vite/bundler
     if (consoleOutput.includes('Build failed') || consoleOutput.includes('bundling failed')) {
       errors.push({
@@ -710,14 +763,14 @@ class AdvancedErrorDetection {
         autoFix: await this.generateBuildFix(consoleOutput)
       });
     }
-    
+
     return errors;
   }
 
   private async detectEnvironmentErrors(context: any, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
     const errors = [];
     const consoleOutput = context.consoleOutput || '';
-    
+
     // Détection d'erreurs de port
     if (consoleOutput.includes('EADDRINUSE') || consoleOutput.includes('port already in use')) {
       errors.push({
@@ -729,7 +782,7 @@ class AdvancedErrorDetection {
         autoFix: await this.generatePortFix(consoleOutput)
       });
     }
-    
+
     // Détection d'erreurs de permissions
     if (consoleOutput.includes('EACCES') || consoleOutput.includes('permission denied')) {
       errors.push({
@@ -741,14 +794,14 @@ class AdvancedErrorDetection {
         autoFix: await this.generatePermissionFix(consoleOutput)
       });
     }
-    
+
     return errors;
   }
 
   private async detectRuntimeErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
     const errors = [];
     const consoleOutput = context.consoleOutput || '';
-    
+
     // Détection d'erreurs de module non trouvé
     if (consoleOutput.includes('Cannot find module') || consoleOutput.includes('MODULE_NOT_FOUND')) {
       const moduleMatch = consoleOutput.match(/Cannot find module ['"]([^'"]+)['"]/);
@@ -764,7 +817,7 @@ class AdvancedErrorDetection {
         });
       }
     }
-    
+
     // Détection d'erreurs de syntaxe runtime
     if (consoleOutput.includes('SyntaxError') || consoleOutput.includes('Unexpected token')) {
       errors.push({
@@ -776,7 +829,7 @@ class AdvancedErrorDetection {
         autoFix: await this.generateRuntimeSyntaxFix(consoleOutput)
       });
     }
-    
+
     return errors;
   }
 
@@ -789,7 +842,7 @@ class AdvancedErrorDetection {
       'nodemon': { package: 'nodemon', type: 'dev', command: 'npm install nodemon --save-dev' },
       'vite': { package: 'vite', type: 'dev', command: 'npm install vite --save-dev' }
     };
-    
+
     const fix = dependencyMap[command];
     if (fix) {
       return {
@@ -800,7 +853,7 @@ class AdvancedErrorDetection {
         confidence: 0.95
       };
     }
-    
+
     return {
       type: 'search_dependency',
       command: `npm search ${command}`,
@@ -831,25 +884,25 @@ class AdvancedErrorDetection {
       'nodemon': 'Install development server: npm install nodemon --save-dev',
       'vite': 'Install Vite bundler: npm install vite --save-dev'
     };
-    
-    return suggestions[command] || `Install missing command: npm install ${command}`;s[command] || `Install missing command: npm install ${command}`;
+
+    return suggestions[command] || `Install missing command: npm install ${command}`;
   }
 
   private async detectMissingPackages(code: string, context: any): Promise<any[]> {
     const errors = [];
-    
+
     // Extraction des imports/requires
     const importRegex = /(?:import.*from\s+['"]([^'"]+)['"]|require\(['"]([^'"]+)['"]\))/g;
     const packageJson = context.packageJson || {};
     const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
-    
+
     let match;
     while ((match = importRegex.exec(code)) !== null) {
       const packageName = match[1] || match[2];
-      
+
       // Ignorer les imports relatifs
       if (packageName.startsWith('.') || packageName.startsWith('/')) continue;
-      
+
       // Vérifier si le package est installé
       if (!dependencies[packageName]) {
         errors.push({
@@ -867,7 +920,7 @@ class AdvancedErrorDetection {
         });
       }
     }
-    
+
     return errors;
   }
 
@@ -880,7 +933,7 @@ class AdvancedErrorDetection {
         confidence: 0.8
       };
     }
-    
+
     if (consoleOutput.includes('TS2304')) {
       return {
         type: 'add_type_declaration',
@@ -888,7 +941,7 @@ class AdvancedErrorDetection {
         confidence: 0.75
       };
     }
-    
+
     return {
       type: 'typescript_config',
       action: 'Check TypeScript configuration',
@@ -946,10 +999,225 @@ class AdvancedErrorDetection {
     return consoleOutput.match(errorRegex) || [];
   }
 
-  // Méthode publique pour analyser les erreurs de console
-  public async analyzeConsoleErrors(consoleOutput: string, context: any = {}): Promise<any> {
-    const enhancedContext = { ...context, consoleOutput };
-    return await this.detectErrors('', enhancedContext);
+  // Méthode utilitaire pour obtenir le numéro de ligne
+  private getLineNumber(code: string, index: number): number {
+    let lineNumber = 1;
+    for (let i = 0; i < index; i++) {
+      if (code[i] === '\n') {
+        lineNumber++;
+      }
+    }
+    return lineNumber;
+  }
+
+  // Méthode placeholder pour la validation d'export
+  private async validateExport(modulePath: string, exportName: string, context: any): Promise<boolean> {
+    // Dans une application réelle, cela impliquerait une analyse statique du module
+    // ou une vérification de l'environnement d'exécution.
+    // Pour cet exemple, nous simulons une vérification basée sur des noms connus.
+    if (modulePath === './modules/quality-assurance.module' && exportName === 'qualityAssurance') {
+      return true;
+    }
+    if (modulePath === './modules/error-detection.module' && exportName === 'errorDetection') {
+      return true;
+    }
+    if (modulePath === './modules/batch-generator.module' && exportName === 'batchGenerator') {
+      return true;
+    }
+    if (modulePath === './modules/particles.module' && exportName === 'particles') {
+      return true;
+    }
+    if (modulePath === './modules/physics.module' && exportName === 'physics') {
+      return true;
+    }
+    if (modulePath === './modules/lighting.module' && exportName === 'lighting') {
+      return true;
+    }
+    if (modulePath === './modules/morphing.module' && exportName === 'morphing') {
+      return true;
+    }
+    // Fallback pour les autres modules ou si la logique de nommage est différente
+    return exportName !== 'qualityAssuranceModule' && exportName !== 'errorDetectionModule' && exportName !== 'batchGeneratorModule';
+  }
+
+  // Méthode placeholder pour la génération d'auto-fix pour les erreurs de syntaxe
+  private async generateAutoFix(match: any, pattern: ErrorPattern): Promise<any> {
+    if (pattern.pattern === 'unclosed_bracket') {
+      return { type: 'add_bracket', position: match.position };
+    }
+    if (pattern.pattern === 'undefined_variable') {
+      return { type: 'declare_variable', name: match.variableName };
+    }
+    return null;
+  }
+
+  // Méthode placeholder pour la détection de vulnérabilités de sécurité
+  private async findSecurityVulnerabilities(code: string, pattern: ErrorPattern): Promise<any[]> {
+    // Simulation de détection basée sur des patterns simples
+    const vulnerabilities = [];
+    if (pattern.pattern === 'sql_injection') {
+      const sqlInjectionRegex = /['"]\s*SELECT.*FROM.*\s*WHERE\s+\w+\s*=\s*['"]\s*\+?\s*\w+/g;
+      let match;
+      while ((match = sqlInjectionRegex.exec(code)) !== null) {
+        vulnerabilities.push({
+          description: 'Potential SQL Injection',
+          line: this.getLineNumber(code, match.index),
+          context: match[0]
+        });
+      }
+    }
+    return vulnerabilities;
+  }
+
+  // Méthode placeholder pour le calcul du niveau de risque
+  private calculateRiskLevel(match: any, pattern: ErrorPattern): string {
+    if (pattern.severity === 'critical') return 'high';
+    if (pattern.severity === 'high') return 'medium';
+    return 'low';
+  }
+
+  // Méthode placeholder pour la génération de correction de sécurité
+  private async generateSecurityFix(match: any, pattern: ErrorPattern): Promise<any> {
+    if (pattern.pattern === 'sql_injection') {
+      return { type: 'prepared_statement', suggestion: 'Use parameterized queries or prepared statements' };
+    }
+    return null;
+  }
+
+  // Méthode placeholder pour la génération d'optimisation de performance
+  private async generatePerformanceOptimization(analysis: any): Promise<any> {
+    if (analysis.timeComplexity > 'O(n)') {
+      return { type: 'optimize_algorithm', suggestion: 'Consider a more efficient algorithm' };
+    }
+    return null;
+  }
+
+  // Méthodes placeholder pour la détection de problèmes de performance
+  private async detectMemoryLeaks(code: string, analysis: any): Promise<any[]> { return []; }
+  private async detectBottlenecks(code: string, analysis: any): Promise<any[]> { return []; }
+
+  // Méthodes placeholder pour la détection d'erreurs logiques
+  private async detectImpossibleConditions(code: string, analysis: any): Promise<any[]> { return []; }
+  private async detectPotentialInfiniteLoops(code: string, analysis: any): Promise<any[]> { return []; }
+  private async detectLogicInconsistencies(code: string, analysis: any): Promise<any[]> { return []; }
+
+  // Méthode placeholder pour la recherche de patterns IA
+  private async findAIPatternMatches(code: string, pattern: ErrorPattern, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
+    // Simulation de détection de patterns IA
+    if (pattern.pattern === 'undefined_variable') {
+      const undefinedVars = [];
+      // Simplified regex to find potential undefined variables
+      const varRegex = /\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g;
+      let match;
+      const declaredVars = new Set(['console', 'require', 'import', 'module', 'exports', 'Date', 'Promise', 'Map', 'Set', 'performance', 'setInterval']); // Mock declared variables
+      while ((match = varRegex.exec(code)) !== null) {
+        if (!declaredVars.has(match[1]) && !code.substring(0, match.index).match(new RegExp(`(?:let|const|var)\\s+${match[1]}\\s*=|function\\s+${match[1]}\\s*\\(`))) {
+          undefinedVars.push({
+            description: `Undefined variable: ${match[1]}`,
+            line: this.getLineNumber(code, match.index),
+            column: match.index,
+            confidence: 0.9,
+            variableName: match[1]
+          });
+        }
+      }
+      return undefinedVars;
+    }
+    return [];
+  }
+
+  // Méthode placeholder pour la déduplication et le classement des erreurs
+  private deduplicateAndRank(errors: any[]): any[] { return errors; }
+
+  // Méthode placeholder pour la consolidation avec IA
+  private async consolidateWithAI(errors: any[], aiAnalysis: AIErrorAnalysis): Promise<any[]> { return errors; }
+
+  // Méthode placeholder pour la génération de stratégie de prévention
+  private async generatePreventionStrategy(semanticAnalysis: any, contextualAnalysis: any): Promise<string> { return 'Default prevention strategy'; }
+
+  // Méthode placeholder pour l'extraction des points d'apprentissage
+  private extractLearningPoints(semanticAnalysis: any, contextualAnalysis: any): string[] { return []; }
+
+  // Méthode placeholder pour la vérification syntaxique traditionnelle
+  private async performTraditionalSyntaxCheck(code: string): Promise<any[]> { return []; }
+
+  // Méthode placeholder pour la validation de correction
+  private async validateFix(fixedCode: string, error: any): Promise<{ isValid: boolean, confidence: number }> { return { isValid: true, confidence: 0.9 }; }
+
+  // Méthode placeholder pour la génération de correction de syntaxe runtime
+  private async generateRuntimeSyntaxFix(consoleOutput: string): Promise<any> { return null; }
+
+  // Méthode placeholder pour la détection d'erreurs d'import/export mismatch
+  private async detectImportExportMismatches(code: string, context: any): Promise<DetectedError[]> {
+    const errors: DetectedError[] = [];
+
+    // Détection des imports manquants
+    const importRegex = /import\s*{\s*([^}]+)\s*}\s*from\s*['"`]([^'"`]+)['"`]/g;
+    let match;
+
+    while ((match = importRegex.exec(code)) !== null) {
+      const [, imports, modulePath] = match;
+      const importNames = imports.split(',').map(imp => imp.trim());
+
+      // Vérification si le module existe
+      for (const importName of importNames) {
+        const exportName = importName.replace(/\s+as\s+\w+/, '').trim();
+        const isValidExport = await this.validateExport(modulePath, exportName, context);
+
+        if (!isValidExport) {
+          errors.push({
+            type: 'import_export_mismatch',
+            message: `The requested module '${modulePath}' does not provide an export named '${exportName}'`,
+            line: this.getLineNumber(code, match.index),
+            column: match.index,
+            severity: 'critical',
+            aiConfidence: 0.98,
+            autoFix: await this.generateExportFix(modulePath, exportName),
+            module: modulePath,
+            export: exportName,
+            solution: `Check exports in ${modulePath} or update import statement`
+          });
+        }
+      }
+    }
+
+    // Détection spécifique des erreurs courantes dans nos modules
+    await this.detectCommonModuleErrors(code, errors);
+
+    return errors;
+  }
+
+  private async detectCommonModuleErrors(code: string, errors: DetectedError[]): Promise<void> {
+    // Détection des erreurs d'import de nos modules spécifiques
+    const commonMismatches = [
+      { wrong: 'qualityAssuranceModule', correct: 'qualityAssurance', module: './modules/quality-assurance.module' },
+      { wrong: 'errorDetectionModule', correct: 'errorDetection', module: './modules/error-detection.module' },
+      { wrong: 'batchGeneratorModule', correct: 'batchGenerator', module: './modules/batch-generator.module' },
+      { wrong: 'particlesModule', correct: 'particles', module: './modules/particles.module' },
+      { wrong: 'physicsModule', correct: 'physics', module: './modules/physics.module' },
+      { wrong: 'lightingModule', correct: 'lighting', module: './modules/lighting.module' },
+      { wrong: 'morphingModule', correct: 'morphing', module: './modules/morphing.module' }
+    ];
+
+    for (const mismatch of commonMismatches) {
+      if (code.includes(`import { ${mismatch.wrong} }`)) {
+        errors.push({
+          type: 'common_module_import_error',
+          message: `Import name mismatch: '${mismatch.wrong}' should be '${mismatch.correct}'`,
+          line: this.getLineNumber(code, code.indexOf(mismatch.wrong)),
+          column: code.indexOf(mismatch.wrong),
+          severity: 'critical',
+          aiConfidence: 0.99,
+          autoFix: `Replace '${mismatch.wrong}' with '${mismatch.correct}'`,
+          solution: `Change import to: import { ${mismatch.correct} } from "${mismatch.module}"`
+        });
+      }
+    }
+  }
+
+  // Méthode placeholder pour la génération de la stratégie de prévention
+  private async generatePreventionStrategy(semanticAnalysis: AIErrorAnalysis, contextualAnalysis: ErrorContext): Promise<string> {
+    return 'Generic prevention strategy';
   }
 }
 

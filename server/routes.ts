@@ -9,7 +9,7 @@ import { batchProcessor } from "./parser/batch-processor";
 import { batchGenerator } from "./modules/batch-generator.module";
 import { classificationStorageModule } from "./modules/classification-storage.module";
 import { errorDetection } from "./modules/error-detection.module";
-import { qualityAssuranceModule } from "./modules/quality-assurance.module";
+import { qualityAssurance } from "./modules/quality-assurance.module";
 
 const router = express.Router();
 
@@ -596,7 +596,7 @@ router.post("/api/assess-quality", async (req, res) => {
   try {
     const { effectData, generatedCode } = req.body;
 
-    const report = await qualityAssuranceModule.assessQuality(effectData, generatedCode);
+    const report = await qualityAssurance.performQualityAssurance(generatedCode, effectData);
 
     res.json({
       success: true,
@@ -615,7 +615,18 @@ router.post("/api/batch-quality", async (req, res) => {
   try {
     const { effects } = req.body;
 
-    const result = await qualityAssuranceModule.runBatchQuality(effects);
+    const results = await Promise.all(
+      effects.map(effect => qualityAssurance.performQualityAssurance(effect.code || '', effect))
+    );
+    const result = {
+      stats: {
+        total: results.length,
+        approved: results.filter(r => r.overallScore >= 0.7).length,
+        rejected: results.filter(r => r.overallScore < 0.7).length,
+        avgScore: results.reduce((sum, r) => sum + r.overallScore, 0) / results.length * 100
+      },
+      reports: results
+    };
 
     res.json({
       success: true,
