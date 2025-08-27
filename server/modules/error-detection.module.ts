@@ -461,6 +461,23 @@ class AdvancedErrorDetection {
         });
       }
 
+      // Détection spécifique des erreurs npm/packages
+      const npmErrorPattern = /npm ERR! (.+)/g;
+      while ((match = npmErrorPattern.exec(consoleOutput)) !== null) {
+        errors.push({
+          type: 'dependency',
+          subtype: 'npm_error',
+          message: `NPM Error: ${match[1]}`,
+          severity: 'high',
+          aiConfidence: 0.9,
+          autoFix: { type: 'npm_install', command: 'npm install --no-optional' },
+          solution: 'Run npm install to fix package dependencies',
+          timestamp: new Date()
+        });
+      }stamp: new Date()
+        });
+      }
+
       // Détection d'erreurs d'import/export
       const exportErrorPattern = /The requested module '([^']+)' does not provide an export named '([^']+)'/g;
       while ((match = exportErrorPattern.exec(consoleOutput)) !== null) {
@@ -727,13 +744,26 @@ class AdvancedErrorDetection {
       'tsx': 'npm install tsx --save-dev',
       'tsc': 'npm install typescript --save-dev',
       'nodemon': 'npm install nodemon --save-dev',
-      'vite': 'npm install vite --save-dev'
+      'vite': 'npm install vite --save-dev',
+      'drizzle-kit': 'npm install drizzle-kit --save-dev'
     };
     return {
       type: 'install_dependency',
       command: dependencyMap[command] || `npm install ${command}`,
       confidence: 0.95
     };
+  }
+
+  private async suggestDependencyInstallation(command: string): Promise<string> {
+    const suggestions = {
+      'tsx': 'Install TypeScript execution engine: npm install tsx --save-dev',
+      'tsc': 'Install TypeScript compiler: npm install typescript --save-dev',
+      'nodemon': 'Install development server: npm install nodemon --save-dev',
+      'vite': 'Install build tool: npm install vite --save-dev',
+      'drizzle-kit': 'Install database toolkit: npm install drizzle-kit --save-dev'
+    };
+    
+    return suggestions[command] || `Install missing command: npm install ${command}`;
   }
 
   private async generateCORSFix() {

@@ -55,7 +55,7 @@ export class DependencyChecker {
   static async autoFixDependencies(): Promise<boolean> {
     try {
       console.log('🔍 Vérification des dépendances...');
-      const issues = await this.checkAllDependencies();
+      const issues = await this.checkAllDependencies();es();
 
       if (issues.length > 0) {
         console.log('⚠️ Dépendances manquantes détectées:');
@@ -66,6 +66,21 @@ export class DependencyChecker {
         console.log('🛠️ Installation automatique des dépendances...');
         await execAsync('npm install');
         
+        // Vérification post-installation
+        console.log('🔄 Re-vérification des dépendances...');
+        const remainingIssues = await this.checkAllDependencies();
+        if (remainingIssues.length > 0) {
+          console.log('⚠️ Certaines dépendances nécessitent une installation spécifique:');
+          for (const issue of remainingIssues) {
+            try {
+              console.log(`🔧 Installation de ${issue.command}...`);
+              await execAsync(issue.solution);
+            } catch (installError) {
+              console.error(`❌ Échec installation ${issue.command}:`, installError);
+            }
+          }
+        }
+        
         console.log('✅ Dépendances installées avec succès!');
         return true;
       }
@@ -74,6 +89,9 @@ export class DependencyChecker {
       return true;
     } catch (error) {
       console.error('❌ Erreur lors de la vérification des dépendances:', error);
+      return false;
+    }
+  }
       return false;
     }
   }
