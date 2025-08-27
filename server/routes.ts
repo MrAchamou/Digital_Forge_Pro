@@ -8,7 +8,7 @@ import { effectParserModule } from "./parser/effect-parser.module";
 import { batchProcessor } from "./parser/batch-processor";
 import { batchGenerator } from "./modules/batch-generator.module";
 import { classificationStorageModule } from "./modules/classification-storage.module";
-import { errorDetectionModule } from "./modules/error-detection.module";
+import { errorDetection } from "./modules/error-detection.module";
 import { qualityAssuranceModule } from "./modules/quality-assurance.module";
 
 const router = express.Router();
@@ -576,7 +576,7 @@ router.post("/api/validate-code", async (req, res) => {
   try {
     const { code, context } = req.body;
 
-    const result = await errorDetectionModule.validateCode(code, context);
+    const result = await errorDetection.detectErrors(code, context);
 
     res.json({
       success: true,
