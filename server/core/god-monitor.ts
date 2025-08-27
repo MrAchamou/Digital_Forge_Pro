@@ -384,6 +384,13 @@ class GodLevelMonitor {
   }
 
   // API Publique
+  public initialize() {
+    console.log('🚀 GOD Monitor initialisé avec succès');
+    console.log(`📊 Santé globale du système: ${this.systemStatus.overallHealth}%`);
+    console.log(`🔮 Précision prédictive: ${(this.predictiveEngine.accuracy * 100).toFixed(1)}%`);
+    return true;
+  }
+
   public getGodStatus(): GodSystemStatus {
     return {
       ...this.systemStatus,
