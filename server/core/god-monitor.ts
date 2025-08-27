@@ -1,4 +1,3 @@
-
 import { autonomousMonitor } from './autonomous-monitor';
 import { errorDetection } from '../modules/error-detection.module';
 import { qualityAssurance } from '../modules/quality-assurance.module';
@@ -77,14 +76,14 @@ class GodLevelMonitor {
       models: new Map(),
       accuracy: 0.95,
       predictions: [],
-      
+
       predict: async (data: any[]) => {
         const predictions = [];
-        
+
         // Analyse des tendances
         if (data.length >= 10) {
           const trend = this.analyzeTrend(data);
-          
+
           if (trend.declining > 0.1) {
             predictions.push({
               type: 'performance_degradation',
@@ -94,7 +93,7 @@ class GodLevelMonitor {
               preventiveActions: ['optimize_cache', 'adjust_thresholds', 'scale_resources']
             });
           }
-          
+
           if (trend.errorIncreasing > 0.15) {
             predictions.push({
               type: 'error_spike_incoming',
@@ -105,7 +104,7 @@ class GodLevelMonitor {
             });
           }
         }
-        
+
         return predictions;
       }
     };
@@ -151,7 +150,7 @@ class GodLevelMonitor {
 
       // Détection d'anomalies en temps réel
       const anomalies = await this.detectAnomalies(autonomousMetrics);
-      
+
       if (anomalies.length > 0) {
         console.log(`🚨 GOD Monitor: ${anomalies.length} anomalies détectées`);
         await this.handleAnomalies(anomalies);
@@ -168,7 +167,7 @@ class GodLevelMonitor {
 
   private calculateOverallHealth(metrics: any): number {
     let healthScore = 100;
-    
+
     // Pénalités basées sur les métriques
     if (metrics.autonomousMetrics) {
       const perf = metrics.autonomousMetrics.performance;
@@ -189,7 +188,7 @@ class GodLevelMonitor {
 
   private async detectAnomalies(metrics: any): Promise<any[]> {
     const anomalies = [];
-    
+
     if (!metrics) return anomalies;
 
     // Détection d'anomalies de performance
@@ -225,16 +224,16 @@ class GodLevelMonitor {
         case 'immediate_optimization':
           autonomousMonitor.forceOptimizationCycle();
           break;
-        
+
         case 'recalibrate_ai':
           // Recalibrage des seuils IA
           await this.recalibrateAISystems();
           break;
-        
+
         default:
           console.log(`Anomalie non gérée: ${anomaly.type}`);
       }
-      
+
       this.autoRepairCount++;
     }
   }
@@ -243,7 +242,7 @@ class GodLevelMonitor {
     try {
       const recentMetrics = await this.getRecentSystemMetrics();
       const predictions = await this.predictiveEngine.predict(recentMetrics);
-      
+
       for (const prediction of predictions) {
         if (prediction.probability > 0.8) {
           console.log(`🔮 Prédiction critique: ${prediction.type} dans ${prediction.timeframe}`);
@@ -251,7 +250,7 @@ class GodLevelMonitor {
           this.preventedIssuesCount++;
         }
       }
-      
+
     } catch (error) {
       console.error('Erreur prédiction:', error);
     }
@@ -265,7 +264,7 @@ class GodLevelMonitor {
             global.systemCache.optimize();
           }
           break;
-        
+
         case 'adjust_thresholds':
           autonomousMonitor.addCustomOptimization({
             type: 'threshold_modify',
@@ -275,7 +274,7 @@ class GodLevelMonitor {
             estimatedImpact: 0.3
           });
           break;
-        
+
         case 'enable_fallback_systems':
           console.log('🛡️ Activation des systèmes de secours');
           // Activer les systèmes de fallback
@@ -320,25 +319,25 @@ class GodLevelMonitor {
 
   private generateRecommendations(): string[] {
     const recommendations = [];
-    
+
     if (this.systemStatus.overallHealth < 90) {
       recommendations.push('Système en dessous de 90% - Diagnostic approfondi recommandé');
     }
-    
+
     if (this.autoRepairCount > 50) {
       recommendations.push('Nombre élevé de réparations - Analyse des causes racines nécessaire');
     }
-    
+
     if (this.predictiveEngine.accuracy < 0.9) {
       recommendations.push('Précision prédictive faible - Réentraînement des modèles suggéré');
     }
-    
+
     return recommendations;
   }
 
   private async emergencyProtocol(error: Error) {
     console.log('🚨 PROTOCOLE D\'URGENCE ACTIVÉ');
-    
+
     // Sauvegarde de l'état critique
     const emergencyState = {
       timestamp: new Date(),
@@ -361,11 +360,11 @@ class GodLevelMonitor {
     if (global.systemCache) {
       global.systemCache.clear();
     }
-    
+
     if (global.gc) {
       global.gc();
     }
-    
+
     // Redémarrage des modules critiques
     try {
       const criticalModules = [
@@ -373,7 +372,7 @@ class GodLevelMonitor {
         '../modules/quality-assurance.module',
         './decision-engine'
       ];
-      
+
       for (const module of criticalModules) {
         delete require.cache[require.resolve(module)];
         require(module);
@@ -414,7 +413,7 @@ class GodLevelMonitor {
     // Analyse simplifiée des tendances
     const recent = data.slice(-5);
     const older = data.slice(-10, -5);
-    
+
     return {
       declining: Math.random() * 0.3,
       errorIncreasing: Math.random() * 0.2
@@ -440,4 +439,15 @@ class GodLevelMonitor {
   }
 }
 
-export const godMonitor = new GodLevelMonitor();
+// Instance globale
+let godMonitorInstance: GodLevelMonitor | null = null;
+
+export function getGodMonitor(): GodLevelMonitor {
+  if (!godMonitorInstance) {
+    godMonitorInstance = new GodLevelMonitor();
+  }
+  return godMonitorInstance;
+}
+
+// Export direct de l'instance pour faciliter l'import
+export const godMonitor = getGodMonitor();

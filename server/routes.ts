@@ -12,6 +12,7 @@ import { errorDetection } from "./modules/error-detection.module";
 import { qualityAssurance } from "./modules/quality-assurance.module";
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { godMonitor } from './core/god-monitor';
 
 const execAsync = promisify(exec);
 

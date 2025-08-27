@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Sparkles, 
-  Database, 
+import {
+  Sparkles,
+  Database,
   Brain,
   Zap,
   Target,
@@ -42,6 +42,9 @@ interface SystemHealth {
   ai?: {
     confidence: number;
   };
+  predictiveAccuracy?: number;
+  efficiency?: number;
+  activeModules?: number;
 }
 
 // Mock data for resource usage and module counts if they are not fetched
