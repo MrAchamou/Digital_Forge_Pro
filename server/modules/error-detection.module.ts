@@ -54,6 +54,12 @@ class AdvancedErrorDetection {
     const securityVulnerabilities = await this.detectSecurityIssues(code, aiAnalysis);
     const compatibilityIssues = await this.detectCompatibilityIssues(code, aiAnalysis);
     
+    // Nouvelles détections avancées
+    const dependencyErrors = await this.detectDependencyErrors(code, context, aiAnalysis);
+    const buildErrors = await this.detectBuildErrors(code, context, aiAnalysis);
+    const environmentErrors = await this.detectEnvironmentErrors(context, aiAnalysis);
+    const runtimeErrors = await this.detectRuntimeErrors(code, context, aiAnalysis);
+    
     // Predictive Error Detection
     const predictedErrors = await this.predictFutureErrors(code, context, aiAnalysis);
     
@@ -64,6 +70,10 @@ class AdvancedErrorDetection {
       ...performanceIssues,
       ...securityVulnerabilities,
       ...compatibilityIssues,
+      ...dependencyErrors,
+      ...buildErrors,
+      ...environmentErrors,
+      ...runtimeErrors,
       ...predictedErrors
     ], aiAnalysis);
 
@@ -332,6 +342,70 @@ class AdvancedErrorDetection {
         preventionStrategy: 'input_sanitization'
       }
     ]);
+
+    // Patterns de dépendances et build
+    this.aiErrorPatterns.set('dependencies', [
+      {
+        pattern: 'command_not_found',
+        severity: 'critical',
+        category: 'dependency',
+        aiConfidence: 0.95,
+        autoFix: true,
+        preventionStrategy: 'dependency_verification'
+      },
+      {
+        pattern: 'missing_package',
+        severity: 'high',
+        category: 'dependency',
+        aiConfidence: 0.9,
+        autoFix: true,
+        preventionStrategy: 'package_integrity_check'
+      },
+      {
+        pattern: 'version_mismatch',
+        severity: 'medium',
+        category: 'dependency',
+        aiConfidence: 0.85,
+        autoFix: true,
+        preventionStrategy: 'version_lock'
+      },
+      {
+        pattern: 'build_failure',
+        severity: 'high',
+        category: 'build',
+        aiConfidence: 0.88,
+        autoFix: true,
+        preventionStrategy: 'build_verification'
+      }
+    ]);
+
+    // Patterns d'environnement Replit
+    this.aiErrorPatterns.set('environment', [
+      {
+        pattern: 'port_binding_error',
+        severity: 'medium',
+        category: 'network',
+        aiConfidence: 0.9,
+        autoFix: true,
+        preventionStrategy: 'port_configuration'
+      },
+      {
+        pattern: 'file_permission_error',
+        severity: 'medium',
+        category: 'filesystem',
+        aiConfidence: 0.85,
+        autoFix: true,
+        preventionStrategy: 'permission_management'
+      },
+      {
+        pattern: 'memory_limit_exceeded',
+        severity: 'high',
+        category: 'resource',
+        aiConfidence: 0.9,
+        autoFix: false,
+        preventionStrategy: 'resource_optimization'
+      }
+    ]);
   }
 
   private initializeNeuralNetwork() {
@@ -395,6 +469,35 @@ class AdvancedErrorDetection {
               name: 'algorithm_optimization',
               action: 'optimize_algorithm',
               confidence: 0.7
+            });
+            break;
+          case 'dependency':
+            strategies.push({
+              name: 'dependency_installation',
+              action: 'install_missing_dependency',
+              confidence: 0.95,
+              autoExecute: true
+            });
+            break;
+          case 'build':
+            strategies.push({
+              name: 'build_repair',
+              action: 'fix_build_configuration',
+              confidence: 0.8
+            });
+            break;
+          case 'environment':
+            strategies.push({
+              name: 'environment_correction',
+              action: 'fix_environment_issue',
+              confidence: 0.85
+            });
+            break;
+          case 'runtime':
+            strategies.push({
+              name: 'runtime_correction',
+              action: 'fix_runtime_error',
+              confidence: 0.8
             });
             break;
         }
@@ -523,6 +626,293 @@ class AdvancedErrorDetection {
   private async enhanceFixingCapabilities() {
     // Amélioration des capacités de correction
     console.log('Enhancing auto-fixing capabilities');
+  }
+
+  // =================== NOUVELLES MÉTHODES DE DÉTECTION SPÉCIALISÉES ===================
+
+  private async detectDependencyErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
+    const errors = [];
+    
+    // Détection d'erreurs "command not found"
+    const commandNotFoundPattern = /sh:\s+\d+:\s+(\w+):\s+not\s+found/g;
+    let match;
+    while ((match = commandNotFoundPattern.exec(context.consoleOutput || '')) !== null) {
+      const missingCommand = match[1];
+      
+      errors.push({
+        type: 'dependency',
+        subtype: 'command_not_found',
+        message: `Command "${missingCommand}" not found - Missing dependency detected`,
+        severity: 'critical',
+        aiConfidence: 0.95,
+        autoFix: await this.generateDependencyFix(missingCommand),
+        command: missingCommand,
+        solution: await this.suggestDependencyInstallation(missingCommand)
+      });
+    }
+    
+    // Détection de packages manquants dans package.json
+    if (code.includes('require(') || code.includes('import ')) {
+      const packageErrors = await this.detectMissingPackages(code, context);
+      errors.push(...packageErrors);
+    }
+    
+    return errors;
+  }
+
+  private async detectBuildErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
+    const errors = [];
+    const consoleOutput = context.consoleOutput || '';
+    
+    // Détection d'erreurs de compilation TypeScript
+    if (consoleOutput.includes('TSError') || consoleOutput.includes('TS2')) {
+      errors.push({
+        type: 'build',
+        subtype: 'typescript_error',
+        message: 'TypeScript compilation error detected',
+        severity: 'high',
+        aiConfidence: 0.9,
+        autoFix: await this.generateTypeScriptFix(consoleOutput),
+        details: this.extractTypeScriptErrors(consoleOutput)
+      });
+    }
+    
+    // Détection d'erreurs de build Vite/bundler
+    if (consoleOutput.includes('Build failed') || consoleOutput.includes('bundling failed')) {
+      errors.push({
+        type: 'build',
+        subtype: 'bundler_error',
+        message: 'Build process failed',
+        severity: 'high',
+        aiConfidence: 0.85,
+        autoFix: await this.generateBuildFix(consoleOutput)
+      });
+    }
+    
+    return errors;
+  }
+
+  private async detectEnvironmentErrors(context: any, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
+    const errors = [];
+    const consoleOutput = context.consoleOutput || '';
+    
+    // Détection d'erreurs de port
+    if (consoleOutput.includes('EADDRINUSE') || consoleOutput.includes('port already in use')) {
+      errors.push({
+        type: 'environment',
+        subtype: 'port_conflict',
+        message: 'Port conflict detected',
+        severity: 'medium',
+        aiConfidence: 0.9,
+        autoFix: await this.generatePortFix(consoleOutput)
+      });
+    }
+    
+    // Détection d'erreurs de permissions
+    if (consoleOutput.includes('EACCES') || consoleOutput.includes('permission denied')) {
+      errors.push({
+        type: 'environment',
+        subtype: 'permission_error',
+        message: 'File permission error detected',
+        severity: 'medium',
+        aiConfidence: 0.85,
+        autoFix: await this.generatePermissionFix(consoleOutput)
+      });
+    }
+    
+    return errors;
+  }
+
+  private async detectRuntimeErrors(code: string, context: any, aiAnalysis: AIErrorAnalysis): Promise<any[]> {
+    const errors = [];
+    const consoleOutput = context.consoleOutput || '';
+    
+    // Détection d'erreurs de module non trouvé
+    if (consoleOutput.includes('Cannot find module') || consoleOutput.includes('MODULE_NOT_FOUND')) {
+      const moduleMatch = consoleOutput.match(/Cannot find module ['"]([^'"]+)['"]/);
+      if (moduleMatch) {
+        errors.push({
+          type: 'runtime',
+          subtype: 'module_not_found',
+          message: `Module "${moduleMatch[1]}" not found`,
+          severity: 'high',
+          aiConfidence: 0.9,
+          autoFix: await this.generateModuleFix(moduleMatch[1]),
+          module: moduleMatch[1]
+        });
+      }
+    }
+    
+    // Détection d'erreurs de syntaxe runtime
+    if (consoleOutput.includes('SyntaxError') || consoleOutput.includes('Unexpected token')) {
+      errors.push({
+        type: 'runtime',
+        subtype: 'syntax_runtime_error',
+        message: 'Runtime syntax error detected',
+        severity: 'high',
+        aiConfidence: 0.85,
+        autoFix: await this.generateRuntimeSyntaxFix(consoleOutput)
+      });
+    }
+    
+    return errors;
+  }
+
+  // =================== MÉTHODES D'AUTO-CORRECTION SPÉCIALISÉES ===================
+
+  private async generateDependencyFix(command: string): Promise<any> {
+    const dependencyMap = {
+      'tsx': { package: 'tsx', type: 'dev', command: 'npm install tsx --save-dev' },
+      'tsc': { package: 'typescript', type: 'dev', command: 'npm install typescript --save-dev' },
+      'nodemon': { package: 'nodemon', type: 'dev', command: 'npm install nodemon --save-dev' },
+      'vite': { package: 'vite', type: 'dev', command: 'npm install vite --save-dev' }
+    };
+    
+    const fix = dependencyMap[command];
+    if (fix) {
+      return {
+        type: 'install_dependency',
+        command: fix.command,
+        package: fix.package,
+        devDependency: fix.type === 'dev',
+        confidence: 0.95
+      };
+    }
+    
+    return {
+      type: 'search_dependency',
+      command: `npm search ${command}`,
+      suggestion: `Search for ${command} package and install it`,
+      confidence: 0.7
+    };
+  }
+
+  private async suggestDependencyInstallation(command: string): Promise<string> {
+    const suggestions = {
+      'tsx': 'Install TypeScript executor: npm install tsx --save-dev',
+      'tsc': 'Install TypeScript compiler: npm install typescript --save-dev',
+      'nodemon': 'Install development server: npm install nodemon --save-dev',
+      'vite': 'Install Vite bundler: npm install vite --save-dev'
+    };
+    
+    return suggestions[command] || `Install missing command: npm install ${command}`;
+  }
+
+  private async detectMissingPackages(code: string, context: any): Promise<any[]> {
+    const errors = [];
+    
+    // Extraction des imports/requires
+    const importRegex = /(?:import.*from\s+['"]([^'"]+)['"]|require\(['"]([^'"]+)['"]\))/g;
+    const packageJson = context.packageJson || {};
+    const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
+    
+    let match;
+    while ((match = importRegex.exec(code)) !== null) {
+      const packageName = match[1] || match[2];
+      
+      // Ignorer les imports relatifs
+      if (packageName.startsWith('.') || packageName.startsWith('/')) continue;
+      
+      // Vérifier si le package est installé
+      if (!dependencies[packageName]) {
+        errors.push({
+          type: 'dependency',
+          subtype: 'missing_package',
+          message: `Package "${packageName}" is imported but not installed`,
+          severity: 'high',
+          aiConfidence: 0.9,
+          autoFix: {
+            type: 'install_package',
+            command: `npm install ${packageName}`,
+            package: packageName
+          },
+          package: packageName
+        });
+      }
+    }
+    
+    return errors;
+  }
+
+  private async generateTypeScriptFix(consoleOutput: string): Promise<any> {
+    // Analyse des erreurs TypeScript communes
+    if (consoleOutput.includes('TS2307')) {
+      return {
+        type: 'install_types',
+        action: 'Install type definitions',
+        confidence: 0.8
+      };
+    }
+    
+    if (consoleOutput.includes('TS2304')) {
+      return {
+        type: 'add_type_declaration',
+        action: 'Add missing type declaration',
+        confidence: 0.75
+      };
+    }
+    
+    return {
+      type: 'typescript_config',
+      action: 'Check TypeScript configuration',
+      confidence: 0.6
+    };
+  }
+
+  private async generateBuildFix(consoleOutput: string): Promise<any> {
+    return {
+      type: 'rebuild',
+      action: 'Clean and rebuild project',
+      commands: ['npm run clean', 'npm install', 'npm run build'],
+      confidence: 0.7
+    };
+  }
+
+  private async generatePortFix(consoleOutput: string): Promise<any> {
+    return {
+      type: 'change_port',
+      action: 'Change to available port',
+      suggestion: 'Use PORT environment variable or change port in config',
+      confidence: 0.8
+    };
+  }
+
+  private async generatePermissionFix(consoleOutput: string): Promise<any> {
+    return {
+      type: 'fix_permissions',
+      action: 'Fix file permissions',
+      commands: ['chmod +x script', 'Check file ownership'],
+      confidence: 0.75
+    };
+  }
+
+  private async generateModuleFix(moduleName: string): Promise<any> {
+    return {
+      type: 'install_module',
+      command: `npm install ${moduleName}`,
+      module: moduleName,
+      confidence: 0.9
+    };
+  }
+
+  private async generateRuntimeSyntaxFix(consoleOutput: string): Promise<any> {
+    return {
+      type: 'syntax_correction',
+      action: 'Fix syntax error',
+      suggestion: 'Check for missing brackets, semicolons, or incorrect syntax',
+      confidence: 0.7
+    };
+  }
+
+  private extractTypeScriptErrors(consoleOutput: string): string[] {
+    const errorRegex = /TS\d+:.*$/gm;
+    return consoleOutput.match(errorRegex) || [];
+  }
+
+  // Méthode publique pour analyser les erreurs de console
+  public async analyzeConsoleErrors(consoleOutput: string, context: any = {}): Promise<any> {
+    const enhancedContext = { ...context, consoleOutput };
+    return await this.detectErrors('', enhancedContext);
   }
 }
 
