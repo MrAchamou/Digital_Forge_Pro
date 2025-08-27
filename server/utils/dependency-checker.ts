@@ -1,12 +1,5 @@
-
-
 import { exec } from 'child_process';
 import { promisify } from 'util';
-
-const execAsync = promisify(exec);
-
-import { promisify } from 'util';
-import { exec } from 'child_process';
 
 const execAsync = promisify(exec);
 
@@ -19,7 +12,7 @@ interface DependencyIssue {
 export class DependencyChecker {
   private static requiredCommands = [
     'tsx',
-    'tsc', 
+    'tsc',
     'vite',
     'drizzle-kit'
   ];
@@ -62,14 +55,14 @@ export class DependencyChecker {
     try {
       console.log('🔍 Vérification des dépendances...');
       const issues = await this.checkAllDependencies();
-      
+
       if (issues.length === 0) {
         console.log('✅ Toutes les dépendances sont présentes');
         return true;
       }
 
       console.log(`❌ ${issues.length} dépendances manquantes détectées`);
-      
+
       // Auto-installation des dépendances manquantes
       for (const issue of issues) {
         console.log(`📦 Installation de ${issue.command}...`);
@@ -94,42 +87,5 @@ export class DependencyChecker {
       console.error('❌ Erreur lors de la vérification des dépendances:', error);
       return false;
     }
-  }es();
-
-      if (issues.length > 0) {
-        console.log('⚠️ Dépendances manquantes détectées:');
-        issues.forEach(issue => {
-          console.log(`  - ${issue.command}: ${issue.solution}`);
-        });
-
-        console.log('🛠️ Installation automatique des dépendances...');
-        await execAsync('npm install');
-        
-        // Vérification post-installation
-        console.log('🔄 Re-vérification des dépendances...');
-        const remainingIssues = await this.checkAllDependencies();
-        if (remainingIssues.length > 0) {
-          console.log('⚠️ Certaines dépendances nécessitent une installation spécifique:');
-          for (const issue of remainingIssues) {
-            try {
-              console.log(`🔧 Installation de ${issue.command}...`);
-              await execAsync(issue.solution);
-            } catch (installError) {
-              console.error(`❌ Échec installation ${issue.command}:`, installError);
-            }
-          }
-        }
-        
-        console.log('✅ Dépendances installées avec succès!');
-        return true;
-      }
-
-      console.log('✅ Toutes les dépendances sont présentes');
-      return true;
-    } catch (error) {
-      console.error('❌ Erreur lors de la vérification des dépendances:', error);
-      return false;
-    }
   }
 }
-
