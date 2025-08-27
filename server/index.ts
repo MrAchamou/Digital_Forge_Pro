@@ -1,3 +1,4 @@
+
 import express, { type Request, Response, NextFunction } from "express";
 import { setupVite, serveStatic, log } from "./vite";
 import { registerRoutes } from "./routes";
@@ -75,24 +76,13 @@ app.use((req, res, next) => {
   const port = parseInt(process.env.PORT || '5000', 10);
 
   // Initialize GOD monitoring system
-  // Initialisation du système de monitoring GOD
-  import { godMonitor } from './core/god-monitor';
-  import { DependencyChecker } from './utils/dependency-checker';
-
-  // Vérification et auto-réparation des dépendances au démarrage
-  DependencyChecker.autoFixDependencies().then((success) => {
-    if (success) {
-      console.log('✅ Dépendances vérifiées et corrigées');
-    } else {
-      console.warn('⚠️ Certaines dépendances pourraient être manquantes');
-    }
-  });
+  const { godMonitor } = await import('./core/god-monitor');
 
   // Initialisation des systèmes globaux
-  global.systemCache = new Map();
-  global.activeSessions = 0;
-  global.processedRequests = 0;
-  global.systemMetrics = {
+  (global as any).systemCache = new Map();
+  (global as any).activeSessions = 0;
+  (global as any).processedRequests = 0;
+  (global as any).systemMetrics = {
     responseTime: 0,
     errorCount: 0
   };
@@ -100,12 +90,12 @@ app.use((req, res, next) => {
   // Surveillance des métriques de base
   app.use((req, res, next) => {
     const startTime = Date.now();
-    global.activeSessions++;
+    (global as any).activeSessions++;
 
     res.on('finish', () => {
-      global.activeSessions--;
-      global.processedRequests++;
-      global.systemMetrics.responseTime = Date.now() - startTime;
+      (global as any).activeSessions--;
+      (global as any).processedRequests++;
+      (global as any).systemMetrics.responseTime = Date.now() - startTime;
     });
 
     next();
