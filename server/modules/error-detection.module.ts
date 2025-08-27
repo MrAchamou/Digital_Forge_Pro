@@ -1185,27 +1185,44 @@ clearTimeout(timeoutId);`,
   // === DÉTECTION PROACTIVE DE FICHIERS ===
 
   public async scanProjectFiles(): Promise<{ errors: DetectedError[], autoFixed: number }> {
-    const fs = require('fs');
-    const path = require('path');
-    const glob = require('glob');
-
     const results = {
       errors: [] as DetectedError[],
       autoFixed: 0
     };
 
     try {
+      // Import dynamique des modules Node.js
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      // Scan manuel des fichiers sans glob pour éviter les dépendances
+      const scanDirectory = async (dir: string, extensions: string[]): Promise<string[]> => {
+        const files: string[] = [];
+        try {
+          const entries = await fs.readdir(dir, { withFileTypes: true });
+          for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isDirectory() && entry.name !== 'node_modules') {
+              files.push(...await scanDirectory(fullPath, extensions));
+            } else if (entry.isFile() && extensions.some(ext => entry.name.endsWith(ext))) {
+              files.push(fullPath);
+            }
+          }
+        } catch (error) {
+          // Directory doesn't exist or can't be read
+        }
+        return files;
+      };
+
       // Scanner tous les fichiers TypeScript/JavaScript
       const files = [
-        ...glob.sync('server/**/*.ts'),
-        ...glob.sync('server/**/*.js'),
-        ...glob.sync('client/src/**/*.tsx'),
-        ...glob.sync('client/src/**/*.ts')
+        ...(await scanDirectory('server', ['.ts', '.js'])),
+        ...(await scanDirectory('client/src', ['.tsx', '.ts']))
       ];
 
       for (const filePath of files) {
         try {
-          const fileContent = fs.readFileSync(filePath, 'utf8');
+          const fileContent = await fs.readFile(filePath, 'utf8');
           const fileErrors = await this.detectErrors(fileContent, { 
             filePath,
             scanMode: true 
@@ -1222,7 +1239,7 @@ clearTimeout(timeoutId);`,
               
               // Appliquer les corrections au fichier
               if (fileErrors.autoFixes.improvedCode !== fileContent) {
-                fs.writeFileSync(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
+                await fs.writeFile(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
                 console.log(`✅ Fichier ${filePath} auto-corrigé`);
               }
             }
@@ -1253,35 +1270,43 @@ clearTimeout(timeoutId);`,
       }
     }, 5 * 60 * 1000);
 
-    // Surveillance en temps réel des changements de fichiers
-    const chokidar = require('chokidar');
-    const watcher = chokidar.watch(['server/**/*.ts', 'client/src/**/*.{ts,tsx}'], {
-      ignored: /node_modules/,
-      persistent: true
-    });
+    try {
+      // Surveillance en temps réel des changements de fichiers (optionnel)
+      const chokidar = await import('chokidar').catch(() => null);
+      if (chokidar) {
+        const watcher = chokidar.default.watch(['server/**/*.ts', 'client/src/**/*.{ts,tsx}'], {
+          ignored: /node_modules/,
+          persistent: true
+        });
 
-    watcher.on('change', async (filePath: string) => {
-      console.log(`🔍 Fichier modifié: ${filePath} - Scan en cours...`);
-      try {
-        const fs = require('fs');
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        const fileErrors = await this.detectErrors(fileContent, { filePath, realTimeCheck: true });
-        
-        if (fileErrors.errors.length > 0) {
-          console.log(`⚠️ ${fileErrors.errors.length} erreurs détectées dans ${filePath}`);
-          // Auto-correction immédiate si confidence élevée
-          if (fileErrors.autoFixes?.fixed?.length > 0) {
-            const highConfidenceFixes = fileErrors.autoFixes.fixed.filter(fix => fix.confidence > 0.9);
-            if (highConfidenceFixes.length > 0) {
-              fs.writeFileSync(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
-              console.log(`✅ ${highConfidenceFixes.length} erreurs auto-corrigées immédiatement dans ${filePath}`);
+        watcher.on('change', async (filePath: string) => {
+          console.log(`🔍 Fichier modifié: ${filePath} - Scan en cours...`);
+          try {
+            const fs = await import('fs');
+            const fileContent = await fs.readFile(filePath, 'utf8');
+            const fileErrors = await this.detectErrors(fileContent, { filePath, realTimeCheck: true });
+            
+            if (fileErrors.errors.length > 0) {
+              console.log(`⚠️ ${fileErrors.errors.length} erreurs détectées dans ${filePath}`);
+              // Auto-correction immédiate si confidence élevée
+              if (fileErrors.autoFixes?.fixed?.length > 0) {
+                const highConfidenceFixes = fileErrors.autoFixes.fixed.filter(fix => fix.confidence > 0.9);
+                if (highConfidenceFixes.length > 0) {
+                  await fs.writeFile(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
+                  console.log(`✅ ${highConfidenceFixes.length} erreurs auto-corrigées immédiatement dans ${filePath}`);
+                }
+              }
             }
+          } catch (error) {
+            console.error(`❌ Erreur scan temps réel ${filePath}:`, error);
           }
-        }
-      } catch (error) {
-        console.error(`❌ Erreur scan temps réel ${filePath}:`, error);
+        });
+      } else {
+        console.log('📝 Surveillance temps réel désactivée (chokidar non disponible)');
       }
-    });
+    } catch (error) {
+      console.log('📝 Surveillance temps réel désactivée:', error.message);
+    }
   }
 
   // API publique
