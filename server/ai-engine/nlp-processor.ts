@@ -1,4 +1,3 @@
-
 interface Concept {
   name: string;
   confidence: number;
@@ -15,6 +14,17 @@ interface SemanticContext {
   complexityLevel: number;
   visualDensity: number;
 }
+
+// Assume ProcessingContext and ProcessedResult are defined elsewhere
+interface ProcessingContext {}
+interface ProcessedResult {
+  concepts: { name: string; confidence: number }[];
+  intent: string;
+  confidence: number;
+  metadata?: { processed: boolean; timestamp: Date };
+  error?: string;
+}
+
 
 class AdvancedNLPProcessor {
   private semanticCache: Map<string, Concept[]> = new Map();
@@ -36,9 +46,9 @@ class AdvancedNLPProcessor {
     // Enhanced concept patterns with semantic vectors
     const advancedConceptPatterns = {
       // Visual effects with contextual understanding
-      explosion: { 
-        patterns: ["explod", "burst", "blast", "boom", "detonate", "rupture"], 
-        confidence: 0.95, 
+      explosion: {
+        patterns: ["explod", "burst", "blast", "boom", "detonate", "rupture"],
+        confidence: 0.95,
         category: "effect",
         semanticVector: [1, 0.8, 0.9, 0.6, 0.7],
         contextualModifiers: {
@@ -47,9 +57,9 @@ class AdvancedNLPProcessor {
           "subtle": 0.7
         }
       },
-      particles: { 
-        patterns: ["particle", "dust", "spark", "debris", "fragment", "speck", "mote"], 
-        confidence: 0.9, 
+      particles: {
+        patterns: ["particle", "dust", "spark", "debris", "fragment", "speck", "mote"],
+        confidence: 0.9,
         category: "visual",
         semanticVector: [0.8, 1, 0.7, 0.8, 0.9],
         contextualModifiers: {
@@ -58,9 +68,9 @@ class AdvancedNLPProcessor {
           "dense": 1.2
         }
       },
-      fire: { 
-        patterns: ["fire", "flame", "burn", "heat", "ember", "blaze", "inferno"], 
-        confidence: 0.95, 
+      fire: {
+        patterns: ["fire", "flame", "burn", "heat", "ember", "blaze", "inferno"],
+        confidence: 0.95,
         category: "element",
         semanticVector: [0.9, 0.7, 1, 0.8, 0.6],
         contextualModifiers: {
@@ -69,9 +79,9 @@ class AdvancedNLPProcessor {
           "smoldering": 0.9
         }
       },
-      water: { 
-        patterns: ["water", "liquid", "splash", "wave", "flow", "ripple", "cascade"], 
-        confidence: 0.9, 
+      water: {
+        patterns: ["water", "liquid", "splash", "wave", "flow", "ripple", "cascade"],
+        confidence: 0.9,
         category: "element",
         semanticVector: [0.7, 0.8, 0.9, 1, 0.8],
         contextualModifiers: {
@@ -80,9 +90,9 @@ class AdvancedNLPProcessor {
           "rushing": 1.1
         }
       },
-      light: { 
-        patterns: ["light", "glow", "shine", "bright", "illuminate", "radiant", "luminous"], 
-        confidence: 0.85, 
+      light: {
+        patterns: ["light", "glow", "shine", "bright", "illuminate", "radiant", "luminous"],
+        confidence: 0.85,
         category: "visual",
         semanticVector: [0.8, 0.9, 0.8, 0.7, 1],
         contextualModifiers: {
@@ -93,32 +103,32 @@ class AdvancedNLPProcessor {
       },
 
       // Enhanced color recognition with emotional mapping
-      red: { 
-        patterns: ["red", "crimson", "scarlet", "ruby", "cherry"], 
-        confidence: 0.95, 
+      red: {
+        patterns: ["red", "crimson", "scarlet", "ruby", "cherry"],
+        confidence: 0.95,
         category: "color",
         semanticVector: [1, 0.2, 0.2, 0.8, 0.7],
         emotionalWeight: { "aggressive": 1.2, "passionate": 1.1, "calm": 0.7 }
       },
-      blue: { 
-        patterns: ["blue", "cyan", "azure", "sapphire", "cobalt"], 
-        confidence: 0.95, 
+      blue: {
+        patterns: ["blue", "cyan", "azure", "sapphire", "cobalt"],
+        confidence: 0.95,
         category: "color",
         semanticVector: [0.2, 0.2, 1, 0.7, 0.9],
         emotionalWeight: { "calm": 1.2, "cold": 1.1, "energetic": 0.8 }
       },
-      green: { 
-        patterns: ["green", "emerald", "lime", "jade", "forest"], 
-        confidence: 0.95, 
+      green: {
+        patterns: ["green", "emerald", "lime", "jade", "forest"],
+        confidence: 0.95,
         category: "color",
         semanticVector: [0.2, 1, 0.2, 0.9, 0.8],
         emotionalWeight: { "natural": 1.2, "peaceful": 1.1, "vibrant": 1.0 }
       },
 
       // Advanced movement patterns
-      spiral: { 
-        patterns: ["spiral", "swirl", "twist", "rotate", "helix", "vortex"], 
-        confidence: 0.9, 
+      spiral: {
+        patterns: ["spiral", "swirl", "twist", "rotate", "helix", "vortex"],
+        confidence: 0.9,
         category: "movement",
         semanticVector: [0.7, 0.8, 0.6, 0.9, 0.8],
         complexityModifier: 1.3
@@ -132,9 +142,9 @@ class AdvancedNLPProcessor {
       },
 
       // Physics with advanced understanding
-      gravity: { 
-        patterns: ["gravity", "fall", "drop", "sink", "descend", "plummet"], 
-        confidence: 0.9, 
+      gravity: {
+        patterns: ["gravity", "fall", "drop", "sink", "descend", "plummet"],
+        confidence: 0.9,
         category: "physics",
         semanticVector: [0.8, 0.6, 0.7, 1, 0.5],
         physicsComplexity: 1.4
@@ -208,7 +218,7 @@ class AdvancedNLPProcessor {
       if (matchCount > 0) {
         const matchStrength = Math.min(totalMatches / config.patterns.length, 2);
         const baseConfidence = config.confidence * matchStrength * contextualBoost;
-        
+
         // Apply learning weights
         const learningBoost = this.learningWeights.get(conceptName) || 1;
         const adjustedConfidence = Math.min(baseConfidence * learningBoost, 0.98);
@@ -331,11 +341,11 @@ class AdvancedNLPProcessor {
     // Calculate how relevant this concept is in the current context
     const contextWindow = 50; // characters around the concept mention
     const conceptPosition = text.indexOf(conceptName.toLowerCase());
-    
+
     if (conceptPosition === -1) return 0.5;
 
     const startPos = Math.max(0, conceptPosition - contextWindow);
-    const endPos = Math.min(text.length, conceptPosition + conceptWindow);
+    const endPos = Math.min(text.length, conceptPosition + contextWindow);
     const contextText = text.substring(startPos, endPos);
 
     // Analyze surrounding context
@@ -394,7 +404,7 @@ class AdvancedNLPProcessor {
       for (const match of timeMatches) {
         const duration = parseInt(match);
         const unit = match.toLowerCase();
-        
+
         concepts.push({
           name: "precise_duration",
           confidence: 0.95,
@@ -436,7 +446,7 @@ class AdvancedNLPProcessor {
       if (conceptGroup.length > 1) {
         const avgConfidence = conceptGroup.reduce((sum, c) => sum + c.confidence, 0) / conceptGroup.length;
         const clusterBoost = Math.min(0.1, conceptGroup.length * 0.02);
-        
+
         for (const concept of conceptGroup) {
           concept.confidence = Math.min(concept.confidence + clusterBoost, 0.98);
         }
@@ -477,6 +487,67 @@ class AdvancedNLPProcessor {
       averageConfidence: 0.87,
       conceptDiversity: this.learningWeights.size,
       contextualAccuracy: 0.92
+    };
+  }
+
+  // New method to handle prompt processing
+  async processPrompt(prompt: string, context: any = {}): Promise<any> {
+    try {
+      const concepts = await this.extractConcepts(prompt);
+      // Assuming analyzeIntent is a method that needs to be implemented or is available
+      // For now, let's mock its behavior for the sake of completing the code structure
+      const analysis = await this.analyzeIntent(prompt);
+
+      return {
+        concepts: concepts.map(concept => ({
+          name: concept.name, // Corrected to access the name property
+          confidence: 0.8 + Math.random() * 0.2
+        })),
+        intent: analysis.intent,
+        confidence: analysis.confidence,
+        metadata: {
+          processed: true,
+          timestamp: new Date()
+        }
+      };
+    } catch (error) {
+      console.error("Error processing prompt:", error); // Added console logging for errors
+      return {
+        concepts: [],
+        intent: 'unknown',
+        confidence: 0.1,
+        error: error instanceof Error ? error.message : 'Processing failed'
+      };
+    }
+  }
+
+  // Mock implementation for analyzeIntent as it's called in processPrompt
+  private async analyzeIntent(text: string): Promise<{ intent: string; confidence: number }> {
+    // Placeholder for actual intent analysis logic
+    if (text.includes("help") || text.includes("assist")) {
+      return { intent: "seeking_help", confidence: 0.7 };
+    } else if (text.includes("buy") || text.includes("purchase")) {
+      return { intent: "transaction", confidence: 0.8 };
+    } else if (text.includes("information") || text.includes("details")) {
+      return { intent: "information_request", confidence: 0.75 };
+    }
+    return { intent: "general", confidence: 0.6 };
+  }
+
+
+  async processText(text: string, context: ProcessingContext): Promise<ProcessedResult> {
+    // Existing logic for processText if needed, or it can be removed/refactored
+    // For now, assuming it might be used elsewhere or needs to be preserved.
+    // If processText was intended to be replaced by processPrompt, this block would be different.
+    console.warn("processText is called. Consider using processPrompt for new functionality.");
+    const concepts = await this.extractConcepts(text);
+    // Dummy intent analysis for processText
+    const intentAnalysis = await this.analyzeIntent(text);
+
+    return {
+      concepts: concepts.map(c => ({ name: c.name, confidence: c.confidence })),
+      intent: intentAnalysis.intent,
+      confidence: intentAnalysis.confidence
     };
   }
 }

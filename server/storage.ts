@@ -1,7 +1,10 @@
 import { type User, type InsertUser, type Effect, type InsertEffect, type Job, type InsertJob, type Upload, type InsertUpload, type SystemMetrics, type InsertSystemMetrics, type EffectGenerationResponse, type JobStatusResponse, type EffectAnalysis, type SystemHealth } from "@shared/schema";
 import { randomUUID } from "crypto";
 
-export interface IStorage {
+// Define Json type if not already defined globally or imported
+type Json = any; // Replace 'any' with a more specific type if possible, e.g., string | number | boolean | null | Json[] | { [key: string]: Json }
+
+interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -149,14 +152,18 @@ export class MemStorage implements IStorage {
 
     sampleEffects.forEach(effect => {
       const id = randomUUID();
-      this.effects.set(id, {
+      const newEffect: Effect = {
         ...effect,
         id,
+        complexity: effect.complexity || 5,
+        performance: effect.performance || 'medium',
+        version: effect.version || '1.0.0',
+        tags: effect.tags || [],
         rating: effect.rating || 0,
         downloads: effect.downloads || 0,
-        tags: effect.tags || [],
         createdAt: new Date()
-      });
+      };
+      this.effects.set(id, newEffect);
     });
   }
 
@@ -196,7 +203,7 @@ export class MemStorage implements IStorage {
     }
     if (params?.search) {
       const searchLower = params.search.toLowerCase();
-      effects = effects.filter(effect => 
+      effects = effects.filter(effect =>
         effect.name.toLowerCase().includes(searchLower) ||
         effect.description.toLowerCase().includes(searchLower) ||
         effect.tags.some(tag => tag.toLowerCase().includes(searchLower))
@@ -204,7 +211,7 @@ export class MemStorage implements IStorage {
     }
 
     const total = effects.length;
-    
+
     // Apply pagination
     const offset = params?.offset || 0;
     const limit = params?.limit || 20;
@@ -215,16 +222,19 @@ export class MemStorage implements IStorage {
 
   async createEffect(insertEffect: InsertEffect): Promise<Effect> {
     const id = randomUUID();
-    const effect: Effect = {
+    const newEffect: Effect = {
       ...insertEffect,
       id,
-      rating: 0,
-      downloads: 0,
+      complexity: insertEffect.complexity || 5,
+      performance: insertEffect.performance || 'medium',
+      version: insertEffect.version || '1.0.0',
       tags: insertEffect.tags || [],
+      rating: insertEffect.rating || 0,
+      downloads: insertEffect.downloads || 0,
       createdAt: new Date()
     };
-    this.effects.set(id, effect);
-    return effect;
+    this.effects.set(id, newEffect);
+    return newEffect;
   }
 
   async updateEffect(id: string, updates: Partial<Effect>): Promise<Effect | undefined> {
@@ -354,12 +364,12 @@ export class MemStorage implements IStorage {
       timestamp: new Date()
     };
     this.systemMetrics.push(metrics);
-    
+
     // Keep only last 100 entries
     if (this.systemMetrics.length > 100) {
       this.systemMetrics = this.systemMetrics.slice(-100);
     }
-    
+
     return metrics;
   }
 
@@ -370,7 +380,7 @@ export class MemStorage implements IStorage {
   async getSystemHealth(): Promise<SystemHealth> {
     const queueStats = await this.getQueueStats();
     const latest = await this.getLatestSystemMetrics();
-    
+
     return {
       overall: 98.7,
       modules: {
@@ -436,11 +446,11 @@ class ParticleExplosion {
 
   render() {
     this.ctx.globalCompositeOperation = 'lighter';
-    
+
     this.particles.forEach(particle => {
       if (particle.life > 0) {
         this.updateParticle(particle);
-        
+
         this.ctx.save();
         this.ctx.globalAlpha = particle.life;
         this.ctx.fillStyle = particle.color;
@@ -450,7 +460,7 @@ class ParticleExplosion {
         this.ctx.restore();
       }
     });
-    
+
     this.particles = this.particles.filter(p => p.life > 0);
   }
 }`;
@@ -471,26 +481,26 @@ class FluidWave {
   render() {
     const { width, height } = this.canvas;
     this.ctx.clearRect(0, 0, width, height);
-    
+
     this.ctx.beginPath();
     this.ctx.moveTo(0, height / 2);
-    
+
     for (let x = 0; x < width; x++) {
       const y = height / 2 + Math.sin((x * this.frequency + this.time) * 0.01) * this.amplitude;
       this.ctx.lineTo(x, y);
     }
-    
+
     this.ctx.lineTo(width, height);
     this.ctx.lineTo(0, height);
     this.ctx.closePath();
-    
+
     const gradient = this.ctx.createLinearGradient(0, 0, 0, height);
     gradient.addColorStop(0, 'rgba(0, 212, 255, 0.8)');
     gradient.addColorStop(1, 'rgba(255, 0, 110, 0.3)');
-    
+
     this.ctx.fillStyle = gradient;
     this.ctx.fill();
-    
+
     this.time += this.speed;
   }
 }`;
@@ -511,7 +521,7 @@ class MatrixGlitch {
     const { width, height } = this.canvas;
     const imageData = this.ctx.getImageData(0, 0, width, height);
     const data = imageData.data;
-    
+
     // Glitch effect
     for (let i = 0; i < data.length; i += 4) {
       if (Math.random() < this.intensity * 0.01) {
@@ -521,7 +531,7 @@ class MatrixGlitch {
         data[i + 2] = data[i + 2 + offset] || 0;   // Blue
       }
     }
-    
+
     this.ctx.putImageData(imageData, 0, 0);
     this.time++;
   }
@@ -542,14 +552,14 @@ class LightningStorm {
   generateBolt(startX, startY, endX, endY) {
     const points = [{ x: startX, y: startY }];
     const segments = 20;
-    
+
     for (let i = 1; i < segments; i++) {
       const progress = i / segments;
       const x = startX + (endX - startX) * progress + (Math.random() - 0.5) * 50;
       const y = startY + (endY - startY) * progress + (Math.random() - 0.5) * 20;
       points.push({ x, y });
     }
-    
+
     points.push({ x: endX, y: endY });
     return points;
   }
@@ -557,24 +567,24 @@ class LightningStorm {
   render() {
     const { width, height } = this.canvas;
     this.ctx.clearRect(0, 0, width, height);
-    
+
     for (let i = 0; i < this.branches; i++) {
       const startX = Math.random() * width;
       const endX = Math.random() * width;
       const bolt = this.generateBolt(startX, 0, endX, height);
-      
+
       this.ctx.strokeStyle = this.color;
       this.ctx.lineWidth = 2 + Math.random() * 3;
       this.ctx.shadowColor = this.color;
       this.ctx.shadowBlur = 10;
-      
+
       this.ctx.beginPath();
       this.ctx.moveTo(bolt[0].x, bolt[0].y);
-      
+
       for (let j = 1; j < bolt.length; j++) {
         this.ctx.lineTo(bolt[j].x, bolt[j].y);
       }
-      
+
       this.ctx.stroke();
     }
   }
@@ -595,7 +605,7 @@ class ShapeMorph {
 
   drawShape(shape, progress, centerX, centerY, size) {
     this.ctx.beginPath();
-    
+
     switch (shape) {
       case 'circle':
         this.ctx.arc(centerX, centerY, size, 0, Math.PI * 2);
@@ -617,22 +627,22 @@ class ShapeMorph {
     const centerX = width / 2;
     const centerY = height / 2;
     const size = 50;
-    
+
     this.ctx.clearRect(0, 0, width, height);
-    
+
     // Current shape
     this.ctx.fillStyle = \`rgba(0, 212, 255, \${1 - this.morphProgress})\`;
     this.drawShape(this.shapes[this.currentShape], this.morphProgress, centerX, centerY, size);
     this.ctx.fill();
-    
+
     // Next shape
     const nextShape = (this.currentShape + 1) % this.shapes.length;
     this.ctx.fillStyle = \`rgba(255, 0, 110, \${this.morphProgress})\`;
     this.drawShape(this.shapes[nextShape], this.morphProgress, centerX, centerY, size);
     this.ctx.fill();
-    
+
     this.morphProgress += 0.01 * this.morphSpeed;
-    
+
     if (this.morphProgress >= 1) {
       this.morphProgress = 0;
       this.currentShape = nextShape;
@@ -669,33 +679,33 @@ class DigitalFire {
   render() {
     const { width, height } = this.canvas;
     this.ctx.clearRect(0, 0, width, height);
-    
+
     // Add new particles at the bottom
     for (let i = 0; i < 5; i++) {
       this.particles.push(this.createFlameParticle(width / 2, height - 20));
     }
-    
+
     // Update and render particles
     this.particles = this.particles.filter(particle => {
       particle.x += particle.vx;
       particle.y += particle.vy;
       particle.life -= particle.decay;
-      
+
       if (particle.life > 0) {
         const alpha = particle.life * this.intensity;
         const hue = particle.heat * 60; // Red to yellow
-        
+
         this.ctx.save();
         this.ctx.globalAlpha = alpha;
         this.ctx.fillStyle = \`hsl(\${hue}, 100%, 50%)\`;
         this.ctx.shadowColor = \`hsl(\${hue}, 100%, 50%)\`;
         this.ctx.shadowBlur = particle.size;
-        
+
         this.ctx.beginPath();
         this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         this.ctx.fill();
         this.ctx.restore();
-        
+
         return true;
       }
       return false;

@@ -36,7 +36,16 @@ class AdvancedQualityAssurance {
   private securityAnalyzer: any;
   private learningEngine: any;
   private qualityHistory: Map<string, QualityReport[]> = new Map();
-  private benchmarkStandards: QualityMetrics;
+  private benchmarkStandards: QualityMetrics = {
+    codeComplexity: 80,
+    maintainabilityIndex: 75,
+    testCoverage: 80,
+    performanceScore: 85,
+    securityScore: 90,
+    readabilityScore: 80,
+    reusabilityScore: 70,
+    errorProneness: 85
+  };
 
   constructor() {
     this.initializeAITestGenerator();
@@ -92,7 +101,7 @@ class AdvancedQualityAssurance {
 
     } catch (error) {
       console.error('Erreur dans l\'assurance qualité:', error);
-      return this.generateDefaultReport(error.message);
+      return this.generateDefaultReport(error instanceof Error ? error.message : 'Unknown error');
     }
   }
 
@@ -208,7 +217,7 @@ class AdvancedQualityAssurance {
     
     let score = 0;
     for (const [metric, value] of Object.entries(metrics)) {
-      score += value * (weights[metric] || 0);
+      score += value * ((weights as any)[metric] || 0);
     }
     
     return Math.round(score * 100) / 100;
@@ -258,7 +267,7 @@ class AdvancedQualityAssurance {
           passed: false,
           executionTime: 0,
           coverage: 0,
-          errors: [error.message],
+          errors: [error instanceof Error ? error.message : 'Unknown error'],
           performance: 0
         });
       }
@@ -336,9 +345,9 @@ class AdvancedQualityAssurance {
 
   private async performAutoImprovements(code: string, metrics: QualityMetrics): Promise<any> {
     const improvements = {
-      applied: [],
-      suggested: [],
-      automated: []
+      applied: [] as string[],
+      suggested: [] as string[],
+      automated: [] as string[]
     };
     
     // Auto-améliorations basées sur les métriques
@@ -360,9 +369,10 @@ class AdvancedQualityAssurance {
   private async generateAIInsights(metrics: QualityMetrics, testResults: TestResult[], validation: any): Promise<string[]> {
     const insights: string[] = [];
     
-    if (metrics.overallScore > 85) {
+    const overallScore = this.calculateOverallScore(metrics);
+    if (overallScore > 85) {
       insights.push('🎯 Excellent code quality - Prêt pour la production');
-    } else if (metrics.overallScore > 70) {
+    } else if (overallScore > 70) {
       insights.push('✅ Bonne qualité de code - Quelques améliorations possibles');
     } else {
       insights.push('⚠️ Qualité à améliorer - Revue nécessaire avant production');
