@@ -11,12 +11,12 @@ export function useEffectGenerator() {
   const { data: currentJob, refetch: refetchJob } = useQuery<Job>({
     queryKey: ["/api/effects/status", currentJobId],
     enabled: !!currentJobId,
-    refetchInterval: (data) => {
-      // Stop polling if job is completed or failed
+    refetchInterval: (query) => {
+      const data = (query as any).state?.data as Job | undefined;
       if (data?.status === 'completed' || data?.status === 'failed') {
         return false;
       }
-      return 2000; // Poll every 2 seconds
+      return 2000;
     },
   });
 

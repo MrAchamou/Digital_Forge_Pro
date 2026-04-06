@@ -136,10 +136,10 @@ export default function NotificationSystem() {
               
               <Badge 
                 className={`${
-                  libraryStats?.expansionRate > 0 ? 'bg-green-500' : 'bg-gray-500'
+                  (libraryStats?.expansionRate ?? 0) > 0 ? 'bg-green-500' : 'bg-gray-500'
                 } text-white`}
               >
-                {libraryStats?.expansionRate > 0 ? 'Expansion Active' : 'Standby'}
+                {(libraryStats?.expansionRate ?? 0) > 0 ? 'Expansion Active' : 'Standby'}
               </Badge>
 
               <button

@@ -1,6 +1,5 @@
 import { nlpProcessor } from "../ai-engine/nlp-processor";
 import { parameterOptimizer } from "../ai-engine/parameter-optimizer";
-import { decisionEngine } from "./decision-engine";
 import { jsGenerator } from "../generator/js-generator";
 import { particlesModule } from "../modules/particles.module";
 import { physicsModule } from "../modules/physics.module";
@@ -206,7 +205,7 @@ class Orchestrator {
           confidence: 0.3,
           performance: { score: 50, warnings: ['Fallback mode'] },
           platform,
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           isFallback: true
         }
       };
@@ -241,7 +240,7 @@ class Orchestrator {
           console.error(`Failed to generate effect for module ${module.name} after ${retries + 1} attempts:`, error);
           throw error;
         }
-        console.warn(`Retry ${attempt + 1} for module ${module.name}:`, error.message);
+        console.warn(`Retry ${attempt + 1} for module ${module.name}:`, error instanceof Error ? error.message : String(error));
         await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1))); // Exponential backoff
       }
     }
@@ -268,7 +267,7 @@ class Orchestrator {
     } catch (error) {
       return {
         isValid: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         score: 0
       };
     }

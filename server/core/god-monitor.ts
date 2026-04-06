@@ -31,13 +31,13 @@ interface GodSystemStatus {
 }
 
 class GodLevelMonitor {
-  private systemStatus: GodSystemStatus;
+  private systemStatus!: GodSystemStatus;
   private healingQueue: any[] = [];
   private learningModels: Map<string, any> = new Map();
   private predictiveEngine: any;
   private autoRepairCount = 0;
   private preventedIssuesCount = 0;
-  private requestTracking: Map<string, any>; // Added for request tracking
+  private requestTracking: Map<string, any> = new Map(); // Added for request tracking
 
   constructor() {
     this.initializeGodMonitoring();

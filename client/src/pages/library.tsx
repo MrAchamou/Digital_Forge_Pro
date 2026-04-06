@@ -296,7 +296,7 @@ export default function Library() {
           {data?.effects.map((effect) => (
             <EffectCard
               key={effect.id}
-              effect={effect}
+              effect={effect as any}
               onPreview={() => handlePreview(effect)}
               onDownload={() => handleDownload(effect)}
             />

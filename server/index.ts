@@ -124,7 +124,7 @@ app.use((req, res, next) => {
     await errorDetection.startContinuousFileMonitoring();
     console.log('✅ Surveillance continue des fichiers activée');
   } catch (error) {
-    console.warn('⚠️ Surveillance fichiers partiellement activée:', error.message);
+    console.warn('⚠️ Surveillance fichiers partiellement activée:', error instanceof Error ? error.message : String(error));
   }
 
   // Scan initial du système
@@ -133,7 +133,7 @@ app.use((req, res, next) => {
     const initialScan = await errorDetection.scanProjectFiles();
     console.log(`📊 Scan initial: ${initialScan.errors.length} erreurs trouvées, ${initialScan.autoFixed} auto-corrigées`);
   } catch (error) {
-    console.warn('⚠️ Scan initial échoué:', error.message);
+    console.warn('⚠️ Scan initial échoué:', error instanceof Error ? error.message : String(error));
   }
 
   // Statut final
@@ -152,12 +152,7 @@ app.use((req, res, next) => {
     console.log('🔍 Auto-détection et correction des erreurs: ACTIVE');
 
     // ─── Auto-détection des clés Replit (OpenAI / Anthropic) ───────────────
-    import('./services/api-key-rotator').then(({ rotator: rot }) => {
-      const { ApiKeyRotator } = rot as any;
-      const replitKeys = (rot.rotator as any).constructor.detectReplitKeys
-        ? (rot.rotator as any).constructor.detectReplitKeys()
-        : require('./services/api-key-rotator').rotator;
-
+    import('./services/api-key-rotator').then(({ rotator }) => {
       const openaiOk    = !!process.env.OPENAI_API_KEY?.startsWith('sk-');
       const anthropicOk = !!process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-');
 
@@ -173,9 +168,9 @@ app.use((req, res, next) => {
       }
 
       // Initialisation du rotateur avec chargement DB
-      rot.rotator.init().then(() => {
+      rotator.init().then(() => {
         console.log('🔑 Rotateur API v2.0 initialisé (PostgreSQL + circuit breaker + health scoring)');
-      }).catch((e: any) => {
+      }).catch((e: Error) => {
         console.warn('⚠️  Rotateur API init partiel:', e.message);
       });
     }).catch(() => {});

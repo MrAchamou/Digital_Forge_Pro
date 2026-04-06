@@ -101,7 +101,7 @@ class LibraryDatabase {
             break;
           case 'createdAt':
           default:
-            compareValue = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            compareValue = new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime();
             break;
         }
 
@@ -251,7 +251,7 @@ class LibraryDatabase {
       const oneDayMs = 24 * 60 * 60 * 1000;
 
       const scored = effects.map(effect => {
-        const daysOld = (now - new Date(effect.createdAt).getTime()) / oneDayMs;
+        const daysOld = (now - new Date(effect.createdAt ?? 0).getTime()) / oneDayMs;
         const recencyFactor = Math.max(0, 1 - daysOld / 30); // Favor effects less than 30 days old
         
         const downloadScore = (effect.downloads || 0) / 100; // Normalize downloads

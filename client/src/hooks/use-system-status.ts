@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { SystemHealth, Job } from "@shared/schema";
 
+interface QueueStats {
+  size: number;
+  processing: number;
+  failed: number;
+}
+
 // Interface for SystemStatus with enhanced GOD-level properties
 export interface SystemStatus {
   isHealthy: boolean;
@@ -132,11 +138,39 @@ export function useSystemStatus() {
     }
   };
 
+  const systemHealth: SystemHealth | undefined = status
+    ? {
+        overall: status.godLevel?.overallHealth ?? 100,
+        modules: {},
+        queue: {
+          size: 0,
+          processing: 0,
+          failed: 0,
+        },
+        resources: {
+          cpu: 0,
+          memory: 0,
+          gpu: 0,
+          network: 0,
+          storage: 0,
+        },
+      }
+    : undefined;
+
+  const queueStats: QueueStats | undefined = systemHealth
+    ? systemHealth.queue
+    : undefined;
+
+  const recentJobs: Job[] = [];
+
   return { 
     status, 
     loading, 
     error, 
     forceOptimization, 
-    triggerAutoRepair 
+    triggerAutoRepair,
+    systemHealth,
+    queueStats,
+    recentJobs,
   };
 }

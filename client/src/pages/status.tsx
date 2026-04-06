@@ -267,7 +267,7 @@ export default function Status() {
                       <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-400 capitalize">
                           {job.status}
-                          {job.progress > 0 && job.status === 'processing' && ` - ${job.progress}%`}
+                          {(job.progress ?? 0) > 0 && job.status === 'processing' && ` - ${job.progress}%`}
                         </p>
                         <Badge 
                           variant="outline" 
@@ -276,8 +276,8 @@ export default function Status() {
                           {job.platform}
                         </Badge>
                       </div>
-                      {job.status === 'processing' && job.progress > 0 && (
-                        <Progress value={job.progress} className="h-1 mt-2" />
+                      {job.status === 'processing' && (job.progress ?? 0) > 0 && (
+                        <Progress value={job.progress ?? 0} className="h-1 mt-2" />
                       )}
                     </div>
                   </div>

@@ -130,8 +130,9 @@ export default function Generator() {
   };
 
   const handleCopyCode = async () => {
-    if (currentJob?.result?.code) {
-      await navigator.clipboard.writeText(currentJob.result.code);
+    const resultCode = (currentJob?.result as any)?.code as string | undefined;
+    if (resultCode) {
+      await navigator.clipboard.writeText(resultCode);
       toast({
         title: "Code Copied",
         description: "Code copied to clipboard",
@@ -140,8 +141,9 @@ export default function Generator() {
   };
 
   const handleDownload = () => {
-    if (currentJob?.result?.code) {
-      const blob = new Blob([currentJob.result.code], { type: 'text/plain' });
+    const resultCode = (currentJob?.result as any)?.code as string | undefined;
+    if (resultCode) {
+      const blob = new Blob([resultCode], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -353,7 +355,7 @@ export default function Generator() {
                       <Target className="w-4 h-4" /> Detected Concepts
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      {analysis.concepts.map((concept, index) => (
+                      {analysis.concepts.map((concept: string, index: number) => (
                         <Badge 
                           key={index} 
                           variant="secondary" 
@@ -371,7 +373,7 @@ export default function Generator() {
                       <Layers className="w-4 h-4" /> Recommended Modules
                     </h4>
                     <div className="space-y-2">
-                      {analysis.modules.map((moduleName, index) => (
+                      {analysis.modules.map((moduleName: string, index: number) => (
                         <div key={index} className="flex items-center justify-between text-sm">
                           <span className="capitalize">{moduleName}</span>
                           <span className="text-green-400">
@@ -431,10 +433,10 @@ export default function Generator() {
                     <span className="text-gray-300">Status: <span className="font-medium text-white">{currentJob.status}</span></span>
                     <span className="text-forge-cyan font-medium">{currentJob.progress}%</span>
                   </div>
-                  <Progress value={currentJob.progress} className="h-2 bg-forge-purple" />
+                  <Progress value={currentJob.progress ?? 0} className="h-2 bg-forge-purple" />
                   {currentJob.estimatedTime && (
                     <p className="text-sm text-gray-400 flex items-center gap-1">
-                      <Clock className="w-4 h-4" /> Estimated time remaining: {Math.max(0, Math.round(currentJob.estimatedTime * (1 - currentJob.progress / 100) / 60))} minutes
+                      <Clock className="w-4 h-4" /> Estimated time remaining: {Math.max(0, Math.round(currentJob.estimatedTime * (1 - (currentJob.progress ?? 0) / 100) / 60))} minutes
                     </p>
                   )}
                   {currentPhase && (
@@ -499,7 +501,7 @@ export default function Generator() {
           </CardHeader>
           <CardContent>
             <CodePreview 
-              code={currentJob.result.code} 
+              code={(currentJob.result as any)?.code || ''}
               language={platform === 'javascript' ? 'javascript' : 'text'}
             />
           </CardContent>
