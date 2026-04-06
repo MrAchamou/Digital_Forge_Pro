@@ -616,7 +616,6 @@ export { AdvancedThreeMorphing };
   private measureSystemPerformance(system: MorphingSystem): any { return { morphingTime: 3 }; }
   private async optimizeSystem(system: MorphingSystem): Promise<void> { }
   private performQualityCheck(): void { }
-  private calculateAverageComplexity(systems: MorphingSystem[]): number { return 0.5; }
   private generateGenericMorphingCode(system: MorphingSystem): string { return '// Generic morphing code'; }
   private generateBabylonMorphingCode(system: MorphingSystem): string { return '// Babylon morphing code'; }
 }

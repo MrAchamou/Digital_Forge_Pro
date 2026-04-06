@@ -6,6 +6,7 @@ interface ParticleSystem {
   performance: ParticlePerformance;
   aiOptimizations: string[];
   autonomousSettings: any;
+  code?: string;
 }
 
 interface ParticlePerformance {
@@ -771,6 +772,29 @@ class GPUParticleRenderer {
 
     return totalPerformance / systems.length;
   }
+
+  // Méthodes manquantes — stubs IA
+  private async applyGPUOptimizations(system: ParticleSystem, config: any): Promise<void> { }
+  private async configureAutonomousBehavior(system: ParticleSystem, aiAnalysis: any): Promise<void> { }
+  private analyzePerformanceNeeds(context: any): any { return { target: 'balanced' }; }
+  private analyzeVisualNeeds(config: any): any { return { quality: 'high' }; }
+  private analyzePlatformConstraints(context: any): any { return { maxRecommendedParticles: 2000 }; }
+  private async identifyOptimizationOpportunities(config: any, context: any): Promise<any[]> { return []; }
+  private async calculateOptimalLOD(aiAnalysis: any): Promise<number> { return 1.0; }
+  private async calculateOptimalUpdateFrequency(aiAnalysis: any): Promise<number> { return 60; }
+  private async selectOptimalCullingStrategy(aiAnalysis: any): Promise<string> { return 'frustum'; }
+  private async assessRenderingCapabilities(): Promise<any> { return { gpu: { available: false, performance: 0.5 } }; }
+  private analyzeRenderingRequirements(config: any): any { return { particleCount: config.maxParticles || 500 }; }
+  private async generateAutonomousSettings(aiAnalysis: any): Promise<any> { return {}; }
+  private async applyCodeOptimizations(code: string, system: ParticleSystem, aiAnalysis: any): Promise<string> { return code; }
+  private async addAIEnhancements(code: string, system: ParticleSystem, aiAnalysis: any): Promise<string> { return code; }
+  private async addAutonomousFeatures(code: string, system: ParticleSystem): Promise<string> { return code; }
+  private checkWebGLSupport(): boolean { return false; }
+  private assessGPUCapabilities(): any { return { performance: 0.5 }; }
+  private optimizeGPURendering(particleSystem: any): void { }
+  private monitorParticleSystem(system: ParticleSystem): void { }
+  private autonomouslyOptimizeSystem(system: ParticleSystem): void { }
+  private updateOptimizationStrategies(data: any): void { }
 }
 
 export const particles = new AdvancedParticleModule();

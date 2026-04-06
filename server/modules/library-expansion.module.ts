@@ -579,7 +579,7 @@ class LocalExpansionAI {
   }
 
   private extractCreativeElements(sourceElements: any[]): any {
-    const elements = {
+    const elements: { primary: any[]; secondary: any[]; styles: string[] } = {
       primary: [],
       secondary: [],
       styles: []
@@ -601,7 +601,7 @@ class LocalExpansionAI {
     return elements;
   }
 
-  private async combineElements(template: string, elements: any, creativityLevel: string): string {
+  private async combineElements(template: string, elements: any, creativityLevel: string): Promise<string> {
     let description = template;
 
     // Remplacement des placeholders

@@ -33,7 +33,7 @@ class AutonomousMonitor {
   private metrics: SystemMetrics[] = [];
   private optimizationQueue: OptimizationAction[] = [];
   private learningRates: Map<string, number> = new Map();
-  private performanceTargets: SystemMetrics;
+  private performanceTargets!: SystemMetrics;
   private lastOptimization: Date = new Date();
   private adaptiveParameterControllers: Map<string, any> = new Map();
 
@@ -150,7 +150,7 @@ class AutonomousMonitor {
     } catch (error) {
       console.error('Metrics collection error:', error);
       // Auto-réparation en cas d'erreur de collecte
-      await this.handleMetricsCollectionFailure(error);
+      await this.handleMetricsCollectionFailure(error as Error);
     }
   }
 
@@ -183,8 +183,8 @@ class AutonomousMonitor {
         ...baseMetrics,
         errorDetectionHealth: errorDetectionModule.errorDetection?.getSystemHealth() || { isHealthy: false },
         qualityAssuranceMetrics: qualityAssuranceModule.qualityAssurance?.getSystemMetrics() || {},
-        activeSessions: global.activeSessions || 0,
-        processedRequests: global.processedRequests || 0
+        activeSessions: (global as any).activeSessions || 0,
+        processedRequests: (global as any).processedRequests || 0
       };
     } catch (error) {
       return baseMetrics;
@@ -429,8 +429,8 @@ class AutonomousMonitor {
 
     // Divide by count to get averages
     for (const category of Object.keys(avg)) {
-      for (const metric of Object.keys(avg[category])) {
-        avg[category][metric] /= count;
+      for (const metric of Object.keys((avg as any)[category])) {
+        (avg as any)[category][metric] /= count;
       }
     }
 

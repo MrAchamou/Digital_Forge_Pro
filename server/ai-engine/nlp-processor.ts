@@ -201,17 +201,17 @@ class AdvancedNLPProcessor {
       }
 
       // Apply contextual modifiers
-      if (config.contextualModifiers) {
-        for (const [modifier, boost] of Object.entries(config.contextualModifiers)) {
+      if ((config as any).contextualModifiers) {
+        for (const [modifier, boost] of Object.entries((config as any).contextualModifiers)) {
           if (text.includes(modifier)) {
-            contextualBoost *= boost;
+            contextualBoost *= boost as number;
           }
         }
       }
 
       // Apply emotional weights
-      if (config.emotionalWeight) {
-        const emotionalBoost = this.calculateEmotionalRelevance(semanticContext.emotionalTone, config.emotionalWeight);
+      if ((config as any).emotionalWeight) {
+        const emotionalBoost = this.calculateEmotionalRelevance(semanticContext.emotionalTone, (config as any).emotionalWeight);
         contextualBoost *= emotionalBoost;
       }
 
@@ -444,7 +444,7 @@ class AdvancedNLPProcessor {
     // Apply clustering boost
     for (const [category, conceptGroup] of clusters.entries()) {
       if (conceptGroup.length > 1) {
-        const avgConfidence = conceptGroup.reduce((sum, c) => sum + c.confidence, 0) / conceptGroup.length;
+        const avgConfidence = conceptGroup.reduce((sum: number, c: any) => sum + c.confidence, 0) / conceptGroup.length;
         const clusterBoost = Math.min(0.1, conceptGroup.length * 0.02);
 
         for (const concept of conceptGroup) {

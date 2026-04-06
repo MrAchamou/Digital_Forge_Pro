@@ -272,8 +272,8 @@ class AdvancedClassificationStorage {
     }
 
     // Estimation de la qualité
-    if (!enriched.qualityScore) {
-      enriched.qualityScore = await this.aiSearchEngine.estimateQuality(enriched);
+    if (!(enriched as any).qualityScore) {
+      (enriched as any).qualityScore = await this.aiSearchEngine.estimateQuality(enriched);
     }
 
     // Classification automatique
@@ -305,7 +305,7 @@ class AdvancedClassificationStorage {
     const similarIds = await this.semanticIndex.findSimilar(searchVector, 50);
     
     return similarIds
-      .map(id => this.storage.get(id))
+      .map((id: string) => this.storage.get(id))
       .filter(Boolean) as ClassificationData[];
   }
 

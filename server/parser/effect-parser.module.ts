@@ -469,12 +469,14 @@ class LocalAIEngine {
       }
     }
     
-    const bestType = Object.entries(typeScores).reduce((a, b) => 
-      typeScores[a[0]] > typeScores[b[0]] ? a : b
+    const typeScoresMap = typeScores as Record<string, number>;
+    const bestType = Object.entries(typeScoresMap).reduce((a, b) => 
+      typeScoresMap[a[0]] > typeScoresMap[b[0]] ? a : b
     )[0] || 'VIDEO';
     
-    const bestCategory = Object.entries(categoryScores).reduce((a, b) => 
-      categoryScores[a[0]] > categoryScores[b[0]] ? a : b
+    const categoryScoresMap = categoryScores as Record<string, number>;
+    const bestCategory = Object.entries(categoryScoresMap).reduce((a, b) => 
+      categoryScoresMap[a[0]] > categoryScoresMap[b[0]] ? a : b
     )[0] || 'GENERAL';
     
     return { type: bestType, category: bestCategory };

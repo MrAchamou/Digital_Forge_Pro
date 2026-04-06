@@ -28,7 +28,7 @@ class AdvancedBatchGenerator {
   private aiScheduler: any;
   private performanceOptimizer: any;
   private autonomousManager: any;
-  private metrics: BatchMetrics;
+  private metrics!: BatchMetrics;
   private maxConcurrency: number = 8;
   private adaptiveScaling: boolean = true;
 
@@ -196,7 +196,7 @@ class AdvancedBatchGenerator {
       predictAndPrevent: () => {
         const prediction = this.predictSystemIssues();
         if (prediction.potentialIssues.length > 0) {
-          prediction.potentialIssues.forEach(issue => {
+          prediction.potentialIssues.forEach((issue: any) => {
             this.implementPreventiveMeasure(issue);
           });
         }

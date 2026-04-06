@@ -798,8 +798,8 @@ router.get('/system/health', (req, res) => {
     },
     queue: { size: 0, processing: 0, failed: 0 },
     resources: {
-      cpu: god.performance?.cpuUsage ?? 12,
-      memory: god.performance?.memoryUsage ?? 34,
+      cpu: (god.performance as any)?.cpuUsage ?? 12,
+      memory: (god.performance as any)?.memoryUsage ?? 34,
       gpu: 8,
       network: 2,
       storage: 18,

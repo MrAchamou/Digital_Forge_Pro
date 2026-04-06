@@ -1,30 +1,36 @@
 interface ErrorPattern {
-  pattern: string;
+  pattern: string | RegExp;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  category: string;
-  aiConfidence: number;
+  category?: string;
+  aiConfidence?: number;
   autoFix: boolean;
+  solution?: string;
   preventionStrategy?: string;
 }
 
 interface ErrorContext {
   timestamp: Date;
-  module: string;
-  environment: string;
-  userContext: any;
-  systemState: any;
-  aiAnalysis: any;
+  module?: string;
+  environment?: string;
+  userContext?: any;
+  systemState?: any;
+  aiAnalysis?: any;
   consoleOutput?: string;
   stackTrace?: string;
+  error?: string;
+  fixed?: boolean;
+  solution?: string;
 }
 
 interface AIErrorAnalysis {
-  rootCause: string;
-  impactAssessment: number;
-  recoveryProbability: number;
-  preventionStrategy: string;
-  learningPoints: string[];
+  rootCause?: string;
+  impactAssessment?: number;
+  recoveryProbability?: number;
+  preventionStrategy?: string;
+  learningPoints?: string[];
   overallConfidence: number;
+  patterns: string[];
+  suggestions: string[];
 }
 
 interface DetectedError {
@@ -48,38 +54,7 @@ interface DetectedError {
   className?: string;
   stackTrace?: string;
   timestamp: Date;
-}
-
-interface ErrorPattern {
-  pattern: RegExp;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  autoFix: boolean;
-  solution: string;
-}
-
-interface ErrorContext {
-  timestamp: Date;
-  error: string;
-  fixed: boolean;
-  solution?: string;
-}
-
-interface DetectedError {
-  type: string;
-  message: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  line?: number;
-  column?: number;
   file?: string;
-  autoFix: boolean;
-  aiConfidence: number;
-  solution?: string;
-}
-
-interface AIErrorAnalysis {
-  overallConfidence: number;
-  patterns: string[];
-  suggestions: string[];
 }
 
 class AdvancedErrorDetection {
@@ -150,19 +125,6 @@ class AdvancedErrorDetection {
   }
 
 
-  // API publique
-  public getDetectionMetrics() {
-    return Object.fromEntries(this.performanceMetrics);
-  }
-
-  public getSystemHealth() {
-    return {
-      isHealthy: true,
-      errorDetectionRate: 0.94,
-      autoFixSuccessRate: 0.82
-    };
-  }
-
   private async performAIAnalysis(code: string, context: any): Promise<AIErrorAnalysis> {
     try {
       const semanticAnalysis = await this.neuralNetwork.analyzeSemantics(code);
@@ -175,7 +137,9 @@ class AdvancedErrorDetection {
         recoveryProbability: robustnessScore.recoveryLikelihood,
         preventionStrategy: await this.generatePreventionStrategy(semanticAnalysis, contextualAnalysis),
         learningPoints: this.extractLearningPoints(semanticAnalysis, contextualAnalysis),
-        overallConfidence: 0.85 + Math.random() * 0.1
+        overallConfidence: 0.85 + Math.random() * 0.1,
+        patterns: [],
+        suggestions: []
       };
     } catch (error) {
       return {
@@ -184,7 +148,9 @@ class AdvancedErrorDetection {
         recoveryProbability: 0.5,
         preventionStrategy: 'manual_review',
         learningPoints: [],
-        overallConfidence: 0.3
+        overallConfidence: 0.3,
+        patterns: [],
+        suggestions: []
       };
     }
   }
@@ -205,11 +171,11 @@ class AdvancedErrorDetection {
           stack.push(char);
         } else if (Object.values(brackets).includes(char)) {
           const last = stack.pop();
-          if (!last || brackets[last] !== char) {
+          if (!last || (brackets as Record<string, string>)[last] !== char) {
             errors.push({
               type: 'syntax',
               subtype: 'unmatched_bracket',
-              message: `Bracket mismatch: expected '${brackets[last] || ''}', found '${char}'`,
+              message: `Bracket mismatch: expected '${(brackets as Record<string, string>)[last!] || ''}', found '${char}'`,
               line: lineIndex + 1,
               column: charIndex + 1,
               severity: 'high',
@@ -226,7 +192,7 @@ class AdvancedErrorDetection {
     const variablePattern = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\s*[=\[\.]|\s*\()/g;
     const declaredVars = new Set(['console', 'require', 'import', 'module', 'exports', 'Date', 'Promise', 'Map', 'Set', 'performance', 'setInterval', 'setTimeout', 'clearInterval', 'clearTimeout', 'Array', 'Object', 'JSON', 'Math', 'String', 'Number', 'Boolean', 'Error', 'RegExp']);
 
-    let match;
+    let match: RegExpExecArray | null;
     while ((match = variablePattern.exec(code)) !== null) {
       const varName = match[1];
       if (!declaredVars.has(varName) && !code.includes(`let ${varName}`) && !code.includes(`const ${varName}`) && !code.includes(`var ${varName}`) && !code.includes(`function ${varName}`)) {
@@ -258,7 +224,7 @@ class AdvancedErrorDetection {
           column: line.indexOf('='),
           severity: 'high',
           aiConfidence: 0.98,
-          autoFix: { type: 'remove_duplicate_assignment', position: match.index },
+          autoFix: { type: 'remove_duplicate_assignment', position: 0 },
           suggestion: `Remove duplicate assignment, use: "= ${duplicateAssignmentMatch[1]};" only once`,
           timestamp: new Date()
         });
@@ -546,7 +512,12 @@ class AdvancedErrorDetection {
   }
 
   private async performAutonomousCorrection(errors: DetectedError[], code: string): Promise<any> {
-    const fixResults = {
+    const fixResults: {
+      fixed: Array<{error: DetectedError; fix: any; confidence: any}>;
+      partiallyFixed: Array<{error: DetectedError; attemptedFix: any; reason: any}>;
+      unfixable: Array<{error: DetectedError; reason: any}>;
+      improvedCode: string;
+    } = {
       fixed: [],
       partiallyFixed: [],
       unfixable: [],
@@ -583,7 +554,7 @@ class AdvancedErrorDetection {
         } catch (fixError) {
           fixResults.unfixable.push({
             error,
-            reason: fixError.message
+            reason: (fixError as Error).message
           });
         }
       }
@@ -764,7 +735,7 @@ class AdvancedErrorDetection {
   }
 
   private async generateDependencyFix(command: string) {
-    const dependencyMap = {
+    const dependencyMap: Record<string, string> = {
       'tsx': 'npm install tsx --save-dev',
       'tsc': 'npm install typescript --save-dev',
       'nodemon': 'npm install nodemon --save-dev',
@@ -843,7 +814,7 @@ class AdvancedErrorDetection {
       return {
         success: false,
         attemptedFix: null,
-        failureReason: error.message
+        failureReason: (error as Error).message
       };
     }
   }
@@ -1225,7 +1196,7 @@ clearTimeout(timeoutId);`,
       const scanDirectory = async (dir: string, extensions: string[]): Promise<string[]> => {
         const files: string[] = [];
         try {
-          const entries = await fs.readdir(dir, { withFileTypes: true });
+          const entries = await fs.promises.readdir(dir, { withFileTypes: true });
           for (const entry of entries) {
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory() && entry.name !== 'node_modules') {
@@ -1248,7 +1219,7 @@ clearTimeout(timeoutId);`,
 
       for (const filePath of files) {
         try {
-          const fileContent = await fs.readFile(filePath, 'utf8');
+          const fileContent = await fs.promises.readFile(filePath, 'utf8');
           const fileErrors = await this.detectErrors(fileContent, { 
             filePath,
             scanMode: true 
@@ -1265,7 +1236,7 @@ clearTimeout(timeoutId);`,
               
               // Appliquer les corrections au fichier
               if (fileErrors.autoFixes.improvedCode !== fileContent) {
-                await fs.writeFile(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
+                await fs.promises.writeFile(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
                 console.log(`✅ Fichier ${filePath} auto-corrigé`);
               }
             }
@@ -1309,16 +1280,16 @@ clearTimeout(timeoutId);`,
           console.log(`🔍 Fichier modifié: ${filePath} - Scan en cours...`);
           try {
             const fs = await import('fs');
-            const fileContent = await fs.readFile(filePath, 'utf8');
+            const fileContent = await fs.promises.readFile(filePath, 'utf8');
             const fileErrors = await this.detectErrors(fileContent, { filePath, realTimeCheck: true });
             
             if (fileErrors.errors.length > 0) {
               console.log(`⚠️ ${fileErrors.errors.length} erreurs détectées dans ${filePath}`);
               // Auto-correction immédiate si confidence élevée
               if (fileErrors.autoFixes?.fixed?.length > 0) {
-                const highConfidenceFixes = fileErrors.autoFixes.fixed.filter(fix => fix.confidence > 0.9);
+                const highConfidenceFixes = fileErrors.autoFixes.fixed.filter((fix: any) => fix.confidence > 0.9);
                 if (highConfidenceFixes.length > 0) {
-                  await fs.writeFile(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
+                  await fs.promises.writeFile(filePath, fileErrors.autoFixes.improvedCode, 'utf8');
                   console.log(`✅ ${highConfidenceFixes.length} erreurs auto-corrigées immédiatement dans ${filePath}`);
                 }
               }
@@ -1331,7 +1302,7 @@ clearTimeout(timeoutId);`,
         console.log('📝 Surveillance temps réel désactivée (chokidar non disponible)');
       }
     } catch (error) {
-      console.log('📝 Surveillance temps réel désactivée:', error.message);
+      console.log('📝 Surveillance temps réel désactivée:', (error as Error).message);
     }
   }
 

@@ -430,7 +430,7 @@ export function enrichZoneColors(
   // Validation daltonisme optionnelle (log uniquement, pas de remplacement automatique)
   if (options?.validateColorblind) {
     const cbPalette = generateColorblindPalette(palette);
-    const ctaDeut   = checkWCAGContrast(cbPalette.deuteranopia.cta, safeBg);
+    const ctaDeut   = checkWCAGContrast((cbPalette.deuteranopia as any).cta, safeBg);
     if (!ctaDeut.levelAA) {
       console.warn(`⚠️  ColorHarmony — CTA non conforme WCAG AA en deuteranopie (ratio: ${ctaDeut.ratio})`);
     }

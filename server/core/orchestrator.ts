@@ -103,9 +103,9 @@ class Orchestrator {
       const estimatedDuration = this.estimateDuration(complexity);
 
       return {
-        concepts: concepts.map(c => c.name),
+        concepts: concepts.map((c: any) => c.name),
         confidence: this.calculateConfidence(concepts),
-        modules: moduleDecisions.map(m => m.name),
+        modules: moduleDecisions.map((m: any) => m.name),
         parameters,
         complexity,
         estimatedDuration
@@ -157,7 +157,7 @@ class Orchestrator {
 
       // Génération parallèle avec gestion d'erreurs
       const results = await Promise.allSettled(
-        selectedModules.map(module => 
+        selectedModules.map((module: any) => 
           this.generateModuleEffectWithRetry(module, concepts, platform, options)
         )
       );
@@ -181,13 +181,13 @@ class Orchestrator {
       return {
         code: optimizedCode,
         metadata: {
-          modules: selectedModules.map(m => m.name),
+          modules: selectedModules.map((m: any) => m.name),
           confidence: this.calculateConfidence(selectedModules),
           performance: await this.estimatePerformance(optimizedCode),
           platform,
           validation: validationResult,
           generationTime: Date.now(),
-          concepts: concepts.map(c => c.name),
+          concepts: concepts.map((c: any) => c.name),
           warnings: this.extractWarnings(results)
         }
       };

@@ -162,7 +162,7 @@ class GodLevelMonitor {
 
     } catch (error) {
       console.error('GOD Monitor error:', error);
-      await this.emergencyProtocol(error);
+      await this.emergencyProtocol(error as Error);
     }
   }
 
@@ -188,7 +188,7 @@ class GodLevelMonitor {
   }
 
   private async detectAnomalies(metrics: any): Promise<any[]> {
-    const anomalies = [];
+    const anomalies: any[] = [];
 
     if (!metrics) return anomalies;
 
@@ -261,8 +261,8 @@ class GodLevelMonitor {
     for (const action of actions) {
       switch (action) {
         case 'optimize_cache':
-          if (global.systemCache) {
-            global.systemCache.optimize();
+          if ((global as any).systemCache) {
+            (global as any).systemCache.optimize();
           }
           break;
 
@@ -358,12 +358,12 @@ class GodLevelMonitor {
 
   private async emergencyRepair() {
     // Réinitialisations d'urgence
-    if (global.systemCache) {
-      global.systemCache.clear();
+    if ((global as any).systemCache) {
+      (global as any).systemCache.clear();
     }
 
-    if (global.gc) {
-      global.gc();
+    if ((global as any).gc) {
+      (global as any).gc();
     }
 
     // Redémarrage des modules critiques

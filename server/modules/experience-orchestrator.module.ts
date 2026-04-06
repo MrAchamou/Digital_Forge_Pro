@@ -179,7 +179,7 @@ function applyObjectiveAdaptation(phases: PhaseConfig[], objective: ExperienceOb
         break;
     }
 
-    const newZones = phase.zones_active.includes(...zonesBoost)
+    const newZones = zonesBoost.some((z: string) => phase.zones_active.includes(z))
       ? phase.zones_active
       : [...phase.zones_active, ...zonesBoost.filter(z => !phase.zones_active.includes(z))];
 
@@ -468,7 +468,7 @@ export function orchestrateExperience(
   const { delays, durations } = computeZoneDelays(phases, cycleMs, composition);
 
   // Score d'engagement
-  arc.engagement_score = parseFloat(computeEngagementScore(arc, composition));
+  arc.engagement_score = computeEngagementScore(arc, composition);
 
   // Appliquer l'arc
   const experienceComposition = applyExperienceArc(composition, arc, delays);

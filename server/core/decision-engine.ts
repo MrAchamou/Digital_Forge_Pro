@@ -133,9 +133,10 @@ class AdvancedDecisionEngine {
         const conceptText = concept.name.toLowerCase();
         
         // Direct neural activation
-        if (rule.neural_activations[conceptText]) {
-          activationScore += rule.neural_activations[conceptText] * concept.confidence;
-          reasoning.push(`Strong neural activation for "${conceptText}" (${rule.neural_activations[conceptText]})`);
+        const neuralActivations = rule.neural_activations as Record<string, number>;
+        if (neuralActivations[conceptText]) {
+          activationScore += neuralActivations[conceptText] * concept.confidence;
+          reasoning.push(`Strong neural activation for "${conceptText}" (${neuralActivations[conceptText]})`);
         }
 
         // Pattern matching with weighted importance
@@ -228,15 +229,17 @@ class AdvancedDecisionEngine {
     ];
 
     for (const [moduleA, moduleB, strength] of synergyPairs) {
-      if (!this.synergyMatrix.has(moduleA)) {
-        this.synergyMatrix.set(moduleA, new Map());
+      const mA = String(moduleA);
+      const mB = String(moduleB);
+      if (!this.synergyMatrix.has(mA)) {
+        this.synergyMatrix.set(mA, new Map());
       }
-      if (!this.synergyMatrix.has(moduleB)) {
-        this.synergyMatrix.set(moduleB, new Map());
+      if (!this.synergyMatrix.has(mB)) {
+        this.synergyMatrix.set(mB, new Map());
       }
       
-      this.synergyMatrix.get(moduleA)!.set(moduleB, strength as number);
-      this.synergyMatrix.get(moduleB)!.set(moduleA, strength as number);
+      this.synergyMatrix.get(mA)!.set(mB, strength as number);
+      this.synergyMatrix.get(mB)!.set(mA, strength as number);
     }
   }
 
@@ -276,7 +279,7 @@ class AdvancedDecisionEngine {
       'procedural': 0.2
     };
 
-    const penalty = complexityPenalty[moduleName] || 0.1;
+    const penalty = (complexityPenalty as Record<string, number>)[moduleName] || 0.1;
     if (context.complexityBudget < 5) {
       boost *= Math.max(0.5, 1 - penalty);
       reasoning.push(`Complexity penalty: ${penalty} for low complexity budget`);
@@ -328,7 +331,7 @@ class AdvancedDecisionEngine {
       procedural: 60
     };
 
-    const basePriority = basePriorities[moduleName] || 50;
+    const basePriority = (basePriorities as Record<string, number>)[moduleName] || 50;
     const confidenceBoost = confidence * 100;
     const matchBoost = Math.min(matchCount * 20, 100);
     const complexityPenalty = rule.complexity * 10;
