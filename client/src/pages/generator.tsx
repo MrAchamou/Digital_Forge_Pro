@@ -28,7 +28,11 @@ import {
   Shield,
   Layers,
   Clock,
-  BarChart3
+  BarChart3,
+  Wand2,
+  Code,
+  Copy,
+  Loader2
 } from "lucide-react";
 import type { EffectAnalysis } from "@shared/schema";
 import { useEffectGenerator } from "@/hooks/use-effect-generator";

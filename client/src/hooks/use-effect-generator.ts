@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Job, EffectGenerationResponse } from "@shared/schema";
@@ -48,7 +48,7 @@ export function useEffectGenerator() {
   };
 
   // Update generating state based on job status
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentJob) {
       if (currentJob.status === 'completed' || currentJob.status === 'failed') {
         setIsGenerating(false);

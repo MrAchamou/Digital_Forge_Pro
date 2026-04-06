@@ -4,7 +4,6 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Upload from './pages/upload';
 import Preview from './pages/preview';
 import Status from './pages/status';
 import Expansion from './pages/expansion';
@@ -17,52 +16,41 @@ import Signature from "@/pages/signature";
 import Navigation from "@/components/ui/navigation";
 import ParticleBackground from "@/components/ui/particle-background";
 import { useEffect } from "react";
-
 // Global error handler
-const useGlobalErrorHandler = () => {
-  useEffect(() => {
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('Unhandled promise rejection:', event.reason);
-      // Prevent the default browser behavior
-      event.preventDefault();
-    };
-
-    const handleError = (event: ErrorEvent) => {
-      console.error('Global error:', event.error);
-    };
-
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-    window.addEventListener('error', handleError);
-
-    return () => {
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-      window.removeEventListener('error', handleError);
-    };
-  }, []);
+var useGlobalErrorHandler = function () {
+    useEffect(function () {
+        var handleUnhandledRejection = function (event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            // Prevent the default browser behavior
+            event.preventDefault();
+        };
+        var handleError = function (event) {
+            console.error('Global error:', event.error);
+        };
+        window.addEventListener('unhandledrejection', handleUnhandledRejection);
+        window.addEventListener('error', handleError);
+        return function () {
+            window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+            window.removeEventListener('error', handleError);
+        };
+    }, []);
 };
-
-
 function Router() {
-  return (
-    <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/generator" component={Generator} />
-      <Route path="/library" component={Library} />
-      <Route path="/preview" component={Preview} />
-      <Route path="/status" component={Status} />
-      <Route path="/modules" component={Modules} />
-      <Route path="/expansion" component={Expansion} />
-      <Route path="/signature" component={Signature} />
-      <Route component={NotFound} />
-    </Switch>
-  );
+    return (<Switch>
+      <Route path="/" component={Dashboard}/>
+      <Route path="/generator" component={Generator}/>
+      <Route path="/library" component={Library}/>
+      <Route path="/preview" component={Preview}/>
+      <Route path="/status" component={Status}/>
+      <Route path="/modules" component={Modules}/>
+      <Route path="/expansion" element={<Expansion />}/>
+      <Route path="/signature" component={Signature}/>
+      <Route component={NotFound}/>
+    </Switch>);
 }
-
 function App() {
-  useGlobalErrorHandler();
-
-  return (
-    <QueryClientProvider client={queryClient}>
+    useGlobalErrorHandler();
+    return (<QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="bg-forge-black text-forge-white min-h-screen relative overflow-x-hidden">
           <ParticleBackground />
@@ -79,8 +67,6 @@ function App() {
         </div>
         <Toaster />
       </TooltipProvider>
-    </QueryClientProvider>
-  );
+    </QueryClientProvider>);
 }
-
 export default App;
