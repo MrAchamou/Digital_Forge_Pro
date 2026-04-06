@@ -113,13 +113,16 @@ function buildFallbackTechnical(scenario: NarrativeScenario, palette: string[]):
 }
 
 async function runBrain1GPT(imageBase64: string | null, metadata: any): Promise<CreativeBrief> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
   if (!apiKey) {
     log('OPENAI_API_KEY manquant — fallback Cerveau 1', 'triple-ai');
     return buildFallbackBrief(metadata);
   }
 
-  const client = new OpenAI({ apiKey });
+  const client = new OpenAI({
+    apiKey,
+    baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL || undefined,
+  });
 
   const messages: any[] = [
     {
@@ -166,13 +169,16 @@ Réponds UNIQUEMENT en JSON valide. Aucun texte autour.`,
 }
 
 async function runBrain2Claude(brief: CreativeBrief): Promise<NarrativeScenario> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     log('ANTHROPIC_API_KEY manquant — fallback Cerveau 2', 'triple-ai');
     return buildFallbackScenario();
   }
 
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({
+    apiKey,
+    baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL || undefined,
+  });
   const effectsList = EFFECTS_LIBRARY.join(', ');
 
   try {
