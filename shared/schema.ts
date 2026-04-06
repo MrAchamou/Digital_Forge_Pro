@@ -135,6 +135,36 @@ export const presets = pgTable("presets", {
   createdAt:     timestamp("created_at").defaultNow(),
 });
 
+// ─── API Key Configs ──────────────────────────────────────────────────────────
+export const apiKeyConfigs = pgTable("api_key_configs", {
+  id:         varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  service:    text("service").notNull(),
+  key_value:  text("key_value").notNull(),
+  label:      text("label").notNull().default(''),
+  is_active:  boolean("is_active").notNull().default(true),
+  source:     text("source").notNull().default('manual'),
+  added_at:   timestamp("added_at").defaultNow(),
+});
+
+// ─── API Key States ───────────────────────────────────────────────────────────
+export const apiKeyStates = pgTable("api_key_states", {
+  key_id:           text("key_id").primaryKey(),
+  service:          text("service").notNull(),
+  status:           text("status").notNull().default('active'),
+  usage_today:      integer("usage_today").notNull().default(0),
+  cooldown_until:   timestamp("cooldown_until"),
+  cooldown_count:   integer("cooldown_count").notNull().default(0),
+  error_count:      integer("error_count").notNull().default(0),
+  success_count:    integer("success_count").notNull().default(0),
+  avg_response_ms:  integer("avg_response_ms").notNull().default(0),
+  health_score:     real("health_score").notNull().default(100),
+  calls_last_hour:  integer("calls_last_hour").notNull().default(0),
+  hour_window_start: timestamp("hour_window_start").defaultNow(),
+  last_used:        timestamp("last_used"),
+  last_error:       text("last_error"),
+  last_saved:       timestamp("last_saved").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -197,6 +227,15 @@ export const insertPresetSchema = createInsertSchema(presets).omit({
   version: true,
 });
 
+export const insertApiKeyConfigSchema = createInsertSchema(apiKeyConfigs).omit({
+  id: true,
+  added_at: true,
+});
+
+export const insertApiKeyStateSchema = createInsertSchema(apiKeyStates).omit({
+  last_saved: true,
+});
+
 // Unified types from schema inference
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -224,6 +263,12 @@ export type InsertUserPreference = z.infer<typeof insertUserPreferencesSchema>;
 
 export type Preset = typeof presets.$inferSelect;
 export type InsertPreset = z.infer<typeof insertPresetSchema>;
+
+export type ApiKeyConfig = typeof apiKeyConfigs.$inferSelect;
+export type InsertApiKeyConfig = z.infer<typeof insertApiKeyConfigSchema>;
+
+export type ApiKeyState = typeof apiKeyStates.$inferSelect;
+export type InsertApiKeyState = z.infer<typeof insertApiKeyStateSchema>;
 
 // API Response types
 export interface EffectGenerationResponse {

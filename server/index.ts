@@ -150,6 +150,35 @@ app.use((req, res, next) => {
     console.log('🎯 Système GOD entièrement opérationnel');
     console.log('🔍 Auto-détection et correction des erreurs: ACTIVE');
 
+    // ─── Auto-détection des clés Replit (OpenAI / Anthropic) ───────────────
+    import('./services/api-key-rotator').then(({ rotator: rot }) => {
+      const { ApiKeyRotator } = rot as any;
+      const replitKeys = (rot.rotator as any).constructor.detectReplitKeys
+        ? (rot.rotator as any).constructor.detectReplitKeys()
+        : require('./services/api-key-rotator').rotator;
+
+      const openaiOk    = !!process.env.OPENAI_API_KEY?.startsWith('sk-');
+      const anthropicOk = !!process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-');
+
+      if (openaiOk) {
+        console.log(`✅ OpenAI (GPT-4o) : clé Replit détectée et active — ...${process.env.OPENAI_API_KEY!.slice(-4)}`);
+      } else {
+        console.warn('⚠️  OpenAI : clé non trouvée — vérifiez l\'intégration Replit');
+      }
+      if (anthropicOk) {
+        console.log(`✅ Anthropic (Claude) : clé Replit détectée et active — ...${process.env.ANTHROPIC_API_KEY!.slice(-4)}`);
+      } else {
+        console.warn('⚠️  Anthropic : clé non trouvée — vérifiez l\'intégration Replit');
+      }
+
+      // Initialisation du rotateur avec chargement DB
+      rot.rotator.init().then(() => {
+        console.log('🔑 Rotateur API v2.0 initialisé (PostgreSQL + circuit breaker + health scoring)');
+      }).catch((e: any) => {
+        console.warn('⚠️  Rotateur API init partiel:', e.message);
+      });
+    }).catch(() => {});
+
     // Chargement des effets premium après démarrage
     console.log('📦 Chargement des effets premium...');
     loadPremiumEffects().then(result => {

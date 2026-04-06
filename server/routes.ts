@@ -1305,7 +1305,7 @@ router.get('/signature/export/:id/:type', async (req, res) => {
 });
 
 // =============================================
-// GET /api/keys/status — Statut des clés API
+// GET /api/keys/status — Statut enrichi des clés
 // =============================================
 router.get('/keys/status', async (_req, res) => {
   try {
@@ -1315,21 +1315,30 @@ router.get('/keys/status', async (_req, res) => {
 
     const now = new Date();
     const daysInMonth = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 0).getDate();
-    const dayOfMonth = now.getUTCDate();
-    const daysLeft = daysInMonth - dayOfMonth;
-    const monthKey = now.toISOString().slice(0, 7);
+    const dayOfMonth  = now.getUTCDate();
+    const daysLeft    = daysInMonth - dayOfMonth;
+    const monthKey    = now.toISOString().slice(0, 7);
     const serperMonthly = status.monthlyUsage[`serper_${monthKey}`] || 0;
 
+    // Clés Replit (OpenAI / Anthropic)
+    const openaiOk    = !!process.env.OPENAI_API_KEY?.startsWith('sk-');
+    const anthropicOk = !!process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-');
+
     const serializedKeys = status.keys.map(k => ({
-      id: k.id,
-      service: k.service,
-      status: k.status,
-      usageToday: k.usageToday,
-      dailyLimit: k.dailyLimit,
-      successCount: k.successCount,
-      avgResponseTime: k.avgResponseTime,
-      cooldownUntil: k.cooldownUntil?.toISOString() || null,
-      lastError: k.lastError,
+      id:                   k.id,
+      service:              k.service,
+      label:                (k as any).label || k.id,
+      source:               (k as any).source || 'env',
+      status:               k.status,
+      usageToday:           k.usageToday,
+      dailyLimit:           k.dailyLimit,
+      successCount:         k.successCount,
+      avgResponseTime:      k.avgResponseTime,
+      healthScore:          Math.round((k as any).healthScore ?? 100),
+      velocity:             (k as any).velocity ?? 0,
+      minutesUntilExhausted: (k as any).minutesUntilExhausted ?? null,
+      cooldownUntil:        k.cooldownUntil?.toISOString() || null,
+      lastError:            k.lastError,
     }));
 
     return res.json({
@@ -1338,9 +1347,57 @@ router.get('/keys/status', async (_req, res) => {
       serperMonthly,
       serperMonthlyLimit: 2500,
       daysLeft,
+      replit: {
+        openai:    { configured: openaiOk,    suffix: openaiOk    ? `...${process.env.OPENAI_API_KEY!.slice(-4)}`    : null },
+        anthropic: { configured: anthropicOk, suffix: anthropicOk ? `...${process.env.ANTHROPIC_API_KEY!.slice(-4)}` : null },
+      },
     });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/keys/add — Ajout dynamique d'une clé (persiste en DB)
+router.post('/keys/add', async (req, res) => {
+  try {
+    const { service, key, label } = req.body as {
+      service: 'gemini' | 'cerebras' | 'serper';
+      key: string;
+      label?: string;
+    };
+    if (!service || !key) {
+      return res.status(400).json({ error: 'service et key sont requis' });
+    }
+    if (!['gemini', 'cerebras', 'serper'].includes(service)) {
+      return res.status(400).json({ error: 'service doit être gemini, cerebras ou serper' });
+    }
+    const { rotator } = await import('./services/api-key-rotator');
+    const newKey = await rotator.addKey(service, key, label);
+    return res.json({
+      success: true,
+      message: `Clé ${service} ajoutée et persistée en base de données`,
+      key: {
+        id:      newKey.id,
+        service: newKey.service,
+        label:   newKey.label,
+        source:  newKey.source,
+        status:  newKey.status,
+      },
+    });
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+// DELETE /api/keys/:id — Suppression d'une clé
+router.delete('/keys/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rotator } = await import('./services/api-key-rotator');
+    await rotator.removeKey(id);
+    return res.json({ success: true, message: `Clé ${id} retirée de la rotation` });
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
   }
 });
 
@@ -1362,6 +1419,30 @@ router.post('/keys/test', async (_req, res) => {
     const { rotator } = await import('./services/api-key-rotator');
     const results = await rotator.testAllKeys();
     return res.json({ results });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/keys/replit — État des clés Replit (OpenAI / Anthropic)
+router.get('/keys/replit', async (_req, res) => {
+  try {
+    const openaiOk    = !!process.env.OPENAI_API_KEY?.startsWith('sk-');
+    const anthropicOk = !!process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-');
+    return res.json({
+      openai: {
+        configured: openaiOk,
+        model: 'gpt-4o',
+        suffix: openaiOk ? `...${process.env.OPENAI_API_KEY!.slice(-4)}` : null,
+        source: 'replit-integration',
+      },
+      anthropic: {
+        configured: anthropicOk,
+        model: 'claude-opus-4-5',
+        suffix: anthropicOk ? `...${process.env.ANTHROPIC_API_KEY!.slice(-4)}` : null,
+        source: 'replit-integration',
+      },
+    });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
