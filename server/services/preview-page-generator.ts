@@ -4,6 +4,15 @@ import { log } from '../vite';
 import type { PreviewPageContent } from './cerebras-content-generator';
 import type { NarrativeScenario } from './triple-ai-director';
 
+function esc(str: string): string {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export async function generatePreviewPage(params: {
   signatureId: string;
   svgContent: string;
@@ -313,7 +322,7 @@ export async function generatePreviewPage(params: {
       <div class="gmail-label">Gmail — Boîte de réception</div>
     </div>
     <div class="gmail-body">
-      <div class="gmail-from">De : ${nom} &lt;contact@${(metadata.site || 'entreprise.com').replace(/https?:\/\//, '').replace(/\/$/, '')}&gt;</div>
+      <div class="gmail-from">De : ${esc(nom)} &lt;contact@${esc((metadata.site || 'entreprise.com').replace(/https?:\/\//, '').replace(/\/$/, ''))}&gt;</div>
       <div class="gmail-subject">Objet : Présentation de notre collaboration</div>
       <div class="gmail-message">Bonjour,<br><br>Merci pour notre échange. Je reste disponible pour toute question.<br><br>Cordialement,</div>
       <div class="gmail-sig-zone">

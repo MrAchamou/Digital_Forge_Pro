@@ -3,8 +3,27 @@ import { callCerebras } from './cerebras-wrapper';
 
 async function cerebrasGenerate(prompt: string): Promise<any> {
   const text = await callCerebras(prompt, { maxTokens: 2000, temperature: 0.7 });
-  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
+  const cleaned = text
+    .replace(/```json\n?/g, '')
+    .replace(/```\n?/g, '')
+    .trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[0]);
+      } catch {
+        throw new Error(`JSON invalide apres extraction: ${cleaned.slice(0, 120)}`);
+      }
+    }
+    throw new Error(`Reponse Cerebras non JSON: ${cleaned.slice(0, 120)}`);
+  }
+}
+
+function isValid<T>(obj: any, keys: (keyof T)[]): boolean {
+  return obj && typeof obj === 'object' && keys.every(k => k in obj);
 }
 
 export interface InstructionsContent {
@@ -42,12 +61,12 @@ export interface ReadmeTxt {
 }
 
 export interface CerebrasPackageContent {
-  instructionsGmail: InstructionsContent;
+  instructionsGmail:   InstructionsContent;
   instructionsOutlook: InstructionsContent;
-  instructionsApple: InstructionsContent;
-  emailLivraison: DeliveryEmailContent;
-  previewPage: PreviewPageContent;
-  readme: ReadmeTxt;
+  instructionsApple:   InstructionsContent;
+  emailLivraison:      DeliveryEmailContent;
+  previewPage:         PreviewPageContent;
+  readme:              ReadmeTxt;
 }
 
 export async function generateAllContent(
@@ -57,124 +76,78 @@ export async function generateAllContent(
 ): Promise<CerebrasPackageContent> {
   const { nom, entreprise, secteur } = metadata;
   const effetsStr = effectsUsed.join(', ');
+  const baseInfo = `Client : ${nom} de ${entreprise}, secteur ${secteur}.`;
 
-  const baseClientInfo = `Client : ${nom} de ${entreprise}, secteur ${secteur}.`;
+  const makeInstructionsPrompt = (client: string, tips: string) => `
+Tu es un redacteur technique expert UX.
+Genere des instructions d'installation pour ${client} en JSON valide uniquement :
+{"titre":"string","intro":"string personnalise","etapes":[{"numero":1,"titre":"string","description":"string detaille","conseil":"string astuce"},{"numero":2,"titre":"string","description":"string","conseil":"string"},{"numero":3,"titre":"string","description":"string","conseil":"string"}],"note_finale":"string"}
+${baseInfo} ${tips}
+Ton : professionnel et chaleureux. Reponds UNIQUEMENT avec le JSON, sans texte autour.`.trim();
 
-  const promptGmail = `Tu es un rédacteur technique expert UX.
-Génère des instructions d'installation claires et élégantes pour Gmail en JSON :
-{
-  "titre": "Installer votre signature dans Gmail",
-  "intro": "phrase accrocheuse personnalisée",
-  "etapes": [
-    {"numero": 1, "titre": "string", "description": "string détaillé", "conseil": "string astuce pro"},
-    {"numero": 2, "titre": "string", "description": "string détaillé", "conseil": "string astuce pro"},
-    {"numero": 3, "titre": "string", "description": "string détaillé", "conseil": "string astuce pro"}
-  ],
-  "note_finale": "string encourageant"
-}
-${baseClientInfo}
-Ton : professionnel mais chaleureux. 3 étapes maximum. Réponds UNIQUEMENT en JSON valide.`;
+  const prompts = {
+    gmail:   makeInstructionsPrompt('Gmail',      'Mentionner le fichier signature-gmail.html.'),
+    outlook: makeInstructionsPrompt('Outlook',    'Mentionner le fichier .htm. Ne pas copier-coller SVG directement.'),
+    apple:   makeInstructionsPrompt('Apple Mail', 'Mentionner de desactiver le format RTF si necessaire.'),
 
-  const promptOutlook = `Tu es un rédacteur technique expert UX.
-Génère des instructions d'installation claires pour Outlook en JSON :
-{
-  "titre": "Installer votre signature dans Outlook",
-  "intro": "phrase accrocheuse personnalisée",
-  "etapes": [
-    {"numero": 1, "titre": "string", "description": "string détaillé mentionnant le fichier .htm fourni", "conseil": "string astuce pro"},
-    {"numero": 2, "titre": "string", "description": "string détaillé - ne pas copier-coller le SVG directement", "conseil": "string astuce pro"},
-    {"numero": 3, "titre": "string", "description": "string détaillé", "conseil": "string astuce pro"}
-  ],
-  "note_finale": "string encourageant"
-}
-${baseClientInfo}
-Ton : professionnel mais chaleureux. 3 étapes. Réponds UNIQUEMENT en JSON valide.`;
+    email: `Tu es un copywriter premium.
+Genere un email de livraison en JSON valide uniquement :
+{"sujet":"string accrocheur","intro":"string warm","corps":"string descriptif","section_magic":"string unique","instructions_rapides":"string 1 phrase","cta":"string bouton","signature_expediteur":"string","ps":"string conseil"}
+Client : ${nom}, ${entreprise}, ${secteur}. Effets : ${effetsStr}. Arc : ${arcNarratif}.
+Reponds UNIQUEMENT avec le JSON.`.trim(),
 
-  const promptApple = `Tu es un rédacteur technique expert UX.
-Génère des instructions d'installation claires pour Apple Mail en JSON :
-{
-  "titre": "Installer votre signature dans Apple Mail",
-  "intro": "phrase accrocheuse personnalisée",
-  "etapes": [
-    {"numero": 1, "titre": "string", "description": "string détaillé", "conseil": "string astuce pro"},
-    {"numero": 2, "titre": "string", "description": "string détaillé - désactiver RTF si nécessaire", "conseil": "string astuce pro"},
-    {"numero": 3, "titre": "string", "description": "string détaillé", "conseil": "string astuce pro"}
-  ],
-  "note_finale": "string encourageant"
-}
-${baseClientInfo}
-Ton : professionnel mais chaleureux. 3 étapes. Réponds UNIQUEMENT en JSON valide.`;
-
-  const promptEmail = `Tu es un copywriter expert en emails de livraison premium pour agences créatives.
-Génère un email de livraison professionnel et mémorable en JSON :
-{
-  "sujet": "string accrocheur",
-  "intro": "string personnalisé warm",
-  "corps": "string décrivant ce qui est livré",
-  "section_magic": "string décrivant pourquoi cette signature est unique et vivante",
-  "instructions_rapides": "string 1 phrase",
-  "cta": "string texte bouton",
-  "signature_expediteur": "string",
-  "ps": "string conseil exclusif"
-}
-Client : ${nom}, ${entreprise}, ${secteur}.
-Effets utilisés : ${effetsStr}.
-Arc narratif : ${arcNarratif}.
-Ton : premium, exclusif, mémorable. Réponds UNIQUEMENT en JSON valide.`;
-
-  const promptPreview = `Tu es un développeur frontend expert.
-Génère le contenu d'une page de prévisualisation premium pour une signature email vivante en JSON :
-{
-  "titre_page": "string",
-  "headline": "string accrocheur",
-  "description": "string 1-2 phrases",
-  "section_effets": "string décrivant les effets utilisés",
-  "texte_bouton_gmail": "string",
-  "texte_bouton_outlook": "string",
-  "texte_bouton_apple": "string",
-  "texte_bouton_download": "string",
-  "footer": "string"
-}
+    preview: `Tu es un developpeur frontend expert.
+Genere le contenu d'une page preview en JSON valide uniquement :
+{"titre_page":"string","headline":"string accrocheur","description":"string 1-2 phrases","section_effets":"string","texte_bouton_gmail":"string","texte_bouton_outlook":"string","texte_bouton_apple":"string","texte_bouton_download":"string","footer":"string"}
 Client : ${nom}, ${entreprise}. Effets : ${effetsStr}.
-Ton : exclusif, technologique, premium. Réponds UNIQUEMENT en JSON valide.`;
+Reponds UNIQUEMENT avec le JSON.`.trim(),
 
-  const promptReadme = `Tu es un assistant chaleureux et professionnel.
-Génère un texte simple expliquant le contenu d'un dossier de signature email premium en JSON :
-{
-  "contenu": "texte de 8 à 10 lignes maximum, chaleureux, expliquant les fichiers du package"
-}
+    readme: `Tu es un assistant chaleureux.
+Genere un texte de README en JSON valide uniquement :
+{"contenu":"8 a 10 lignes expliquant le package, les fichiers inclus, chaleureux"}
 Client : ${nom} de ${entreprise}.
-Fichiers inclus : signature.svg, signature-fallback.png, signature-outlook.htm, signature-gmail.html, instructions-gmail.pdf, instructions-outlook.pdf, instructions-apple-mail.pdf, config.json.
-Réponds UNIQUEMENT en JSON valide.`;
+Fichiers : signature.svg, signature-fallback.png, signature-outlook.htm, signature-gmail.html, instructions-gmail.pdf, instructions-outlook.pdf, instructions-apple-mail.pdf, config.json.
+Reponds UNIQUEMENT avec le JSON.`.trim(),
+  };
 
-  log('Génération parallèle Cerebras de 6 contenus...', 'cerebras-content');
+  log('Generation parallele Cerebras de 6 contenus...', 'cerebras-content');
 
   const [
-    instructionsGmail,
-    instructionsOutlook,
-    instructionsApple,
-    emailLivraison,
-    previewPage,
-    readmeRaw,
-  ] = await Promise.all([
-    cerebrasGenerate(promptGmail),
-    cerebrasGenerate(promptOutlook),
-    cerebrasGenerate(promptApple),
-    cerebrasGenerate(promptEmail),
-    cerebrasGenerate(promptPreview),
-    cerebrasGenerate(promptReadme),
+    rGmail, rOutlook, rApple, rEmail, rPreview, rReadme,
+  ] = await Promise.allSettled([
+    cerebrasGenerate(prompts.gmail),
+    cerebrasGenerate(prompts.outlook),
+    cerebrasGenerate(prompts.apple),
+    cerebrasGenerate(prompts.email),
+    cerebrasGenerate(prompts.preview),
+    cerebrasGenerate(prompts.readme),
   ]);
 
-  log('Génération Cerebras terminée ✓', 'cerebras-content');
+  const failed = [rGmail, rOutlook, rApple, rEmail, rPreview, rReadme]
+    .filter(r => r.status === 'rejected')
+    .map(r => (r as PromiseRejectedResult).reason?.message || 'erreur inconnue');
 
-  return {
-    instructionsGmail,
-    instructionsOutlook,
-    instructionsApple,
-    emailLivraison,
-    previewPage,
-    readme: readmeRaw,
+  if (failed.length > 0) {
+    log(`Cerebras: ${failed.length}/6 section(s) en fallback — ${failed.join(' | ')}`, 'cerebras-content');
+  }
+
+  const fallback = getFallbackContent(metadata, effectsUsed);
+
+  const resolve = <T>(result: PromiseSettledResult<T>, fallbackVal: T, keys: string[]): T => {
+    if (result.status === 'fulfilled' && isValid(result.value, keys as any)) return result.value;
+    return fallbackVal;
   };
+
+  const instructionsGmail   = resolve(rGmail,   fallback.instructionsGmail,   ['titre','intro','etapes','note_finale']);
+  const instructionsOutlook = resolve(rOutlook, fallback.instructionsOutlook, ['titre','intro','etapes','note_finale']);
+  const instructionsApple   = resolve(rApple,   fallback.instructionsApple,   ['titre','intro','etapes','note_finale']);
+  const emailLivraison      = resolve(rEmail,   fallback.emailLivraison,      ['sujet','intro','corps','cta']);
+  const previewPage         = resolve(rPreview, fallback.previewPage,         ['titre_page','headline','description']);
+  const readme              = resolve(rReadme,  fallback.readme,              ['contenu']);
+
+  log(`Generation Cerebras terminee (${6 - failed.length}/6 succes)`, 'cerebras-content');
+
+  return { instructionsGmail, instructionsOutlook, instructionsApple, emailLivraison, previewPage, readme };
 }
 
 export function getFallbackContent(
@@ -182,44 +155,60 @@ export function getFallbackContent(
   effectsUsed: string[]
 ): CerebrasPackageContent {
   const { nom, entreprise } = metadata;
+
   const makeInstructions = (client: string): InstructionsContent => ({
     titre: `Installer votre signature dans ${client}`,
     intro: `Bonjour ${nom}, voici comment installer votre signature vivante dans ${client}.`,
     etapes: [
-      { numero: 1, titre: 'Ouvrir les paramètres', description: `Ouvrez ${client} et accédez aux Paramètres de signature.`, conseil: 'Utilisez le raccourci Ctrl+, pour accéder rapidement aux préférences.' },
-      { numero: 2, titre: 'Créer une nouvelle signature', description: 'Créez une nouvelle signature et ouvrez l\'éditeur HTML.', conseil: 'Donnez un nom mémorable à votre signature pour la retrouver facilement.' },
-      { numero: 3, titre: 'Coller le code fourni', description: `Collez le fichier signature approprié pour ${client} dans l'éditeur.`, conseil: 'Enregistrez et envoyez-vous un email test pour vérifier le rendu.' },
+      {
+        numero: 1,
+        titre: 'Ouvrir les parametres',
+        description: `Ouvrez ${client} et accdez aux Parametres de signature.`,
+        conseil: 'Utilisez le raccourci Ctrl+, pour acceèder rapidement aux preferences.',
+      },
+      {
+        numero: 2,
+        titre: 'Creer une nouvelle signature',
+        description: 'Creez une nouvelle signature et ouvrez l\'editeur HTML.',
+        conseil: 'Donnez un nom memorable a votre signature pour la retrouver facilement.',
+      },
+      {
+        numero: 3,
+        titre: 'Coller le code fourni',
+        description: `Collez le fichier signature approprie pour ${client} dans l'editeur.`,
+        conseil: 'Enregistrez et envoyez-vous un email test pour verifier le rendu.',
+      },
     ],
-    note_finale: `Votre signature ${entreprise} est maintenant vivante ! Elle illuminera chaque email que vous enverrez.`,
+    note_finale: `Votre signature ${entreprise} est maintenant vivante !`,
   });
 
   return {
-    instructionsGmail: makeInstructions('Gmail'),
+    instructionsGmail:   makeInstructions('Gmail'),
     instructionsOutlook: makeInstructions('Outlook'),
-    instructionsApple: makeInstructions('Apple Mail'),
+    instructionsApple:   makeInstructions('Apple Mail'),
     emailLivraison: {
-      sujet: `✨ Votre signature vivante est prête, ${nom}`,
-      intro: `Bonjour ${nom}, nous sommes ravis de vous livrer votre signature email exclusive.`,
-      corps: `Votre package complet contient la signature SVG animée, ses versions Outlook et Gmail, ainsi que les guides d'installation illustrés.`,
-      section_magic: `Votre signature n'est pas une image statique — c'est une œuvre vivante qui cycle entre 4 variations artistiques, chacune portant une intention narrative unique.`,
-      instructions_rapides: 'Téléchargez le package et suivez le guide PDF correspondant à votre client mail.',
-      cta: 'Voir ma signature en prévisualisation',
-      signature_expediteur: 'L\'équipe EffectForge AI',
-      ps: `Conseil pro : testez votre signature sur mobile en vous envoyant un email depuis votre téléphone.`,
+      sujet:                `Votre signature vivante est prete, ${nom}`,
+      intro:                `Bonjour ${nom}, nous sommes ravis de vous livrer votre signature email exclusive.`,
+      corps:                `Votre package contient la signature SVG animee, ses versions Outlook et Gmail, ainsi que les guides d'installation.`,
+      section_magic:        `Votre signature cycle entre 4 variations artistiques, chacune portant une intention narrative unique.`,
+      instructions_rapides: 'Telechargez le package et suivez le guide PDF correspondant a votre client mail.',
+      cta:                  'Voir ma signature en previsualisation',
+      signature_expediteur: 'L\'equipe EffectForge AI',
+      ps:                   `Conseil pro : testez votre signature sur mobile.`,
     },
     previewPage: {
-      titre_page: `Signature Vivante — ${nom} | ${entreprise}`,
-      headline: `Votre signature email prend vie`,
-      description: `Une signature exclusive en 4 variations qui raconte l'histoire de ${entreprise}.`,
-      section_effets: `Effets utilisés : ${effectsUsed.join(', ')}`,
-      texte_bouton_gmail: 'Installer dans Gmail',
-      texte_bouton_outlook: 'Installer dans Outlook',
-      texte_bouton_apple: 'Installer dans Apple Mail',
-      texte_bouton_download: '⬇ Télécharger mon package complet',
-      footer: 'Signature créée par EffectForge AI',
+      titre_page:            `Signature Vivante — ${nom} | ${entreprise}`,
+      headline:              `Votre signature email prend vie`,
+      description:           `Une signature exclusive en 4 variations qui raconte l'histoire de ${entreprise}.`,
+      section_effets:        `Effets utilises : ${effectsUsed.join(', ')}`,
+      texte_bouton_gmail:    'Installer dans Gmail',
+      texte_bouton_outlook:  'Installer dans Outlook',
+      texte_bouton_apple:    'Installer dans Apple Mail',
+      texte_bouton_download: 'Telecharger mon package complet',
+      footer:                'Signature creee par EffectForge AI',
     },
     readme: {
-      contenu: `Bienvenue ${nom},\n\nVoici votre package de signature email premium créé par EffectForge AI.\n\nContenu du dossier :\n- signature.svg : Votre signature animée principale\n- signature-fallback.png : Fallback haute résolution pour clients bloquant les SVG\n- signature-outlook.htm : Version optimisée pour Outlook\n- signature-gmail.html : Version optimisée pour Gmail\n- instructions-gmail.pdf : Guide d'installation Gmail\n- instructions-outlook.pdf : Guide d'installation Outlook\n- instructions-apple-mail.pdf : Guide d'installation Apple Mail\n- config.json : Configuration complète de votre signature\n\nBonne utilisation,\nL'équipe EffectForge AI`,
+      contenu: `Bienvenue ${nom},\n\nVoici votre package de signature email premium cree par EffectForge AI.\n\nContenu du dossier :\n- signature.svg : Votre signature animee principale\n- signature-fallback.png : Fallback haute resolution\n- signature-outlook.htm : Version optimisee pour Outlook\n- signature-gmail.html : Version optimisee pour Gmail\n- instructions-gmail.pdf : Guide d'installation Gmail\n- instructions-outlook.pdf : Guide d'installation Outlook\n- instructions-apple-mail.pdf : Guide d'installation Apple Mail\n- config.json : Configuration complete\n\nBonne utilisation,\nL'equipe EffectForge AI`,
     },
   };
 }

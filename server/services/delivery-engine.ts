@@ -147,7 +147,10 @@ export async function runDeliveryEngine(
     await generatePreviewPage({
       signatureId,
       svgContent,
-      metadata,
+      metadata: {
+        ...metadata,
+        cycle_total: creativeConfig.technique?.cycle_total ?? 240,
+      },
       scenario: creativeConfig.scenario as NarrativeScenario,
       pageContent: cerebrasContent.previewPage,
       baseUrl,
@@ -194,6 +197,12 @@ export async function runDeliveryEngine(
       readmeTxt: cerebrasContent.readme.contenu,
       outputDir: EXPORTS_DIR,
     });
+    // Référence exacte vers le fichier ZIP pour la lookup déterministe
+    await fs.writeFile(
+      path.join(EXPORTS_DIR, `${signatureId}.zipref`),
+      path.basename(zipPath),
+      'utf-8'
+    );
     setStep(5, 'done');
   } catch (err: any) {
     setStep(5, 'error', err.message);
@@ -283,11 +292,21 @@ export async function getDeliveryFile(
     }
 
     if (type === 'zip') {
-      const files = await fs.readdir(EXPORTS_DIR);
-      const zipFile = files.find(f => f.includes(signatureId.split('_')[1] || signatureId) && f.endsWith('.zip'));
-      if (!zipFile) return null;
-      const buffer = await fs.readFile(path.join(EXPORTS_DIR, zipFile));
-      return { buffer, contentType: 'application/zip', filename: zipFile };
+      // Lecture déterministe via le fichier de référence créé à l'assemblage
+      const refPath = path.join(EXPORTS_DIR, `${signatureId}.zipref`);
+      let zipFilename: string;
+      try {
+        zipFilename = (await fs.readFile(refPath, 'utf-8')).trim();
+      } catch {
+        // Fallback : scan du répertoire si la référence est absente (anciennes signatures)
+        const files = await fs.readdir(EXPORTS_DIR);
+        const uuidPart = signatureId.split('_')[1] || signatureId;
+        const found = files.find(f => f.includes(uuidPart) && f.endsWith('.zip'));
+        if (!found) return null;
+        zipFilename = found;
+      }
+      const buffer = await fs.readFile(path.join(EXPORTS_DIR, zipFilename));
+      return { buffer, contentType: 'application/zip', filename: zipFilename };
     }
 
     const { ext, ct } = typeMap[type] || {};
