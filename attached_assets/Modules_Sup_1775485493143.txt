@@ -1,0 +1,97 @@
+17 modules au total, répartis sur 5 priorités :
+
+P1 : 3 modules | P2 : 3 | P3 : 3 | P4 : 3 | P5 : 5
+Oui, j'ai des améliorations précises et concrètes pour chacun. Voici l'inventaire complet :
+
+P1 — Harmonie, Timing, Diversité
+1. ColorHarmonyEngine
+Contrôle WCAG 2.1 (ratios de contraste AA/AAA) pour garantir la lisibilité sur fond blanc/sombre
+Interpolation perceptuelle OKLCH au lieu de HSL (transitions de couleur biologiquement naturelles)
+Simulation daltonisme (deuteranopie, protanopie) pour valider l'accessibilité de chaque palette
+Mode "température dynamique" : palette chaude le matin, froide le soir, selon l'horodatage
+2. TimingMaster
+Fallback statique automatique pour Outlook 2016/2019 (ne supporte pas les CSS animations)
+Calcul de la durée de cycle optimal en fonction de la densité textuelle (plus de texte = cycle plus long)
+Respect de prefers-reduced-motion : détecter la préférence d'accessibilité et réduire les animations
+Garde-fous CSS stricts : durées min 100 ms / max 10 s avec alerte si dépassement
+3. VarianceEngine
+Remplacement de la distance heuristique par une distance cosinus entre vecteurs d'effets (diversité mathématiquement exacte)
+Algorithme de croisement génétique A×B → échange de zones entre deux variations pour créer des hybrides contrôlés
+Détection automatique des "clones" (similarité > 85%) et mutation forcée
+Cache des meilleurs génotypes par secteur pour accélérer les générations suivantes
+P2 — Intelligence Contextuelle
+4. ContextualIntelligenceModerator
+Extension à 50+ secteurs (actuellement ~10) avec règles spécifiques par sous-secteur (ex: banque privée ≠ néobanque)
+Détection du ton de marque depuis le brief (luxe, startup, corporate, artisanal) en NLP léger
+Règles de conformité sectorielle : secteur médical → animations < 2 Hz pour éviter le risque épileptique
+Validation croisée avec les effets rejetés dans UserPreferencesEngine
+5. SmartOptimizer
+Optimisation multi-objectifs de Pareto : maximiser impact visuel ET compatibilité email simultanément
+Simulation des 5 principaux clients email (Gmail, Outlook 365, Apple Mail, Yahoo, Thunderbird) avec profils de rendu différents
+Réduction automatique de la complexité si le poids SVG dépasse 50 KB
+Détection des propriétés CSS qui causent des repaints coûteux (filter, box-shadow) et substitution
+6. VisualFocusEngine
+Calibration sur des données eye-tracking réelles (patterns F et Z) plutôt que sur des heuristiques
+Support RTL complet : inverser le chemin d'œil pour l'arabe et l'hébreu
+Détection des "zones mortes" (aucune zone d'intérêt à cet endroit) et correction automatique du layout
+Unification avec AttentionGuide (P5) : pipeline de guidage visuel en deux passes au lieu de deux systèmes parallèles
+P3 — Orchestration
+7. EffectFusionEngine
+Bibliothèque de recettes hybrides étendue à 50+ combinaisons (actuellement ~8)
+Validation physique des mélanges : détecter les effets qui se contredisent visuellement (ex: GLITCH + SOUL_AURA = incohérent)
+Calcul du "poids perceptuel" de chaque recette pour éviter la surcharge sensorielle
+Recettes adaptatives avec proportions variables selon le score de complexité du ContentAnalyzer
+8. DynamicFusionOrchestrator
+Blueprint 4D : ajouter l'axe temporel (quelles zones s'animent en même temps vs en séquence)
+Matrice de compatibilité avec scores de synergie décimaux au lieu de booléens binaires
+Export du blueprint en JSON réutilisable par le PresetManager
+Détection des conflits visuels entre zones adjacentes (ex: deux zones fast côte à côte)
+9. ExperienceOrchestrator
+Arc émotionnel en 7 phases au lieu de 4 : Ouverture → Montée → Tension → Climax → Descente → Résolution → Signature
+Adaptation de l'arc selon l'objectif (vente → climax centré sur le CTA, networking → équilibre général)
+Calcul d'un "BPM émotionnel" global aligné avec le métronome du PredictiveTransitionEngine
+Détection de la fatigue visuelle : plafonner l'intensité cumulée sur la durée totale du cycle
+P4 — Optimisation Technique
+10. ContentAnalyzer
+Analyse NLP légère du texte de la signature (nom, titre, CTA) pour extraire le ton et ajuster les seuils
+Détection de la langue pour adapter les règles typographiques (espacement, casse)
+Analyse de la qualité du logo depuis le base64 (résolution, transparence, dominante de couleur)
+Score de "richesse sémantique" pour calibrer la densité d'effets proposée
+11. AdaptiveRenderingEngine
+Profil "Dark Mode" : détecter et adapter la palette si le destinataire est en mode sombre
+Profil "Print" : générer une version entièrement statique pour impression
+Fallback progressif automatique : si Ultra échoue (timeout IA), passer à High puis Balanced
+FPS simulé : calculer le nombre de keyframes par seconde et alerter si > 60 fps (inutile en SVG/CSS)
+12. AnalyticsModule
+Persistance PostgreSQL : actuellement en mémoire vive → toutes les métriques sont perdues au redémarrage
+Dashboard temps réel via WebSocket : mise à jour des stats sans rechargement de page
+Segmentation des métriques par secteur, variation et profil de rendu
+Alertes automatiques si le temps de génération dépasse un seuil configurable (ex: > 45 secondes)
+Export CSV/JSON des données pour analyse externe
+P5 — Personnalisation & Identité
+13. PredictiveTransitionEngine
+Calcul des transitions inter-zones basé sur la proximité spatiale : zones adjacentes → transitions plus douces et coordonnées
+Prédiction de la transition suivante par modèle léger Markov (basé sur l'historique des compositions)
+Support des transitions 3D (perspective, rotateX, rotateY) pour la variation D
+Validation CSS stricte : vérifier que chaque propriété animée est dans la liste des propriétés CSS animables
+14. AttentionGuide
+Score de "conversion estimée" : calculer la probabilité que le destinataire clique sur le CTA selon la qualité du guidage
+Détection des obstacles qui brisent le chemin d'œil (séparateurs mal positionnés, zones trop denses)
+Données eye-tracking sectorielles : le chemin d'œil d'un email finance ≠ email créatif
+Unification avec VisualFocusEngine pour une seule passe de guidage visuel cohérente
+15. VisualSignatureEngine
+Persistance : stocker les fingerprints générés en base pour garantir l'unicité globale (pas seulement locale par session)
+Comparaison par distance de Hamming : rejeter et régénérer si la similarité avec un fingerprint existant dépasse 90%
+Génération de "familles de signatures" cohérentes pour une même marque (seeds proches mais distincts)
+Watermark invisible : encoder le fingerprint dans les métadonnées du SVG généré
+16. UserPreferencesEngine
+Persistance PostgreSQL : actuellement tout est en mémoire → perdu au redémarrage du serveur
+Clustering automatique des utilisateurs par style (segmentation k-means légère)
+Recommandations proactives : "Basé sur vos 12 générations, essayez l'effet GOLDEN_SHIMMER"
+Détection du changement de goût : si l'utilisateur rejette ses anciens favoris → réinitialisation partielle du profil
+17. PresetManager
+Persistance PostgreSQL : les presets custom sont actuellement perdus au redémarrage
+Versioning des presets : historique des modifications avec possibilité de rollback
+Miniature SVG générée automatiquement pour chaque preset (aperçu visuel en ~200×60 px)
+Algorithme de recommandation : "Les utilisateurs avec un profil similaire ont préféré ce preset"
+Partage de presets entre utilisateurs (presets publics/privés)
