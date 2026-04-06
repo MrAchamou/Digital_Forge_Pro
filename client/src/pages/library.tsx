@@ -5,8 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import EffectCard from "@/components/ui/effect-card";
-import { Database, Search, ChevronLeft, ChevronRight, Layers, RefreshCw } from "lucide-react";
+import CodePreview from "@/components/ui/code-preview";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Database, Search, ChevronLeft, ChevronRight, Layers, RefreshCw,
+  Download, Cpu, Tag, Zap, X
+} from "lucide-react";
 import type { Effect } from "@shared/schema";
 
 interface EffectsResponse {
@@ -44,9 +50,6 @@ const categoryOptions = [
   { value: "ENERGIE", label: "Énergie" },
   { value: "TRANSFORMATION", label: "Transformation" },
   { value: "TRANSITION", label: "Transition" },
-  { value: "EXPLOSION", label: "Explosion" },
-  { value: "FIRE", label: "Fire" },
-  { value: "DISTORTION", label: "Distortion" },
 ];
 
 const typeOptions = [
@@ -67,7 +70,15 @@ const typeOptions = [
   { value: "TRANSITION", label: "Transition" },
 ];
 
+const performanceBadge: Record<string, string> = {
+  high: "bg-green-500/20 text-green-400 border-green-500/30",
+  medium: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  low: "bg-red-500/20 text-red-400 border-red-500/30",
+};
+
 export default function Library() {
+  const { toast } = useToast();
+
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [category, setCategory] = useState("all");
@@ -75,7 +86,8 @@ export default function Library() {
   const [page, setPage] = useState(1);
   const limit = 12;
 
-  // Debounce search input
+  const [previewEffect, setPreviewEffect] = useState<Effect | null>(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -84,7 +96,6 @@ export default function Library() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Build URL with real query params
   const buildUrl = () => {
     const params = new URLSearchParams();
     if (debouncedSearch) params.append("search", debouncedSearch);
@@ -122,6 +133,28 @@ export default function Library() {
 
   const hasFilters = debouncedSearch || category !== "all" || type !== "all";
 
+  const handlePreview = (effect: Effect) => {
+    setPreviewEffect(effect);
+  };
+
+  const handleDownload = (effect: Effect) => {
+    const code = effect.code || "";
+    const filename = `${effect.name.replace(/\s+/g, "_")}.js`;
+    const blob = new Blob([code], { type: "text/javascript;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({
+      title: "Téléchargement démarré",
+      description: `${filename} téléchargé avec succès.`,
+    });
+  };
+
   return (
     <div className="space-y-8">
       {/* Hero Section */}
@@ -134,7 +167,6 @@ export default function Library() {
           Catalogue complet de vos effets premium — tous réels, tous chargés depuis la base de données
         </p>
 
-        {/* Live count badge */}
         <div className="flex justify-center items-center gap-3 flex-wrap">
           <Badge className="bg-forge-cyan text-forge-dark px-4 py-2 text-base font-bold" data-testid="badge-total-effects">
             <Database className="w-4 h-4 mr-2 inline" />
@@ -205,7 +237,7 @@ export default function Library() {
           </div>
 
           {hasFilters && (
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
               <span className="text-xs text-gray-400">Filtres actifs :</span>
               {debouncedSearch && <Badge className="bg-forge-cyan/20 border border-forge-cyan text-forge-cyan text-xs">"{debouncedSearch}"</Badge>}
               {category !== "all" && <Badge className="bg-forge-purple/20 border border-forge-purple text-forge-purple text-xs">{category}</Badge>}
@@ -256,7 +288,7 @@ export default function Library() {
               {hasFilters ? "Essaie d'ajuster tes critères de recherche" : "Aucun effet disponible"}
             </p>
             {hasFilters && (
-              <Button onClick={clearFilters} variant="outline" className="border-forge-cyan text-forge-cyan hover:bg-forge-cyan/10" data-testid="button-clear-filters">
+              <Button onClick={clearFilters} variant="outline" className="border-forge-cyan text-forge-cyan hover:bg-forge-cyan/10" data-testid="button-clear-filters-empty">
                 Effacer les filtres
               </Button>
             )}
@@ -265,7 +297,12 @@ export default function Library() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="grid-effects">
           {data?.effects.map((effect) => (
-            <EffectCard key={effect.id} effect={effect} />
+            <EffectCard
+              key={effect.id}
+              effect={effect}
+              onPreview={() => handlePreview(effect)}
+              onDownload={() => handleDownload(effect)}
+            />
           ))}
         </div>
       )}
@@ -352,6 +389,87 @@ export default function Library() {
           </CardContent>
         </Card>
       )}
+
+      {/* Preview Modal */}
+      <Dialog open={!!previewEffect} onOpenChange={(open) => { if (!open) setPreviewEffect(null); }}>
+        <DialogContent className="max-w-3xl w-full bg-forge-dark border border-forge-purple/40 text-white p-0 overflow-hidden">
+          {previewEffect && (
+            <>
+              {/* Modal Header */}
+              <DialogHeader className="px-6 pt-6 pb-4 border-b border-forge-purple/20">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <DialogTitle className="text-2xl font-bold text-forge-cyan truncate">
+                      {previewEffect.name}
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-300 mt-1 text-sm">
+                      {previewEffect.description}
+                    </DialogDescription>
+                  </div>
+                </div>
+
+                {/* Meta badges */}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <Badge className="bg-forge-purple/30 border border-forge-purple/50 text-forge-purple text-xs">
+                    <Tag className="w-3 h-3 mr-1" />
+                    {previewEffect.category}
+                  </Badge>
+                  <Badge className="bg-forge-cyan/20 border border-forge-cyan/40 text-forge-cyan text-xs">
+                    <Zap className="w-3 h-3 mr-1" />
+                    {previewEffect.type}
+                  </Badge>
+                  <Badge className={`border text-xs ${performanceBadge[previewEffect.performance] ?? "bg-gray-500/20 text-gray-400 border-gray-500/30"}`}>
+                    <Cpu className="w-3 h-3 mr-1" />
+                    Performance : {previewEffect.performance}
+                  </Badge>
+                  <Badge className="bg-forge-gold/20 border border-forge-gold/40 text-forge-gold text-xs">
+                    Complexité : {previewEffect.complexity}/10
+                  </Badge>
+                  {Array.isArray(previewEffect.tags) && previewEffect.tags.slice(0, 4).map((tag) => (
+                    <Badge key={tag} variant="secondary" className="text-xs bg-forge-dark/60 text-gray-300 border-gray-600/40">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </DialogHeader>
+
+              {/* Code Preview */}
+              <div className="px-6 py-4">
+                <p className="text-xs text-gray-400 mb-2 font-mono uppercase tracking-wider">Code source JavaScript</p>
+                <CodePreview
+                  code={previewEffect.code ?? "// Aucun code disponible"}
+                  language="javascript"
+                  maxHeight="360px"
+                />
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 pb-6 flex justify-between items-center gap-3 border-t border-forge-purple/20 pt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPreviewEffect(null)}
+                  className="text-gray-400 hover:text-white"
+                  data-testid="button-close-preview"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Fermer
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleDownload(previewEffect);
+                  }}
+                  className="bg-forge-electric hover:bg-forge-electric/80 text-white"
+                  data-testid="button-download-from-preview"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Télécharger {previewEffect.name.replace(/\s+/g, "_")}.js
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
