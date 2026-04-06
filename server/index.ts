@@ -113,9 +113,8 @@ app.use((req, res, next) => {
     console.log('✅ GOD Monitor activé');
   }
 
-  // Démarrage monitoring autonome
+  // Monitoring autonome (démarre automatiquement à l'initialisation)
   console.log('🤖 Autonomous Monitor démarré');
-  autonomousMonitor.start(); // Assurez-vous que autonomousMonitor.start() est implémenté
 
   // Activation détection d'erreurs continue
   console.log('🔍 Activation détection d\'erreurs continue...');
@@ -138,17 +137,16 @@ app.use((req, res, next) => {
   // Statut final
   const godStatus = godMonitor.getGodStatus();
   console.log('\n🎭 === EFFET GENERATOR SERVER - NIVEAU GOD ===');
-  console.log(`🌐 API accessible sur: http://localhost:${port}`);
-  console.log(`🔗 WebSocket sur: ws://localhost:${port}`);
   console.log(`📊 Santé système: ${godStatus.overallHealth}%`);
   console.log(`🧠 IA confidence: ${(godStatus.ai.confidenceLevel * 100).toFixed(1)}%`);
   console.log(`🔮 Précision prédictive: ${(godStatus.predictiveAccuracy * 100).toFixed(1)}%`);
-  console.log('🚀 Système GOD opérationnel et autonome!');
-})();
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`🚀 Serveur démarré sur http://0.0.0.0:${port}`);
-  console.log(`📊 Dashboard disponible sur http://0.0.0.0:${port}/api/system/health`);
-  console.log('🎯 Système GOD entièrement opérationnel');
-  console.log('🔍 Auto-détection et correction des erreurs: ACTIVE');
-});
+  server.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Serveur démarré sur http://0.0.0.0:${port}`);
+    console.log(`🌐 API accessible sur: http://localhost:${port}`);
+    console.log(`🔗 WebSocket sur: ws://localhost:${port}`);
+    console.log(`📊 Dashboard disponible sur http://0.0.0.0:${port}/api/system/health`);
+    console.log('🎯 Système GOD entièrement opérationnel');
+    console.log('🔍 Auto-détection et correction des erreurs: ACTIVE');
+  });
+})();

@@ -775,4 +775,9 @@ router.post('/system/optimize', async (req, res) => {
   }
 });
 
+export function registerRoutes(app: express.Application) {
+  app.use(cors());
+  app.use('/api', router);
+}
+
 export default router;
