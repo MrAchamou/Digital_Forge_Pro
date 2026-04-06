@@ -457,3 +457,8 @@ export function getFocusDelays(variation: VariationKey, baseDelay = 0, dir: Read
 }
 
 console.log('👁️ Visual Focus Engine v2.0 — eye-tracking F/Z | RTL | zones mortes | pipeline 2 passes AttentionGuide');
+
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
