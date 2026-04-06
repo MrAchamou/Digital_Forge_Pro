@@ -1,0 +1,37 @@
+LISTE COMPLÈTE DES MODULES À CRÉER
+🔴 PRIORITÉ 1 — Fondamentaux visuels (impact WOW immédiat sur le rendu SVG)
+#	Module	Rôle dans notre pipeline	Source
+1	ColorHarmonyEngine	Génère des palettes complémentaires à partir de la couleur de la marque. Remplace les couleurs statiques dans le SVG par des gradients intelligents (harmonies triadiques, analogues, split-complémentaires).	Fichier 2
+2	TimingMaster	Remplace toutes les durées d'animation hardcodées par des séquences basées sur le nombre d'or (1.618) et Fibonacci. Synchronise les boucles multi-zones sur un métronome principal. Élimine la monotonie mécanique.	Fichier 2
+3	VarianceEngine	Moteur génétique qui garantit que les 4 variations A/B/C/D sont maximalement différentes. Algorithme de croisement ADN + mutation rate + sélection par fitness. Transforme 1 effet en univers infini de sous-variantes.	Fichier 7
+🟠 PRIORITÉ 2 — Intelligence de rendu (algorithmes adaptatifs)
+#	Module	Rôle dans notre pipeline	Source
+4	ContextualIntelligenceModerator	Analyse la complexité de l'effet original avant de l'améliorer. Évite la sur-complexification : un effet simple + niveau 3 = protection activée (cap 3x max). Détermine quels modules sont autorisés ou interdits selon l'effet.	Fichier 5
+5	SmartOptimizer	Intercepte toutes les variables numériques du SVG (vitesse, intensité, échelle) et les remplace par des fonctions d'optimisation intelligente selon le contenu de la signature (logo présent ? texte court ? CTA visible ?).	Fichier 2
+6	VisualFocusEngine	Détecte les zones d'intérêt naturel dans la composition de la signature (règle des tiers, hiérarchie visuelle). Ajuste les coordonnées et trajectoires d'animation pour guider naturellement l'œil vers le CTA ou le nom.	Fichier 2
+🟡 PRIORITÉ 3 — Orchestration des couches (fusion multi-effets)
+#	Module	Rôle dans notre pipeline	Source
+7	DynamicFusionOrchestrator	Chef d'orchestre central : décompose l'essence d'un effet (ADN animatoire), analyse la compatibilité des modules actifs, crée un blueprint de fusion, reconstruit l'effet entièrement. Gère les 3 niveaux (Standard / Pro / Ultimate).	Fichier 1
+8	EffectFusionEngine	Identifie toutes les variantes d'un même effet (ex: les 10 sous-variantes PARTICLE), crée des "recettes de mélange" (40% SWARM + 30% FIREFLIES + 30% COSMIC), fusionne les algorithmes mathématiquement pour des rendus hybrides uniques.	Fichier 2
+9	ExperienceOrchestrator	Mappe le voyage complet de la signature : intro → développement → climax → outro. Crée des phases d'intensité progressives. Ajoute des micro-récompenses visuelles à intervalles optimaux pour maximiser l'engagement.	Fichier 2
+🟢 PRIORITÉ 4 — Optimisation technique (performance et fiabilité)
+#	Module	Rôle dans notre pipeline	Source
+10	AdaptiveRenderingEngine	Détecte les capacités du device (GPU/CPU tier, mémoire, batterie). Sélectionne automatiquement le profil de rendu (Ultra / High / Balanced / Performance / Low). Adapte la densité de particules et le FPS cible.	Fichiers 3 & 4
+11	ContentAnalyzer	Scanne les paramètres de la signature (couleurs dominantes, complexité visuelle, nombre d'éléments, longueur du texte). Extrait les seuils de déclenchement. Injecte des capteurs dynamiques qui remplacent les valeurs fixes par des calculs en temps réel.	Fichier 2
+12	AnalyticsModule	Collecte les métriques de performance (FPS moyen, durée d'engagement, zones les plus regardées). Génère des rapports d'optimisation automatiques pour ajuster les algorithmes de génération au fil du temps.	Fichier 2
+🔵 PRIORITÉ 5 — Expérience avancée (différenciation compétitive)
+#	Module	Rôle dans notre pipeline	Source
+13	PredictiveTransitionEngine	Prédit et prépare les transitions avant même qu'elles se déclenchent. Fonctions d'easing procédurales (Fibonacci, golden ratio, organic, neural). Pipeline d'animation multi-couche avec synchronisation parfaite.	Fichier 6
+14	AttentionGuide	Ajoute des "aimants visuels" subtils sur les éléments clés (lueurs douces, micro-pulsations). Crée des chemins d'œil naturels qui guident de la zone logo vers le CTA. Effets de parallaxe légers pour hiérarchiser l'information.	Fichier 2
+15	VisualSignatureEngine	Génère une "empreinte visuelle" unique pour chaque rendu. Garantit qu'aucune signature produite ne ressemble à une autre, même avec les mêmes paramètres d'entrée.	Fichier 2
+16	UserPreferencesEngine	Mémorise les choix de l'utilisateur (styles favoris, intensités préférées, effets rejetés). Adapte progressivement les suggestions aux préférences individuelles.	Fichier 2
+17	PresetManager	Système de sauvegarde/restauration de configurations complètes. Génère des presets intelligents basés sur le secteur d'activité détecté. Tags automatiques pour classifier les configurations.	Fichier 2
+📊 RÉSUMÉ STRATÉGIQUE
+TOTAL : 17 modules
+├── 3 modules Priorité 1  → Couleurs + Timing + Variations génétiques
+├── 3 modules Priorité 2  → Intelligence + Optimisation + Focus visuel
+├── 3 modules Priorité 3  → Orchestration + Fusion + Expérience
+├── 3 modules Priorité 4  → Rendu adaptatif + Analyse + Analytics
+└── 5 modules Priorité 5  → Transitions + Attention + Signature unique + Préférences + Presets
+
+À noter : Les modules côté serveur (1–12) s'intègrent directement dans le pipeline zone-svg-renderer.ts → triple-ai-director.ts. Les modules 13–17 touchent aussi le frontend (client/src).

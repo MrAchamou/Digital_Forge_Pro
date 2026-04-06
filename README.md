@@ -185,25 +185,61 @@ npm start
 
 ---
 
+## Modules Avancés — Pipeline d'Intelligence
+
+### ✅ Priorité 1 — Fondamentaux visuels
+| Module | Fichier | Rôle |
+|--------|---------|------|
+| **ColorHarmonyEngine** | `server/modules/color-harmony.module.ts` | Palettes complémentaires (triadiques, analogues, split-complémentaires) |
+| **TimingMaster** | `server/modules/timing-master.module.ts` | Durées basées sur le nombre d'or (φ=1.618) + séquences Fibonacci |
+| **VarianceEngine** | `server/modules/variance-engine.module.ts` | Moteur génétique ADN — garantit que A/B/C/D sont maximalement distincts |
+
+### ✅ Priorité 2 — Intelligence de rendu
+| Module | Fichier | Rôle |
+|--------|---------|------|
+| **ContextualIntelligenceModerator** | `server/modules/contextual-intelligence.module.ts` | Modère la complexité par secteur, évite la sur-complexification |
+| **SmartOptimizer** | `server/modules/smart-optimizer.module.ts` | Calibration adaptative des intensités/vitesses selon le contenu |
+| **VisualFocusEngine** | `server/modules/visual-focus.module.ts` | Guide l'œil logo → nom → CTA via règle des tiers |
+
+### ✅ Priorité 3 — Orchestration des couches
+| Module | Fichier | Rôle |
+|--------|---------|------|
+| **EffectFusionEngine** | `server/modules/effect-fusion-engine.module.ts` | Recettes de mélange hybrides (40% PARTICLE + 30% ENERGY + 30% FLUID) |
+| **DynamicFusionOrchestrator** | `server/modules/dynamic-fusion-orchestrator.module.ts` | Blueprint cross-zones + matrice de compatibilité, niveaux Standard/Pro/Ultimate |
+| **ExperienceOrchestrator** | `server/modules/experience-orchestrator.module.ts` | Arc émotionnel Intro→Développement→Climax→Outro + micro-récompenses visuelles |
+
+---
+
 ## Structure du Projet
 
 ```
 effectforge-ai/
 ├── server/
 │   ├── services/
-│   │   ├── gmb-scraper.ts          # Scraping complet GMB + logo
-│   │   ├── triple-ai-director.ts   # Pipeline 3 cerveaux IA
-│   │   └── signature-delivery.ts   # Export SVG/PDF/JSON
-│   ├── routes.ts                   # API endpoints
-│   └── index.ts                    # Serveur Express
+│   │   ├── gmb-scraper.ts              # Scraping complet GMB + logo
+│   │   ├── triple-ai-director.ts       # Pipeline 3 cerveaux IA + P1/P2/P3
+│   │   ├── zone-svg-renderer.ts        # Rendu SVG par zone (TimingMaster + ColorHarmony)
+│   │   └── signature-delivery.ts       # Export SVG/PDF/JSON
+│   ├── modules/
+│   │   ├── color-harmony.module.ts     # P1 — Palettes intelligentes
+│   │   ├── timing-master.module.ts     # P1 — Durées φ et Fibonacci
+│   │   ├── variance-engine.module.ts   # P1 — Diversité génétique A/B/C/D
+│   │   ├── contextual-intelligence.module.ts  # P2 — Modération par secteur
+│   │   ├── smart-optimizer.module.ts   # P2 — Calibration adaptative
+│   │   ├── visual-focus.module.ts      # P2 — Guide œil logo→CTA
+│   │   ├── effect-fusion-engine.module.ts      # P3 — Recettes hybrides
+│   │   ├── dynamic-fusion-orchestrator.module.ts # P3 — Blueprint cross-zones
+│   │   └── experience-orchestrator.module.ts   # P3 — Arc émotionnel
+│   ├── routes.ts                       # API endpoints
+│   └── index.ts                        # Serveur Express
 ├── client/src/
 │   ├── pages/
-│   │   ├── studio.tsx              # God Tier Studio (page principale)
-│   │   └── ...                     # Autres pages
+│   │   ├── studio.tsx                  # God Tier Studio (page principale)
+│   │   └── ...                         # Autres pages
 │   └── components/
-│       └── ui/                     # shadcn/ui components
+│       └── ui/                         # shadcn/ui components
 └── shared/
-    └── schema.ts                   # Types Drizzle + Zod
+    └── schema.ts                       # Types Drizzle + Zod
 ```
 
 ---

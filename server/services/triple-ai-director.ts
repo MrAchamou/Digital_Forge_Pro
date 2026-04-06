@@ -14,6 +14,9 @@ import { maximizeDiversity, logFitnessReport } from '../modules/variance-engine.
 import { moderateComposition, normalizeSecteur } from '../modules/contextual-intelligence.module';
 import { optimizeComposition, analyzeSignatureContent } from '../modules/smart-optimizer.module';
 import { applyVisualFocus } from '../modules/visual-focus.module';
+import { applyEffectFusion } from '../modules/effect-fusion-engine.module';
+import { orchestrateFusion } from '../modules/dynamic-fusion-orchestrator.module';
+import { orchestrateExperience } from '../modules/experience-orchestrator.module';
 
 const EFFECTS_LIBRARY = [
   'HEARTBEAT', 'SOUL_AURA', 'PLASMA_DRIFT', 'NEON_PULSE', 'GOLDEN_SHIMMER',
@@ -556,6 +559,28 @@ function applyPriority2Pipeline(
   return focused.composition;
 }
 
+/**
+ * 🎛️ Pipeline Priorité 3 : Fusion des effets → Orchestration → Arc d'expérience
+ * Appliqué à chaque variation après le VarianceEngine.
+ * Rend les effets hybrides, orchestrés et narrativement engageants.
+ */
+function applyPriority3Pipeline(
+  comp:      ZoneComposition,
+  variation: 'A' | 'B' | 'C' | 'D',
+  cycleMs:   number = 8000
+): ZoneComposition {
+  // 1. EffectFusionEngine — recettes de mélange hybrides entre effets
+  const fusionResult = applyEffectFusion(comp, variation);
+
+  // 2. DynamicFusionOrchestrator — blueprint d'orchestration cross-zones
+  const orchestratorResult = orchestrateFusion(comp, fusionResult, variation);
+
+  // 3. ExperienceOrchestrator — arc émotionnel intro→climax→outro
+  const experienceResult = orchestrateExperience(orchestratorResult, variation, cycleMs);
+
+  return experienceResult.composition;
+}
+
 async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief, palette: string[], secteur: string, metadata: any): Promise<TechnicalConfig> {
   log('Cerveau 3 — Sélection zones par variation (séquentiel pour garantir diversité)...', 'triple-ai');
 
@@ -600,6 +625,14 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
   const optimizedComps  = diversityReport.compositions;
   log(`🧬 Variance Engine — Diversité: ${(diversityReport.overall_diversity * 100).toFixed(1)}% | ${logFitnessReport(optimizedComps)} | Mutations: ${diversityReport.mutations_applied}`, 'triple-ai');
 
+  // ── Priorité 3 : Fusion + Orchestration + Arc d'expérience ───────────────
+  const cycleMs = (metadata?.cycle_total ?? 8) * 1000;
+  const p3A = applyPriority3Pipeline(optimizedComps.A, 'A', cycleMs);
+  const p3B = applyPriority3Pipeline(optimizedComps.B, 'B', cycleMs);
+  const p3C = applyPriority3Pipeline(optimizedComps.C, 'C', cycleMs);
+  const p3D = applyPriority3Pipeline(optimizedComps.D, 'D', cycleMs);
+  log(`🎛️ P3 complet — Fusion+Orchestration+Expérience appliquées sur A/B/C/D`, 'triple-ai');
+
   const baseConfig = buildFallbackTechnical(scenario, palette);
 
   return {
@@ -611,9 +644,12 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
       `Variance Engine — Diversité génétique: ${(diversityReport.overall_diversity * 100).toFixed(1)}%`,
       'Timing Master — Durées φ et Fibonacci actives',
       'Color Harmony Engine — Palettes enrichies par zone',
+      'Effect Fusion Engine — Recettes hybrides cross-effets',
+      'Dynamic Fusion Orchestrator — Blueprint cross-zones Standard/Pro/Ultimate',
+      'Experience Orchestrator — Arc émotionnel Intro→Climax→Outro',
     ],
-    notes_techniques: `Zone+Variance+Timing+Color | Secteur:${secteur} | A:${optimizedComps.A.logo.effet_id} B:${optimizedComps.B.logo.effet_id} C:${optimizedComps.C.logo.effet_id} D:${optimizedComps.D.logo.effet_id}`,
-    zone_compositions: { A: optimizedComps.A, B: optimizedComps.B, C: optimizedComps.C, D: optimizedComps.D },
+    notes_techniques: `Zone+Variance+P3-Fusion+Orchestration+Experience | Secteur:${secteur} | A:${p3A.logo.effet_id} B:${p3B.logo.effet_id} C:${p3C.logo.effet_id} D:${p3D.logo.effet_id}`,
+    zone_compositions: { A: p3A, B: p3B, C: p3C, D: p3D },
   };
 }
 
