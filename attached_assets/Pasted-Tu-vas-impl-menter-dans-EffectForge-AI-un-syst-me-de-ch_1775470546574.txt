@@ -1,0 +1,926 @@
+Tu vas implémenter dans EffectForge AI un système de 
+chirurgie visuelle par zones pour les signatures vivantes.
+Chaque zone de la signature possède sa propre bibliothèque 
+d'effets codifiée, ses propres règles de combinaison, 
+et l'IA sélectionne intelligemment depuis cette liste 
+structurée pour garantir un rendu God Tier cohérent 
+et jamais chaotique.
+
+═══════════════════════════════════════════════════════
+PHILOSOPHIE DU SYSTÈME
+═══════════════════════════════════════════════════════
+
+Chaque zone de la signature est un univers indépendant.
+Les effets sont pensés spécifiquement pour leur zone.
+L'IA ne mélange jamais des effets incompatibles.
+Le résultat final est une symphonie visuelle cohérente
+où chaque zone joue sa partition sans jamais couvrir
+les autres.
+
+Les 7 zones chirurgicales :
+1. LOGO        — La pièce maîtresse 3D vivante
+2. NOM         — L'identité typographique
+3. TITRE       — Le positionnement subtil
+4. CONTACT     — L'information en cascade
+5. SÉPARATEUR  — Le flux d'énergie vertical
+6. FOND        — L'univers atmosphérique
+7. CTA         — L'invitation magnétique
+
+═══════════════════════════════════════════════════════
+PARTIE 1 — BIBLIOTHÈQUE D'EFFETS PAR ZONE
+═══════════════════════════════════════════════════════
+
+Créer server/data/zone-effects-library.json
+
+Ce fichier JSON est la source de vérité absolue
+que l'IA consulte pour sélectionner les effets.
+Il contient pour chaque zone tous les effets
+disponibles avec leurs règles de compatibilité.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ZONE 1 — LOGO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le logo est la pièce centrale. Il doit avoir une 
+présence 3D réelle — pas simulée grossièrement.
+Il vit, il respire, il a une matière, une énergie.
+
+{
+  "zone": "logo",
+  "description": "Pièce maîtresse 3D — présence physique maximale",
+  "max_effets_simultanes": 3,
+  "obligatoire": ["dimension"],
+  "categories": {
+
+    "dimension": {
+      "description": "La forme dans l'espace 3D",
+      "choisir": 1,
+      "effets": [
+        {
+          "id": "LOGO_3D_FLOAT",
+          "nom": "Flottement 3D",
+          "css_technique": "rotateY(-8deg) à rotateY(8deg) + translateZ(0) à translateZ(12px)",
+          "duree_cycle": "8s ease-in-out infinite",
+          "description": "Rotation Y douce donnant profondeur réelle",
+          "intensite": {"min": 0.2, "max": 0.6, "defaut": 0.4},
+          "compatible_secteurs": ["tous"],
+          "incompatible_avec": ["LOGO_STATIC_LOCK", "LOGO_RIGID_FORM"]
+        },
+        {
+          "id": "LOGO_VOLUME_BREATHE",
+          "nom": "Respiration Volumétrique",
+          "css_technique": "scaleX(1) scaleY(1) à scaleX(1.06) scaleY(1.04) asymétrique",
+          "duree_cycle": "6s cubic-bezier(0.4,0,0.2,1) infinite",
+          "description": "Gonflement organique 3D — le logo respire de l'intérieur",
+          "intensite": {"min": 0.1, "max": 0.4, "defaut": 0.25},
+          "compatible_secteurs": ["tous"],
+          "incompatible_avec": ["LOGO_RIGID_FORM"]
+        },
+        {
+          "id": "LOGO_GYRO_TILT",
+          "nom": "Gyroscope Subtil",
+          "css_technique": "rotateX(-3deg) rotateY(5deg) à rotateX(3deg) rotateY(-5deg)",
+          "duree_cycle": "12s ease-in-out infinite alternate",
+          "description": "Inclinaison gyroscopique — flottement dans l'espace",
+          "intensite": {"min": 0.2, "max": 0.5, "defaut": 0.3},
+          "compatible_secteurs": ["tech", "créatif", "innovation"],
+          "incompatible_avec": ["LOGO_3D_FLOAT"]
+        }
+      ]
+    },
+
+    "matiere": {
+      "description": "La surface physique du logo",
+      "choisir": 1,
+      "effets": [
+        {
+          "id": "LOGO_METAL_BRUSH",
+          "nom": "Métal Brossé",
+          "css_technique": "gradient animé simulant reflet métallique horizontal",
+          "description": "Reflet lumineux sur surface métallique brossée",
+          "couleurs": "déduit de la palette — version désaturée + brillance",
+          "intensite": {"min": 0.3, "max": 0.8, "defaut": 0.5},
+          "compatible_secteurs": ["finance", "tech", "industrie", "juridique"],
+          "incompatible_avec": ["LOGO_GLASS_IRIS", "LOGO_ORGANIC_MATTER", "LOGO_GOLD_POLISH"]
+        },
+        {
+          "id": "LOGO_GLASS_IRIS",
+          "nom": "Verre Irisé",
+          "css_technique": "gradient multi-stop animé simulant iridescence",
+          "description": "Reflets chromatiques changeants sur surface transparente",
+          "couleurs": "spectre complet filtré sur palette de base",
+          "intensite": {"min": 0.2, "max": 0.7, "defaut": 0.4},
+          "compatible_secteurs": ["créatif", "luxe", "beauté", "art"],
+          "incompatible_avec": ["LOGO_METAL_BRUSH", "LOGO_MATTE_FLAT"]
+        },
+        {
+          "id": "LOGO_GOLD_POLISH",
+          "nom": "Or Poli",
+          "css_technique": "gradient or animé avec point de brillance en mouvement",
+          "description": "Brillance dorée avec reflet chaud en déplacement lent",
+          "couleurs": "#c9a84c #f0d080 #8b6914 en rotation",
+          "intensite": {"min": 0.4, "max": 0.9, "defaut": 0.6},
+          "compatible_secteurs": ["luxe", "juridique", "finance", "prestige"],
+          "incompatible_avec": ["LOGO_METAL_BRUSH", "LOGO_MATTE_FLAT", "LOGO_GLASS_IRIS"]
+        },
+        {
+          "id": "LOGO_MATTE_FLAT",
+          "nom": "Mat Vivant",
+          "css_technique": "micro-texture noise animée sur surface mate",
+          "description": "Surface mate avec micro-vibration organique subtile",
+          "couleurs": "palette originale sans modification",
+          "intensite": {"min": 0.1, "max": 0.3, "defaut": 0.15},
+          "compatible_secteurs": ["minimaliste", "design", "mode"],
+          "incompatible_avec": ["LOGO_GOLD_POLISH", "LOGO_GLASS_IRIS", "LOGO_METAL_BRUSH"]
+        }
+      ]
+    },
+
+    "energie": {
+      "description": "L'aura et le rayonnement du logo",
+      "choisir": 1,
+      "effets": [
+        {
+          "id": "LOGO_HALO_PULSE",
+          "nom": "Halo Cardiaque",
+          "css_technique": "radialGradient pulsant synchronized 72bpm",
+          "description": "Lumière émise au rythme d'un cœur lent et certain",
+          "intensite": {"min": 0.1, "max": 0.5, "defaut": 0.3},
+          "compatible_secteurs": ["tous"],
+          "incompatible_avec": []
+        },
+        {
+          "id": "LOGO_ORBITAL_PARTICLES",
+          "nom": "Particules Orbitales",
+          "css_technique": "cercles SVG en orbit path elliptique à vitesses variables",
+          "description": "3 à 5 micro-particules orbitant à distances différentes",
+          "nombre_particules": "3 à 5 selon intensité",
+          "intensite": {"min": 0.2, "max": 0.6, "defaut": 0.4},
+          "compatible_secteurs": ["tech", "science", "innovation", "créatif"],
+          "incompatible_avec": ["LOGO_CLEAN_SPACE", "LOGO_CRYSTAL_FRAGMENT"]
+        },
+        {
+          "id": "LOGO_SOUL_AURA",
+          "nom": "Aura d'Âme",
+          "css_technique": "multiple radialGradients décalés en rotation lente",
+          "description": "Énergie organique douce émanant de toute la forme",
+          "intensite": {"min": 0.1, "max": 0.4, "defaut": 0.2},
+          "compatible_secteurs": ["art", "bien-être", "créatif", "spirituel"],
+          "incompatible_avec": ["LOGO_CORPORATE_CLEAN"]
+        },
+        {
+          "id": "LOGO_ELECTRIC_CORONA",
+          "nom": "Couronne Électrique",
+          "css_technique": "stroke-dasharray animé + glow filter",
+          "description": "Couronne d'énergie électrique contenue autour du logo",
+          "intensite": {"min": 0.2, "max": 0.7, "defaut": 0.4},
+          "compatible_secteurs": ["tech", "énergie", "innovation", "gaming"],
+          "incompatible_avec": ["LOGO_SOUL_AURA", "LOGO_HALO_PULSE"]
+        }
+      ]
+    },
+
+    "transformation": {
+      "description": "La métamorphose subtile de la forme",
+      "choisir": "0 ou 1",
+      "effets": [
+        {
+          "id": "LOGO_CRYSTAL_FRAGMENT",
+          "nom": "Fragmentation Cristal",
+          "css_technique": "clip-path polygon animé en micro-fragments",
+          "description": "Micro-éclatement imperceptible puis reconstruction lente",
+          "duree_cycle": "24s — rare et surprenant",
+          "intensite": {"min": 0.1, "max": 0.4, "defaut": 0.2},
+          "compatible_secteurs": ["créatif", "tech", "innovation", "art"],
+          "incompatible_avec": ["LOGO_ORBITAL_PARTICLES", "LOGO_STABLE_FORM"]
+        },
+        {
+          "id": "LOGO_LIQUID_EDGE",
+          "nom": "Bords Liquides",
+          "css_technique": "border-radius animé sur valeurs multiples asymétriques",
+          "description": "Les contours ondulent comme une surface liquide calme",
+          "intensite": {"min": 0.1, "max": 0.3, "defaut": 0.15},
+          "compatible_secteurs": ["beauté", "art", "créatif", "bien-être"],
+          "incompatible_avec": ["LOGO_SHARP_FORM", "LOGO_CRYSTAL_FRAGMENT"]
+        },
+        {
+          "id": "LOGO_NEURAL_MORPH",
+          "nom": "Morphose Neurale",
+          "css_technique": "SVG path d= animé entre états légèrement différents",
+          "description": "La forme évolue imperceptiblement entre micro-états",
+          "intensite": {"min": 0.05, "max": 0.2, "defaut": 0.1},
+          "compatible_secteurs": ["tech", "IA", "innovation", "science"],
+          "incompatible_avec": ["LOGO_STATIC_LOCK", "LOGO_LIQUID_EDGE"]
+        }
+      ]
+    }
+  }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ZONE 2 — NOM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le nom doit rester parfaitement lisible en permanence.
+Les effets servent la lisibilité — jamais contre elle.
+Maximum subtilité — maximum présence.
+
+{
+  "zone": "nom",
+  "description": "Identité typographique — lisibilité absolue",
+  "max_effets_simultanes": 2,
+  "regles": "Lisibilité > Impact. Jamais d'effet qui gêne la lecture.",
+  "categories": {
+
+    "lumiere": {
+      "choisir": 1,
+      "effets": [
+        {
+          "id": "NOM_SHIMMER_GOLD",
+          "nom": "Shimmer Doré",
+          "css_technique": "linearGradient animé traversant le texte horizontalement",
+          "description": "Reflet lumineux qui traverse le nom lentement",
+          "duree_cycle": "6s ease-in-out infinite",
+          "intensite": {"min": 0.2, "max": 0.6, "defaut": 0.4},
+          "compatible_secteurs": ["luxe", "prestige", "juridique", "finance"],
+          "incompatible_avec": ["NOM_NEON_GLOW"]
+        },
+        {
+          "id": "NOM_NEON_GLOW",
+          "nom": "Neon Respirant",
+          "css_technique": "text-shadow animé sur 3 valeurs de blur",
+          "description": "Lueur néon qui pulse doucement autour des lettres",
+          "duree_cycle": "4s ease-in-out infinite",
+          "intensite": {"min": 0.2, "max": 0.7, "defaut": 0.4},
+          "compatible_secteurs": ["tech", "gaming", "créatif", "digital"],
+          "incompatible_avec": ["NOM_SHIMMER_GOLD", "NOM_CLEAN_STATIC"]
+        },
+        {
+          "id": "NOM_HOLOGRAM_SCAN",
+          "nom": "Scan Holographique",
+          "css_technique": "linearGradient scan vertical + légère distorsion",
+          "description": "Ligne de scan holographique traversant le nom",
+          "duree_cycle": "8s linear infinite",
+          "intensite": {"min": 0.1, "max": 0.4, "defaut": 0.25},
+          "compatible_secteurs": ["tech", "IA", "futuriste", "digital"],
+          "incompatible_avec": ["NOM_SHIMMER_GOLD"]
+        },
+        {
+          "id": "NOM_CLEAN_BREATHE",
+          "nom": "Respiration Propre",
+          "css_technique": "opacity 1 à 0.85 à 1 très lent",
+          "description": "Le nom respire — présence constante légèrement vivante",
+          "duree_cycle": "10s ease-in-out infinite",
+          "intensite": {"min": 0.05, "max": 0.2, "defaut": 0.1},
+          "compatible_secteurs": ["minimaliste", "médical", "institutionnel"],
+          "incompatible_avec": []
+        }
+      ]
+    },
+
+    "mouvement": {
+      "choisir": "0 ou 1",
+      "effets": [
+        {
+          "id": "NOM_FLOAT_SUBTLE",
+          "nom": "Flottement Subtil",
+          "css_technique": "translateY(0) à translateY(-3px) très lent",
+          "description": "Le nom flotte imperceptiblement — apesanteur",
+          "duree_cycle": "8s ease-in-out infinite alternate",
+          "intensite": {"min": 0.1, "max": 0.3, "defaut": 0.15},
+          "compatible_secteurs": ["créatif", "luxe", "art"],
+          "incompatible_avec": ["NOM_TYPEWRITER"]
+        },
+        {
+          "id": "NOM_LETTER_WAVE",
+          "nom": "Vague de Lettres",
+          "css_technique": "chaque lettre translateY décalé en cascade",
+          "description": "Les lettres ondulent comme une vague très lente",
+          "duree_cycle": "6s ease-in-out infinite",
+          "intensite": {"min": 0.1, "max": 0.3, "defaut": 0.15},
+          "compatible_secteurs": ["créatif", "art", "mode", "beauté"],
+          "incompatible_avec": ["NOM_FLOAT_SUBTLE", "NOM_CLEAN_BREATHE"]
+        }
+      ]
+    }
+  }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ZONE 3 — TITRE / POSTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le titre est secondaire au nom — il doit être
+présent mais jamais dominant. Effets discrets.
+
+{
+  "zone": "titre",
+  "description": "Positionnement subtil — discret mais présent",
+  "max_effets_simultanes": 1,
+  "regles": "Un seul effet maximum. Toujours moins intense que le nom.",
+  "effets": [
+    {
+      "id": "TITRE_SLIDE_IN",
+      "nom": "Slide Élégant",
+      "css_technique": "translateX(-8px) à translateX(0) + opacity",
+      "description": "Le titre glisse depuis la gauche au chargement",
+      "duree": "une seule fois au démarrage — pas de loop",
+      "compatible_secteurs": ["tous"],
+      "incompatible_avec": []
+    },
+    {
+      "id": "TITRE_LETTER_SPACING_BREATHE",
+      "nom": "Espacement Respirant",
+      "css_technique": "letter-spacing 1.5px à 2.5px très lent",
+      "description": "Les lettres s'écartent et se rapprochent imperceptiblement",
+      "duree_cycle": "12s ease-in-out infinite",
+      "compatible_secteurs": ["luxe", "prestige", "mode"],
+      "incompatible_avec": ["TITRE_SLIDE_IN"]
+    },
+    {
+      "id": "TITRE_COLOR_SHIFT",
+      "nom": "Dérive Chromatique",
+      "css_technique": "color animé entre 2 teintes proches de la palette",
+      "description": "La couleur du titre dérive très lentement",
+      "duree_cycle": "16s ease-in-out infinite",
+      "compatible_secteurs": ["créatif", "art", "digital"],
+      "incompatible_avec": []
+    },
+    {
+      "id": "TITRE_FADE_PRESENCE",
+      "nom": "Présence Fantôme",
+      "css_technique": "opacity 0.6 à 0.9 à 0.6 très lent",
+      "description": "Le titre apparaît et disparaît comme une présence",
+      "duree_cycle": "14s ease-in-out infinite",
+      "compatible_secteurs": ["minimaliste", "institutionnel"],
+      "incompatible_avec": []
+    }
+  ]
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ZONE 4 — CONTACT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Les infos de contact doivent rester ultra-lisibles.
+Les effets servent uniquement à les rendre vivantes
+sans jamais compromettre leur fonction première.
+
+{
+  "zone": "contact",
+  "description": "Information vivante — lisibilité non négociable",
+  "max_effets_simultanes": 1,
+  "regles": "Jamais d'animation qui gêne la lecture d'une adresse email ou d'un numéro.",
+  "effets": [
+    {
+      "id": "CONTACT_CASCADE_APPEAR",
+      "nom": "Apparition en Cascade",
+      "css_technique": "animation-delay décalé par ligne — fade + translateY",
+      "description": "Chaque ligne contact apparaît avec un délai",
+      "duree": "une seule fois au démarrage",
+      "compatible_secteurs": ["tous"],
+      "incompatible_avec": []
+    },
+    {
+      "id": "CONTACT_SCAN_LINE",
+      "nom": "Ligne de Scan",
+      "css_technique": "pseudo-element linearGradient qui scan verticalement",
+      "description": "Un scan lumineux parcourt les infos contact",
+      "duree_cycle": "20s linear infinite — très rare",
+      "compatible_secteurs": ["tech", "digital", "futuriste"],
+      "incompatible_avec": ["CONTACT_CASCADE_APPEAR"]
+    },
+    {
+      "id": "CONTACT_ICON_PULSE",
+      "nom": "Pulse des Icônes",
+      "css_technique": "scale 1 à 1.15 à 1 sur les icônes uniquement",
+      "description": "Les icônes email/tel/web pulsent légèrement",
+      "duree_cycle": "4s ease-in-out infinite staggered",
+      "compatible_secteurs": ["tous"],
+      "incompatible_avec": []
+    },
+    {
+      "id": "CONTACT_HIGHLIGHT_HOVER",
+      "nom": "Surbrillance Active",
+      "css_technique": "background-color transition sur chaque ligne",
+      "description": "Chaque ligne s'illumine au passage — interactivité",
+      "note": "Effet CSS pur — fonctionne dans les webmails uniquement",
+      "compatible_secteurs": ["tous"],
+      "incompatible_avec": []
+    }
+  ]
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ZONE 5 — SÉPARATEUR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le séparateur est la colonne vertébrale de la signature.
+C'est lui qui structure l'espace et peut porter
+des effets d'énergie sans jamais distraire.
+
+{
+  "zone": "separateur",
+  "description": "Colonne vertébrale énergétique de la signature",
+  "max_effets_simultanes": 2,
+  "effets": [
+    {
+      "id": "SEP_ENERGY_FLOW",
+      "nom": "Flux d'Énergie",
+      "css_technique": "linearGradient animé de haut en bas en boucle",
+      "description": "Énergie qui coule du haut vers le bas en continu",
+      "duree_cycle": "3s linear infinite",
+      "compatible_secteurs": ["tous"],
+      "incompatible_avec": ["SEP_STATIC_GLOW"]
+    },
+    {
+      "id": "SEP_ELECTRIC_PULSE",
+      "nom": "Pulsation Électrique",
+      "css_technique": "opacity + width 2px à 4px à 2px + glow",
+      "description": "La ligne pulse comme un courant électrique contenu",
+      "duree_cycle": "2s ease-in-out infinite",
+      "compatible_secteurs": ["tech", "énergie", "finance", "digital"],
+      "incompatible_avec": ["SEP_BREATHING_CALM"]
+    },
+    {
+      "id": "SEP_BREATHING_CALM",
+      "nom": "Respiration Calme",
+      "css_technique": "opacity 0.4 à 1 à 0.4 + largeur 1px à 3px très lent",
+      "description": "Le séparateur respire — présence organique douce",
+      "duree_cycle": "8s ease-in-out infinite",
+      "compatible_secteurs": ["art", "bien-être", "créatif", "médical"],
+      "incompatible_avec": ["SEP_ELECTRIC_PULSE"]
+    },
+    {
+      "id": "SEP_PARTICLE_STREAM",
+      "nom": "Flux de Particules",
+      "css_technique": "micro-cercles SVG animés le long de la ligne",
+      "description": "Particules remontant ou descendant le long du séparateur",
+      "nombre": "3 à 6 particules en décalé",
+      "duree_cycle": "4s linear infinite staggered",
+      "compatible_secteurs": ["tech", "science", "innovation"],
+      "incompatible_avec": ["SEP_BREATHING_CALM"]
+    },
+    {
+      "id": "SEP_GOLD_SHINE",
+      "nom": "Éclat Doré",
+      "css_technique": "point brillant doré remontant la ligne en boucle",
+      "description": "Un éclat doré glisse lentement du bas vers le haut",
+      "duree_cycle": "6s ease-in-out infinite",
+      "compatible_secteurs": ["luxe", "prestige", "juridique"],
+      "incompatible_avec": ["SEP_PARTICLE_STREAM"]
+    }
+  ]
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ZONE 6 — FOND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le fond est l'univers dans lequel tout vit.
+Il ne doit jamais voler l'attention — il doit
+créer une atmosphère que le destinataire ressent
+sans forcément identifier.
+
+{
+  "zone": "fond",
+  "description": "Univers atmosphérique — ressenti sans être vu",
+  "max_effets_simultanes": 2,
+  "regles": "Intensité maximale 0.3 — jamais dominant.",
+  "effets": [
+    {
+      "id": "FOND_STELLAR_DRIFT",
+      "nom": "Dérive Stellaire",
+      "css_technique": "micro-points SVG en déplacement très lent",
+      "description": "Poussière d'étoiles dérivant imperceptiblement",
+      "nombre_points": "20 à 40 selon intensité",
+      "intensite_max": 0.25,
+      "duree_cycle": "30s linear infinite — très lent",
+      "compatible_secteurs": ["tous"],
+      "incompatible_avec": ["FOND_CLEAN_DARK"]
+    },
+    {
+      "id": "FOND_ATMOSPHERIC_BREATH",
+      "nom": "Respiration Atmosphérique",
+      "css_technique": "radialGradient central animé en scale très lent",
+      "description": "L'atmosphère du fond respire — vague de lumière centrale",
+      "intensite_max": 0.2,
+      "duree_cycle": "16s ease-in-out infinite",
+      "compatible_secteurs": ["tous"],
+      "incompatible_avec": []
+    },
+    {
+      "id": "FOND_PLASMA_FIELD",
+      "nom": "Champ Plasma",
+      "css_technique": "multiple radialGradients animés en positions variables",
+      "description": "Champ de plasma coloré en mouvement très lent",
+      "intensite_max": 0.15,
+      "duree_cycle": "24s ease-in-out infinite",
+      "compatible_secteurs": ["tech", "créatif", "art", "digital"],
+      "incompatible_avec": ["FOND_CLEAN_DARK", "FOND_MINIMAL_NOISE"]
+    },
+    {
+      "id": "FOND_NEURAL_GRID",
+      "nom": "Grille Neurale",
+      "css_technique": "SVG lines pattern animé en opacity très faible",
+      "description": "Réseau de connexions neurales imperceptible",
+      "intensite_max": 0.1,
+      "duree_cycle": "20s ease-in-out infinite",
+      "compatible_secteurs": ["tech", "IA", "science", "finance"],
+      "incompatible_avec": ["FOND_PLASMA_FIELD"]
+    },
+    {
+      "id": "FOND_MINIMAL_NOISE",
+      "nom": "Bruit Minimal",
+      "css_technique": "SVG feTurbulence très subtil animé",
+      "description": "Texture noise organique quasi-invisible",
+      "intensite_max": 0.08,
+      "duree_cycle": "continu",
+      "compatible_secteurs": ["minimaliste", "luxe", "mode", "design"],
+      "incompatible_avec": ["FOND_PLASMA_FIELD", "FOND_STELLAR_DRIFT"]
+    },
+    {
+      "id": "FOND_CLEAN_DARK",
+      "nom": "Obscurité Pure",
+      "css_technique": "fond statique — aucun effet",
+      "description": "Fond parfaitement immobile — toute l'attention sur le contenu",
+      "intensite_max": 0,
+      "compatible_secteurs": ["institutionnel", "médical", "juridique strict"],
+      "incompatible_avec": ["tous les autres effets de fond"]
+        }
+      ]
+    }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ZONE 7 — CTA / BOUTON
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le CTA doit inviter sans forcer.
+Il attire l'œil par son énergie propre —
+jamais par l'agression visuelle.
+
+{
+  "zone": "cta",
+  "description": "Invitation magnétique — attire sans forcer",
+  "max_effets_simultanes": 2,
+  "effets": [
+    {
+      "id": "CTA_GRAVITY_PULSE",
+      "nom": "Pulsation Gravitationnelle",
+      "css_technique": "scale 1 à 1.03 à 1 + box-shadow animé",
+      "description": "Le bouton pulse comme un aimant doux",
+      "duree_cycle": "3s ease-in-out infinite",
+      "compatible_secteurs": ["tous"],
+      "incompatible_avec": ["CTA_STATIC_PRESENCE"]
+    },
+    {
+      "id": "CTA_SHIMMER_SWEEP",
+      "nom": "Balayage Lumineux",
+      "css_technique": "pseudo-element gradient à 45° traversant le bouton",
+      "description": "Reflet lumineux balayant le bouton régulièrement",
+      "duree_cycle": "4s ease-in-out infinite",
+      "compatible_secteurs": ["luxe", "prestige", "créatif"],
+      "incompatible_avec": []
+    },
+    {
+      "id": "CTA_ELECTRIC_BORDER",
+      "nom": "Bordure Électrique",
+      "css_technique": "border gradient animé en rotation",
+      "description": "Bordure électrique tournant autour du bouton",
+      "duree_cycle": "3s linear infinite",
+      "compatible_secteurs": ["tech", "gaming", "digital", "innovation"],
+      "incompatible_avec": ["CTA_STATIC_PRESENCE"]
+    },
+    {
+      "id": "CTA_BREATH_INVITATION",
+      "nom": "Souffle d'Invitation",
+      "css_technique": "opacity background 0.7 à 1 à 0.7 très lent",
+      "description": "Le bouton s'illumine et s'assombrit — invite doucement",
+      "duree_cycle": "6s ease-in-out infinite",
+      "compatible_secteurs": ["minimaliste", "bien-être", "médical"],
+      "incompatible_avec": ["CTA_GRAVITY_PULSE"]
+    },
+    {
+      "id": "CTA_PARTICLE_ATTRACT",
+      "nom": "Attraction Particulaire",
+      "css_technique": "micro-particules convergeant vers le bouton",
+      "description": "Particules attirées vers le CTA depuis les bords",
+      "nombre": "4 à 8 particules",
+      "duree_cycle": "8s ease-in-out infinite",
+      "compatible_secteurs": ["tech", "créatif", "innovation"],
+      "incompatible_avec": ["CTA_STATIC_PRESENCE"]
+    },
+    {
+      "id": "CTA_STATIC_PRESENCE",
+      "nom": "Présence Statique",
+      "css_technique": "aucune animation — bouton immobile",
+      "description": "Bouton parfaitement immobile — autorité pure",
+      "compatible_secteurs": ["institutionnel", "juridique strict"],
+      "incompatible_avec": ["tous les autres effets CTA"]
+    }
+  ]
+}
+
+═══════════════════════════════════════════════════════
+PARTIE 2 — MODULE IA DE SÉLECTION PAR ZONE
+═══════════════════════════════════════════════════════
+
+Créer server/services/zone-effect-selector.ts
+
+Ce module reçoit le brief créatif du Cerveau 1
+et le scénario narratif du Cerveau 2, puis
+sélectionne les effets appropriés depuis
+zone-effects-library.json pour chaque variation.
+
+Il fournit à Gemini Flash (Cerveau 3) une liste
+pré-filtrée et validée d'effets compatibles
+pour chaque zone — Gemini ne choisit plus 
+dans 847 effets mais dans une liste courte
+et cohérente de 3 à 5 options par zone.
+
+function selectCandidatesForZone(
+  zone: string,
+  secteur: string,
+  tonEmotionnel: string,
+  intensiteMouvement: string,
+  variationContext: string
+): EffetCandidat[] {
+
+  1. Charger la zone depuis zone-effects-library.json
+
+  2. Filtrer par secteur compatible
+     Exclure les effets avec secteur incompatible
+
+  3. Filtrer par intensité mouvement :
+     'minimal' → intensite.defaut < 0.2 uniquement
+     'subtil'  → intensite.defaut < 0.4
+     'expressif' → tous
+     'dramatique' → intensite.max > 0.5 préféré
+
+  4. Filtrer par contexte de variation :
+     Variation A → effets stables et rassurants
+     Variation B → effets précis et dynamiques
+     Variation C → effets profonds et atmosphériques
+     Variation D → effets puissants et mémorables
+
+  5. Retourner max 4 candidats par zone
+     avec leur score de compatibilité
+
+  6. Valider les incompatibilités entre zones :
+     Si LOGO_ORBITAL_PARTICLES est sélectionné
+     → FOND_STELLAR_DRIFT intensité réduite de 50%
+     pour éviter la surcharge particulaire
+
+  7. Retourner le JSON final des candidats
+     pour soumission à Gemini Flash
+}
+
+═══════════════════════════════════════════════════════
+PARTIE 3 — PROMPT GEMINI FLASH AVEC LISTE FILTRÉE
+═══════════════════════════════════════════════════════
+
+Gemini Flash (Cerveau 3) reçoit maintenant
+une liste pré-filtrée par zone au lieu des 847 effets.
+
+Le prompt devient :
+
+"Tu es un ingénieur créatif expert.
+Tu dois sélectionner 1 effet par zone
+parmi les candidats pré-validés ci-dessous
+et définir les paramètres techniques exacts.
+
+CONTEXTE CLIENT :
+Secteur : [secteur]
+Ton : [ton]
+Intensité globale : [intensite]
+Variation : [A/B/C/D] — [titre narratif]
+Intention : [intention du Cerveau 2]
+
+CANDIDATS PAR ZONE :
+
+LOGO :
+- [effet_id_1] : [description courte] (score: 0.9)
+- [effet_id_2] : [description courte] (score: 0.7)
+- [effet_id_3] : [description courte] (score: 0.6)
+
+NOM :
+- [effet_id_1] : [description courte] (score: 0.85)
+- [effet_id_2] : [description courte] (score: 0.7)
+
+TITRE :
+- [effet_id_1] : [description courte] (score: 0.9)
+- [effet_id_2] : [description courte] (score: 0.6)
+
+CONTACT :
+- [effet_id_1] : [description courte] (score: 0.95)
+- [effet_id_2] : [description courte] (score: 0.5)
+
+SÉPARATEUR :
+- [effet_id_1] : [description courte] (score: 0.88)
+- [effet_id_2] : [description courte] (score: 0.72)
+- [effet_id_3] : [description courte] (score: 0.6)
+
+FOND :
+- [effet_id_1] : [description courte] (score: 0.9)
+- [effet_id_2] : [description courte] (score: 0.7)
+
+CTA :
+- [effet_id_1] : [description courte] (score: 0.85)
+- [effet_id_2] : [description courte] (score: 0.7)
+
+SÉLECTIONNE 1 effet par zone.
+DÉFINIS intensity (dans les limites autorisées).
+DÉFINIS speed: slow | medium | fast.
+DÉFINIS color: hex depuis la palette client.
+EXPLIQUE en 1 phrase pourquoi ce choix.
+
+Réponds UNIQUEMENT en JSON valide :
+{
+  'logo': {
+    'effet_id': 'string',
+    'intensity': 0.0,
+    'speed': 'string',
+    'color': '#hex',
+    'raison': 'string'
+  },
+  'nom': { ... },
+  'titre': { ... },
+  'contact': { ... },
+  'separateur': { ... },
+  'fond': { ... },
+  'cta': { ... }
+}"
+
+═══════════════════════════════════════════════════════
+PARTIE 4 — GÉNÉRATEUR SVG PAR ZONE
+═══════════════════════════════════════════════════════
+
+Créer server/services/zone-svg-renderer.ts
+
+Pour chaque effet sélectionné par Gemini,
+ce module génère le code SVG/CSS exact
+correspondant à l'effet, à l'intensité
+et aux couleurs définies.
+
+Chaque effet a sa fonction de génération :
+
+function renderEffect(
+  effectId: string,
+  zone: ZoneConfig,
+  params: EffectParams,
+  variationIndex: 'A' | 'B' | 'C' | 'D',
+  delayOffset: number
+): SVGEffectCode {
+
+  switch(effectId) {
+
+    case 'LOGO_3D_FLOAT':
+      return generateLogo3DFloat(zone, params, delayOffset)
+
+    case 'LOGO_HALO_PULSE':
+      return generateLogoHaloPulse(zone, params, delayOffset)
+
+    case 'NOM_SHIMMER_GOLD':
+      return generateNomShimmerGold(zone, params, delayOffset)
+
+    case 'SEP_ENERGY_FLOW':
+      return generateSepEnergyFlow(zone, params, delayOffset)
+
+    case 'FOND_STELLAR_DRIFT':
+      return generateFondStellarDrift(zone, params, delayOffset)
+
+    case 'CTA_GRAVITY_PULSE':
+      return generateCtaGravityPulse(zone, params, delayOffset)
+
+    // ... un cas pour chaque effet de la bibliothèque
+  }
+}
+
+Chaque fonction génère :
+- Les keyframes CSS spécifiques à la variation
+- Les éléments SVG nécessaires (cercles, rects, paths)
+- Les delays calculés pour la variation (A=0s B=62s C=122s D=182s)
+- Les durées respectant le cycle total de 240s
+
+═══════════════════════════════════════════════════════
+PARTIE 5 — VALIDATION FINALE ANTI-CHAOS
+═══════════════════════════════════════════════════════
+
+Créer server/services/harmony-validator.ts
+
+Avant de générer le SVG final, ce module
+vérifie que la combinaison d'effets sélectionnés
+respecte les règles d'harmonie globale.
+
+Règles de validation :
+
+RÈGLE 1 — Densité visuelle
+Compter le nombre total d'éléments animés.
+Si > 12 éléments simultanés → réduire
+les effets de fond en intensité de 40%.
+
+RÈGLE 2 — Hiérarchie visuelle
+L'intensité doit toujours respecter :
+Logo > Nom > CTA > Séparateur > Fond > Titre > Contact
+Si une zone inférieure a une intensité supérieure
+→ la recalibrer automatiquement.
+
+RÈGLE 3 — Cohérence de vitesse
+Si le logo est en mode 'slow' →
+le fond doit être 'slow' aussi.
+Les vitesses disparates créent du chaos.
+Harmoniser toutes les vitesses autour
+de la vitesse du logo.
+
+RÈGLE 4 — Compatibilité palette
+Toutes les couleurs des effets doivent
+appartenir à la palette client ou en être
+des dérivés (version plus claire / plus sombre).
+Rejeter toute couleur hors palette.
+
+RÈGLE 5 — Test lisibilité
+Simuler le contraste entre les effets animés
+et le texte du nom et du titre.
+Si contraste < 4.5:1 → réduire l'intensité
+du fond et du séparateur jusqu'à conformité.
+
+Si toutes les règles passent → 
+retourner { valid: true, config: finalConfig }
+
+Si une règle échoue →
+corriger automatiquement et retourner
+{ valid: true, corrections: [...], config: fixedConfig }
+
+═══════════════════════════════════════════════════════
+PARTIE 6 — CANVAS LIVE MISE À JOUR
+═══════════════════════════════════════════════════════
+
+Mettre à jour le canvas live dans le Studio
+pour afficher la construction zone par zone :
+
+Phase 1 — Fond s'installe (2s)
+"FOND_STELLAR_DRIFT activé — intensité 0.15"
+
+Phase 2 — Séparateur s'allume (1s)
+"SEP_ENERGY_FLOW activé — speed: slow"
+
+Phase 3 — Logo apparaît et prend vie (3s)
+"LOGO_3D_FLOAT + LOGO_HALO_PULSE activés"
+Le logo effectue sa première rotation 3D
+devant les yeux de l'utilisateur en temps réel
+
+Phase 4 — Nom shimmer (1s)
+"NOM_SHIMMER_GOLD activé — intensité 0.4"
+
+Phase 5 — Titre slide in (0.5s)
+"TITRE_SLIDE_IN activé"
+
+Phase 6 — Contact cascade (1.5s)
+"CONTACT_CASCADE_APPEAR activé"
+
+Phase 7 — CTA pulse (1s)
+"CTA_GRAVITY_PULSE activé"
+
+Phase 8 — Validation harmonie
+"Harmony Validator — vérification..."
+Chaque règle s'affiche avec ✓ ou correction
+
+Phase 9 — Preview variation A complète
+La signature tourne en boucle en variation A
+pendant 8 secondes
+
+Phase 10 — Transition vers variation B
+Le fondu entre A et B visible en temps réel
+
+Phase 11 — Cycle complet visible
+Toutes les variations défilent une fois
+avant de revenir au preview final
+
+═══════════════════════════════════════════════════════
+ORDRE D'EXÉCUTION
+═══════════════════════════════════════════════════════
+
+1. Créer zone-effects-library.json
+   avec les 7 zones et tous leurs effets
+
+2. Créer zone-effect-selector.ts
+   avec la logique de filtrage par zone
+
+3. Mettre à jour triple-ai-director.ts
+   pour intégrer le sélecteur avant Gemini
+
+4. Créer zone-svg-renderer.ts
+   avec une fonction par effet
+
+5. Créer harmony-validator.ts
+   avec les 5 règles de validation
+
+6. Mettre à jour le canvas live Studio
+   avec les 11 phases de construction
+
+7. Tester avec 3 secteurs différents :
+   - Cabinet d'avocats (juridique strict)
+   - Studio créatif (expressif)
+   - Startup tech (subtil dynamique)
+   Vérifier que les effets sélectionnés
+   sont cohérents et distincts pour chacun.

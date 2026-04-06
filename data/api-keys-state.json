@@ -1,5 +1,141 @@
 {
-  "lastSaved": "2026-04-06T09:59:41.418Z",
-  "keys": {},
+  "lastSaved": "2026-04-06T10:26:39.060Z",
+  "keys": {
+    "gemini_1": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "gemini_2": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "gemini_3": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "gemini_4": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "gemini_5": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "cerebras_1": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "cerebras_2": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "cerebras_3": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "cerebras_4": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "cerebras_5": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "serper_1": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "serper_2": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "serper_3": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "serper_4": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    },
+    "serper_5": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0
+    }
+  },
   "monthlyUsage": {}
 }

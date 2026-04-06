@@ -1,4 +1,6 @@
 import type { StyleData } from './signature-base-generator';
+import { renderZoneComposition, assembleSVGEffects } from '../services/zone-svg-renderer';
+import type { ZoneComposition } from '../services/harmony-validator';
 
 export interface VariationEffect {
   id: string;
@@ -18,19 +20,96 @@ const INTENSITY_MAP = {
   high:   { particleCount: 20, speed: 'fast',    opacity: 0.65, blur: 3 },
 };
 
+const VARIATION_LABELS: Record<string, string> = {
+  A: 'Stable et Rassurant',
+  B: 'Précis et Dynamique',
+  C: 'Profond et Atmosphérique',
+  D: 'Puissant et Mémorable',
+};
+
 export class SignatureVariationsGenerator {
-  generate(style: StyleData, palette: string[]): VariationsResult {
+  generate(
+    style: StyleData,
+    palette: string[],
+    zoneCompositions?: { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition }
+  ): VariationsResult {
     const [c0, c1, c2] = palette;
     const cfg = INTENSITY_MAP[style.intensite] || INTENSITY_MAP.medium;
+
+    if (zoneCompositions) {
+      return this.buildZoneVariations(palette, zoneCompositions);
+    }
 
     const varA = this.buildVariationA(c0, c1, c2, cfg, style);
     const varB = this.buildVariationB(c0, c1, c2, cfg, style);
     const varC = this.buildVariationC(c0, c1, c2, cfg, style);
     const varD = this.buildVariationD(c0, c1, c2, cfg, style);
-
     const globalDefs = this.buildGlobalDefs(c0, c1, c2, cfg);
 
     return { variations: [varA, varB, varC, varD], globalDefs };
+  }
+
+  private buildZoneVariations(
+    palette: string[],
+    zoneCompositions: { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition }
+  ): VariationsResult {
+    const [c0, c1, c2] = palette;
+    const variations = (['A', 'B', 'C', 'D'] as const).map((varKey, idx) => {
+      const composition = zoneCompositions[varKey];
+      const delayOffset = idx === 0 ? 0 : 0;
+      const zoneResult  = renderZoneComposition(composition, varKey, delayOffset, palette);
+      const assembled   = assembleSVGEffects(zoneResult);
+
+      const varId = `var-${varKey.toLowerCase()}`;
+
+      return {
+        id:            varId,
+        label:         VARIATION_LABELS[varKey] || varKey,
+        cssAnimations: assembled.allKeyframes
+          ? `/* === VARIATION ${varKey}: ${VARIATION_LABELS[varKey]} — Zone System === */\n${assembled.allKeyframes}`
+          : `/* === VARIATION ${varKey}: ${VARIATION_LABELS[varKey]} === */`,
+        svgElements: `<g id="${varId}">${assembled.allElements}</g>`,
+        filterDefsExtra: assembled.allFilterDefs,
+      };
+    }) as any[];
+
+    const globalDefs = this.buildGlobalDefsZone(palette, variations);
+
+    return {
+      variations: variations as [VariationEffect, VariationEffect, VariationEffect, VariationEffect],
+      globalDefs,
+    };
+  }
+
+  private buildGlobalDefsZone(palette: string[], variations: any[]): string {
+    const [c0, c1, c2] = palette;
+    const extraDefs = variations.map((v: any) => v.filterDefsExtra || '').filter(Boolean).join('\n');
+
+    return `<!-- Gradients de base pour toutes les variations -->
+    <linearGradient id="grad-bg-a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${c0}"/>
+      <stop offset="100%" stop-color="${c1}" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="grad-bg-b" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${c1}" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="${c2}" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="grad-shimmer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="${c1}" stop-opacity="0"/>
+      <stop offset="50%" stop-color="${c1}" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="${c1}" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="grad-halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="${c1}" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="${c1}" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="grad-sep-flow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${c1}" stop-opacity="0"/>
+      <stop offset="40%" stop-color="${c1}" stop-opacity="1"/>
+      <stop offset="60%" stop-color="${c2}" stop-opacity="1"/>
+      <stop offset="100%" stop-color="${c2}" stop-opacity="0"/>
+    </linearGradient>
+    ${extraDefs}`;
   }
 
   private buildGlobalDefs(c0: string, c1: string, c2: string, cfg: any): string {
@@ -294,7 +373,6 @@ export class SignatureVariationsGenerator {
       const x = Math.round(rng(i * 3.1) * maxW);
       const y = Math.round(rng(i * 7.3) * maxH);
       const r = Math.round(1 + rng(i * 5.7) * 4);
-      const delay = (rng(i * 2.9) * 3).toFixed(2);
       if (asCircles) {
         items.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" fill-opacity="0.6" style="--i:${i}" />`);
       } else {

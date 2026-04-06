@@ -1021,14 +1021,14 @@ router.post('/expansion/expand', async (req, res) => {
 // =============================================
 router.post('/signature/generate', async (req, res) => {
   try {
-    const { signature, style } = req.body;
+    const { signature, style, zone_compositions } = req.body;
 
     if (!signature || !style) {
       return res.status(400).json({ error: 'Champs "signature" et "style" requis.' });
     }
 
     const baseResult = signatureBaseGenerator.generate(signature, style);
-    const variationsResult = signatureVariationsGenerator.generate(style, baseResult.palette);
+    const variationsResult = signatureVariationsGenerator.generate(style, baseResult.palette, zone_compositions || undefined);
     const exportResult = signatureSVGExporter.export(signature.nom || 'signature', baseResult, variationsResult);
 
     return res.json({

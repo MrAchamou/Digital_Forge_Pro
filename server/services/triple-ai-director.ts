@@ -2,6 +2,14 @@ import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { log } from '../vite';
 import { callGemini } from './gemini-wrapper';
+import {
+  selectCandidatesForAllZones,
+  buildGeminiPromptZones,
+  type VariationContext,
+  type IntensiteMouvement,
+  type ZoneSelection,
+} from './zone-effect-selector';
+import { validateHarmony, type ZoneComposition } from './harmony-validator';
 
 const EFFECTS_LIBRARY = [
   'HEARTBEAT', 'SOUL_AURA', 'PLASMA_DRIFT', 'NEON_PULSE', 'GOLDEN_SHIMMER',
@@ -65,6 +73,12 @@ export interface TechnicalConfig {
   cycle_total: number;
   optimisations_email: string[];
   notes_techniques: string;
+  zone_compositions?: {
+    A: ZoneComposition;
+    B: ZoneComposition;
+    C: ZoneComposition;
+    D: ZoneComposition;
+  };
 }
 
 interface VariationConfig {
@@ -349,76 +363,97 @@ Réponds UNIQUEMENT en JSON valide :
   }
 }
 
-async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief, palette: string[]): Promise<TechnicalConfig> {
-  const bgColor = palette?.[0] || '#0f0f0f';
-  const primaryColor = palette?.[1] || '#6366f1';
-  const accentColor = palette?.[2] || '#e8e8ff';
+async function runZoneSelectionForVariation(
+  variation: VariationContext,
+  scenario: NarrativeScenario,
+  brief: CreativeBrief,
+  secteur: string,
+  palette: string[]
+): Promise<ZoneComposition> {
+  const intensite = brief.intensite_mouvement as IntensiteMouvement;
+  const selection = selectCandidatesForAllZones(secteur, intensite, variation);
+  const varData   = scenario.variations[variation];
+  const intention = varData?.intention || `Variation ${variation}`;
+  const ton       = brief.ton_emotionnel;
 
-  const prompt = `Tu es l'Ingénieur Créatif Senior et expert en animation SVG/CSS pour email. Tu maîtrises parfaitement les contraintes techniques des clients email (Gmail, Outlook, Apple Mail, Yahoo) et tu sais transformer des intentions narratives en configurations d'effets mathématiquement parfaites.
+  const primaryColor = palette[1] || '#6366f1';
 
-Tu reçois le scénario narratif du Directeur Narratif et le brief du Directeur Artistique. Ton rôle : traduire chaque intention créative en valeurs techniques précises et optimisées.
+  const prompt = buildGeminiPromptZones(
+    secteur,
+    ton,
+    intensite,
+    variation,
+    intention,
+    selection
+  );
 
-**Contraintes techniques absolues (non négociables) :**
-- Zéro JavaScript dans le SVG final
-- CSS animations et SVG SMIL uniquement
-- Largeur maximum 600px
-- Compatibilité Gmail + Outlook 2019+ garantie
-- Cycle total entre 200s et 280s (optimal 240-260s pour engagement maximal)
-- Intensités calibrées pour ne jamais fatiguer l'œil sur un écran email
-- Performance : aucun effet ne doit dépasser 60fps équivalent en CSS
-
-**Principes de calibration :**
-- Fond : intensity 0.2-0.5 (doit rester discret, support du contenu)
-- Logo : intensity 0.4-0.8 (point focal principal, peut être expressif)
-- Texte : intensity 0.1-0.4 (lisibilité primordiale, mouvement subtil)
-- Séparateur : intensity 0.3-0.7 (lien visuel, rythme de lecture)
-
-**Palette à utiliser :**
-- Fond/Background: ${bgColor}
-- Primaire/Accent: ${primaryColor}
-- Secondaire/Texte: ${accentColor}
-
-Pour chaque variation, définis des paramètres SPÉCIFIQUES à l'effet nommé (par ex: pour HEARTBEAT → {bpm: 72, amplitude: 0.08}, pour NEON_PULSE → {frequency: 0.5, glow_radius: 8}).
-
-Réponds UNIQUEMENT en JSON valide :
-{
-  "variation_a": {
-    "fond": { "effet": "NOM_EXACT", "intensity": 0.0-1.0, "speed": "slow|medium|fast", "color": "#hex", "params": { "parametres_specifiques": "valeurs" } },
-    "logo": { ... },
-    "texte": { ... },
-    "separateur": { ... },
-    "duree": 55-65
-  },
-  "variation_b": { ... },
-  "variation_c": { ... },
-  "variation_d": { ... },
-  "transitions": {
-    "duree": 1.5-3.0,
-    "easing": "cubic-bezier(x,x,x,x)",
-    "type": "cross-fade|slide|dissolve"
-  },
-  "cycle_total": 200-280,
-  "optimisations_email": ["optimisation1 spécifique", "optimisation2", "optimisation3"],
-  "notes_techniques": "tes remarques techniques importantes en 1-2 phrases"
-}
-
-Scénario narratif à traduire :
-${JSON.stringify(scenario, null, 2)}
-
-Brief créatif de référence :
-Intensité mouvement souhaitée: ${brief.intensite_mouvement}
-Univers visuel: ${brief.univers_visuel}
-Contraintes: ${JSON.stringify(brief.contraintes)}`;
+  const fallbackComposition = (): ZoneComposition => {
+    const pick = (zone: any[]) => zone[0];
+    const makeDecision = (z: any[]): import('./harmony-validator').ZoneEffectDecision => ({
+      effet_id:  pick(z)?.id || 'LOGO_VOLUME_BREATHE',
+      intensity: pick(z)?.intensite_recommandee || 0.3,
+      speed:     'medium',
+      color:     primaryColor,
+      raison:    'fallback automatique',
+    });
+    return {
+      logo:       makeDecision(selection.logo),
+      nom:        makeDecision(selection.nom),
+      titre:      makeDecision(selection.titre),
+      contact:    makeDecision(selection.contact),
+      separateur: makeDecision(selection.separateur),
+      fond:       makeDecision(selection.fond),
+      cta:        makeDecision(selection.cta),
+    };
+  };
 
   try {
-    const text = await callGemini(prompt, { temperature: 0.4, maxTokens: 2500 });
-    const config = parseJsonSafely<TechnicalConfig>(text);
-    log(`Cerveau 3 (Gemini) — Cycle: ${config.cycle_total}s | Optimisations: ${config.optimisations_email?.length || 0}`, 'triple-ai');
-    return config;
+    const text = await callGemini(prompt, { temperature: 0.3, maxTokens: 1200 });
+    const raw  = parseJsonSafely<ZoneComposition>(text);
+
+    const zones: Array<keyof ZoneComposition> = ['logo', 'nom', 'titre', 'contact', 'separateur', 'fond', 'cta'];
+    for (const z of zones) {
+      if (!raw[z]) {
+        const fb = fallbackComposition();
+        raw[z]   = fb[z];
+      }
+      if (!raw[z].color || raw[z].color === '#000000') {
+        raw[z].color = primaryColor;
+      }
+    }
+
+    const validated = validateHarmony(raw, palette);
+    if (validated.corrections.length > 0) {
+      log(`Cerveau 3 zones ${variation} — ${validated.corrections.length} corrections: ${validated.corrections[0]}`, 'triple-ai');
+    }
+    return validated.config;
   } catch (err: any) {
-    log(`Cerveau 3 erreur: ${err.message}`, 'triple-ai');
-    return buildFallbackTechnical(scenario, palette);
+    log(`Cerveau 3 zone ${variation} erreur: ${err.message} — fallback`, 'triple-ai');
+    const fb = fallbackComposition();
+    return validateHarmony(fb, palette).config;
   }
+}
+
+async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief, palette: string[], secteur: string): Promise<TechnicalConfig> {
+  log('Cerveau 3 — Sélection zones par variation (4 appels parallèles)...', 'triple-ai');
+
+  const [compA, compB, compC, compD] = await Promise.all([
+    runZoneSelectionForVariation('A', scenario, brief, secteur, palette),
+    runZoneSelectionForVariation('B', scenario, brief, secteur, palette),
+    runZoneSelectionForVariation('C', scenario, brief, secteur, palette),
+    runZoneSelectionForVariation('D', scenario, brief, secteur, palette),
+  ]);
+
+  log(`Cerveau 3 (Gemini Zone) — Compositions: A(${compA.logo.effet_id}) B(${compB.logo.effet_id}) C(${compC.logo.effet_id}) D(${compD.logo.effet_id})`, 'triple-ai');
+
+  const baseConfig = buildFallbackTechnical(scenario, palette);
+
+  return {
+    ...baseConfig,
+    optimisations_email: ['CSS animations uniquement — zéro JS', 'Chirurgie visuelle par zones actives', 'Harmony validator — 5 règles appliquées'],
+    notes_techniques: `Système zone-effects actif : ${compA.logo.effet_id} | ${compB.nom.effet_id} | ${compC.separateur.effet_id}`,
+    zone_compositions: { A: compA, B: compB, C: compC, D: compD },
+  };
 }
 
 export async function runTripleAIPipeline(
@@ -444,8 +479,8 @@ export async function runTripleAIPipeline(
   log(`✓ Cerveau 2 — Arc: ${scenario.arc_emotionnel?.slice(0, 50)}`, 'triple-ai');
   onProgress?.(2, { status: 'done', data: scenario });
 
-  onProgress?.(3, { status: 'running', label: 'Cerveau 3 — Gemini Pro : Optimisation technique' });
-  const config = await runBrain3Gemini(scenario, brief, metadata?.palette || []);
+  onProgress?.(3, { status: 'running', label: 'Cerveau 3 — Gemini Flash : Chirurgie visuelle par zones' });
+  const config = await runBrain3Gemini(scenario, brief, metadata?.palette || [], metadata?.secteur || '');
   log(`✓ Cerveau 3 — Cycle ${config.cycle_total}s | ${config.optimisations_email?.length || 0} optimisations`, 'triple-ai');
   onProgress?.(3, { status: 'done', data: config });
 
