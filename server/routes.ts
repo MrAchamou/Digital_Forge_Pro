@@ -1392,6 +1392,68 @@ router.get('/analytics/stats', async (_req, res) => {
   }
 });
 
+// GET /api/analytics/export/csv — Export CSV des événements de génération
+router.get('/analytics/export/csv', async (req, res) => {
+  try {
+    const { exportCSVFromDB } = await import('./modules/analytics.module');
+    const days = parseInt(String(req.query.days ?? '30'), 10);
+    const csv  = await exportCSVFromDB(days);
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="analytics_${days}j.csv"`);
+    return res.send(csv);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/analytics/export/json — Export JSON des événements
+router.get('/analytics/export/json', async (req, res) => {
+  try {
+    const { exportJSONFromDB } = await import('./modules/analytics.module');
+    const days = parseInt(String(req.query.days ?? '30'), 10);
+    const json = await exportJSONFromDB(days);
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="analytics_${days}j.json"`);
+    return res.send(json);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/analytics/alerts — Alertes récentes
+router.get('/analytics/alerts', async (req, res) => {
+  try {
+    const { getRecentAlerts } = await import('./modules/analytics.module');
+    const limit = parseInt(String(req.query.limit ?? '20'), 10);
+    return res.json(getRecentAlerts(limit));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/analytics/thresholds — Configurer les seuils d'alerte
+router.patch('/analytics/thresholds', async (req, res) => {
+  try {
+    const { setAlertThresholds, getAlertThresholds } = await import('./modules/analytics.module');
+    setAlertThresholds(req.body);
+    return res.json({ success: true, thresholds: getAlertThresholds() });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/analytics/segmentation — Segmentation par variation et profil
+router.get('/analytics/segmentation', async (req, res) => {
+  try {
+    const { fetchEventsFromDB, getSegmentation } = await import('./modules/analytics.module');
+    const days   = parseInt(String(req.query.days ?? '30'), 10);
+    const events = await fetchEventsFromDB(days);
+    return res.json(getSegmentation(events));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PREFERENCES ENGINE — P5, Module 16
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1451,6 +1513,29 @@ router.get('/preferences/weights', async (req, res) => {
   }
 });
 
+// GET /api/preferences/recommendations — Recommandations proactives
+router.get('/preferences/recommendations', async (req, res) => {
+  try {
+    const { getProactiveRecommendations } = await import('./modules/user-preferences-engine.module');
+    const userId = String(req.query.user_id ?? 'default');
+    return res.json(getProactiveRecommendations(userId));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/signatures/history — Historique des fingerprints visuels
+router.get('/signatures/history', async (req, res) => {
+  try {
+    const { getFingerprintHistory } = await import('./modules/visual-signature-engine.module');
+    const secteur = req.query.secteur ? String(req.query.secteur) : undefined;
+    const limit   = parseInt(String(req.query.limit ?? '50'), 10);
+    return res.json(await getFingerprintHistory(secteur, limit));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PRESET MANAGER — P5, Module 17
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1459,7 +1544,7 @@ router.get('/preferences/weights', async (req, res) => {
 router.get('/presets', async (_req, res) => {
   try {
     const { getAllPresets } = await import('./modules/preset-manager.module');
-    return res.json(getAllPresets());
+    return res.json(await getAllPresets());
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
@@ -1469,11 +1554,11 @@ router.get('/presets', async (_req, res) => {
 router.post('/presets', async (req, res) => {
   try {
     const { createPreset } = await import('./modules/preset-manager.module');
-    const { name, description, secteur, configuration, tags } = req.body;
+    const { name, description, secteur, configuration, tags, is_public, created_by } = req.body;
     if (!name || !secteur || !configuration) {
       return res.status(400).json({ error: 'name, secteur et configuration requis' });
     }
-    const preset = createPreset({ name, description, secteur, configuration, tags });
+    const preset = await createPreset({ name, description, secteur, configuration, tags, is_public, created_by });
     return res.status(201).json(preset);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
@@ -1484,8 +1569,17 @@ router.post('/presets', async (req, res) => {
 router.get('/presets/smart/:secteur', async (req, res) => {
   try {
     const { getSmartPresets } = await import('./modules/preset-manager.module');
-    const secteur = req.params.secteur;
-    return res.json(getSmartPresets(secteur));
+    return res.json(await getSmartPresets(req.params.secteur));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/presets/public — Presets publics partagés
+router.get('/presets/public', async (_req, res) => {
+  try {
+    const { getPublicPresets } = await import('./modules/preset-manager.module');
+    return res.json(await getPublicPresets());
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
@@ -1495,7 +1589,41 @@ router.get('/presets/smart/:secteur', async (req, res) => {
 router.get('/presets/sector/:secteur', async (req, res) => {
   try {
     const { getPresetsBySector } = await import('./modules/preset-manager.module');
-    return res.json(getPresetsBySector(req.params.secteur));
+    return res.json(await getPresetsBySector(req.params.secteur));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/presets/:id/versions — Historique des versions
+router.get('/presets/:id/versions', async (req, res) => {
+  try {
+    const { getPresetVersionHistory } = await import('./modules/preset-manager.module');
+    return res.json(await getPresetVersionHistory(req.params.id));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/presets/:id — Mettre à jour un preset (avec versioning)
+router.patch('/presets/:id', async (req, res) => {
+  try {
+    const { updatePreset } = await import('./modules/preset-manager.module');
+    const updated = await updatePreset(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ error: 'Preset introuvable ou preset smart non-modifiable' });
+    return res.json(updated);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/presets/:id/rollback/:versionId — Rollback vers une version précédente
+router.post('/presets/:id/rollback/:versionId', async (req, res) => {
+  try {
+    const { rollbackPreset } = await import('./modules/preset-manager.module');
+    const rolled = await rollbackPreset(req.params.id, req.params.versionId);
+    if (!rolled) return res.status(404).json({ error: 'Version introuvable' });
+    return res.json(rolled);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
@@ -1505,7 +1633,7 @@ router.get('/presets/sector/:secteur', async (req, res) => {
 router.get('/presets/:id', async (req, res) => {
   try {
     const { getPresetById } = await import('./modules/preset-manager.module');
-    const preset = getPresetById(req.params.id);
+    const preset = await getPresetById(req.params.id);
     if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
     return res.json(preset);
   } catch (err: any) {
@@ -1517,7 +1645,7 @@ router.get('/presets/:id', async (req, res) => {
 router.post('/presets/:id/use', async (req, res) => {
   try {
     const { usePreset } = await import('./modules/preset-manager.module');
-    const preset = usePreset(req.params.id);
+    const preset = await usePreset(req.params.id);
     if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
     return res.json(preset);
   } catch (err: any) {
@@ -1529,7 +1657,7 @@ router.post('/presets/:id/use', async (req, res) => {
 router.delete('/presets/:id', async (req, res) => {
   try {
     const { deletePreset } = await import('./modules/preset-manager.module');
-    const deleted = deletePreset(req.params.id);
+    const deleted = await deletePreset(req.params.id);
     if (!deleted) return res.status(404).json({ error: 'Preset introuvable ou preset smart non-supprimable' });
     return res.json({ success: true });
   } catch (err: any) {

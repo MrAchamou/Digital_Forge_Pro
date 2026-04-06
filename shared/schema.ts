@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, real, jsonb, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, real, jsonb, timestamp, boolean, bigint } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -71,6 +71,70 @@ export const systemMetrics = pgTable("system_metrics", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
+// ─── Analytics Events ─────────────────────────────────────────────────────────
+export const analyticsEvents = pgTable("analytics_events", {
+  id:                  varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  secteur:             text("secteur").notNull(),
+  entreprise:          text("entreprise").notNull(),
+  duration_ms:         integer("duration_ms").notNull(),
+  variations:          jsonb("variations").notNull(),
+  pipeline_scores:     jsonb("pipeline_scores").notNull(),
+  rendering_profiles:  jsonb("rendering_profiles").notNull(),
+  optimisations_count: integer("optimisations_count").notNull().default(0),
+  status:              text("status").notNull().default('success'),
+  config_hash:         text("config_hash"),
+  createdAt:           timestamp("created_at").defaultNow(),
+});
+
+// ─── Visual Fingerprints ───────────────────────────────────────────────────────
+export const visualFingerprints = pgTable("visual_fingerprints", {
+  id:              varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fingerprint_id:  text("fingerprint_id").notNull().unique(),
+  seed:            bigint("seed", { mode: "number" }).notNull(),
+  entropy:         real("entropy").notNull(),
+  style_token:     text("style_token").notNull(),
+  micro_variations: jsonb("micro_variations").notNull(),
+  phase_offsets:   jsonb("phase_offsets").notNull(),
+  secteur:         text("secteur").notNull().default('default'),
+  variation:       text("variation").notNull().default('A'),
+  createdAt:       timestamp("created_at").defaultNow(),
+});
+
+// ─── User Preferences ─────────────────────────────────────────────────────────
+export const userPreferences = pgTable("user_preferences", {
+  id:                  varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  user_id:             text("user_id").notNull().unique(),
+  favorite_effects:    jsonb("favorite_effects").notNull().default(sql`'{}'::jsonb`),
+  rejected_effects:    text("rejected_effects").array().notNull().default(sql`'{}'`),
+  preferred_style:     text("preferred_style"),
+  preferred_intensity: real("preferred_intensity"),
+  sector_history:      text("sector_history").array().notNull().default(sql`'{}'`),
+  variation_choices:   jsonb("variation_choices").notNull().default(sql`'{}'::jsonb`),
+  session_count:       integer("session_count").notNull().default(0),
+  cluster_label:       text("cluster_label"),
+  last_active:         timestamp("last_active").defaultNow(),
+  createdAt:           timestamp("created_at").defaultNow(),
+});
+
+// ─── Presets ──────────────────────────────────────────────────────────────────
+export const presets = pgTable("presets", {
+  id:            varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name:          text("name").notNull(),
+  description:   text("description").notNull().default(''),
+  secteur:       text("secteur").notNull(),
+  tags:          text("tags").array().notNull().default(sql`'{}'`),
+  is_smart:      boolean("is_smart").notNull().default(false),
+  is_public:     boolean("is_public").notNull().default(false),
+  configuration: jsonb("configuration").notNull(),
+  thumbnail_svg: text("thumbnail_svg"),
+  usage_count:   integer("usage_count").notNull().default(0),
+  version:       integer("version").notNull().default(1),
+  parent_id:     varchar("parent_id"),
+  created_by:    text("created_by").notNull().default('system'),
+  last_used:     timestamp("last_used"),
+  createdAt:     timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -109,6 +173,30 @@ export const insertSystemMetricsSchema = createInsertSchema(systemMetrics).omit(
   timestamp: true,
 });
 
+export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertVisualFingerprintSchema = createInsertSchema(visualFingerprints).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
+  id: true,
+  createdAt: true,
+  last_active: true,
+});
+
+export const insertPresetSchema = createInsertSchema(presets).omit({
+  id: true,
+  createdAt: true,
+  last_used: true,
+  usage_count: true,
+  version: true,
+});
+
 // Unified types from schema inference
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -124,6 +212,18 @@ export type InsertUpload = z.infer<typeof insertUploadSchema>;
 
 export type SystemMetrics = typeof systemMetrics.$inferSelect;
 export type InsertSystemMetrics = z.infer<typeof insertSystemMetricsSchema>;
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export type InsertAnalyticsEvent = z.infer<typeof insertAnalyticsEventSchema>;
+
+export type VisualFingerprint = typeof visualFingerprints.$inferSelect;
+export type InsertVisualFingerprint = z.infer<typeof insertVisualFingerprintSchema>;
+
+export type UserPreference = typeof userPreferences.$inferSelect;
+export type InsertUserPreference = z.infer<typeof insertUserPreferencesSchema>;
+
+export type Preset = typeof presets.$inferSelect;
+export type InsertPreset = z.infer<typeof insertPresetSchema>;
 
 // API Response types
 export interface EffectGenerationResponse {

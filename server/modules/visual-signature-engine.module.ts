@@ -1,44 +1,49 @@
 /**
- * 🔏 VISUAL SIGNATURE ENGINE — Module 15, Priorité 5
+ * 🔏 VISUAL SIGNATURE ENGINE — Module 15, v2.0 (PostgreSQL persistant)
  *
  * Génère une "empreinte visuelle" unique pour chaque rendu.
  * Garantit qu'aucune signature produite ne ressemble à une autre,
  * même avec les mêmes paramètres d'entrée.
  *
- * Méthode :
- *   1. Calcule un hash déterministe à partir du contenu
- *   2. Dérive un seed génératif unique (temps + contenu + entropie)
- *   3. Applique des micro-variations aux intensités et vitesses
- *   4. Injecte des offsets de phase aléatoires dans les animations
- *   5. Génère une empreinte lisible (fingerprint string)
+ * Nouveautés v2.0 :
+ *   - Persistance PostgreSQL des fingerprints (unicité globale, pas seulement locale)
+ *   - Comparaison par distance de Hamming : rejet si similarité > 90%
+ *   - Génération de "familles de signatures" cohérentes pour une même marque
+ *   - Watermark invisible : fingerprint encodé dans les métadonnées SVG
  */
 
 import type { ZoneComposition, ZoneEffectDecision } from '../services/harmony-validator';
 import type { VariationKey } from './variance-engine.module';
+import { db } from '../db';
+import { visualFingerprints } from '../../shared/schema';
+import { eq } from 'drizzle-orm';
+import { log } from '../vite';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface VisualFingerprint {
-  id:               string;     // identifiant unique de la signature (24 chars)
-  seed:             number;     // graine numérique reproductible
-  entropy:          number;     // 0-1 — degré d'unicité
-  micro_variations: Record<string, MicroVariation>;  // par zone
-  phase_offsets:    Record<string, number>;            // délai de phase en % (0-0.3)
-  style_token:      string;     // token lisible ex: "AZURE-PULSE-7F3"
+  id:               string;
+  seed:             number;
+  entropy:          number;
+  micro_variations: Record<string, MicroVariation>;
+  phase_offsets:    Record<string, number>;
+  style_token:      string;
   created_at:       number;
 }
 
 export interface MicroVariation {
-  intensity_delta:  number;     // -0.08 à +0.08
-  speed_variant:    'slow' | 'medium' | 'fast';  // peut varier légèrement
-  phase_shift:      number;     // 0-0.25 — décalage phase animation
-  color_tint:       number;     // -15 à +15 degrés hue
+  intensity_delta:  number;
+  speed_variant:    'slow' | 'medium' | 'fast';
+  phase_shift:      number;
+  color_tint:       number;
 }
 
 export interface SignatureResult {
   composition:  ZoneComposition;
   fingerprint:  VisualFingerprint;
-  uniqueness:   number;          // 0-1 — score d'unicité estimé
+  uniqueness:   number;
+  is_regenerated?: boolean;   // true si forcé à cause de similarité > 90%
+  watermark_meta?: string;    // métadonnées SVG pour le watermark invisible
 }
 
 // ─── Générateur pseudo-aléatoire déterministe (LCG) ──────────────────────────
@@ -83,20 +88,15 @@ function generateStyleToken(rng: () => number, contentHash: number): string {
 // ─── Micro-variation pour une zone ───────────────────────────────────────────
 
 function generateMicroVariation(rng: () => number, zone: ZoneEffectDecision): MicroVariation {
-  // Intensité : ±8% max, centré sur 0
   const intensityDelta = (rng() - 0.5) * 0.16;
 
-  // Vitesse : 10% de chance de varier d'un cran
   const speedRoll = rng();
   let speedVariant = zone.speed;
   if (speedRoll > 0.90) {
     speedVariant = zone.speed === 'slow' ? 'medium' : zone.speed === 'fast' ? 'medium' : (rng() > 0.5 ? 'slow' : 'fast');
   }
 
-  // Phase : 0-25% de décalage
   const phaseShift = rng() * 0.25;
-
-  // Teinte : ±15 degrés
   const colorTint = (rng() - 0.5) * 30;
 
   return { intensity_delta: intensityDelta, speed_variant: speedVariant, phase_shift: phaseShift, color_tint: colorTint };
@@ -126,22 +126,114 @@ function generateUniqueId(rng: () => number, contentHash: number): string {
   return id.slice(0, 24);
 }
 
-// ─── Fonction principale ──────────────────────────────────────────────────────
+// ─── Distance de Hamming entre deux fingerprint IDs ──────────────────────────
 
-export function generateVisualSignature(
-  composition: ZoneComposition,
-  variation:   VariationKey,
-  secteur:     string = 'default'
-): SignatureResult {
+/**
+ * Calcule la distance de Hamming entre deux chaînes de même longueur.
+ * Retourne un score de similarité 0-1 (1 = identiques, 0 = complètement différents).
+ */
+function hammingDistance(a: string, b: string): number {
+  const len = Math.min(a.length, b.length);
+  if (len === 0) return 0;
+  let diff = 0;
+  for (let i = 0; i < len; i++) {
+    if (a[i] !== b[i]) diff++;
+  }
+  // Similarité = 1 - (diff / len)
+  return 1 - (diff / len);
+}
+
+/**
+ * Vérifie si un fingerprint est trop similaire aux fingerprints existants (depuis PostgreSQL).
+ * Retourne true si la similarité de Hamming dépasse 90% avec un fingerprint existant.
+ */
+async function isTooSimilarToExisting(fingerprintId: string, secteur: string): Promise<boolean> {
+  try {
+    const existingRows = await db.select({ fingerprint_id: visualFingerprints.fingerprint_id })
+      .from(visualFingerprints)
+      .limit(500);
+
+    for (const row of existingRows) {
+      const similarity = hammingDistance(fingerprintId, row.fingerprint_id);
+      if (similarity > 0.90) {
+        log(`🔏 SignatureEngine: fingerprint trop similaire (${(similarity * 100).toFixed(0)}%) → mutation forcée`, 'signature');
+        return true;
+      }
+    }
+    return false;
+  } catch {
+    return false; // en cas d'erreur DB, on accepte le fingerprint
+  }
+}
+
+// ─── Watermark invisible ──────────────────────────────────────────────────────
+
+/**
+ * Encode le fingerprint dans des métadonnées SVG invisibles.
+ * À injecter dans le SVG généré comme commentaire ou attribut data.
+ */
+function generateWatermarkMeta(fingerprintId: string, styleToken: string, seed: number): string {
+  const encoded = Buffer.from(JSON.stringify({
+    fp: fingerprintId,
+    st: styleToken,
+    sd: seed,
+    ts: Date.now(),
+  })).toString('base64');
+  return `<!-- effectforge:${encoded} -->`;
+}
+
+// ─── Familles de signatures pour une marque ───────────────────────────────────
+
+/**
+ * Génère un seed de famille cohérent basé sur le nom de marque.
+ * Les signatures d'une même marque auront des seeds proches mais distincts.
+ */
+function brandFamilySeed(brandName: string): number {
+  let hash = 0;
+  for (let i = 0; i < brandName.length; i++) {
+    hash = (hash * 31 + brandName.charCodeAt(i)) & 0xFFFFFFFF;
+  }
+  return Math.abs(hash);
+}
+
+// ─── Persistance PostgreSQL ───────────────────────────────────────────────────
+
+async function persistFingerprint(
+  fingerprint: VisualFingerprint,
+  secteur:     string,
+  variation:   string
+): Promise<void> {
+  try {
+    await db.insert(visualFingerprints).values({
+      fingerprint_id:  fingerprint.id,
+      seed:            fingerprint.seed,
+      entropy:         fingerprint.entropy,
+      style_token:     fingerprint.style_token,
+      micro_variations: fingerprint.micro_variations as any,
+      phase_offsets:   fingerprint.phase_offsets as any,
+      secteur,
+      variation,
+    }).onConflictDoNothing();
+  } catch (err: any) {
+    log(`⚠️ SignatureEngine DB persist error: ${err.message}`, 'signature');
+  }
+}
+
+// ─── Génération interne d'un fingerprint ─────────────────────────────────────
+
+function buildFingerprint(
+  composition:  ZoneComposition,
+  variation:    VariationKey,
+  secteur:      string,
+  extraEntropy: number = 0
+): { fingerprint: VisualFingerprint; newComposition: ZoneComposition; uniqueness: number } {
   const zones = ['logo', 'nom', 'titre', 'contact', 'separateur', 'fond', 'cta'] as const;
 
-  // Seed composite : hash du contenu + entropie temporelle
   const contentHash = hashContent(composition, secteur, variation);
-  const timeSeed    = Date.now() & 0xFFFF;
+  const timeSeed    = (Date.now() + extraEntropy) & 0xFFFF;
   const seed        = (contentHash ^ (timeSeed * 2654435761)) >>> 0;
   const rng         = createRng(seed);
 
-  // Micro-variations par zone
   const microVariations: Record<string, MicroVariation> = {};
   const phaseOffsets:    Record<string, number>          = {};
   const newComposition   = { ...composition };
@@ -149,14 +241,12 @@ export function generateVisualSignature(
   zones.forEach(zoneName => {
     const zone = composition[zoneName];
     if (!zone?.effet_id) return;
-
     const mv = generateMicroVariation(rng, zone);
     microVariations[zoneName] = mv;
     phaseOffsets[zoneName]    = mv.phase_shift;
     (newComposition as any)[zoneName] = applyMicroVariation(zone, mv);
   });
 
-  // Score d'unicité : basé sur la dispersion des deltas
   const deltas   = Object.values(microVariations).map(mv => Math.abs(mv.intensity_delta));
   const avgDelta = deltas.reduce((a, b) => a + b, 0) / Math.max(1, deltas.length);
   const entropy  = Math.min(1, avgDelta * 8 + rng() * 0.2);
@@ -172,5 +262,93 @@ export function generateVisualSignature(
     created_at:       Date.now(),
   };
 
-  return { composition: newComposition, fingerprint, uniqueness };
+  return { fingerprint, newComposition, uniqueness };
+}
+
+// ─── Fonction principale (asynchrone — recommandée) ──────────────────────────
+
+export async function generateVisualSignatureAsync(
+  composition: ZoneComposition,
+  variation:   VariationKey,
+  secteur:     string = 'default',
+  brandName?:  string
+): Promise<SignatureResult> {
+  let attempt = 0;
+  let extraEntropy = brandName ? brandFamilySeed(brandName) : 0;
+  let is_regenerated = false;
+
+  while (attempt < 5) {
+    const { fingerprint, newComposition, uniqueness } = buildFingerprint(
+      composition, variation, secteur, extraEntropy + attempt * 12345
+    );
+
+    const tooSimilar = await isTooSimilarToExisting(fingerprint.id, secteur);
+
+    if (!tooSimilar) {
+      // Persister le fingerprint validé
+      await persistFingerprint(fingerprint, secteur, variation);
+
+      const watermark_meta = generateWatermarkMeta(fingerprint.id, fingerprint.style_token, fingerprint.seed);
+
+      return {
+        composition: newComposition,
+        fingerprint,
+        uniqueness,
+        is_regenerated,
+        watermark_meta,
+      };
+    }
+
+    is_regenerated = true;
+    attempt++;
+    extraEntropy += Math.floor(Math.random() * 99999);
+  }
+
+  // Fallback après 5 tentatives : accepter quand même
+  const { fingerprint, newComposition, uniqueness } = buildFingerprint(
+    composition, variation, secteur, extraEntropy + 999999
+  );
+  await persistFingerprint(fingerprint, secteur, variation);
+  const watermark_meta = generateWatermarkMeta(fingerprint.id, fingerprint.style_token, fingerprint.seed);
+
+  return { composition: newComposition, fingerprint, uniqueness, is_regenerated: true, watermark_meta };
+}
+
+// ─── Fonction principale synchrone (compatibilité) ───────────────────────────
+
+export function generateVisualSignature(
+  composition: ZoneComposition,
+  variation:   VariationKey,
+  secteur:     string = 'default'
+): SignatureResult {
+  const { fingerprint, newComposition, uniqueness } = buildFingerprint(composition, variation, secteur);
+  const watermark_meta = generateWatermarkMeta(fingerprint.id, fingerprint.style_token, fingerprint.seed);
+
+  // Persistance asynchrone non-bloquante
+  persistFingerprint(fingerprint, secteur, variation).catch(() => {});
+
+  return { composition: newComposition, fingerprint, uniqueness, watermark_meta };
+}
+
+// ─── Récupération des fingerprints depuis PostgreSQL ─────────────────────────
+
+export async function getFingerprintHistory(secteur?: string, limit = 50): Promise<VisualFingerprint[]> {
+  try {
+    const rows = secteur
+      ? await db.select().from(visualFingerprints).where(eq(visualFingerprints.secteur, secteur)).limit(limit)
+      : await db.select().from(visualFingerprints).limit(limit);
+
+    return rows.map(row => ({
+      id:               row.fingerprint_id,
+      seed:             row.seed,
+      entropy:          row.entropy,
+      style_token:      row.style_token,
+      micro_variations: row.micro_variations as Record<string, MicroVariation>,
+      phase_offsets:    row.phase_offsets as Record<string, number>,
+      created_at:       row.createdAt?.getTime() ?? Date.now(),
+    }));
+  } catch (err: any) {
+    log(`⚠️ SignatureEngine getFingerprintHistory error: ${err.message}`, 'signature');
+    return [];
+  }
 }

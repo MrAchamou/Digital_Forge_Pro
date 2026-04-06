@@ -130,28 +130,80 @@ interface ZoneSelection { logo: CategoryCandidates, nom: CategoryCandidates, ...
 
 ---
 
+## Base de données PostgreSQL (Neon)
+
+**Driver** : `@neondatabase/serverless` Pool + `drizzle-orm/neon-serverless` + `ws` (WebSocket)
+
+**IMPORTANT** : Utiliser `drizzle-orm/neon-serverless` avec `Pool` (PAS `drizzle-orm/neon-http` + `neon()`) — ce dernier retourne `null` pour les tables vides et casse les `.map()` dans Drizzle.
+
+```typescript
+// server/db.ts — pattern correct
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from 'ws';
+neonConfig.webSocketConstructor = ws;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const db = drizzle(pool, { schema });
+```
+
+### Tables PostgreSQL (`shared/schema.ts`)
+
+| Table | Rôle |
+|-------|------|
+| `analytics_events` | Évènements de génération (variation, secteur, effets utilisés) |
+| `visual_fingerprints` | Empreintes visuelles MD5 pour détecter les doublons (distance Hamming) |
+| `user_preferences` | Préférences utilisateur persistées (k-means clustering) |
+| `presets` | Presets sauvegardés + 10 presets intelligents auto-initialisés |
+
+### Modules v2 avec persistance PostgreSQL
+
+| Module | Version | Fonctionnalités DB |
+|--------|---------|-------------------|
+| `analytics.module.ts` | v3.0 | Persistance évènements, alertes configurables, export CSV/JSON, segmentation |
+| `visual-signature-engine.module.ts` | v2.0 | Persistance fingerprints, watermark SVG, distance Hamming |
+| `user-preferences-engine.module.ts` | v2.0 | Persistance préférences, clustering, recommandations proactives |
+| `preset-manager.module.ts` | v2.0 | Persistance presets, versioning, thumbnails SVG animées, partage public |
+
+### Nouvelles routes API
+
+```
+GET  /api/analytics/alerts           — alertes configurables
+GET  /api/analytics/segmentation     — segmentation par variation/profil
+GET  /api/analytics/export/csv       — export CSV
+GET  /api/analytics/export/json      — export JSON complet
+GET  /api/signatures/history         — historique fingerprints
+GET  /api/presets/smart/:sector      — presets intelligents par secteur
+GET  /api/presets/public             — presets partagés publiquement
+POST /api/presets/:id/version        — créer nouvelle version
+POST /api/presets/:id/rollback       — rollback vers version précédente
+GET  /api/preferences/recommendations — recommandations proactives
+```
+
+---
+
 ## Dépendances principales
 
 - **OpenAI** (GPT-4o) + **Anthropic** (Claude Opus) + **Google Gemini Flash** — pipeline Triple-IA
-- **Express** + **TypeScript** + **tsx** — serveur (via `npx --yes tsx server/index.ts`)
+- **Express** + **TypeScript** + **tsx** — serveur (via `npx tsx server/index.ts`)
 - **React** + **Vite** + **TanStack Query** — frontend
 - **shadcn/ui** + **Tailwind CSS** + **Wouter** — UI
+- **Neon PostgreSQL** + **Drizzle ORM** + **ws** — base de données
 
 ---
 
 ## Lancement
 
 ```bash
-# Workflow : NODE_ENV=development npx --yes tsx server/index.ts
+# Workflow : NODE_ENV=development npx tsx server/index.ts
 # Port : 5000 (Express + Vite proxy)
 ```
 
 ---
 
-## État du projet (Priorités restantes)
+## État du projet
 
 - **P1** ✅ ColorHarmonyEngine + TimingMaster + VarianceEngine
 - **P2** ✅ ContextualIntelligenceModerator + SmartOptimizer + VisualFocusEngine
-- **P3** ⏳ DynamicFusionOrchestrator + EffectFusionEngine + ExperienceOrchestrator
-- **P4** ⏳ AdaptiveRenderingEngine + ContentAnalyzer + AnalyticsModule
-- **P5** ⏳ PredictiveTransitionEngine + AttentionGuide + VisualSignatureEngine + UserPreferencesEngine + PresetManager
+- **P3** ✅ DynamicFusionOrchestrator + EffectFusionEngine + ExperienceOrchestrator
+- **P4** ✅ AdaptiveRenderingEngine + ContentAnalyzer + AnalyticsModule (v3 PostgreSQL)
+- **P5** ✅ PredictiveTransitionEngine + AttentionGuide + VisualSignatureEngine (v2 DB) + UserPreferencesEngine (v2 DB) + PresetManager (v2 DB)
