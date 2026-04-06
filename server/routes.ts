@@ -1042,6 +1042,87 @@ router.post('/signature/generate', async (req, res) => {
   }
 });
 
+// =============================================
+// POST /api/signature/scrape-gmb
+// Scraping GMB via Serper API
+// =============================================
+router.post('/signature/scrape-gmb', async (req, res) => {
+  try {
+    const { gmb_url } = req.body;
+    if (!gmb_url) return res.status(400).json({ error: 'gmb_url requis' });
+
+    const { scrapeGMB } = await import('./services/gmb-scraper');
+    const data = await scrapeGMB(gmb_url);
+    return res.json(data);
+  } catch (err: any) {
+    console.error('Erreur scrape-gmb:', err);
+    return res.status(500).json({ error: err.message || 'Erreur interne' });
+  }
+});
+
+// =============================================
+// POST /api/signature/analyze-and-configure
+// Pipeline 3 cerveaux IA
+// =============================================
+router.post('/signature/analyze-and-configure', async (req, res) => {
+  try {
+    const { signature_image_base64, metadata } = req.body;
+    if (!metadata) return res.status(400).json({ error: 'metadata requis' });
+
+    const { runTripleAIPipeline } = await import('./services/triple-ai-director');
+    const result = await runTripleAIPipeline(signature_image_base64 || null, metadata);
+    return res.json(result);
+  } catch (err: any) {
+    console.error('Erreur analyze-and-configure:', err);
+    return res.status(500).json({ error: err.message || 'Erreur interne' });
+  }
+});
+
+// =============================================
+// POST /api/signature/export
+// Export SVG + guide + config JSON
+// =============================================
+router.post('/signature/export', async (req, res) => {
+  try {
+    const { metadata, brief, scenario, config } = req.body;
+    if (!metadata || !config) return res.status(400).json({ error: 'metadata et config requis' });
+
+    const { buildDeliveryPackage } = await import('./services/signature-delivery');
+    const pkg = await buildDeliveryPackage(metadata, brief, scenario, config);
+    return res.json({
+      svg_url: pkg.svg_url,
+      pdf_instructions_url: pkg.pdf_instructions_url,
+      config_json_url: pkg.config_json_url,
+      signature_id: pkg.signature_id,
+      svg_content: pkg.svg_content,
+    });
+  } catch (err: any) {
+    console.error('Erreur export:', err);
+    return res.status(500).json({ error: err.message || 'Erreur interne' });
+  }
+});
+
+// =============================================
+// GET /api/signature/export/:id/:type
+// Téléchargement des fichiers exportés
+// =============================================
+router.get('/signature/export/:id/:type', async (req, res) => {
+  try {
+    const { id, type } = req.params;
+    if (!['svg', 'guide', 'config'].includes(type)) return res.status(400).json({ error: 'type invalide' });
+
+    const { getExportFile } = await import('./services/signature-delivery');
+    const file = await getExportFile(id, type as 'svg' | 'guide' | 'config');
+    if (!file) return res.status(404).json({ error: 'Fichier introuvable' });
+
+    res.setHeader('Content-Type', file.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
+    return res.send(file.content);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 export function registerRoutes(app: express.Application) {
   app.use(cors());
   app.use('/api', router);

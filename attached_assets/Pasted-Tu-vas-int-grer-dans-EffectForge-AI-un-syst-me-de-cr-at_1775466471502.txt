@@ -1,0 +1,346 @@
+Tu vas intégrer dans EffectForge AI un système de création 
+de signatures vivantes piloté par 3 IA en cascade, avec 
+visualisation live du processus de création sur canvas.
+
+═══════════════════════════════════════════════════════
+PARTIE 1 — SCRAPER GMB VIA SERPER
+═══════════════════════════════════════════════════════
+
+Créer server/services/gmb-scraper.ts
+
+Ce module reçoit une URL Google My Business et utilise 
+l'API Serper pour extraire automatiquement :
+- Nom de l'entreprise
+- Secteur / catégorie
+- Adresse et téléphone
+- Site web
+- Description
+- Couleurs dominantes extraites du logo GMB
+- Note et avis (pour calibrer le ton)
+
+Endpoint à créer :
+POST /api/signature/scrape-gmb
+Body: { "gmb_url": "string" }
+Response: {
+  "nom": "string",
+  "titre": "string",
+  "entreprise": "string",
+  "telephone": "string",
+  "email": "string",
+  "site": "string",
+  "secteur": "string",
+  "palette": ["#hex1", "#hex2", "#hex3"],
+  "ton": "string",
+  "description": "string"
+}
+
+Ce résultat pré-remplit automatiquement le formulaire 
+de génération de signature dans l'onglet Signature Vivante.
+
+═══════════════════════════════════════════════════════
+PARTIE 2 — PIPELINE 3 CERVEAUX IA
+═══════════════════════════════════════════════════════
+
+Créer server/services/triple-ai-director.ts
+
+Ce module orchestre 3 LLMs en cascade pour créer 
+la configuration artistique de la signature vivante.
+
+---
+
+CERVEAU 1 — GPT-4o Vision (Analyste Visuel)
+Reçoit : image base64 de la signature statique 
+         + métadonnées entreprise
+Prompt système :
+"Tu es un directeur artistique expert en branding visuel 
+de luxe. Tu analyses une signature email statique et les 
+métadonnées de l'entreprise.
+
+Ta mission est de produire un brief créatif précis en JSON :
+{
+  'style_detecte': 'string',
+  'references_visuelles': ['brand1', 'brand2', 'brand3'],
+  'ton_emotionnel': 'string',
+  'intensite_mouvement': 'minimal|subtil|expressif|dramatique',
+  'univers_visuel': 'string description poétique',
+  'contraintes': ['contrainte1', 'contrainte2'],
+  'mot_clef_narratif': 'string en 2-3 mots maximum'
+}
+
+Réponds UNIQUEMENT en JSON valide. Aucun texte autour."
+
+---
+
+CERVEAU 2 — Claude claude-sonnet-4-20250514 (Narrateur)
+Reçoit : le JSON du Cerveau 1 + bibliothèque des 847 effets 
+         catégorisés par nom
+Prompt système :
+"Tu es un narrateur créatif spécialisé en motion design 
+et storytelling visuel. Tu reçois un brief créatif et 
+une bibliothèque d'effets disponibles.
+
+Ta mission est de construire le scénario narratif des 
+4 variations de la signature vivante :
+
+Pour chaque variation A, B, C, D tu dois définir :
+- Un titre poétique (2-3 mots)
+- Une intention narrative (1 phrase)
+- L'effet principal pour chaque zone :
+  fond / logo / texte / separateur
+- L'arc émotionnel global A→B→C→D
+
+Les 4 variations doivent raconter une histoire cohérente.
+Chaque transition doit être imperceptible mais ressentie.
+La non-répétition doit être garantie par la complémentarité
+des variations entre elles.
+
+Réponds UNIQUEMENT en JSON valide :
+{
+  'arc_emotionnel': 'string',
+  'variations': {
+    'A': {
+      'titre': 'string',
+      'intention': 'string',
+      'fond': 'NOM_EFFET',
+      'logo': 'NOM_EFFET',
+      'texte': 'NOM_EFFET',
+      'separateur': 'NOM_EFFET'
+    },
+    'B': { ... },
+    'C': { ... },
+    'D': { ... }
+  }
+}"
+
+---
+
+CERVEAU 3 — Gemini Flash (Optimiseur Technique)
+Reçoit : le scénario narratif du Cerveau 2 + paramètres 
+         techniques des effets disponibles
+Prompt système :
+"Tu es un ingénieur créatif expert en optimisation 
+d'effets visuels pour email. Tu reçois un scénario 
+narratif et tu dois produire la configuration technique 
+finale optimisée.
+
+Pour chaque effet sélectionné tu dois définir :
+- L'intensité exacte (0.0 à 1.0)
+- La vitesse (slow|medium|fast)
+- La couleur dominante en hex
+- La durée de la variation en secondes
+- Les paramètres spécifiques à l'effet
+
+Contraintes techniques absolues :
+- Zéro JavaScript dans le SVG final
+- Animations CSS natives uniquement
+- Largeur max 600px
+- Compatibilité Gmail + Outlook garantie
+- Cycle total entre 200s et 280s
+
+Réponds UNIQUEMENT en JSON valide :
+{
+  'variation_a': {
+    'fond': { 
+      'effet': 'NOM', 
+      'intensity': 0.0, 
+      'speed': 'string',
+      'color': '#hex',
+      'params': {}
+    },
+    'logo': { ... },
+    'texte': { ... },
+    'separateur': { ... },
+    'duree': 60
+  },
+  'variation_b': { ... },
+  'variation_c': { ... },
+  'variation_d': { ... },
+  'transitions': {
+    'duree': 2,
+    'easing': 'cubic-bezier(0.4,0,0.2,1)'
+  },
+  'cycle_total': 240
+}"
+
+---
+
+Endpoint à créer :
+POST /api/signature/analyze-and-configure
+Body: {
+  "signature_image_base64": "string",
+  "metadata": { ...données entreprise }
+}
+Response: {
+  "brief_creatif": { ...cerveau 1 },
+  "scenario_narratif": { ...cerveau 2 },
+  "configuration_technique": { ...cerveau 3 },
+  "status_pipeline": "complete"
+}
+
+═══════════════════════════════════════════════════════
+PARTIE 3 — DASHBOARD ANALYSE + CANVAS LIVE
+═══════════════════════════════════════════════════════
+
+Créer un nouveau onglet "Studio" dans le frontend.
+
+Ce dashboard contient 3 zones :
+
+---
+
+ZONE GAUCHE — Pipeline Status (30% largeur)
+
+Un panneau vertical qui affiche en temps réel 
+l'avancement de la pipeline 3 cerveaux :
+
+Étape 1 : Scraping GMB
+[icône] Récupération des données... ✓
+
+Étape 2 : Cerveau 1 — GPT-4o Vision
+[icône animé pendant traitement]
+Brief créatif : "Puissance silencieuse"
+Ton détecté : Autorité institutionnelle
+Intensité : Subtil
+[barre de progression]
+
+Étape 3 : Cerveau 2 — Claude
+[icône animé pendant traitement]
+Arc émotionnel : "Calme → Précision → 
+                  Profondeur → Prestige"
+Variation A : "L'Autorité"
+Variation B : "La Précision"
+[barre de progression]
+
+Étape 4 : Cerveau 3 — Gemini Flash
+[icône animé pendant traitement]
+Effets sélectionnés : HEARTBEAT + SOUL_AURA...
+Cycle optimisé : 248s
+[barre de progression]
+
+Étape 5 : Génération SVG
+[barre de progression en temps réel]
+Couche fond générée... ✓
+Variation A assemblée... ✓
+Transitions calculées... ✓
+
+Chaque étape s'allume progressivement avec 
+des animations de chargement pendant le traitement
+et des checkmarks verts à la completion.
+
+---
+
+ZONE CENTRALE — Canvas Live (50% largeur)
+
+Un canvas HTML5 qui montre la construction 
+de la signature EN TEMPS RÉEL, couche par couche :
+
+Phase 1 — Fond noir apparaît (fade in 0.5s)
+Phase 2 — Le séparateur vertical se dessine 
+           de haut en bas comme un trait de pinceau
+Phase 3 — La zone photo apparaît avec un cercle 
+           qui se trace progressivement
+Phase 4 — Les initiales ou la photo fade in
+Phase 5 — Le nom s'écrit lettre par lettre 
+           comme une machine à écrire
+Phase 6 — Le titre apparaît par slide depuis la gauche
+Phase 7 — Les infos contact apparaissent en cascade
+Phase 8 — Les icônes réseaux pop in avec un rebond
+Phase 9 — Le CTA se dessine avec un effet de frappe
+Phase 10 — Les effets vivants s'activent progressivement
+            variation A s'allume
+            les particules apparaissent
+            le halo du logo pulse une première fois
+            le séparateur s'illumine
+Phase 11 — Preview final : la signature tourne 
+            en boucle entre les 4 variations
+            avec les transitions réelles
+
+Chaque phase est synchronisée avec le panneau 
+gauche — quand le Cerveau 2 finit, la Phase 5 
+commence sur le canvas.
+
+Le canvas affiche aussi en overlay discret :
+- Le nom de la variation active (A/B/C/D)
+- Le nom de l'effet en cours
+- Le temps restant dans le cycle
+
+---
+
+ZONE DROITE — Méta créative (20% largeur)
+
+Un panneau qui affiche les décisions créatives 
+des 3 cerveaux en temps réel pendant la génération :
+
+"💡 GPT-4o détecte..."
+Références : Rolex, Goldman Sachs
+Univers : Puissance silencieuse
+
+"🎭 Claude compose..."
+Arc : Calme → Prestige
+Variation A : L'Autorité
+Intention : Une pulsation dorée
+             comme un cœur certain
+
+"⚡ Gemini optimise..."
+HEARTBEAT → intensity: 0.3
+Cycle ajusté : 248s
+Compatibilité : Gmail ✓ Outlook ✓
+
+Et en bas un bouton :
+"Télécharger le SVG God Tier"
+qui déclenche l'export du fichier final.
+
+═══════════════════════════════════════════════════════
+PARTIE 4 — EXPORT ET INSTRUCTIONS CLIENT
+═══════════════════════════════════════════════════════
+
+Créer server/services/signature-delivery.ts
+
+À la fin de la pipeline, générer automatiquement :
+
+1. Le fichier SVG final God Tier
+
+2. Un PDF d'instructions d'installation (1 page) :
+   - Comment installer dans Gmail (3 étapes illustrées)
+   - Comment installer dans Outlook (3 étapes illustrées)
+   - Comment installer dans Apple Mail (3 étapes illustrées)
+   - QR code vers une démo en ligne de la signature
+
+3. Un JSON de configuration sauvegardé :
+   - Toutes les décisions des 3 cerveaux
+   - Les effets utilisés et leurs paramètres
+   - La date de génération
+   - Un ID unique de signature
+
+Endpoint :
+POST /api/signature/export
+Body: { "signature_id": "string" }
+Response: {
+  "svg_url": "string",
+  "pdf_instructions_url": "string",
+  "config_json_url": "string",
+  "signature_id": "string"
+}
+
+═══════════════════════════════════════════════════════
+ORDRE D'EXÉCUTION
+═══════════════════════════════════════════════════════
+
+1. Créer gmb-scraper.ts + endpoint scrape-gmb
+2. Créer triple-ai-director.ts + endpoint analyze-and-configure
+3. Créer le dashboard Studio avec les 3 zones
+4. Implémenter le canvas live avec les 11 phases
+5. Créer signature-delivery.ts + endpoint export
+6. Connecter tout ensemble dans un flux continu
+7. Tester avec un exemple réel de bout en bout
+
+═══════════════════════════════════════════════════════
+VARIABLES D'ENVIRONNEMENT NÉCESSAIRES
+═══════════════════════════════════════════════════════
+
+SERPER_API_KEY=        (pour le scraping GMB)
+OPENAI_API_KEY=        (pour GPT-4o Vision)
+ANTHROPIC_API_KEY=     (pour Claude)
+GEMINI_API_KEY=        (pour Gemini Flash)
+
+Ces clés doivent être lues depuis process.env
+et jamais exposées au frontend.
