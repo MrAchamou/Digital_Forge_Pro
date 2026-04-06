@@ -12,6 +12,7 @@ export async function callCerebras(
     maxTokens?: number;
     systemPrompt?: string;
     retryCount?: number;
+    _fromGemini?: boolean;
   } = {}
 ): Promise<string> {
   const retryCount = options.retryCount || 0;
@@ -97,10 +98,14 @@ async function callCerebrasClaudeFallback(prompt: string, options: any): Promise
   try {
     const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
+      // Éviter la boucle infinie : si on vient de Gemini, ne pas rappeler Gemini
+      if (options._fromGemini) {
+        throw new Error('Cerebras et Gemini indisponibles (pas de fallback Claude)');
+      }
       const { callGemini } = await import('./gemini-wrapper');
       const fullPrompt = options.systemPrompt ? `${options.systemPrompt}\n\n${prompt}` : prompt;
       log('Cerebras → fallback Gemini (pas de clé Claude)', 'cerebras-wrapper');
-      return await callGemini(fullPrompt, { maxTokens: options.maxTokens });
+      return await callGemini(fullPrompt, { maxTokens: options.maxTokens, _fromCerebras: true });
     }
 
     const anthropic = new Anthropic({

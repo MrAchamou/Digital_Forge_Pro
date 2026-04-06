@@ -14,6 +14,7 @@ export async function callGemini(
     isVision?: boolean;
     imageBase64?: string;
     retryCount?: number;
+    _fromCerebras?: boolean;
   } = {}
 ): Promise<string> {
   const retryCount = options.retryCount || 0;
@@ -127,13 +128,17 @@ async function callGeminiFallbackClaude(prompt: string, options: any): Promise<s
     }
   }
 
-  // 2. Fallback Cerebras (5 clés disponibles)
+  // 2. Fallback Cerebras (5 clés disponibles) — sauf si on vient déjà de Cerebras
+  if (options._fromCerebras) {
+    throw new Error('Gemini et Cerebras indisponibles (circuit breakers ouverts)');
+  }
   try {
     log('Gemini → fallback Cerebras', 'gemini-wrapper');
     const { callCerebras } = await import('./cerebras-wrapper');
     return await callCerebras(prompt, {
       maxTokens: options.maxTokens ?? 2000,
       temperature: options.temperature ?? 0.7,
+      _fromGemini: true,
     });
   } catch (err: any) {
     throw new Error(`Gemini + Claude + Cerebras échoués: ${err.message}`);
