@@ -9,6 +9,20 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
+export const conversations = pgTable("conversations", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: text("title").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const messages = pgTable("messages", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  conversationId: integer("conversation_id").notNull(),
+  role: text("role").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const effects = pgTable("effects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -315,7 +329,7 @@ declare global {
     interface Request {
       requestId: string;
       startTime: number;
-      files: any[];
+      files?: any[];
     }
   }
 }

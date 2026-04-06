@@ -467,7 +467,7 @@ export default function Generator() {
       </Tabs>
 
       {/* Generated Code */}
-      {currentJob?.status === 'completed' && currentJob.result && (
+      {currentJob?.status === 'completed' && !!currentJob.result && (
         <Card className="glass-morphism border-forge-purple/30 bg-transparent">
           <CardHeader>
             <div className="flex items-center justify-between">

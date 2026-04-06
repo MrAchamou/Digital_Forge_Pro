@@ -116,8 +116,8 @@ export class MemStorage implements IStorage {
       performance: insertEffect.performance || 'medium',
       version: insertEffect.version || '1.0.0',
       tags: insertEffect.tags || [],
-      rating: insertEffect.rating || 0,
-      downloads: insertEffect.downloads || 0,
+      rating: 0,
+      downloads: 0,
       createdAt: new Date()
     };
     this.effects.set(id, newEffect);

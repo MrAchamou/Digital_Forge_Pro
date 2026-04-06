@@ -92,6 +92,7 @@ export interface TechnicalConfig {
     C: ZoneComposition;
     D: ZoneComposition;
   };
+  _analytics_data?: Record<string, unknown>;
 }
 
 interface VariationConfig {
@@ -615,7 +616,7 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
     Object.values(comp).forEach(zone => {
       if (zone?.effet_id) usedEffects.add(zone.effet_id);
       // Extraire aussi toutes les couches secondaires pour garantir diversité totale
-      zone?.layers?.forEach(layer => {
+      zone?.layers?.forEach((layer: import('./harmony-validator').EffectLayer) => {
         if (layer?.effet_id) usedEffects.add(layer.effet_id);
       });
     });

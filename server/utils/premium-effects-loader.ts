@@ -259,12 +259,10 @@ export async function loadPremiumEffects(): Promise<{ loaded: number; skipped: n
         tags,
         complexity,
         performance,
-        rating: 4.5 + Math.random() * 0.5,
-        downloads: Math.floor(Math.random() * 500) + 100,
         version: '1.0.0',
       };
 
-      await storage.createEffect(effect);
+      await storage.createEffect(effect as any);
       result.loaded++;
       console.log(`✅ Chargé: ${entry} → ${meta.displayName}`);
 
