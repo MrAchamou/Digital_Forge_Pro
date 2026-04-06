@@ -138,17 +138,14 @@ export default function Library() {
   };
 
   const handleDownload = (effect: Effect) => {
-    const code = effect.code || "";
     const filename = `${effect.name.replace(/\s+/g, "_")}.js`;
-    const blob = new Blob([code], { type: "text/javascript;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.href = url;
+    link.href = `/api/library/effects/${effect.id}/download`;
     link.download = filename;
+    link.target = "_blank";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
     toast({
       title: "Téléchargement démarré",
       description: `${filename} téléchargé avec succès.`,

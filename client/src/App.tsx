@@ -66,18 +66,18 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="bg-forge-black text-forge-white min-h-screen relative overflow-x-hidden">
+        <div className="bg-forge-black text-forge-white min-h-screen flex">
           <ParticleBackground />
           <Navigation />
-          <main className="pt-24 pb-16 px-4 max-w-7xl mx-auto relative z-10">
-            <Router />
-          </main>
-          <footer className="text-center py-8 text-forge-white/50 text-sm relative z-10">
-            <p className="mb-2">EffectForge AI - Digital Forge of the Future</p>
-            <p className="text-xs opacity-0 hover:opacity-100 transition-opacity">
-              Autonomous • Modular • God-Level Performance
-            </p>
-          </footer>
+          {/* Main content — offset by sidebar width on large screens */}
+          <div className="flex-1 flex flex-col min-h-screen lg:ml-[240px] transition-all duration-300 relative z-10">
+            <main className="flex-1 px-6 py-8 max-w-6xl w-full mx-auto">
+              <Router />
+            </main>
+            <footer className="text-center py-6 text-forge-white/30 text-xs border-t border-white/[0.04]">
+              <p>EffectForge AI &mdash; Digital Forge of the Future &mdash; GOD Level Performance</p>
+            </footer>
+          </div>
         </div>
         <Toaster />
       </TooltipProvider>

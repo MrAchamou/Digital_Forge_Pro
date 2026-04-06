@@ -1,0 +1,519 @@
+{
+  "brief": {
+    "style_detecte": "professionnel moderne",
+    "references_visuelles": [
+      "Apple",
+      "Linear",
+      "Notion"
+    ],
+    "ton_emotionnel": "professionnel et moderne",
+    "intensite_mouvement": "subtil",
+    "univers_visuel": "Espace numérique épuré avec des accents de lumière froide",
+    "contraintes": [
+      "compatibilité email",
+      "animations CSS uniquement"
+    ],
+    "mot_clef_narratif": "Précision Silencieuse",
+    "analyse_logo": "Logo professionnel sobre",
+    "psychologie_couleurs": "Palette neutre évoquant la confiance et la modernité",
+    "personnalite_marque": [
+      "fiable",
+      "moderne",
+      "professionnel"
+    ],
+    "cible_audience": "Professionnels et entreprises",
+    "differentiateur": "Excellence et précision"
+  },
+  "scenario": {
+    "arc_emotionnel": "Calme → Précision → Profondeur → Prestige",
+    "fil_conducteur": "Une marque qui maîtrise son art dans le silence de l'excellence",
+    "variations": {
+      "A": {
+        "titre": "L'Autorité",
+        "sous_titre": "Premier regard",
+        "intention": "Une pulsation dorée, constante, comme un cœur certain",
+        "metaphore": "Le battement régulier d'un horloger suisse",
+        "fond": "SOFT_GRADIENT",
+        "logo": "HEARTBEAT",
+        "texte": "MINIMAL_PULSE",
+        "separateur": "GOLDEN_SHIMMER",
+        "emotion_dominante": "Confiance",
+        "moment_cle": "L'ouverture de l'email"
+      },
+      "B": {
+        "titre": "La Précision",
+        "sous_titre": "La maîtrise",
+        "intention": "L'exactitude géométrique d'un esprit tranchant",
+        "metaphore": "Un scalpel de lumière dans la nuit numérique",
+        "fond": "DEEP_GLOW",
+        "logo": "CRYSTAL_BREATH",
+        "texte": "CLEAN_FADE",
+        "separateur": "NEON_PULSE",
+        "emotion_dominante": "Admiration",
+        "moment_cle": "La lecture du nom"
+      },
+      "C": {
+        "titre": "La Profondeur",
+        "sous_titre": "L'âme",
+        "intention": "Un silence habité, plein de sens et de gravité",
+        "metaphore": "Les eaux profondes d'un lac de montagne en hiver",
+        "fond": "VOID_PULSE",
+        "logo": "SOUL_AURA",
+        "texte": "SUBTLE_BREATHE",
+        "separateur": "PLASMA_DRIFT",
+        "emotion_dominante": "Mystère",
+        "moment_cle": "La contemplation"
+      },
+      "D": {
+        "titre": "Le Prestige",
+        "sous_titre": "L'apothéose",
+        "intention": "L'éclat discret de l'excellence accomplie",
+        "metaphore": "Un diamant qui capte toute la lumière de la pièce",
+        "fond": "AURORA_FLOW",
+        "logo": "PEARL_SHIMMER",
+        "texte": "VELVET_FADE",
+        "separateur": "STAR_DRIFT",
+        "emotion_dominante": "Désir",
+        "moment_cle": "L'appel à l'action"
+      }
+    },
+    "note_du_directeur": "Chaque variation amplifie la précédente comme les mouvements d'une symphonie"
+  },
+  "technique": {
+    "variation_a": {
+      "fond": {
+        "effet": "SOFT_GRADIENT",
+        "intensity": 0.4,
+        "speed": "slow",
+        "color": "#0f0f0f",
+        "params": {
+          "opacity": 0.8,
+          "blur": 0,
+          "scale": 1.02
+        }
+      },
+      "logo": {
+        "effet": "HEARTBEAT",
+        "intensity": 0.6,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "radius": 40,
+          "glow": 0.3,
+          "pulse_scale": 1.05
+        }
+      },
+      "texte": {
+        "effet": "MINIMAL_PULSE",
+        "intensity": 0.3,
+        "speed": "slow",
+        "color": "#e8e8ff",
+        "params": {
+          "blur": 0,
+          "letter_spacing": 0.02,
+          "opacity_min": 0.85
+        }
+      },
+      "separateur": {
+        "effet": "GOLDEN_SHIMMER",
+        "intensity": 0.5,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "width": 2,
+          "glow_spread": 4
+        }
+      },
+      "duree": 60
+    },
+    "variation_b": {
+      "fond": {
+        "effet": "DEEP_GLOW",
+        "intensity": 0.4,
+        "speed": "slow",
+        "color": "#0f0f0f",
+        "params": {
+          "opacity": 0.8,
+          "blur": 0,
+          "scale": 1.02
+        }
+      },
+      "logo": {
+        "effet": "CRYSTAL_BREATH",
+        "intensity": 0.6,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "radius": 40,
+          "glow": 0.3,
+          "pulse_scale": 1.05
+        }
+      },
+      "texte": {
+        "effet": "CLEAN_FADE",
+        "intensity": 0.3,
+        "speed": "slow",
+        "color": "#e8e8ff",
+        "params": {
+          "blur": 0,
+          "letter_spacing": 0.02,
+          "opacity_min": 0.85
+        }
+      },
+      "separateur": {
+        "effet": "NEON_PULSE",
+        "intensity": 0.5,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "width": 2,
+          "glow_spread": 4
+        }
+      },
+      "duree": 60
+    },
+    "variation_c": {
+      "fond": {
+        "effet": "VOID_PULSE",
+        "intensity": 0.4,
+        "speed": "slow",
+        "color": "#0f0f0f",
+        "params": {
+          "opacity": 0.8,
+          "blur": 0,
+          "scale": 1.02
+        }
+      },
+      "logo": {
+        "effet": "SOUL_AURA",
+        "intensity": 0.6,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "radius": 40,
+          "glow": 0.3,
+          "pulse_scale": 1.05
+        }
+      },
+      "texte": {
+        "effet": "SUBTLE_BREATHE",
+        "intensity": 0.3,
+        "speed": "slow",
+        "color": "#e8e8ff",
+        "params": {
+          "blur": 0,
+          "letter_spacing": 0.02,
+          "opacity_min": 0.85
+        }
+      },
+      "separateur": {
+        "effet": "PLASMA_DRIFT",
+        "intensity": 0.5,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "width": 2,
+          "glow_spread": 4
+        }
+      },
+      "duree": 60
+    },
+    "variation_d": {
+      "fond": {
+        "effet": "AURORA_FLOW",
+        "intensity": 0.4,
+        "speed": "slow",
+        "color": "#0f0f0f",
+        "params": {
+          "opacity": 0.8,
+          "blur": 0,
+          "scale": 1.02
+        }
+      },
+      "logo": {
+        "effet": "PEARL_SHIMMER",
+        "intensity": 0.6,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "radius": 40,
+          "glow": 0.3,
+          "pulse_scale": 1.05
+        }
+      },
+      "texte": {
+        "effet": "VELVET_FADE",
+        "intensity": 0.3,
+        "speed": "slow",
+        "color": "#e8e8ff",
+        "params": {
+          "blur": 0,
+          "letter_spacing": 0.02,
+          "opacity_min": 0.85
+        }
+      },
+      "separateur": {
+        "effet": "STAR_DRIFT",
+        "intensity": 0.5,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "width": 2,
+          "glow_spread": 4
+        }
+      },
+      "duree": 60
+    },
+    "transitions": {
+      "duree": 2,
+      "easing": "cubic-bezier(0.4,0,0.2,1)",
+      "type": "cross-fade"
+    },
+    "cycle_total": 248,
+    "optimisations_email": [
+      "CSS animations uniquement — zéro JS",
+      "Chirurgie visuelle par zones actives",
+      "Harmony validator — 5 règles appliquées"
+    ],
+    "notes_techniques": "Système zone-effects actif : LOGO_VOLUME_BREATHE | NOM_HOLOGRAM_SCAN | SEP_PARTICLE_STREAM",
+    "zone_compositions": {
+      "A": {
+        "logo": {
+          "effet_id": "LOGO_VOLUME_BREATHE",
+          "intensity": 0.188,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "nom": {
+          "effet_id": "NOM_CLEAN_BREATHE",
+          "intensity": 0.075,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "titre": {
+          "effet_id": "TITRE_SLIDE_IN",
+          "intensity": 0.046,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "contact": {
+          "effet_id": "CONTACT_HIGHLIGHT_HOVER",
+          "intensity": 0.15,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "separateur": {
+          "effet_id": "SEP_BREATHING_CALM",
+          "intensity": 0.225,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "fond": {
+          "effet_id": "FOND_ATMOSPHERIC_BREATH",
+          "intensity": 0.054,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "cta": {
+          "effet_id": "CTA_GRAVITY_PULSE",
+          "intensity": 0.262,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        }
+      },
+      "B": {
+        "logo": {
+          "effet_id": "LOGO_3D_FLOAT",
+          "intensity": 0.4,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "nom": {
+          "effet_id": "NOM_HOLOGRAM_SCAN",
+          "intensity": 0.25,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "titre": {
+          "effet_id": "TITRE_SLIDE_IN",
+          "intensity": 0.076,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "contact": {
+          "effet_id": "CONTACT_ICON_PULSE",
+          "intensity": 0.15,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "separateur": {
+          "effet_id": "SEP_ENERGY_FLOW",
+          "intensity": 0.315,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "fond": {
+          "effet_id": "FOND_STELLAR_DRIFT",
+          "intensity": 0.09,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "cta": {
+          "effet_id": "CTA_GRAVITY_PULSE",
+          "intensity": 0.35,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        }
+      },
+      "C": {
+        "logo": {
+          "effet_id": "LOGO_VOLUME_BREATHE",
+          "intensity": 0.212,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "nom": {
+          "effet_id": "NOM_SHIMMER_GOLD",
+          "intensity": 0.18,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "titre": {
+          "effet_id": "TITRE_SLIDE_IN",
+          "intensity": 0.065,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "contact": {
+          "effet_id": "CONTACT_ICON_PULSE",
+          "intensity": 0.128,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "separateur": {
+          "effet_id": "SEP_PARTICLE_STREAM",
+          "intensity": 0.297,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "fond": {
+          "effet_id": "FOND_STELLAR_DRIFT",
+          "intensity": 0.077,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "cta": {
+          "effet_id": "CTA_GRAVITY_PULSE",
+          "intensity": 0.297,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        }
+      },
+      "D": {
+        "logo": {
+          "effet_id": "LOGO_3D_FLOAT",
+          "intensity": 0.48,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "nom": {
+          "effet_id": "NOM_NEON_GLOW",
+          "intensity": 0.48,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "titre": {
+          "effet_id": "TITRE_SLIDE_IN",
+          "intensity": 0.073,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "contact": {
+          "effet_id": "CONTACT_ICON_PULSE",
+          "intensity": 0.18,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "separateur": {
+          "effet_id": "SEP_PARTICLE_STREAM",
+          "intensity": 0.42,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "fond": {
+          "effet_id": "FOND_ATMOSPHERIC_BREATH",
+          "intensity": 0.086,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        },
+        "cta": {
+          "effet_id": "CTA_GRAVITY_PULSE",
+          "intensity": 0.42,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "nom": "Jean Dupont",
+    "titre": "Directeur Créatif",
+    "entreprise": "Arti-Pro Plombier",
+    "telephone": "01 40 50 26 26",
+    "email": "artisan.artsrenov@gmail.com",
+    "site": "https://artipro-plomberie.fr/",
+    "secteur": "Plombier",
+    "cta": "Réserver un appel",
+    "palette": [
+      "#0f0f0f",
+      "#6366f1",
+      "#e8e8ff"
+    ],
+    "adresse": "1 Rue de l'Assomption",
+    "ville": "Paris",
+    "pays": "France",
+    "note": 4.6,
+    "avis": 0,
+    "description": "Arti-Pro Plombier — Plombier",
+    "logo_url": "https://www.google.com/s2/favicons?domain=artipro-plomberie.fr&sz=128",
+    "logo_base64": "",
+    "style_visuel": "",
+    "slogan": "",
+    "mots_cles": [
+      "Plombier"
+    ],
+    "ton": "professionnel et moderne",
+    "reseaux_sociaux": {},
+    "client_email": ""
+  },
+  "generated_at": "2026-04-06T11:26:30.423Z",
+  "signature_id": "sig_b0b1ab2b_1775474790422"
+}

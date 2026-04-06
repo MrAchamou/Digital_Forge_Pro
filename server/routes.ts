@@ -870,6 +870,20 @@ router.get('/library/effects', async (req, res) => {
   }
 });
 
+// GET /api/library/effects/:id/download — Téléchargement d'un effet
+router.get('/library/effects/:id/download', async (req, res) => {
+  try {
+    const effect = await storage.getEffect(req.params.id);
+    if (!effect) return res.status(404).json({ error: 'Effet non trouvé' });
+    const filename = `${effect.name.replace(/\s+/g, '_')}.js`;
+    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(effect.code || '');
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/modules/status — Statut des modules
 router.get('/modules/status', (req, res) => {
   const god = godMonitor.getGodStatus();
