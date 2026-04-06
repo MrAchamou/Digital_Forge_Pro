@@ -56,11 +56,6 @@ export class SignatureSVGExporter {
     const timing = this.buildTimingCSS();
     const transitionCSS = this.buildTransitionCSS();
     const allVariantCSS = variations.map(v => v.cssAnimations).join('\n');
-    // Si un logo image est fourni, le logo statique est masqué car chaque variation active
-    // fournit sa propre copie animée positionnée exactement par-dessus
-    const logoHideCSS = logoUrl
-      ? `\n      /* Logo statique caché — copies animées dans chaque variation */\n      #company-logo { visibility: hidden; }`
-      : '';
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"

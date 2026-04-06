@@ -1,19 +1,19 @@
 {
-  "lastSaved": "2026-04-06T18:28:56.778Z",
+  "lastSaved": "2026-04-06T18:35:56.780Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
       "status": "active",
       "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 0,
+      "cooldownCount": 1,
+      "errorCount": 1,
       "successCount": 0,
       "avgResponseTime": 0,
-      "healthScore": 100,
+      "healthScore": 52,
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-06T18:15:19.715Z",
       "lastUsed": null,
-      "lastError": null
+      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
     }
   },
   "monthlyUsage": {}
