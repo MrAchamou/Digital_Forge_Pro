@@ -1,271 +1,428 @@
+<div align="center">
+
 # EffectForge AI — God Tier Studio
 
-![Version](https://img.shields.io/badge/Version-3.0.0--GOD-ff6b35?style=for-the-badge)
-![Stack](https://img.shields.io/badge/Stack-React%20%2B%20Express%20%2B%20TypeScript-00d4ff?style=for-the-badge)
-![AI](https://img.shields.io/badge/AI-GPT--4o%20%7C%20Claude%20Opus%20%7C%20Gemini%20Pro-9333ea?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-00ff00?style=for-the-badge)
+<img src="https://img.shields.io/badge/Version-3.0.0--GOD-ff6b35?style=for-the-badge&logo=fire" alt="Version"/>
+<img src="https://img.shields.io/badge/TypeScript-5.x-3178c6?style=for-the-badge&logo=typescript" alt="TypeScript"/>
+<img src="https://img.shields.io/badge/React-18-61dafb?style=for-the-badge&logo=react" alt="React"/>
+<img src="https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express" alt="Express"/>
+<img src="https://img.shields.io/badge/PostgreSQL-Neon-00e5ff?style=for-the-badge&logo=postgresql" alt="PostgreSQL"/>
+<img src="https://img.shields.io/badge/AI-GPT--4o%20%7C%20Claude%20%7C%20Gemini-9333ea?style=for-the-badge" alt="AI"/>
+<img src="https://img.shields.io/badge/Status-Production%20Ready-22c55e?style=for-the-badge" alt="Status"/>
 
-**EffectForge AI** génère des signatures email animées "God Tier" en SVG à partir de n'importe quel profil Google My Business. Trois intelligences artificielles travaillent en cascade pour produire des signatures visuellement exceptionnelles et techniquement parfaites pour tous les clients email.
+**A full-stack AI platform that generates god-tier animated SVG email signatures through a 3-brain AI pipeline.**
+
+Drop any Google My Business URL → get a professional animated signature with four narrative variations, branded PDFs, and a complete ready-to-install ZIP package — in under 60 seconds.
+
+</div>
 
 ---
 
-## Architecture — Pipeline 3 Cerveaux IA
+## What It Does
+
+EffectForge AI runs a business profile through three AI models in sequence — each with a distinct creative role — to produce an animated SVG email signature. The output is not a template. Every signature is generated from scratch based on the brand's visual identity, sector, color psychology, and a custom narrative arc built by the AI.
+
+The final package includes the animated SVG, Gmail/Outlook/Apple Mail optimized versions, three branded PDF guides, a live preview page, and a full ZIP archive — all client-ready.
+
+---
+
+## Architecture — The 3-Brain AI Pipeline
 
 ```
-URL Google My Business
-        │
-        ▼
-┌───────────────────────────────────────┐
-│  SERPER GMB SCRAPER                   │
-│  • Toutes les données GMB (nom,       │
-│    adresse, téléphone, horaires,      │
-│    note, avis, photos, réseaux        │
-│    sociaux, mots-clés, slogan…)       │
-│  • Capture logo via Clearbit API      │
-│  • Détection secteur & palette auto   │
-└──────────────────┬────────────────────┘
-                   │
-                   ▼
-┌───────────────────────────────────────┐
-│  CERVEAU 1 — GPT-4o Vision            │
-│  Rôle : Directeur Artistique          │
-│  • Analyse logo + métadonnées         │
-│  • Brief créatif complet              │
-│  • Références visuelles (3 marques)   │
-│  • Psychologie des couleurs           │
-│  • Personnalité de marque             │
-│  • Cible audience & différenciateur   │
-│  • Mot-clef narratif central          │
-└──────────────────┬────────────────────┘
-                   │
-                   ▼
-┌───────────────────────────────────────┐
-│  CERVEAU 2 — Claude Opus              │
-│  Rôle : Directeur Narratif & Poète    │
-│  • Arc émotionnel A→B→C→D             │
-│  • Fil conducteur & métaphore centrale│
-│  • 4 variations avec titre, sous-titre│
-│    intention, métaphore, émotion      │
-│  • Sélection cohérente des 50 effets  │
-│  • Note du directeur artistique       │
-└──────────────────┬────────────────────┘
-                   │
-                   ▼
-┌───────────────────────────────────────┐
-│  CERVEAU 3 — Gemini 1.5 Pro           │
-│  Rôle : Ingénieur Créatif Senior      │
-│  • Calibration technique des effets   │
-│  • Paramètres spécifiques par effet   │
-│  • Optimisation compatibilité email   │
-│  • Timing cycle (200-280s)            │
-│  • Courbes d'easing sur mesure        │
-│  • Notes techniques & optimisations   │
-└──────────────────┬────────────────────┘
-                   │
-                   ▼
-        Signature SVG Animée
-     Export SVG / PDF / JSON
-```
-
----
-
-## Bibliothèque d'Effets Premium (62 effets réels)
-
-Tous les effets sont chargés au démarrage depuis le dossier `Premium_Effect-main/`.
-Chaque effet est une classe JavaScript complète héritant de `BaseEffect` avec son propre code d'animation.
-
-| Catégorie | Effets |
-|-----------|--------|
-| **Vivants** | HEARTBEAT, SOUL AURA, BREATHING, BREATHING OBJECT |
-| **Lumineux / Électrique** | NEON GLOW, HOLOGRAM, ELECTRIC FORM, ELECTRIC HOVER, ENERGY FLOW, ENERGY IONIZE, SPARKLE AURA |
-| **Cristal / Glace** | CRYSTAL GROW, CRYSTAL SHATTER, ICE FREEZE, PRISM SPLIT, RAINBOW SHIFT |
-| **Liquide / Vague** | LIQUID MORPH, LIQUID POUR, LIQUID STATE, WAVE DISSOLVE, WAVE DISTORTION, WAVE SURF |
-| **Morphing** | MORPH 3D, MÉTAMORPHOSES D'IMAGES, MIRROR REALITY, DIMENSION SHIFT |
-| **Particules / Cosmique** | PARTICLE BUILD, PARTICLE DISSOLVE, STAR DUST FORM, STAR EXPLOSION, STELLAR DRIFT, SMOKE DISPERSE |
-| **Digital / Quantique** | GLITCH SPAWN, REALITY GLITCH, QUANTUM PHASE, QUANTUM SPLIT, DNA BUILD, NEURAL PULSE, TYPEWRITER, SHADOW CLONE |
-| **Feu** | FIRE CONSUME, FIRE WRITE |
-| **Atmosphérique** | TORNADO ABSORB, TORNADO SPIN, TORNADO TWIST |
-| **Physique / Gravité** | MAGNETIC FIELD, MAGNETIC PULL, GRAVITY REVERSE, FLOAT DANCE, FLOAT PHYSICS, PENDULUM SWING, ORBIT DANCE, GYROSCOPE SPIN |
-| **Temporel** | ECHO MULTIPLE, ECHO TRAIL, TIME ECHO, TIME REWIND |
-| **Énergie** | PHASE THROUGH, PLASMA STATE |
-| **Transformation** | ROTATION 3D, FADE LAYERS |
-
-> **Chargement automatique** : Le serveur lit `Premium_Effect-main/*/Description.txt` et le fichier `.js` correspondant à chaque démarrage.
-> Les doublons sont détectés par `premiumId` unique — aucune duplication possible même après redémarrage.
-
----
-
-## Stack Technique
-
-### Backend
-- **Node.js 20 + TypeScript** — Serveur Express
-- **PostgreSQL + Drizzle ORM** — Base de données
-- **OpenAI SDK** — GPT-4o Vision (Cerveau 1)
-- **Anthropic SDK** — Claude Opus (Cerveau 2)
-- **Google Generative AI SDK** — Gemini 1.5 Pro (Cerveau 3)
-- **Serper API** — Scraping Google My Business
-- **Clearbit API** — Capture logo entreprise
-
-### Frontend
-- **React 18 + TypeScript** — Interface
-- **Vite** — Build & HMR
-- **TanStack Query v5** — État serveur
-- **Tailwind CSS + shadcn/ui** — Design system
-- **Canvas API** — Prévisualisation live
-
----
-
-## Variables d'Environnement
-
-| Variable | Description | Source |
-|----------|-------------|--------|
-| `AI_INTEGRATIONS_OPENAI_API_KEY` | Clé OpenAI pour GPT-4o | Replit Integration |
-| `AI_INTEGRATIONS_OPENAI_BASE_URL` | Base URL OpenAI | Replit Integration |
-| `AI_INTEGRATIONS_ANTHROPIC_API_KEY` | Clé Anthropic pour Claude | Replit Integration |
-| `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | Base URL Anthropic | Replit Integration |
-| `GEMINI_API_KEY` | Clé Google Gemini | Replit Secrets |
-| `SERPER_API_KEY` | Clé Serper pour GMB | Replit Secrets |
-| `DATABASE_URL` | PostgreSQL | Replit Database |
-
----
-
-## API Endpoints
-
-```
-POST /api/signature/scrape-gmb
-  Body: { gmb_url: string }
-  → Données complètes GMB + logo + palette
-
-POST /api/signature/analyze-and-configure
-  Body: { metadata, signatureImageBase64? }
-  → Pipeline 3 cerveaux complet
-
-POST /api/signature/generate-svg
-  Body: { metadata, config, scenario }
-  → Signature SVG animée
-
-POST /api/signature/export
-  Body: { svgContent, format: "svg"|"pdf"|"json", metadata }
-  → Fichier exporté
-
-GET  /api/system/health
-  → Statut système GOD
+Google My Business URL
+          │
+          ▼
+┌─────────────────────────────────────────┐
+│  SERPER GMB SCRAPER                     │
+│  ├── Full profile extraction            │
+│  │   (name, address, phone, hours,      │
+│  │    rating, reviews, photos, keywords)│
+│  ├── Social networks auto-detection     │
+│  ├── Logo capture via Clearbit API      │
+│  └── Sector classification + palette    │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│  BRAIN 1 — GPT-4o Vision                │
+│  Role: Creative Director                │
+│  ├── Logo + metadata visual analysis    │
+│  ├── Full creative brief                │
+│  ├── Visual references (3 top brands)   │
+│  ├── Color psychology                   │
+│  ├── Brand personality mapping          │
+│  ├── Target audience + differentiator   │
+│  └── Central narrative keyword          │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│  BRAIN 2 — Claude Opus                  │
+│  Role: Narrative Director & Poet        │
+│  ├── Emotional arc  A → B → C → D       │
+│  ├── Central metaphor + story thread    │
+│  ├── 4 variations with title, subtitle, │
+│  │   intention, metaphor, emotion       │
+│  ├── Coherent effect selection (55+)    │
+│  └── Artistic director's note          │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│  BRAIN 3 — Gemini 1.5 Pro               │
+│  Role: Senior Creative Engineer         │
+│  ├── Technical calibration per effect   │
+│  ├── Effect-specific parameters         │
+│  ├── Email client compatibility tuning  │
+│  ├── Cycle timing (200–280 seconds)     │
+│  ├── Custom easing curves               │
+│  └── Technical notes + optimizations   │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│  OUTPUT DELIVERY ENGINE  (7 steps)      │
+│                                         │
+│  Step 1 ── SVG + PNG fallback           │
+│  Step 2 ── Gmail HTML + Outlook HTM     │
+│  Step 3 ── Cerebras writes all content  │
+│  Step 4 ── 3 branded PDFs               │
+│  Step 5 ── Live preview HTML page       │
+│  Step 6 ── ZIP package assembly         │
+│  Step 7 ── Delivery email + attachments │
+└─────────────────────────────────────────┘
 ```
 
 ---
 
-## Scraper GMB — Données Capturées
+## Tech Stack
 
-Le scraper collecte l'intégralité des données disponibles sur Google My Business :
-
-- **Identité** : Nom, catégorie, description, slogan, année fondation
-- **Contact** : Téléphone, email (extraction depuis recherche web), site web
-- **Localisation** : Adresse complète, ville, code postal, pays, coordonnées GPS
-- **Réputation** : Note (★), nombre d'avis
-- **Horaires** : Horaires d'ouverture jour par jour
-- **Visuels** : Logo (Clearbit HD → Google Favicon fallback), photos GMB
-- **Social** : Facebook, Instagram, LinkedIn, Twitter, YouTube, TikTok
-- **Enrichissement** : Mots-clés, gamme de prix, accessibilité
-- **Branding auto** : Palette couleurs par secteur, ton de communication
+| Layer | Technology |
+|-------|-----------|
+| **Runtime** | Node.js 20, TypeScript 5 (ESM) |
+| **Backend** | Express 4, Drizzle ORM, WebSocket (ws) |
+| **Frontend** | React 18, Vite 5, TanStack Query v5 |
+| **UI** | Tailwind CSS v4, shadcn/ui, Radix UI, Lucide |
+| **Database** | PostgreSQL via Neon Serverless |
+| **AI — Brain 1** | OpenAI GPT-4o Vision |
+| **AI — Brain 2** | Anthropic Claude Opus |
+| **AI — Brain 3** | Google Gemini 1.5 Pro |
+| **AI — Content** | Cerebras (ultra-fast inference) |
+| **Search** | Serper API (GMB scraping) |
+| **PDF** | PDFKit (multi-page, branded) |
+| **ZIP** | Archiver |
+| **Image** | Sharp (SVG → PNG conversion) |
+| **Email** | Resend API |
+| **Deployment** | Replit Autoscale |
 
 ---
 
-## Démarrage
+## Application Pages
+
+| Page | Route | Description |
+|------|-------|-------------|
+| **Command Center** | `/` | Dashboard — system metrics, queue monitor, recent activity |
+| **God Generator** | `/generator` | Main pipeline — GMB URL input, live progress, result viewer |
+| **Neural Library** | `/library` | Browse and preview all 55+ animated effects |
+| **Signature Vivante** | `/signature` | Multi-variation signature viewer with cycle playback |
+| **Studio** | `/studio` | Animation studio — build and test custom SVG animations |
+| **Reality Preview** | `/preview` | Live SVG renderer — paste any SVG and preview instantly |
+| **AI Expansion** | `/expansion` | AI-powered library growth — describe and generate new effects |
+| **System Matrix** | `/status` | Real-time health dashboard + API key management |
+| **Core Modules** | `/modules` | Inspect all 26 internal modules and their live state |
+
+---
+
+## Output Package
+
+Every generation produces a complete, client-ready ZIP archive:
+
+```
+signature-{company}-{id}.zip
+├── signature.svg                   # Animated SVG — main signature file
+├── signature-fallback.png          # High-res PNG fallback (1200×360)
+├── signature-gmail.html            # Gmail-optimized HTML version
+├── signature-outlook.htm           # Outlook VML + MSO-conditional version
+├── instructions-gmail.pdf          # Branded installation guide — Gmail
+├── instructions-outlook.pdf        # Branded installation guide — Outlook
+├── instructions-apple-mail.pdf     # Branded installation guide — Apple Mail
+├── config.json                     # Full AI generation config + decisions
+├── manifest.json                   # Archive index with file metadata
+└── LISEZ-MOI.txt                   # Human-readable README (AI-written)
+```
+
+Every ZIP includes a **live preview page** hosted at `/api/signature/preview/{id}`:
+- Mock Gmail inbox rendering with the live signature
+- 4-variation cycle counter (real-time)
+- One-click install buttons per email client
+- Direct PDF guide downloads
+
+---
+
+## Premium Effects Library — 55 Loaded, 61 Available
+
+All effects are loaded at startup from `Premium_Effect-main/`. Each is a complete animation class with configurable parameters, inheriting from `BaseEffect`.
+
+| Category | Effects |
+|----------|---------|
+| **Organic / Living** | BREATHING, BREATHING OBJECT, HEARTBEAT, SOUL AURA |
+| **Electric / Light** | NEON GLOW, HOLOGRAM, ELECTRIC FORM, ELECTRIC HOVER, ENERGY FLOW, ENERGY IONIZE, SPARKLE AURA |
+| **Crystal / Ice** | CRYSTAL GROW, ICE FREEZE, PRISM SPLIT |
+| **Liquid / Wave** | LIQUID MORPH, LIQUID POUR, LIQUID STATE, WAVE DISSOLVE, WAVE DISTORTION, WAVE SURF |
+| **Morphing / 3D** | MORPH 3D, MIRROR REALITY, DIMENSION SHIFT, ROTATION 3D |
+| **Particles / Cosmic** | PARTICLE BUILD, STAR DUST FORM, STAR EXPLOSION, STELLAR DRIFT, SMOKE DISPERSE |
+| **Digital / Quantum** | GLITCH SPAWN, REALITY GLITCH, QUANTUM PHASE, QUANTUM SPLIT, DNA BUILD, NEURAL PULSE, TYPEWRITER, SHADOW CLONE |
+| **Fire** | FIRE CONSUME, FIRE WRITE |
+| **Atmospheric** | TORNADO ABSORB, TORNADO SPIN |
+| **Temporal** | ECHO MULTIPLE, ECHO TRAIL, TIME ECHO, TIME REWIND |
+| **Physics** | FLOAT DANCE, FLOAT PHYSICS, GRAVITY REVERSE, GYROSCOPE SPIN, MAGNETIC FIELD, MAGNETIC PULL, PENDULUM SWING |
+| **Phase / Depth** | PHASE THROUGH, FADE LAYERS |
+
+---
+
+## Internal Architecture — 26 Server Modules
+
+```
+server/
+├── core/
+│   ├── god-monitor.ts                        # Composite health scoring system
+│   ├── autonomous-monitor.ts                 # Continuous self-monitoring + auto-repair
+│   ├── decision-engine.ts                    # AI model priority routing
+│   └── orchestrator.ts                       # Module lifecycle management
+│
+├── ai-engine/
+│   ├── nlp-processor.ts                      # Natural language intent extraction
+│   └── parameter-optimizer.ts               # AI parameter auto-calibration
+│
+├── modules/                                  # 26 specialized modules
+│   ├── particles.module.ts                   # Particle system engine
+│   ├── physics.module.ts                     # Physics simulation
+│   ├── morphing.module.ts                    # Shape morphing engine
+│   ├── lighting.module.ts                    # Dynamic lighting + glow
+│   ├── timing-master.module.ts               # φ=1.618 Fibonacci easing engine
+│   ├── color-harmony.module.ts               # WCAG 2.1 + OKLCH color engine
+│   ├── quality-assurance.module.ts           # Output quality scoring
+│   ├── smart-optimizer.module.ts             # Real-time performance optimizer
+│   ├── effect-fusion-engine.module.ts        # Multi-effect composition
+│   ├── adaptive-rendering-engine.module.ts   # Email client-aware rendering
+│   ├── visual-signature-engine.module.ts     # LCG-based unique fingerprinting
+│   ├── predictive-transition-engine.module.ts# Golden ratio transition curves
+│   ├── attention-guide.module.ts             # Visual focal point orchestration
+│   ├── analytics.module.ts                   # Usage and performance analytics
+│   ├── contextual-intelligence.module.ts     # Sector-aware style decisions
+│   ├── content-analyzer.module.ts            # Brand content deep analysis
+│   ├── variance-engine.module.ts             # Controlled aesthetic variation
+│   ├── dynamic-fusion-orchestrator.module.ts # Live multi-effect fusion
+│   ├── experience-orchestrator.module.ts     # End-to-end UX orchestration
+│   ├── library-expansion.module.ts           # AI-driven library growth
+│   ├── preset-manager.module.ts              # 10 smart presets + custom CRUD
+│   ├── batch-generator.module.ts             # Parallel batch generation
+│   ├── classification-storage.module.ts      # Effect classification + indexing
+│   ├── error-detection.module.ts             # Static + runtime error detection
+│   └── user-preferences-engine.module.ts     # User preference memory
+│
+├── services/
+│   ├── triple-ai-director.ts                 # 3-brain pipeline orchestrator
+│   ├── delivery-engine.ts                    # 7-step output pipeline
+│   ├── package-builder.ts                    # SVG→PNG + client-specific builds
+│   ├── pdf-generator.ts                      # Multi-page branded PDFs (PDFKit)
+│   ├── preview-page-generator.ts             # Live preview HTML builder
+│   ├── zip-assembler.ts                      # ZIP assembly + manifest generation
+│   ├── delivery-email.ts                     # Resend email + PDF attachments
+│   ├── cerebras-content-generator.ts         # 6-section AI text generation
+│   ├── api-key-rotator.ts                    # Key rotation + circuit breaker
+│   ├── harmony-validator.ts                  # Color harmony WCAG validation
+│   ├── gemini-wrapper.ts                     # Gemini API client
+│   ├── cerebras-wrapper.ts                   # Cerebras API client
+│   └── zone-svg-renderer.ts                  # SVG zone composition renderer
+│
+└── generator/
+    ├── signature-base-generator.ts           # Base SVG structure builder
+    ├── signature-svg-exporter.ts             # Final SVG export + cleanup
+    ├── signature-variations-generator.ts     # A/B/C/D variation builder
+    ├── js-generator.ts                       # Animation JavaScript generator
+    └── template-engine.ts                    # SVG template system
+```
+
+---
+
+## API Reference — 65 Endpoints
+
+### Signature Generation
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/signature/generate` | Full God Tier generation pipeline |
+| `POST` | `/api/signature/generate-god` | God Tier with SSE live progress |
+| `GET` | `/api/signature/preview/:id` | Render live preview page |
+| `GET` | `/api/signature/download/:id` | Download full ZIP package |
+| `GET` | `/api/signature/export-file/:id/:type` | Download individual file (`svg`, `gmail`, `outlook`, `pdf-gmail`, `pdf-outlook`, `pdf-apple`, `png`, `config`) |
+
+### GMB Scraping
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/gmb/scrape` | Scrape Google My Business profile |
+| `POST` | `/api/gmb/extract-logo` | Extract and base64-encode brand logo |
+
+### Effects Library
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/effects` | List all loaded effects |
+| `GET` | `/api/effects/:id` | Effect details + parameters |
+| `GET` | `/api/library/real-time-stats` | Library stats (count, categories) |
+
+### System & Health
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/health/god-status` | Full GOD health report (all modules) |
+| `GET` | `/api/system/health` | Module health overview |
+| `GET` | `/api/queue/jobs` | Processing queue state |
+
+### API Key Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/keys/status` | All keys health + usage state |
+| `POST` | `/api/keys/add` | Add key (persisted to DB) |
+| `DELETE` | `/api/keys/:service/:index` | Remove key by service + index |
+| `POST` | `/api/keys/reset` | Reset all key states |
+| `GET` | `/api/keys/replit` | Detect Replit-managed integration keys |
+
+---
+
+## API Key Rotation System
+
+Production-grade key management built into the platform:
+
+- **Multi-key pooling** — unlimited keys per service, auto-rotated on failure
+- **Composite health scoring** — weighted score from success rate, response latency, and cooldown state
+- **Circuit breaker** — 5 consecutive failures triggers a 2-minute automatic pause per key
+- **Predictive exhaustion** — monitors hourly velocity to detect rate limit approach before it hits
+- **PostgreSQL persistence** — key states and configs survive server restarts (`api_key_configs` + `api_key_states` tables)
+- **Replit integration** — auto-detects `AI_INTEGRATIONS_OPENAI_API_KEY` and `AI_INTEGRATIONS_ANTHROPIC_API_KEY`
+- **UI management** — add, inspect, and delete keys directly from System Matrix without touching environment variables
+
+---
+
+## GOD Monitor — Health System
+
+The GOD Monitor computes a composite system health score every 5 seconds:
+
+| Signal | Weight |
+|--------|--------|
+| CPU usage | Infrastructure |
+| Memory usage | Infrastructure |
+| Disk usage | Infrastructure |
+| AI model confidence | Intelligence |
+| Predictive precision | Intelligence |
+| Effect library integrity | Library |
+| Queue saturation | Performance |
+| Module error rate | Reliability |
+
+Live health is exposed at `/api/health/god-status` and displayed in real-time on the System Matrix dashboard.
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js 20+
+- PostgreSQL database (Neon recommended)
+
+### Installation
 
 ```bash
-# Développement (port 5000)
+# Install dependencies
+npm install
+
+# Push the database schema
+npm run db:push
+
+# Start the development server (port 5000)
 npm run dev
+```
 
-# Build production
+### Production Build
+
+```bash
 npm run build
-
-# Démarrage production
 npm start
 ```
 
----
-
-## Modules Avancés — Pipeline d'Intelligence
-
-### ✅ Priorité 1 — Fondamentaux visuels
-| Module | Fichier | Rôle |
-|--------|---------|------|
-| **ColorHarmonyEngine** | `server/modules/color-harmony.module.ts` | Palettes complémentaires (triadiques, analogues, split-complémentaires) |
-| **TimingMaster** | `server/modules/timing-master.module.ts` | Durées basées sur le nombre d'or (φ=1.618) + séquences Fibonacci |
-| **VarianceEngine** | `server/modules/variance-engine.module.ts` | Moteur génétique ADN — garantit que A/B/C/D sont maximalement distincts |
-
-### ✅ Priorité 2 — Intelligence de rendu
-| Module | Fichier | Rôle |
-|--------|---------|------|
-| **ContextualIntelligenceModerator** | `server/modules/contextual-intelligence.module.ts` | Modère la complexité par secteur, évite la sur-complexification |
-| **SmartOptimizer** | `server/modules/smart-optimizer.module.ts` | Calibration adaptative des intensités/vitesses selon le contenu |
-| **VisualFocusEngine** | `server/modules/visual-focus.module.ts` | Guide l'œil logo → nom → CTA via règle des tiers |
-
-### ✅ Priorité 3 — Orchestration des couches
-| Module | Fichier | Rôle |
-|--------|---------|------|
-| **EffectFusionEngine** | `server/modules/effect-fusion-engine.module.ts` | Recettes de mélange hybrides (40% PARTICLE + 30% ENERGY + 30% FLUID) |
-| **DynamicFusionOrchestrator** | `server/modules/dynamic-fusion-orchestrator.module.ts` | Blueprint cross-zones + matrice de compatibilité, niveaux Standard/Pro/Ultimate |
-| **ExperienceOrchestrator** | `server/modules/experience-orchestrator.module.ts` | Arc émotionnel Intro→Développement→Climax→Outro + micro-récompenses visuelles |
-
-### ✅ Priorité 4 — Optimisation technique
-| Module | Fichier | Rôle |
-|--------|---------|------|
-| **AdaptiveRenderingEngine** | `server/modules/adaptive-rendering-engine.module.ts` | 5 profils de rendu (Ultra/High/Balanced/Performance/Low) — sélection auto par secteur + variation |
-| **ContentAnalyzer** | `server/modules/content-analyzer.module.ts` | Analyse palette, densité texte, complexité visuelle — calcule les seuils dynamiques du pipeline |
-| **AnalyticsModule** | `server/modules/analytics.module.ts` | Collecte métriques de génération, rapports d'optimisation auto — endpoints `/api/analytics/report` et `/api/analytics/stats` |
-
-### ✅ Priorité 5 — Personnalisation & Identité
-| Module | Fichier | Rôle |
-|--------|---------|------|
-| **VisualSignatureEngine** | `server/modules/visual-signature-engine.module.ts` | Empreinte visuelle unique par rendu (fingerprint LCG + style_token) — garantit qu'aucune signature n'est identique |
-| **PredictiveTransitionEngine** | `server/modules/predictive-transition-engine.module.ts` | Easings procéduraux (Fibonacci/GoldenRatio/Organic/Neural) + métronome BPM global par variation |
-| **AttentionGuide** | `server/modules/attention-guide.module.ts` | Aimants visuels (soft_glow, micro_pulse, focus_bloom) + chemin d'œil logo→nom→CTA par variation |
-| **UserPreferencesEngine** | `server/modules/user-preferences-engine.module.ts` | Mémoire utilisateur des effets favoris/rejetés, intensité préférée, variation dominante — endpoints `/api/preferences` |
-| **PresetManager** | `server/modules/preset-manager.module.ts` | 10 presets intelligents pré-chargés (finance/luxe/tech/creative/medical/default) + CRUD custom — endpoints `/api/presets` |
+Build output: `dist/index.cjs` (server) + `dist/public/` (frontend).
 
 ---
 
-## Structure du Projet
+## Environment Variables
+
+### Required
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+
+### AI Models
+
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | GPT-4o Vision — Brain 1 |
+| `ANTHROPIC_API_KEY` | Claude Opus — Brain 2 |
+| `GEMINI_KEY_1` | Gemini 1.5 Pro — Brain 3 |
+| `CEREBRAS_KEY_1` | Cerebras — content generation |
+| `SERPER_KEY_1` | Serper — GMB scraping |
+
+> Additional keys (`GEMINI_KEY_2`, `CEREBRAS_KEY_2`, etc.) can be added at runtime through the System Matrix UI and are persisted in the database.
+
+### Optional
+
+| Variable | Description |
+|----------|-------------|
+| `RESEND_API_KEY` | Email delivery (Resend) |
+
+---
+
+## Project Structure
 
 ```
 effectforge-ai/
-├── server/
-│   ├── services/
-│   │   ├── gmb-scraper.ts              # Scraping complet GMB + logo
-│   │   ├── triple-ai-director.ts       # Pipeline 3 cerveaux IA + P1/P2/P3
-│   │   ├── zone-svg-renderer.ts        # Rendu SVG par zone (TimingMaster + ColorHarmony)
-│   │   └── signature-delivery.ts       # Export SVG/PDF/JSON
-│   ├── modules/
-│   │   ├── color-harmony.module.ts     # P1 — Palettes intelligentes
-│   │   ├── timing-master.module.ts     # P1 — Durées φ et Fibonacci
-│   │   ├── variance-engine.module.ts   # P1 — Diversité génétique A/B/C/D
-│   │   ├── contextual-intelligence.module.ts  # P2 — Modération par secteur
-│   │   ├── smart-optimizer.module.ts   # P2 — Calibration adaptative
-│   │   ├── visual-focus.module.ts      # P2 — Guide œil logo→CTA
-│   │   ├── effect-fusion-engine.module.ts      # P3 — Recettes hybrides
-│   │   ├── dynamic-fusion-orchestrator.module.ts # P3 — Blueprint cross-zones
-│   │   ├── experience-orchestrator.module.ts   # P3 — Arc émotionnel
-│   │   ├── content-analyzer.module.ts          # P4 — Profil de contenu + seuils dynamiques
-│   │   ├── adaptive-rendering-engine.module.ts # P4 — Profils Ultra/High/Balanced/Perf/Low
-│   │   ├── analytics.module.ts                 # P4 — Métriques génération + rapports auto
-│   │   ├── visual-signature-engine.module.ts   # P5 — Empreinte unique anti-clone (LCG + style_token)
-│   │   ├── predictive-transition-engine.module.ts # P5 — Easing Fibonacci/GoldenRatio + BPM sync
-│   │   ├── attention-guide.module.ts           # P5 — Aimants visuels logo→nom→CTA
-│   │   ├── user-preferences-engine.module.ts   # P5 — Mémoire préférences utilisateur
-│   │   └── preset-manager.module.ts            # P5 — 10 presets smart + CRUD custom
-│   ├── routes.ts                       # API endpoints
-│   └── index.ts                        # Serveur Express
 ├── client/src/
-│   ├── pages/
-│   │   ├── studio.tsx                  # God Tier Studio (page principale)
-│   │   └── ...                         # Autres pages
-│   └── components/
-│       └── ui/                         # shadcn/ui components
-└── shared/
-    └── schema.ts                       # Types Drizzle + Zod
+│   ├── pages/               # 10 application pages
+│   └── components/ui/       # shadcn/ui component library
+├── server/
+│   ├── ai-engine/           # NLP + parameter optimization (2 files)
+│   ├── core/                # GOD monitor, orchestrator, decision engine (4 files)
+│   ├── generator/           # SVG generation pipeline (5 files)
+│   ├── modules/             # 26 specialized modules
+│   ├── parser/              # Effect parser + batch processor
+│   ├── queue/               # Job queue manager
+│   ├── services/            # Delivery engine, AI wrappers, key rotation (16 files)
+│   ├── utils/               # Library initializer, dependency checker
+│   ├── routes.ts            # 65 API endpoints
+│   ├── storage.ts           # Drizzle storage interface
+│   └── index.ts             # Express server entry point
+├── shared/
+│   └── schema.ts            # Drizzle schema + Zod validation types
+├── Premium_Effect-main/     # 61 premium animation effect classes
+└── exports/                 # Generated packages (auto-cleaned, 7-day TTL)
 ```
 
 ---
 
-*Version 3.0.0-GOD — Avril 2026*
+## Codebase Stats
+
+| Metric | Value |
+|--------|-------|
+| Server TypeScript | 30,000+ lines |
+| API endpoints | 65 |
+| Internal modules | 26 |
+| Premium effects | 55 loaded / 61 available |
+| Database tables | 8 |
+| Frontend pages | 10 |
+| Output files per generation | 10 |
+
+---
+
+<div align="center">
+
+**EffectForge AI — God Tier Signatures™**  
+Version 3.0.0-GOD — April 2026
+
+</div>
