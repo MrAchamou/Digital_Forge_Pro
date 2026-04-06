@@ -23,6 +23,7 @@ import { recordGeneration } from '../modules/analytics.module';
 import { generateVisualSignature } from '../modules/visual-signature-engine.module';
 import { buildTransitionPipeline } from '../modules/predictive-transition-engine.module';
 import { applyAttentionGuide } from '../modules/attention-guide.module';
+import { buildChaosComposition, enrichWithChaos } from './chaos-composer';
 
 const EFFECTS_LIBRARY = [
   'HEARTBEAT', 'SOUL_AURA', 'PLASMA_DRIFT', 'NEON_PULSE', 'GOLDEN_SHIMMER',
@@ -422,36 +423,10 @@ async function runZoneSelectionForVariation(
     }
   );
 
-  const fallbackComposition = (): ZoneComposition => {
-    // Pour les zones catégorisées (logo, nom), on prend le premier candidat de la première catégorie
-    const pickCat = (cats: any): import('./harmony-validator').ZoneEffectDecision => {
-      const firstCat = Object.values(cats)[0] as any[];
-      const first = firstCat?.[0];
-      return {
-        effet_id:  first?.id || 'LOGO_VOLUME_BREATHE',
-        intensity: first?.intensite_recommandee || 0.3,
-        speed:     'medium',
-        color:     primaryColor,
-        raison:    'fallback automatique',
-      };
-    };
-    const pickFlat = (arr: any[]): import('./harmony-validator').ZoneEffectDecision => ({
-      effet_id:  arr[0]?.id || 'SEP_BREATHING_CALM',
-      intensity: arr[0]?.intensite_recommandee || 0.25,
-      speed:     'medium',
-      color:     primaryColor,
-      raison:    'fallback automatique',
-    });
-    return {
-      logo:       pickCat(selection.logo),
-      nom:        pickCat(selection.nom),
-      titre:      pickFlat(selection.titre as any[]),
-      contact:    pickFlat(selection.contact as any[]),
-      separateur: pickFlat(selection.separateur as any[]),
-      fond:       pickFlat(selection.fond as any[]),
-      cta:        pickFlat(selection.cta as any[]),
-    };
-  };
+  // Fallback chaos organisé — max de couches par zone depuis les candidats scorés
+  const CHAOS_SPEED: Record<VariationContext, 'slow' | 'medium' | 'fast'> = { A: 'slow', B: 'medium', C: 'slow', D: 'fast' };
+  const fallbackComposition = (): ZoneComposition =>
+    buildChaosComposition(selection, primaryColor, CHAOS_SPEED[variation]);
 
   try {
     const text = await callGemini(prompt, { temperature: 0.25, maxTokens: 1800 });
@@ -514,7 +489,7 @@ async function runZoneSelectionForVariation(
       };
     };
 
-    const raw: ZoneComposition = {
+    const rawComposed: ZoneComposition = {
       logo:       convertLayered(rawMulti.logo,       'logo'),
       nom:        convertLayered(rawMulti.nom,        'nom'),
       titre:      convertLayered(rawMulti.titre,      'titre'),
@@ -523,6 +498,12 @@ async function runZoneSelectionForVariation(
       fond:       convertLayered(rawMulti.fond,       'fond'),
       cta:        convertLayered(rawMulti.cta,        'cta'),
     };
+
+    // 🌀 Chaos Organisé — injecter les couches manquantes depuis les candidats scorés
+    // Garantit que chaque zone a le maximum de couches simultanées (effet waooow)
+    const raw = enrichWithChaos(rawComposed, selection, primaryColor);
+    const totalLayers = Object.values(raw).reduce((sum, z) => sum + (z.layers?.length || 0), 0);
+    log(`🌀 Chaos enrichment [${variation}] — ${totalLayers} couches totales injectées`, 'triple-ai');
 
     const validated = validateHarmony(raw, palette);
     if (validated.corrections.length > 0) {

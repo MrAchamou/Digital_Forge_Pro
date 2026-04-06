@@ -708,12 +708,15 @@ function mergeEffects(effects: SVGEffectCode[]): SVGEffectCode {
 }
 
 // Ordre de rendu des catégories pour chaque zone (du fond vers le premier plan)
+// 🌀 Chaos Organisé : supporte jusqu'à 4 couches simultanées par zone
 const LAYER_RENDER_ORDER: Record<string, string[]> = {
   logo:       ['energie', 'matiere', 'dimension', 'transformation'],  // aura → matière → 3D → morph
   nom:        ['lumiere', 'mouvement'],
-  separateur: ['secondary', 'primary'],  // fond d'abord, puis effet principal
-  fond:       ['secondary', 'primary'],
-  cta:        ['secondary', 'primary'],
+  separateur: ['tertiary', 'secondary', 'primary'],  // fond d'abord, puis couches successives
+  fond:       ['tertiary', 'secondary', 'primary'],
+  cta:        ['tertiary', 'secondary', 'primary'],
+  titre:      ['secondary', 'primary'],
+  contact:    ['secondary', 'primary'],
 };
 
 function renderZoneWithLayers(
@@ -826,11 +829,21 @@ export function renderZoneComposition(
     (dec, vid, delay) => renderCtaEffect(d_fn, dec, vid, delay), c1
   );
 
+  const titreResult = renderZoneWithLayers(
+    'titre', withColor(composition.titre, 'titre', c2), varId, titreDelay,
+    (dec, vid, delay) => renderTitreEffect(d_fn, dec, vid, delay), c2
+  );
+
+  const contactResult = renderZoneWithLayers(
+    'contact', withColor(composition.contact, 'contact', c1), varId, contDelay,
+    (dec, vid, delay) => renderContactEffect(d_fn, dec, vid, delay), c1
+  );
+
   return {
     logo:       logoResult,
     nom:        nomResult,
-    titre:      renderTitreEffect(d_fn, withColor(composition.titre, 'titre', c2), varId, titreDelay),
-    contact:    renderContactEffect(d_fn, withColor(composition.contact, 'contact', c1), varId, contDelay),
+    titre:      titreResult,
+    contact:    contactResult,
     separateur: sepResult,
     fond:       fondResult,
     cta:        ctaResult,

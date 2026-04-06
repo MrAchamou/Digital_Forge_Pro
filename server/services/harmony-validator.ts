@@ -89,17 +89,20 @@ export function validateHarmony(
   const zones = Object.keys(config) as ZoneName[];
 
   // RÈGLE 1 — Densité visuelle globale
+  // 🌀 Chaos Organisé : tolérance augmentée, on atténue seulement en cas de surcharge extrême
+  const totalLayers = zones.reduce((sum, z) => sum + (config[z]?.layers?.length || 0), 0);
   const animatedZones = zones.filter(z => {
     const effect = config[z];
     return effect.intensity > 0 && effect.effet_id !== 'CTA_STATIC_PRESENCE' && effect.effet_id !== 'FOND_CLEAN_DARK';
   });
-  if (animatedZones.length > 6) {
+  if (animatedZones.length >= 7 && totalLayers > 16) {
+    // Vraie surcharge extrême — atténuer seulement le fond
     if (config.fond.intensity > 0) {
-      config.fond.intensity = parseFloat((config.fond.intensity * 0.6).toFixed(3));
+      config.fond.intensity = parseFloat((config.fond.intensity * 0.75).toFixed(3));
       if (config.fond.layers) {
-        config.fond.layers.forEach(l => l.intensity = parseFloat((l.intensity * 0.6).toFixed(3)));
+        config.fond.layers.forEach(l => l.intensity = parseFloat((l.intensity * 0.75).toFixed(3)));
       }
-      corrections.push(`Règle 1: Densité élevée — fond atténué à ${config.fond.intensity}`);
+      corrections.push(`Règle 1: Surcharge chaos (${totalLayers} couches) — fond atténué légèrement`);
     }
   }
 
@@ -146,13 +149,17 @@ export function validateHarmony(
   }
 
   // RÈGLE 4 — Intensités des couches secondaires atténuées
-  // Pour éviter la surcharge visuelle, les couches 2/3/4 doivent être plus douces
+  // 🌀 Chaos Organisé : cascade douce, les couches gardent assez d'intensité pour être visibles
   for (const z of zones) {
     const layers = config[z]?.layers;
     if (layers && layers.length > 1) {
       layers.forEach((layer, idx) => {
-        if (idx > 0 && layer.intensity > config[z].intensity * 0.8) {
-          layer.intensity = parseFloat((config[z].intensity * (0.7 - idx * 0.1)).toFixed(3));
+        if (idx > 0) {
+          // Chaque couche suivante peut avoir jusqu'à 80% de l'intensité de la précédente
+          const maxAllowed = config[z].intensity * (0.80 - idx * 0.08);
+          if (layer.intensity > maxAllowed) {
+            layer.intensity = parseFloat(Math.max(0.05, maxAllowed).toFixed(3));
+          }
         }
       });
     }

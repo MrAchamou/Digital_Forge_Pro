@@ -627,7 +627,9 @@ function formatCategoryZone(cats: CategoryCandidates): string {
 }
 
 function formatFlatZone(effets: EffetCandidat[], maxSelect: number): string {
-  const label = maxSelect > 1
+  const label = maxSelect >= 3
+    ? `(🌀 CHAOS — choisir primary + secondary + tertiary, tous OBLIGATOIRES) :`
+    : maxSelect > 1
     ? `(choisir primary + optionnel secondary parmi) :`
     : `(choisir 1) :`;
   return `  ${label}\n` + effets.map(e =>
@@ -727,35 +729,49 @@ ${formatFlatZone(selection.titre as EffetCandidat[], 1)}
 📞 CONTACT :
 ${formatFlatZone(selection.contact as EffetCandidat[], 1)}
 
-〡SÉPARATEUR — 2 COUCHES POSSIBLES :
-  [RÈGLE] primary obligatoire, secondary optionnel (intensité réduite)
-${formatFlatZone(selection.separateur as EffetCandidat[], 2)}
+〡SÉPARATEUR — 3 COUCHES (chaos organisé) :
+  [RÈGLE] primary obligatoire, secondary + tertiary fortement recommandés — EMPILÉS simultanément !
+  [RÈGLE] tertiary = effet de fond très subtil (intensité max 0.08)
+${formatFlatZone(selection.separateur as EffetCandidat[], 3)}
 
-🌌 FOND — 2 COUCHES ATMOSPHÉRIQUES :
-  [RÈGLE] primary obligatoire, secondary optionnel (très subtil, intensité max 0.12)
-${formatFlatZone(selection.fond as EffetCandidat[], 2)}
+🌌 FOND — 3 COUCHES ATMOSPHÉRIQUES (chaos organisé) :
+  [RÈGLE] primary + secondary + tertiary — tous présents simultanément !
+  [RÈGLE] tertiary très subtil (intensité max 0.06), secondary modéré (max 0.12)
+${formatFlatZone(selection.fond as EffetCandidat[], 3)}
 
-🎯 CTA — 2 COUCHES (impact + finesse) :
-  [RÈGLE] primary obligatoire, secondary optionnel pour amplifier l'appel à l'action
-${formatFlatZone(selection.cta as EffetCandidat[], 2)}
+🎯 CTA — 3 COUCHES D'IMPACT (chaos organisé) :
+  [RÈGLE] primary (fort) + secondary (moyen) + tertiary (subtil) — TOUS présents !
+  [RÈGLE] L'empilement crée un effet d'attraction irrésistible sur le bouton
+${formatFlatZone(selection.cta as EffetCandidat[], 3)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RÈGLES DE COMPOSITION MULTI-COUCHES
+🌀 CHAOS ORGANISÉ — PHILOSOPHIE DES COUCHES SIMULTANÉES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. SUPERPOSITION : Les couches d'un même zone s'empilent — elles doivent être COMPLÉMENTAIRES pas concurrentes
+L'objectif est de créer des effets "WAOOOW" par SUPERPOSITION INTENTIONNELLE.
+Chaque zone a PLUSIEURS effets actifs en même temps — comme un chef qui superpose des saveurs.
+
+RÈGLES DE COMPOSITION :
+1. SUPERPOSITION OBLIGATOIRE : Chaque zone DOIT avoir le maximum de couches possibles
+   → Logo = 4 couches, Nom = 2 couches, Sep/Fond/CTA = 3 couches
 2. HIÉRARCHIE intensité : Logo(total) > Nom(total) > CTA(total) > Séparateur > Fond > Titre > Contact
-3. Chaque couche supplémentaire doit avoir une intensité INFÉRIEURE à la couche précédente (éviter la surcharge)
+3. CASCADE d'intensité : couche 1 = 100%, couche 2 = 75%, couche 3 = 55% — toujours visibles
 4. Cohérence de vitesse au sein d'une même zone : toutes les couches d'une zone ont la même vitesse
 5. Cohérence d'univers global : les 7 zones racontent la MÊME histoire émotionnelle
 6. AUCUN effet interdit — diversité absolue entre les 4 variations A/B/C/D
 7. Couleurs : codes hex valides, tirés de la palette de la marque
 
-PHILOSOPHIE MULTI-COUCHES (exemple logo) :
-- dimension (LOGO_3D_FLOAT) : donne la profondeur physique
-- matiere (LOGO_GOLD_POLISH) : habille la surface en or
-- energie (LOGO_HALO_PULSE) : émet une aura vivante
-- transformation (LOGO_LIQUID_EDGE) : les bords respirent
-→ RÉSULTAT : Un logo qui existe dans l'espace, brillant, vivant, en mouvement
+PHILOSOPHIE CHAOS ORGANISÉ (exemple logo) :
+- energie (LOGO_HALO_PULSE)  : couche de fond — aura lumineuse irradiante
+- matiere (LOGO_GOLD_POLISH) : couche de surface — habillage métallique doré
+- dimension (LOGO_3D_FLOAT)  : couche de forme — profondeur spatiale 3D
+- transformation (LOGO_NEURAL_MORPH) : couche de vie — les contours mutent
+→ RÉSULTAT : Un logo qui existe dans l'espace, brillant, vivant, organique — WAOOOW garanti !
+
+PHILOSOPHIE CHAOS ORGANISÉ (exemple fond) :
+- tertiary (FOND_CLEAN_DARK)        : atmosphère de base imperceptible
+- secondary (FOND_ATMOSPHERIC_BREATH) : souffle doux et lent
+- primary (FOND_STELLAR_DRIFT)       : étoiles filantes subtiles
+→ RÉSULTAT : Un fond qui respire à plusieurs rythmes simultanément
 
 Réponds UNIQUEMENT en JSON strict (aucun texte avant ou après) :
 {
@@ -773,15 +789,18 @@ Réponds UNIQUEMENT en JSON strict (aucun texte avant ou après) :
   "contact":    { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
   "separateur": {
     "primary":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-    "secondary": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+    "secondary": { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "tertiary":  { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "très subtil, fond" }
   },
   "fond": {
     "primary":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-    "secondary": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+    "secondary": { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "tertiary":  { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "très subtil, ambiance de fond" }
   },
   "cta": {
     "primary":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-    "secondary": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+    "secondary": { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "tertiary":  { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "finesse supplémentaire" }
   }
 }`;
 }
