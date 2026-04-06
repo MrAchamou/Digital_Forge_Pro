@@ -59,82 +59,49 @@ class ApiKeyRotator {
   }
 
   private loadKeysFromEnv() {
-    const HARDCODED_KEYS: Record<ServiceName, string[]> = {
-      gemini: [
-        'AIzaSyDvSlFPIEiN5zlcW-1AeD1LHhFwxaVGUsE',
-        'AIzaSyDKg8aohZGOU3p710ICmk9AsaScBD7pvg0',
-        'AIzaSyCbStYydmSl1ocHiXbVWaLiUd7XXmwWTnY',
-        'AIzaSyDsxuT-CPR_KS1fNIpKjZcnTT5BshR-sjA',
-        'AIzaSyDGJjE_Kv8GwxhRtymScLyizAIN62hm_2E',
-      ],
-      cerebras: [
-        'csk-8chppv325r99he2839n6vhkfrpcherkm58225cc324rhtf4t',
-        'csk-fcy48hwxrhxmxkd3j2yeynttv85t5yh5rv5wf42ex84pycvt',
-        'csk-dkfwe2x9dy63kyxw3xp3e9hfe9fjc5wm9r9fpe8x62yytp5k',
-        'csk-nhp66x238xvkmym66dykmwemj28j9dcm3nef3xx62w485xw2',
-        'csk-ch5jkvd3jnmncrkd2k55vjk6hjtfkcckrhfm3yyrnvx5fvc3',
-      ],
-      serper: [
-        'bfa34b52df8a359fafd1b091886a1f3e183a3978',
-        'ff8aff1c057b08df4ef0ceb4e07e41c2aac0ab35',
-        '82e62e3f52b21499b8aaf3890376cd5dd323d200',
-        '4df965f59d55be464ed55769fb6d39c4b8bc4524',
-        'f22997694464049b84886ca43c8aee8a62594c98',
-      ],
+    // ─────────────────────────────────────────────────────────────────────────
+    // Les clés sont lues UNIQUEMENT depuis les secrets Replit.
+    // Convention de nommage :
+    //   GEMINI_KEY_1, GEMINI_KEY_2, ..., GEMINI_KEY_10
+    //   CEREBRAS_KEY_1, CEREBRAS_KEY_2, ..., CEREBRAS_KEY_10
+    //   SERPER_KEY_1, SERPER_KEY_2, ..., SERPER_KEY_10
+    //
+    // Ajoute tes clés une seule fois dans les secrets Replit — le rotateur
+    // les détecte automatiquement à chaque démarrage.
+    // ─────────────────────────────────────────────────────────────────────────
+    const envPrefix: Record<ServiceName, string> = {
+      gemini:   'GEMINI_KEY_',
+      cerebras: 'CEREBRAS_KEY_',
+      serper:   'SERPER_KEY_',
     };
 
     for (const service of ['gemini', 'cerebras', 'serper'] as ServiceName[]) {
       this.pool[service] = [];
 
-      // Charger les clés intégrées en dur
-      for (let i = 0; i < HARDCODED_KEYS[service].length; i++) {
-        const keyValue = HARDCODED_KEYS[service][i];
-        this.pool[service].push({
-          id: `${service}_${i + 1}`,
-          service,
-          key: keyValue,
-          status: 'active',
-          usageToday: 0,
-          dailyLimit: DAILY_LIMITS[service],
-          lastUsed: null,
-          cooldownUntil: null,
-          cooldownCount: 0,
-          errorCount: 0,
-          successCount: 0,
-          avgResponseTime: 0,
-          lastError: null,
-        });
-      }
-
-      // Clés supplémentaires depuis les variables d'environnement (override possible)
-      const envPrefix: Record<ServiceName, string> = {
-        gemini: 'GEMINI_KEY_',
-        cerebras: 'CEREBRAS_KEY_',
-        serper: 'SERPER_KEY_',
-      };
       for (let i = 1; i <= 10; i++) {
-        const envName = `${envPrefix[service]}${i}`;
+        const envName  = `${envPrefix[service]}${i}`;
         const keyValue = process.env[envName];
         if (keyValue && keyValue.trim()) {
-          const alreadyExists = this.pool[service].some(k => k.key === keyValue.trim());
-          if (!alreadyExists) {
-            this.pool[service].push({
-              id: `${service}_env_${i}`,
-              service,
-              key: keyValue.trim(),
-              status: 'active',
-              usageToday: 0,
-              dailyLimit: DAILY_LIMITS[service],
-              lastUsed: null,
-              cooldownUntil: null,
-              cooldownCount: 0,
-              errorCount: 0,
-              successCount: 0,
-              avgResponseTime: 0,
-              lastError: null,
-            });
-          }
+          this.pool[service].push({
+            id:              `${service}_${i}`,
+            service,
+            key:             keyValue.trim(),
+            status:          'active',
+            usageToday:      0,
+            dailyLimit:      DAILY_LIMITS[service],
+            lastUsed:        null,
+            cooldownUntil:   null,
+            cooldownCount:   0,
+            errorCount:      0,
+            successCount:    0,
+            avgResponseTime: 0,
+            lastError:       null,
+          });
         }
+      }
+
+      if (this.pool[service].length === 0) {
+        log(`⚠️  Aucune clé ${service.toUpperCase()} trouvée — ajoute ${envPrefix[service]}1 dans les secrets Replit`, 'api-rotator');
       }
     }
   }
