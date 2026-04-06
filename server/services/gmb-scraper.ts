@@ -20,6 +20,7 @@ export interface GmbScrapedData {
   avis: number;
   horaires: string[];
   logo_url: string;
+  logo_base64: string;
   photos: string[];
   coordonnees: { lat: number; lng: number } | null;
   reseaux_sociaux: Record<string, string>;
@@ -169,6 +170,27 @@ async function fetchLogoUrl(website: string, entrepriseName: string): Promise<st
   }
 }
 
+async function fetchLogoBase64(logoUrl: string): Promise<string> {
+  if (!logoUrl) return '';
+  try {
+    const res = await fetch(logoUrl, {
+      signal: AbortSignal.timeout(8000),
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+    });
+    if (!res.ok) return '';
+    const contentType = res.headers.get('content-type') || 'image/png';
+    const mimeType = contentType.split(';')[0].trim();
+    if (!mimeType.startsWith('image/')) return '';
+    const buffer = await res.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+    log(`Logo converti en base64 (${Math.round(base64.length / 1024)}KB)`, 'gmb-scraper');
+    return `data:${mimeType};base64,${base64}`;
+  } catch (err: any) {
+    log(`Impossible de convertir logo en base64: ${err.message}`, 'gmb-scraper');
+    return '';
+  }
+}
+
 function parseHoraires(openingHours: any): string[] {
   if (!openingHours) return [];
   if (Array.isArray(openingHours)) return openingHours.map((h: any) => String(h));
@@ -279,6 +301,7 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
 
     // ── Logo ─────────────────────────────────────────────────────────────────
     const logo_url = await fetchLogoUrl(website, place.title || rawName);
+    const logo_base64 = await fetchLogoBase64(logo_url);
 
     // ── Mots-clés ────────────────────────────────────────────────────────────
     const mots_cles = [
@@ -310,6 +333,7 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
       avis: parseInt(place.reviewCount || place.reviews) || 0,
       horaires,
       logo_url,
+      logo_base64,
       photos,
       coordonnees,
       reseaux_sociaux,
@@ -347,6 +371,7 @@ function generateDemoData(gmbUrl: string): GmbScrapedData {
     avis: 0,
     horaires: [],
     logo_url: '',
+    logo_base64: '',
     photos: [],
     coordonnees: null,
     reseaux_sociaux: {},
