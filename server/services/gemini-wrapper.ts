@@ -92,37 +92,50 @@ export async function callGemini(
 }
 
 async function callGeminiFallbackClaude(prompt: string, options: any): Promise<string> {
-  try {
-    const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) throw new Error('ANTHROPIC_API_KEY non disponible');
-
-    const anthropic = new Anthropic({
-      apiKey,
-      baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL || undefined,
-    });
-
-    const messages: any[] = [];
-    if (options.isVision && options.imageBase64) {
-      messages.push({
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: 'image/png', data: options.imageBase64 } },
-          { type: 'text', text: prompt },
-        ],
+  // 1. Essayer Claude si la clé est disponible
+  const anthropicKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
+  if (anthropicKey) {
+    try {
+      const anthropic = new Anthropic({
+        apiKey: anthropicKey,
+        baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL || undefined,
       });
-    } else {
-      messages.push({ role: 'user', content: prompt });
+
+      const messages: any[] = [];
+      if (options.isVision && options.imageBase64) {
+        messages.push({
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/png', data: options.imageBase64 } },
+            { type: 'text', text: prompt },
+          ],
+        });
+      } else {
+        messages.push({ role: 'user', content: prompt });
+      }
+
+      const response = await anthropic.messages.create({
+        model: 'claude-opus-4-5',
+        max_tokens: options.maxTokens ?? 2000,
+        messages,
+      });
+
+      log('Gemini → fallback Claude Opus réussi', 'gemini-wrapper');
+      return response.content[0]?.type === 'text' ? response.content[0].text : '';
+    } catch (err: any) {
+      log(`Gemini → Claude fallback échoué: ${err.message} — essai Cerebras`, 'gemini-wrapper');
     }
+  }
 
-    const response = await anthropic.messages.create({
-      model: 'claude-opus-4-5',
-      max_tokens: options.maxTokens ?? 2000,
-      messages,
+  // 2. Fallback Cerebras (5 clés disponibles)
+  try {
+    log('Gemini → fallback Cerebras', 'gemini-wrapper');
+    const { callCerebras } = await import('./cerebras-wrapper');
+    return await callCerebras(prompt, {
+      maxTokens: options.maxTokens ?? 2000,
+      temperature: options.temperature ?? 0.7,
     });
-
-    log('Gemini → fallback Claude Opus réussi', 'gemini-wrapper');
-    return response.content[0]?.type === 'text' ? response.content[0].text : '';
   } catch (err: any) {
-    throw new Error(`Gemini + Claude fallback échoués: ${err.message}`);
+    throw new Error(`Gemini + Claude + Cerebras échoués: ${err.message}`);
   }
 }
