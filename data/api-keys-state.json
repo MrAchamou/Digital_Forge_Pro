@@ -1,5 +1,5 @@
 {
-  "lastSaved": "2026-04-06T17:12:57.957Z",
+  "lastSaved": "2026-04-06T17:21:08.945Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
@@ -70,9 +70,147 @@
       "hourWindowStart": "2026-04-06T17:09:57.872Z",
       "lastUsed": null,
       "lastError": null
+    },
+    "cerebras_1": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "cerebras_2": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "cerebras_3": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "cerebras_4": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "cerebras_5": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "serper_1": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "serper_2": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "serper_3": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "serper_4": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "serper_5": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:14:08.796Z",
+      "lastUsed": null,
+      "lastError": null
     }
   },
-  "monthlyUsage": {
-    "serper_2026-04": 4
-  }
+  "monthlyUsage": {}
 }

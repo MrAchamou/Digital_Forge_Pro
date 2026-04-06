@@ -139,8 +139,8 @@ ${allVariantCSS}
       }
 
       /* Internal variation animations timing */
-      /* VAR A internal elements */
-      #var-a, #var-a-particles > *, #var-a-halo, #var-a-shimmer, #var-a-sep {
+      /* VAR A internal elements (particles excluded — they have individual calc() durations) */
+      #var-a, #var-a-halo, #var-a-shimmer, #var-a-sep {
         animation-duration: 10s;
         animation-iteration-count: infinite;
       }
@@ -151,8 +151,8 @@ ${allVariantCSS}
         animation-iteration-count: infinite;
       }
 
-      /* VAR C internal elements */
-      #var-c, #var-c-particles > *, #var-c-ring, #var-c-shimmer, #var-c-sep {
+      /* VAR C internal elements (particles excluded — they have individual calc() durations) */
+      #var-c, #var-c-ring, #var-c-shimmer, #var-c-sep {
         animation-duration: 10s;
         animation-iteration-count: infinite;
       }

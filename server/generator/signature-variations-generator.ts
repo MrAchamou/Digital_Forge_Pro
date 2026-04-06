@@ -174,11 +174,11 @@ export class SignatureVariationsGenerator {
         80% { opacity: 1; }
         90% { opacity: 0; }
       }
-      #var-a { animation: breathe-bg-a var-a-anim; }
-      #var-a-particles > * { animation: float-pA calc(3s + var(--i) * 0.4s) ease-in-out var-a-delay infinite; }
-      #var-a-halo { animation: pulse-photo-a var-a-anim; }
-      #var-a-shimmer { animation: shimmer-name-a var-a-anim; }
-      #var-a-sep { animation: sep-flow-a var-a-anim; }`;
+      #var-a { animation: breathe-bg-a 10s ease-in-out 0s infinite; }
+      #var-a-particles > * { animation: float-pA calc(3s + var(--i) * 0.4s) ease-in-out 0s infinite; }
+      #var-a-halo { animation: pulse-photo-a 10s ease-in-out 0s infinite; }
+      #var-a-shimmer { animation: shimmer-name-a 10s ease-in-out 0s infinite; }
+      #var-a-sep { animation: sep-flow-a 10s ease-in-out 0s infinite; }`;
 
     const svg = `<g id="var-a">
       <!-- Subtle background wash -->
@@ -230,11 +230,11 @@ export class SignatureVariationsGenerator {
         0%, 100% { opacity: 0; transform: scaleY(0.8); }
         15%, 85% { opacity: 0.8; transform: scaleY(1); }
       }
-      #var-b { animation: breathe-bg-b var-b-anim; }
-      #var-b-wave1 { animation: wave-b var-b-anim; }
-      #var-b-wave2 { animation: wave-b2 var-b-anim; }
-      #var-b-logo-glow { animation: hue-logo-b var-b-anim; }
-      #var-b-sep { animation: sep-pulse-b var-b-anim; transform-origin: 172px 90px; }`;
+      #var-b { animation: breathe-bg-b 10s ease-in-out 0s infinite; }
+      #var-b-wave1 { animation: wave-b 10s ease-in-out 0s infinite; }
+      #var-b-wave2 { animation: wave-b2 10s ease-in-out 0s infinite; }
+      #var-b-logo-glow { animation: hue-logo-b 10s ease-in-out 0s infinite; }
+      #var-b-sep { animation: sep-pulse-b 10s ease-in-out 0s infinite; transform-origin: 172px 90px; }`;
 
     const svg = `<g id="var-b">
       <rect x="0" y="0" width="600" height="180" fill="${c1}" fill-opacity="0.05" rx="12"/>
@@ -280,11 +280,11 @@ export class SignatureVariationsGenerator {
         0%, 100% { opacity: 0; }
         10%, 90% { opacity: 0.6; }
       }
-      #var-c { animation: breathe-bg-c var-c-anim; }
-      #var-c-particles > * { animation: noise-pC calc(2.5s + var(--i) * 0.3s) ease-in-out var-c-delay infinite; }
-      #var-c-ring { animation: ring-expand-c var-c-anim; }
-      #var-c-shimmer { animation: text-shimmer-c var-c-anim; }
-      #var-c-sep { animation: sep-noise-c var-c-anim; }`;
+      #var-c { animation: breathe-bg-c 10s ease-in-out 0s infinite; }
+      #var-c-particles > * { animation: noise-pC calc(2.5s + var(--i) * 0.3s) ease-in-out 0s infinite; }
+      #var-c-ring { animation: ring-expand-c 10s ease-in-out 0s infinite; }
+      #var-c-shimmer { animation: text-shimmer-c 10s ease-in-out 0s infinite; }
+      #var-c-sep { animation: sep-noise-c 10s ease-in-out 0s infinite; }`;
 
     const svg = `<g id="var-c">
       <rect x="0" y="0" width="600" height="180" fill="${c0}" fill-opacity="0.3" rx="12"/>
@@ -337,12 +337,12 @@ export class SignatureVariationsGenerator {
         50% { transform: rotate(${cfg.speed === 'fast' ? '6' : '3'}deg); }
         90% { opacity: 0; }
       }
-      #var-d { animation: breathe-bg-d var-d-anim; }
-      #var-d-outer { animation: resp-outer-d var-d-anim; }
-      #var-d-inner { animation: resp-inner-d var-d-anim; }
-      #var-d-cta { animation: cta-glow-d var-d-anim; }
-      #var-d-sep { animation: sep-resp-d var-d-anim; }
-      #var-d-logo { animation: logo-rotate-d var-d-anim; transform-origin: 76px 135px; }`;
+      #var-d { animation: breathe-bg-d 10s ease-in-out 0s infinite; }
+      #var-d-outer { animation: resp-outer-d 10s ease-in-out 0s infinite; }
+      #var-d-inner { animation: resp-inner-d 10s ease-in-out 0s infinite; }
+      #var-d-cta { animation: cta-glow-d 10s ease-in-out 0s infinite; }
+      #var-d-sep { animation: sep-resp-d 10s ease-in-out 0s infinite; }
+      #var-d-logo { animation: logo-rotate-d 10s ease-in-out 0s infinite; transform-origin: 76px 135px; }`;
 
     const svg = `<g id="var-d">
       <rect x="0" y="0" width="600" height="180" fill="${c1}" fill-opacity="0.06" rx="12"/>
