@@ -1267,6 +1267,7 @@ router.get('/signature/export/:id/:type', async (req, res) => {
 router.get('/keys/status', async (_req, res) => {
   try {
     const { rotator } = await import('./services/api-key-rotator');
+    await rotator.init();
     const status = rotator.getPoolStatus();
 
     const now = new Date();
