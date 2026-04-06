@@ -1,0 +1,898 @@
+{
+  "brief": {
+    "style_detecte": "professionnel moderne",
+    "references_visuelles": [
+      "Apple",
+      "Linear",
+      "Notion"
+    ],
+    "ton_emotionnel": "professionnel et moderne",
+    "intensite_mouvement": "subtil",
+    "univers_visuel": "Espace numérique épuré avec des accents de lumière froide",
+    "contraintes": [
+      "compatibilité email",
+      "animations CSS uniquement"
+    ],
+    "mot_clef_narratif": "Précision Silencieuse",
+    "analyse_logo": "Logo professionnel sobre",
+    "psychologie_couleurs": "Palette neutre évoquant la confiance et la modernité",
+    "personnalite_marque": [
+      "fiable",
+      "moderne",
+      "professionnel"
+    ],
+    "cible_audience": "Professionnels et entreprises",
+    "differentiateur": "Excellence et précision"
+  },
+  "scenario": {
+    "arc_emotionnel": "Calme → Précision → Profondeur → Prestige",
+    "fil_conducteur": "Une marque qui maîtrise son art dans le silence de l'excellence",
+    "variations": {
+      "A": {
+        "titre": "L'Autorité",
+        "sous_titre": "Premier regard",
+        "intention": "Une pulsation dorée, constante, comme un cœur certain",
+        "metaphore": "Le battement régulier d'un horloger suisse",
+        "fond": "SOFT_GRADIENT",
+        "logo": "HEARTBEAT",
+        "texte": "MINIMAL_PULSE",
+        "separateur": "GOLDEN_SHIMMER",
+        "emotion_dominante": "Confiance",
+        "moment_cle": "L'ouverture de l'email"
+      },
+      "B": {
+        "titre": "La Précision",
+        "sous_titre": "La maîtrise",
+        "intention": "L'exactitude géométrique d'un esprit tranchant",
+        "metaphore": "Un scalpel de lumière dans la nuit numérique",
+        "fond": "DEEP_GLOW",
+        "logo": "CRYSTAL_BREATH",
+        "texte": "CLEAN_FADE",
+        "separateur": "NEON_PULSE",
+        "emotion_dominante": "Admiration",
+        "moment_cle": "La lecture du nom"
+      },
+      "C": {
+        "titre": "La Profondeur",
+        "sous_titre": "L'âme",
+        "intention": "Un silence habité, plein de sens et de gravité",
+        "metaphore": "Les eaux profondes d'un lac de montagne en hiver",
+        "fond": "VOID_PULSE",
+        "logo": "SOUL_AURA",
+        "texte": "SUBTLE_BREATHE",
+        "separateur": "PLASMA_DRIFT",
+        "emotion_dominante": "Mystère",
+        "moment_cle": "La contemplation"
+      },
+      "D": {
+        "titre": "Le Prestige",
+        "sous_titre": "L'apothéose",
+        "intention": "L'éclat discret de l'excellence accomplie",
+        "metaphore": "Un diamant qui capte toute la lumière de la pièce",
+        "fond": "AURORA_FLOW",
+        "logo": "PEARL_SHIMMER",
+        "texte": "VELVET_FADE",
+        "separateur": "STAR_DRIFT",
+        "emotion_dominante": "Désir",
+        "moment_cle": "L'appel à l'action"
+      }
+    },
+    "note_du_directeur": "Chaque variation amplifie la précédente comme les mouvements d'une symphonie"
+  },
+  "technique": {
+    "variation_a": {
+      "fond": {
+        "effet": "SOFT_GRADIENT",
+        "intensity": 0.4,
+        "speed": "slow",
+        "color": "#0f0f0f",
+        "params": {
+          "opacity": 0.8,
+          "blur": 0,
+          "scale": 1.02
+        }
+      },
+      "logo": {
+        "effet": "HEARTBEAT",
+        "intensity": 0.6,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "radius": 40,
+          "glow": 0.3,
+          "pulse_scale": 1.05
+        }
+      },
+      "texte": {
+        "effet": "MINIMAL_PULSE",
+        "intensity": 0.3,
+        "speed": "slow",
+        "color": "#e8e8ff",
+        "params": {
+          "blur": 0,
+          "letter_spacing": 0.02,
+          "opacity_min": 0.85
+        }
+      },
+      "separateur": {
+        "effet": "GOLDEN_SHIMMER",
+        "intensity": 0.5,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "width": 2,
+          "glow_spread": 4
+        }
+      },
+      "duree": 60
+    },
+    "variation_b": {
+      "fond": {
+        "effet": "DEEP_GLOW",
+        "intensity": 0.4,
+        "speed": "slow",
+        "color": "#0f0f0f",
+        "params": {
+          "opacity": 0.8,
+          "blur": 0,
+          "scale": 1.02
+        }
+      },
+      "logo": {
+        "effet": "CRYSTAL_BREATH",
+        "intensity": 0.6,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "radius": 40,
+          "glow": 0.3,
+          "pulse_scale": 1.05
+        }
+      },
+      "texte": {
+        "effet": "CLEAN_FADE",
+        "intensity": 0.3,
+        "speed": "slow",
+        "color": "#e8e8ff",
+        "params": {
+          "blur": 0,
+          "letter_spacing": 0.02,
+          "opacity_min": 0.85
+        }
+      },
+      "separateur": {
+        "effet": "NEON_PULSE",
+        "intensity": 0.5,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "width": 2,
+          "glow_spread": 4
+        }
+      },
+      "duree": 60
+    },
+    "variation_c": {
+      "fond": {
+        "effet": "VOID_PULSE",
+        "intensity": 0.4,
+        "speed": "slow",
+        "color": "#0f0f0f",
+        "params": {
+          "opacity": 0.8,
+          "blur": 0,
+          "scale": 1.02
+        }
+      },
+      "logo": {
+        "effet": "SOUL_AURA",
+        "intensity": 0.6,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "radius": 40,
+          "glow": 0.3,
+          "pulse_scale": 1.05
+        }
+      },
+      "texte": {
+        "effet": "SUBTLE_BREATHE",
+        "intensity": 0.3,
+        "speed": "slow",
+        "color": "#e8e8ff",
+        "params": {
+          "blur": 0,
+          "letter_spacing": 0.02,
+          "opacity_min": 0.85
+        }
+      },
+      "separateur": {
+        "effet": "PLASMA_DRIFT",
+        "intensity": 0.5,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "width": 2,
+          "glow_spread": 4
+        }
+      },
+      "duree": 60
+    },
+    "variation_d": {
+      "fond": {
+        "effet": "AURORA_FLOW",
+        "intensity": 0.4,
+        "speed": "slow",
+        "color": "#0f0f0f",
+        "params": {
+          "opacity": 0.8,
+          "blur": 0,
+          "scale": 1.02
+        }
+      },
+      "logo": {
+        "effet": "PEARL_SHIMMER",
+        "intensity": 0.6,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "radius": 40,
+          "glow": 0.3,
+          "pulse_scale": 1.05
+        }
+      },
+      "texte": {
+        "effet": "VELVET_FADE",
+        "intensity": 0.3,
+        "speed": "slow",
+        "color": "#e8e8ff",
+        "params": {
+          "blur": 0,
+          "letter_spacing": 0.02,
+          "opacity_min": 0.85
+        }
+      },
+      "separateur": {
+        "effet": "STAR_DRIFT",
+        "intensity": 0.5,
+        "speed": "medium",
+        "color": "#6366f1",
+        "params": {
+          "width": 2,
+          "glow_spread": 4
+        }
+      },
+      "duree": 60
+    },
+    "transitions": {
+      "duree": 2,
+      "easing": "cubic-bezier(0.4,0,0.2,1)",
+      "type": "cross-fade"
+    },
+    "cycle_total": 248,
+    "optimisations_email": [
+      "CSS animations uniquement — zéro JS",
+      "Chirurgie visuelle par zones — logique métier secteur",
+      "Harmony validator — 5 règles appliquées",
+      "Variance Engine — Diversité génétique: 46.9%",
+      "Timing Master — Durées φ et Fibonacci actives",
+      "Color Harmony Engine — Palettes enrichies par zone",
+      "Effect Fusion Engine — Recettes hybrides cross-effets",
+      "Dynamic Fusion Orchestrator — Blueprint cross-zones Standard/Pro/Ultimate",
+      "Experience Orchestrator — Arc émotionnel Intro→Climax→Outro",
+      "Content Analyzer — Profil:balanced | Budget animation:86%",
+      "Adaptive Rendering — Profils A:performance B:balanced C:balanced D:balanced",
+      "Visual Signature — A:OPAL-RIPPLE-365 B:FROST-RIPPLE-E86 C:GOLD-SPARK-A04 D:CRIMSON-MIST-544",
+      "Predictive Transitions — BPM global: A:60 B:72 C:50 D:90",
+      "Attention Guide — Magnets visuels actifs | Score guide: A:0.16 D:0.16"
+    ],
+    "notes_techniques": "P1→P5 | Secteur:Plombier | A:LOGO_VOLUME_BREATHE[OPAL-RIPPLE-365] B:LOGO_3D_FLOAT[FROST-RIPPLE-E86] C:LOGO_GYRO_TILT[GOLD-SPARK-A04] D:LOGO_VOLUME_BREATHE[CRIMSON-MIST-544]",
+    "zone_compositions": {
+      "A": {
+        "logo": {
+          "effet_id": "LOGO_VOLUME_BREATHE",
+          "intensity": 0.5176487319992503,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Life Force] Force vitale + particules de lumière | Orchestration standard: 4D(x=0.10,z=0.73) | Expérience 7P establish(73%) BPM:68 delay=1440ms ease-in-out | Profile performance desktop: density=25% fps=30 quality=reduced | SignatureEngine: Δi=-0.015 φ=0.21 | Transition[golden] bpm-sync:impact entry:764ms | AttentionGuide[focus_bloom] strength=0.56",
+          "layers": [
+            {
+              "effet_id": "SEP_BREATHING_CALM",
+              "category": "secondary",
+              "intensity": 0.03748499999999999,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "Fusion overlay: ORGANIC @ 15%"
+            },
+            {
+              "effet_id": "ATTENTION_FOCUS_BLOOM",
+              "category": "secondary",
+              "intensity": 0.3366,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: focus_bloom → logo→nom [filter:drop-shadow(0 0 7px currentColor)]"
+            }
+          ]
+        },
+        "nom": {
+          "effet_id": "NOM_SHIMMER_GOLD",
+          "intensity": 0.4941817440812433,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Magnetic Dream] Champ magnétique + atmosphère onirique | Orchestration standard: 4D(x=0.50,z=0.50) | Expérience 7P develop(85%) BPM:75 delay=2560ms ease-in-out | Profile performance desktop: density=25% fps=30 quality=reduced | SignatureEngine: Δi=+0.069 φ=0.10 | Transition[fibonacci] bpm-sync:identity entry:1146ms | AttentionGuide[micro_pulse] strength=0.42",
+          "layers": [
+            {
+              "effet_id": "TITRE_SLIDE_IN",
+              "category": "secondary",
+              "intensity": 0.02924,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "Fusion multiplicative: ATMOSPHERIC @ 17%"
+            },
+            {
+              "effet_id": "ATTENTION_MICRO_PULSE",
+              "category": "secondary",
+              "intensity": 0.25155,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: micro_pulse → nom→titre [animation-timing-function:ease-in-out;an]"
+            }
+          ]
+        },
+        "titre": {
+          "effet_id": "TITRE_SLIDE_IN",
+          "intensity": 0.20107020054619532,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.30) | Expérience 7P develop(85%) BPM:75 delay=2560ms ease-in-out | Profile performance desktop: density=25% fps=30 quality=reduced | SignatureEngine: Δi=-0.054 φ=0.09 | Transition[organic] bpm-sync:identity entry:1528ms",
+          "layers": []
+        },
+        "contact": {
+          "effet_id": "CONTACT_ICON_PULSE",
+          "intensity": 0.1412162392449603,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.20) | Expérience 7P outro(60%) BPM:65 delay=7360ms ease-out | Profile performance desktop: density=25% fps=30 quality=reduced | SignatureEngine: Δi=+0.021 φ=0.03 | Transition[linear] bpm-sync:info entry:1910ms",
+          "layers": []
+        },
+        "separateur": {
+          "effet_id": "SEP_BREATHING_CALM",
+          "intensity": 0.26174819413613254,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.40) | Expérience 7P develop(85%) BPM:75 delay=2560ms ease-in-out | Profile performance desktop: density=25% fps=30 quality=reduced | SignatureEngine: Δi=-0.078 φ=0.25 | Transition[organic] bpm-sync:structure entry:382ms",
+          "layers": []
+        },
+        "fond": {
+          "effet_id": "FOND_ATMOSPHERIC_BREATH",
+          "intensity": 0.1899366112670248,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Life Force] Force vitale + particules de lumière | Orchestration standard: 4D(x=0.50,z=0.30) | Expérience 7P intro(55%) BPM:62 delay=400ms ease-in | Profile performance desktop: density=25% fps=30 quality=reduced | SignatureEngine: Δi=+0.025 φ=0.14 | Transition[linear] bpm-sync:ambient entry:0ms",
+          "layers": [
+            {
+              "effet_id": "LOGO_VOLUME_BREATHE",
+              "category": "secondary",
+              "intensity": 0.006619374999999999,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "Fusion overlay: ORGANIC @ 16%"
+            }
+          ]
+        },
+        "cta": {
+          "effet_id": "CTA_BREATH_INVITATION",
+          "intensity": 0.5305165140611391,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Life Force] Force vitale + particules de lumière | Orchestration standard: 4D(x=0.80,z=0.55) | Expérience 7P climax(95%) BPM:105 delay=4960ms linear | Profile performance desktop: density=25% fps=30 quality=reduced | SignatureEngine: Δi=+0.009 φ=0.23 | Transition[golden] bpm-sync:impact entry:2292ms | AttentionGuide[soft_glow] strength=0.55",
+          "layers": [
+            {
+              "effet_id": "LOGO_VOLUME_BREATHE",
+              "category": "secondary",
+              "intensity": 0.031609374999999995,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "Fusion overlay: ORGANIC @ 15%"
+            },
+            {
+              "effet_id": "ATTENTION_SOFT_GLOW",
+              "category": "secondary",
+              "intensity": 0.3321,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: soft_glow → cta→end [box-shadow:0 0 4px rgba(255,255,255,0.22]"
+            }
+          ]
+        }
+      },
+      "B": {
+        "logo": {
+          "effet_id": "LOGO_3D_FLOAT",
+          "intensity": 0.5930367432157594,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Living Hologram] Hologramme organique respirant | Orchestration standard: 4D(x=0.10,z=0.89) | Expérience 7P intro(65%) BPM:62 delay=160ms ease-in | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=+0.014 φ=0.17 | Transition[neural] bpm-sync:impact entry:0ms | AttentionGuide[focus_bloom] strength=0.56",
+          "layers": [
+            {
+              "effet_id": "NOM_HOLOGRAM_SCAN",
+              "category": "secondary",
+              "intensity": 0.1328221931760687,
+              "speed": "fast",
+              "color": "#6366f1",
+              "raison": "Fusion overlay: DIMENSIONAL @ 16%"
+            },
+            {
+              "effet_id": "ATTENTION_FOCUS_BLOOM",
+              "category": "secondary",
+              "intensity": 0.3366,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: focus_bloom → logo→cta [filter:drop-shadow(0 0 7px currentColor)]"
+            }
+          ]
+        },
+        "nom": {
+          "effet_id": "NOM_HOLOGRAM_SCAN",
+          "intensity": 0.4297683072741535,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Living Hologram] Hologramme organique respirant | Orchestration standard: 4D(x=0.50,z=0.60) | Expérience 7P establish(81%) BPM:68 delay=800ms linear | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.056 φ=0.02 | Transition[golden] bpm-sync:impact entry:318ms | AttentionGuide[micro_pulse] strength=0.41",
+          "layers": [
+            {
+              "effet_id": "LOGO_3D_FLOAT",
+              "category": "secondary",
+              "intensity": 0.032895,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "Fusion overlay: DIMENSIONAL @ 19%"
+            },
+            {
+              "effet_id": "ATTENTION_MICRO_PULSE",
+              "category": "secondary",
+              "intensity": 0.2457,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: micro_pulse → nom→contact [animation-timing-function:ease-in-out;an]"
+            }
+          ]
+        },
+        "titre": {
+          "effet_id": "TITRE_LETTER_SPACING_BREATHE",
+          "intensity": 0.2698858009359999,
+          "speed": "fast",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.35) | Expérience 7P develop(90%) BPM:75 delay=1600ms ease-in | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.045 φ=0.03 | Transition[fibonacci] bpm-sync:identity entry:1592ms",
+          "layers": []
+        },
+        "contact": {
+          "effet_id": "CONTACT_HIGHLIGHT_HOVER",
+          "intensity": 0.21232624353545865,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.25) | Expérience 7P develop(90%) BPM:75 delay=1600ms ease-in | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.013 φ=0.11 | Transition[organic] bpm-sync:info entry:1910ms",
+          "layers": []
+        },
+        "separateur": {
+          "effet_id": "SEP_ENERGY_FLOW",
+          "intensity": 0.49503361242358423,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.50) | Expérience 7P tension(95%) BPM:88 delay=3040ms spring | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=+0.020 φ=0.18 | Transition[fibonacci] bpm-sync:identity entry:955ms",
+          "layers": []
+        },
+        "fond": {
+          "effet_id": "FOND_STELLAR_DRIFT",
+          "intensity": 0.2784295460682897,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Magnetic Dream] Champ magnétique + atmosphère onirique | Orchestration standard: 4D(x=0.50,z=0.35) | Expérience 7P develop(90%) BPM:75 delay=1600ms ease-in | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.037 φ=0.20 | Transition[linear] bpm-sync:ambient entry:1273ms",
+          "layers": [
+            {
+              "effet_id": "CONTACT_HIGHLIGHT_HOVER",
+              "category": "secondary",
+              "intensity": 0.06638425037334322,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "Fusion multiplicative: ATMOSPHERIC @ 16%"
+            }
+          ]
+        },
+        "cta": {
+          "effet_id": "CTA_ELECTRIC_BORDER",
+          "intensity": 0.6001652972435498,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Pulse Aura] Pulsation énergétique + aura organique | Orchestration standard: 4D(x=0.80,z=0.70) | Expérience 7P climax(95%) BPM:105 delay=3840ms ease-in-out | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.065 φ=0.15 | Transition[neural] bpm-sync:impact entry:637ms | AttentionGuide[soft_glow] strength=0.58",
+          "layers": [
+            {
+              "effet_id": "SEP_ENERGY_FLOW",
+              "category": "secondary",
+              "intensity": 0.050050507499999994,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "Fusion additive: ENERGY @ 21%"
+            },
+            {
+              "effet_id": "ATTENTION_SOFT_GLOW",
+              "category": "secondary",
+              "intensity": 0.3483,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: soft_glow → cta→nom [box-shadow:0 0 5px rgba(255,255,255,0.23]"
+            }
+          ]
+        }
+      },
+      "C": {
+        "logo": {
+          "effet_id": "LOGO_GYRO_TILT",
+          "intensity": 0.45962114334330456,
+          "speed": "fast",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Bioluminescence] Bioluminescence naturelle dans l'obscurité | Orchestration standard: 4D(x=0.10,z=0.79) | Expérience 7P establish(63%) BPM:68 delay=1760ms ease-in-out | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.038 φ=0.15 | Transition[fibonacci] bpm-sync:impact entry:458ms | AttentionGuide[focus_bloom] strength=0.55",
+          "layers": [
+            {
+              "effet_id": "TITRE_FADE_PRESENCE",
+              "category": "secondary",
+              "intensity": 0.10277562586584274,
+              "speed": "fast",
+              "color": "#6366f1",
+              "raison": "Fusion screen: ATMOSPHERIC @ 15%"
+            },
+            {
+              "effet_id": "ATTENTION_FOCUS_BLOOM",
+              "category": "secondary",
+              "intensity": 0.33048000000000005,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: focus_bloom → logo→nom [filter:drop-shadow(0 0 7px currentColor)]"
+            }
+          ]
+        },
+        "nom": {
+          "effet_id": "NOM_CLEAN_BREATHE",
+          "intensity": 0.4789225816060608,
+          "speed": "fast",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Living Water] Liquide organique avec pulsation vitale | Orchestration standard: 4D(x=0.50,z=0.55) | Expérience 7P develop(78%) BPM:75 delay=2800ms ease-in-out | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=+0.050 φ=0.10 | Transition[organic] bpm-sync:identity entry:1375ms | AttentionGuide[micro_pulse] strength=0.41",
+          "layers": [
+            {
+              "effet_id": "SEP_PARTICLE_STREAM",
+              "category": "secondary",
+              "intensity": 0.05720538437309248,
+              "speed": "fast",
+              "color": "#6366f1",
+              "raison": "Fusion additive: PARTICLE @ 16%"
+            },
+            {
+              "effet_id": "ATTENTION_MICRO_PULSE",
+              "category": "secondary",
+              "intensity": 0.24804,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: micro_pulse → nom→separateur [animation-timing-function:ease-in-out;an]"
+            }
+          ]
+        },
+        "titre": {
+          "effet_id": "TITRE_FADE_PRESENCE",
+          "intensity": 0.2538365329065911,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.30) | Expérience 7P develop(78%) BPM:75 delay=2800ms ease-in-out | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=+0.020 φ=0.11 | Transition[golden] bpm-sync:ambient entry:1834ms",
+          "layers": []
+        },
+        "contact": {
+          "effet_id": "CONTACT_CASCADE_APPEAR",
+          "intensity": 0.06754376050493302,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.20) | Expérience 7P resolution(65%) BPM:72 delay=6400ms ease-out | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.062 φ=0.07 | Transition[linear] bpm-sync:info entry:2750ms",
+          "layers": []
+        },
+        "separateur": {
+          "effet_id": "SEP_PARTICLE_STREAM",
+          "intensity": 0.2593701692808816,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.40) | Expérience 7P develop(78%) BPM:75 delay=2800ms ease-in-out | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.053 φ=0.02 | Transition[golden] bpm-sync:ambient entry:917ms",
+          "layers": []
+        },
+        "fond": {
+          "effet_id": "FOND_PLASMA_FIELD",
+          "intensity": 0.1587809462854129,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Bioluminescence] Bioluminescence naturelle dans l'obscurité | Orchestration standard: 4D(x=0.50,z=0.45) | Expérience 7P intro(45%) BPM:62 delay=640ms ease-in | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.044 φ=0.14 | Transition[fibonacci] bpm-sync:ambient entry:0ms",
+          "layers": [
+            {
+              "effet_id": "LOGO_GYRO_TILT",
+              "category": "secondary",
+              "intensity": 0.05049886381500964,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "Fusion screen: ATMOSPHERIC @ 17%"
+            }
+          ]
+        },
+        "cta": {
+          "effet_id": "CTA_GRAVITY_PULSE",
+          "intensity": 0.4680309514347536,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Bioluminescence] Bioluminescence naturelle dans l'obscurité | Orchestration standard: 4D(x=0.80,z=0.60) | Expérience 7P climax(90%) BPM:105 delay=5120ms ease-in-out | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.072 φ=0.10 | Transition[fibonacci] bpm-sync:impact entry:2292ms | AttentionGuide[soft_glow] strength=0.55",
+          "layers": [
+            {
+              "effet_id": "LOGO_GYRO_TILT",
+              "category": "secondary",
+              "intensity": 0.09955503301524071,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "Fusion screen: ATMOSPHERIC @ 15%"
+            },
+            {
+              "effet_id": "ATTENTION_SOFT_GLOW",
+              "category": "secondary",
+              "intensity": 0.33048000000000005,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: soft_glow → cta→end [box-shadow:0 0 4px rgba(255,255,255,0.22]"
+            }
+          ]
+        }
+      },
+      "D": {
+        "logo": {
+          "effet_id": "LOGO_VOLUME_BREATHE",
+          "intensity": 0.8422130913828064,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Living Water] Liquide organique avec pulsation vitale | Orchestration standard: 4D(x=0.10,z=1.00) | Expérience 7P intro(88%) BPM:105 delay=80ms spring | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.008 φ=0.16 | Transition[neural] bpm-sync:impact entry:0ms | AttentionGuide[focus_bloom] strength=0.56",
+          "layers": [
+            {
+              "effet_id": "CTA_PARTICLE_ATTRACT",
+              "category": "secondary",
+              "intensity": 0.10499303196459127,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "Fusion additive: PARTICLE @ 15%"
+            },
+            {
+              "effet_id": "ATTENTION_FOCUS_BLOOM",
+              "category": "secondary",
+              "intensity": 0.3366,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: focus_bloom → logo→cta [filter:drop-shadow(0 0 7px currentColor)]"
+            }
+          ]
+        },
+        "nom": {
+          "effet_id": "NOM_NEON_GLOW",
+          "intensity": 0.7778501390614199,
+          "speed": "fast",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Plasma Nebula] Nuage de particules chargées électriquement | Orchestration standard: 4D(x=0.50,z=0.80) | Expérience 7P develop(98%) BPM:88 delay=1200ms ease-in | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.006 φ=0.20 | Transition[neural] bpm-sync:impact entry:509ms | AttentionGuide[micro_pulse] strength=0.41",
+          "layers": [
+            {
+              "effet_id": "CTA_PARTICLE_ATTRACT",
+              "category": "secondary",
+              "intensity": 0.02924,
+              "speed": "fast",
+              "color": "#6366f1",
+              "raison": "Fusion additive: PARTICLE @ 17%"
+            },
+            {
+              "effet_id": "ATTENTION_MICRO_PULSE",
+              "category": "secondary",
+              "intensity": 0.2457,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: micro_pulse → nom→fond [animation-timing-function:ease-in-out;an]"
+            }
+          ]
+        },
+        "titre": {
+          "effet_id": "TITRE_COLOR_SHIFT",
+          "intensity": 0.42652706797852347,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.40) | Expérience 7P develop(98%) BPM:88 delay=1200ms ease-in | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=+0.035 φ=0.19 | Transition[golden] bpm-sync:impact entry:1273ms",
+          "layers": []
+        },
+        "contact": {
+          "effet_id": "CONTACT_SCAN_LINE",
+          "intensity": 0.3288094069852515,
+          "speed": "fast",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.30) | Expérience 7P develop(98%) BPM:88 delay=1200ms ease-in | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=+0.035 φ=0.19 | Transition[fibonacci] bpm-sync:identity entry:1528ms",
+          "layers": []
+        },
+        "separateur": {
+          "effet_id": "SEP_GOLD_SHINE",
+          "intensity": 0.4553140765359425,
+          "speed": "fast",
+          "color": "#6366f1",
+          "raison": "fallback automatique | Orchestration standard: 4D(x=0.50,z=0.65) | Expérience 7P resolution(82%) BPM:72 delay=6240ms ease-out | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=-0.078 φ=0.12 | Transition[neural] bpm-sync:impact entry:1019ms",
+          "layers": []
+        },
+        "fond": {
+          "effet_id": "FOND_CLEAN_DARK",
+          "intensity": 0.5532035294170965,
+          "speed": "medium",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Magnetic Dream] Champ magnétique + atmosphère onirique | Orchestration standard: 4D(x=0.50,z=0.50) | Expérience 7P establish(95%) BPM:105 delay=400ms spring | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=+0.078 φ=0.12 | Transition[golden] bpm-sync:impact entry:764ms",
+          "layers": [
+            {
+              "effet_id": "TITRE_COLOR_SHIFT",
+              "category": "secondary",
+              "intensity": 0.07002456725371674,
+              "speed": "medium",
+              "color": "#6366f1",
+              "raison": "Fusion multiplicative: ATMOSPHERIC @ 16%"
+            }
+          ]
+        },
+        "cta": {
+          "effet_id": "CTA_PARTICLE_ATTRACT",
+          "intensity": 0.7843361410694979,
+          "speed": "slow",
+          "color": "#6366f1",
+          "raison": "fallback automatique | [Plasma Nebula] Nuage de particules chargées électriquement | Orchestration standard: 4D(x=0.80,z=0.85) | Expérience 7P intro(88%) BPM:105 delay=80ms spring | Profile balanced desktop: density=50% fps=30 quality=reduced | SignatureEngine: Δi=+0.036 φ=0.05 | Transition[neural] bpm-sync:impact entry:255ms | AttentionGuide[soft_glow] strength=0.58",
+          "layers": [
+            {
+              "effet_id": "NOM_NEON_GLOW",
+              "category": "secondary",
+              "intensity": 0.09832384746299692,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "Fusion additive: ENERGY @ 15%"
+            },
+            {
+              "effet_id": "ATTENTION_SOFT_GLOW",
+              "category": "secondary",
+              "intensity": 0.3483,
+              "speed": "slow",
+              "color": "#6366f1",
+              "raison": "AttentionGuide: soft_glow → cta→nom [box-shadow:0 0 5px rgba(255,255,255,0.23]"
+            }
+          ]
+        }
+      }
+    },
+    "_analytics_data": {
+      "rendering_profiles": {
+        "A": "performance",
+        "B": "balanced",
+        "C": "balanced",
+        "D": "balanced"
+      },
+      "diversity_score": 0.469,
+      "content_profile": {
+        "has_logo": false,
+        "has_cta": false,
+        "has_social": false,
+        "element_count": 7,
+        "active_zones": [
+          "logo",
+          "nom",
+          "titre",
+          "contact",
+          "separateur",
+          "fond",
+          "cta"
+        ],
+        "palette": {
+          "dominant_hue": 160,
+          "saturation_avg": 0.6117647058823529,
+          "lightness_avg": 0.5601307189542483,
+          "contrast_ratio": 0.896078431372549,
+          "palette_richness": 3,
+          "color_temperature": "cool",
+          "color_harmony": "complex"
+        },
+        "text": {
+          "nom_chars": 11,
+          "titre_chars": 17,
+          "contact_chars": 14,
+          "cta_chars": 0,
+          "total_chars": 42,
+          "density_level": "light"
+        },
+        "logo": {
+          "has_logo": false,
+          "complexity": "none",
+          "complexity_score": 0,
+          "estimated_bytes": 0,
+          "has_transparency": false
+        },
+        "brand_sentiment": {
+          "sentiment": "neutral",
+          "sentiment_score": 0,
+          "signals": [],
+          "energy_level": "medium"
+        },
+        "visual_complexity": 0.2,
+        "content_richness": 0.614,
+        "nlp_score": 0,
+        "style_vector": [
+          0.5,
+          0.5,
+          0.55,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "thresholds": {
+          "max_intensity": 0.78,
+          "min_intensity": 0.09,
+          "max_layers": 5,
+          "animation_budget": 0.86,
+          "effect_cap": 5
+        },
+        "recommended_profile": "balanced",
+        "sector_boost": 0.6
+      },
+      "performance_scores": {
+        "A": 0.584,
+        "B": 0.732,
+        "C": 0.696,
+        "D": 0.783
+      },
+      "signatures": {
+        "A": "OPAL-RIPPLE-365",
+        "B": "FROST-RIPPLE-E86",
+        "C": "GOLD-SPARK-A04",
+        "D": "CRIMSON-MIST-544"
+      },
+      "guide_scores": {
+        "A": 0.16000000000000003,
+        "B": 0.16000000000000003,
+        "C": 0.2,
+        "D": 0.16000000000000003
+      },
+      "transition_bpm": {
+        "A": 60,
+        "B": 72,
+        "C": 50,
+        "D": 90
+      }
+    }
+  },
+  "metadata": {
+    "nom": "Jean Dupont",
+    "titre": "Directeur Créatif",
+    "entreprise": "Arti-Pro Plombier",
+    "telephone": "01 40 50 26 26",
+    "email": "artisan.artsrenov@gmail.com",
+    "site": "https://artipro-plomberie.fr/",
+    "secteur": "Plombier",
+    "cta": "Réserver un appel",
+    "palette": [
+      "#0f0f0f",
+      "#6366f1",
+      "#e8e8ff"
+    ],
+    "adresse": "1 Rue de l'Assomption",
+    "ville": "Paris",
+    "pays": "France",
+    "note": 4.6,
+    "avis": 0,
+    "description": "Arti-Pro Plombier — Plombier",
+    "logo_url": "",
+    "logo_base64": "data:image/png;base64,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",
+    "style_visuel": "Porfessionnel et luxieux",
+    "slogan": "",
+    "mots_cles": [
+      "Plombier"
+    ],
+    "ton": "professionnel et moderne",
+    "reseaux_sociaux": {},
+    "client_email": ""
+  },
+  "generated_at": "2026-04-06T16:57:48.687Z",
+  "signature_id": "sig_9e5cf713_1775494668678"
+}

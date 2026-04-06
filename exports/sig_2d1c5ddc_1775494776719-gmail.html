@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signature Gmail — Jean Dupont</title>
+<style>
+  body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
+  .sig-container { max-width: 600px; background: #0f0f0f; border-radius: 8px; overflow: hidden; }
+  .sig-svg { display: block; width: 100%; }
+  @media (prefers-color-scheme: light) {
+    .sig-container { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+  }
+  @media only screen and (max-width: 480px) {
+    .sig-container { width: 100% !important; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="sig-container">
+  <?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="600" height="180" viewBox="0 0 600 180"
+     role="img" aria-label="Email Signature">
+  <title>Email Signature</title>
+
+  <defs>
+    <!-- Gradients de base pour toutes les variations -->
+    <linearGradient id="grad-bg-a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0f0f"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="grad-bg-b" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#e8e8ff" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="grad-shimmer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#6366f1" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="grad-halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="grad-sep-flow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#6366f1" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#e8e8ff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#e8e8ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="vb-sep-flow" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#6366f1" stop-opacity="0"/>
+          <stop offset="30%"  stop-color="#6366f1" stop-opacity="0.5006635181479304"/>
+          <stop offset="50%"  stop-color="#8b8eff" stop-opacity="0.5006635181479304"/>
+          <stop offset="70%"  stop-color="#6366f1" stop-opacity="0.5006635181479304"/>
+          <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="0 -1" to="0 1" dur="2.98s" repeatCount="indefinite"/>
+        </linearGradient>
+<linearGradient id="vd-titre-shift" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#6366f1" stop-opacity="0.27005293194531765"/>
+          <stop offset="100%" stop-color="#9598ff" stop-opacity="0.13502646597265883"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="10.00s" repeatCount="indefinite"/>
+        </linearGradient>
+<linearGradient id="vd-contact-scan-g" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"  stop-color="#6366f1" stop-opacity="0"/>
+          <stop offset="50%" stop-color="#9fa2ff" stop-opacity="0.16575880293821885"/>
+          <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="0 -1" to="0 1" dur="7.72s" repeatCount="indefinite"/>
+        </linearGradient>
+<radialGradient id="vd-sep-gold-pt" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f0d080" stop-opacity="0.4648752727685206"/><stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/></radialGradient>
+
+    <style>
+      /* =============================================
+         EFFECTFORGE AI — Living Email Signature SVG
+         Cycle: 240s total | 4 Variations | Pure CSS
+         No JavaScript | Email-compatible
+         ============================================= */
+
+      /* Timing custom properties */
+      :root {
+        --cycle: 240s;
+        --fade-dur: 2s;
+      }
+
+      /* Smooth cross-fade transitions between variations */
+      .var-layer-enter {
+        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .var-layer-exit {
+        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+/* === VARIATION A: Stable et Rassurant — Zone System === */
+@keyframes va-titre-slide {
+          0%   { transform: translateX(-12px); opacity: 0; }
+          100% { transform: translateX(0);     opacity: 1; }
+        }
+@keyframes va-sep-calm {
+          0%,100% { opacity: 0.13114972732103192; transform: scaleX(1); }
+          50%      { opacity: 0.3278743183025798;     transform: scaleX(1.16393715915129); }
+        }
+/* === VARIATION B: Précis et Dynamique — Zone System === */
+@keyframes vb-titre-space {
+          0%,100% { letter-spacing: 1.5px; opacity: 0.85; }
+          50%      { letter-spacing: 2.5px; opacity: 1; }
+        }
+@keyframes vb-contact-icon {
+          0%,100% { transform: scale(1);    opacity: 0.7; }
+          50%      { transform: scale(1.0356452600187378); opacity: 1; }
+        }
+/* === VARIATION C: Profond et Atmosphérique — Zone System === */
+@keyframes vc-titre-fade {
+          0%,100% { opacity: 0.5805508447078873; }
+          50%      { opacity: 0.9194491552921127; }
+        }
+@keyframes vc-contact-cascade {
+          0%   { transform: translateY(8px); opacity: 0; }
+          100% { transform: translateY(0);   opacity: 1; }
+        }
+@keyframes vc-sep-particle {
+          0%   { transform: translateY(0);      opacity: 0; }
+          10%  { opacity: 0.27876903334603853; }
+          90%  { opacity: 0.27876903334603853; }
+          100% { transform: translateY(148px); opacity: 0; }
+        }
+/* === VARIATION D: Puissant et Mémorable — Zone System === */
+@keyframes vd-sep-shine {
+          0%   { transform: translateY(148px); opacity: 0; }
+          10%  { opacity: 0.4648752727685206; }
+          90%  { opacity: 0.4648752727685206; }
+          100% { transform: translateY(0);       opacity: 0; }
+        }
+
+      /* Variation layer visibility orchestration */
+      #layer-var-a, #layer-var-b, #layer-var-c, #layer-var-d {
+        opacity: 0;
+      }
+
+      /* === TIMING ORCHESTRATION (240s cycle) === */
+
+      /* VAR A: appears at 0s, fades at 8s, gone by 10s */
+      #layer-var-a {
+        animation: layer-fade-a 240s ease-in-out 0s infinite;
+      }
+      /* VAR B: appears at 60s, fades at 70s */
+      #layer-var-b {
+        animation: layer-fade-b 240s ease-in-out 0s infinite;
+      }
+      /* VAR C: appears at 120s, fades at 130s */
+      #layer-var-c {
+        animation: layer-fade-c 240s ease-in-out 0s infinite;
+      }
+      /* VAR D: appears at 180s, fades at 190s */
+      #layer-var-d {
+        animation: layer-fade-d 240s ease-in-out 0s infinite;
+      }
+
+      @keyframes layer-fade-a {
+        0%       { opacity: 0; }
+        0.5%     { opacity: 0; }
+        2%       { opacity: 1; }
+        22%      { opacity: 1; }
+        24%      { opacity: 0; }
+        100%     { opacity: 0; }
+      }
+
+      @keyframes layer-fade-b {
+        0%       { opacity: 0; }
+        24%      { opacity: 0; }
+        25.5%    { opacity: 1; }
+        48%      { opacity: 1; }
+        49.5%    { opacity: 0; }
+        100%     { opacity: 0; }
+      }
+
+      @keyframes layer-fade-c {
+        0%       { opacity: 0; }
+        49.5%    { opacity: 0; }
+        51%      { opacity: 1; }
+        73%      { opacity: 1; }
+        74.5%    { opacity: 0; }
+        100%     { opacity: 0; }
+      }
+
+      @keyframes layer-fade-d {
+        0%       { opacity: 0; }
+        74.5%    { opacity: 0; }
+        76%      { opacity: 1; }
+        98%      { opacity: 1; }
+        99.5%    { opacity: 0; }
+        100%     { opacity: 0; }
+      }
+
+      /* Internal variation animations timing */
+      /* VAR A internal elements */
+      #var-a, #var-a-particles > *, #var-a-halo, #var-a-shimmer, #var-a-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+      /* VAR B internal elements */
+      #var-b, #var-b-wave1, #var-b-wave2, #var-b-logo-glow, #var-b-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+      /* VAR C internal elements */
+      #var-c, #var-c-particles > *, #var-c-ring, #var-c-shimmer, #var-c-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+      /* VAR D internal elements */
+      #var-d, #var-d-outer, #var-d-inner, #var-d-cta, #var-d-sep, #var-d-logo {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+      /* Micro-variation on repetitions: subtle scale + hue shift */
+      #layer-var-a { animation-timing-function: ease-in-out; }
+      #layer-var-b { animation-timing-function: ease-in-out; }
+      #layer-var-c { animation-timing-function: ease-in-out; }
+      #layer-var-d { animation-timing-function: ease-in-out; }
+
+      /* Base layer always on top */
+      #layer-base {
+        opacity: 1;
+      }
+
+      /* Static background always visible */
+      #bg-base {
+        opacity: 1;
+      }
+
+    </style>
+  </defs>
+
+  <!-- ===== LAYER 0: Static Background ===== -->
+  <rect id="bg-root" x="0" y="0" width="600" height="180" fill="#0f0f0f" rx="12"/>
+
+  <!-- ===== LAYER 2: Variation A — Breathing Particles ===== -->
+  <g id="layer-var-a">
+    <g id="var-a"><rect x="195" y="56" width="180" height="16" fill="#6366f1" fill-opacity="0.018352047509968293" rx="2" style="animation:va-titre-slide 0.8s ease-out 0.809s 1 both;"/>
+<rect x="172" y="16" width="2" height="148" fill="#6366f1" fill-opacity="1" rx="1" style="animation:va-sep-calm 10.00s ease-in-out 0.485s infinite; transform-origin:173px 90px;"/></g>
+  </g>
+
+  <!-- ===== LAYER 3: Variation B — Chromatic Wave ===== -->
+  <g id="layer-var-b">
+    <g id="var-b"><rect x="195" y="56" width="180" height="16" fill="#6366f1" fill-opacity="0.01546787732349892" rx="2" style="animation:vb-titre-space 10.00s ease-in-out 0.5s infinite;"/>
+<circle cx="193" cy="83"  r="5" fill="#6366f1" fill-opacity="0.09505402671663417" style="animation:vb-contact-icon 6.40s ease-in-out 0.8s infinite; transform-origin:193px 83px;"/>
+          <circle cx="193" cy="99"  r="5" fill="#6366f1" fill-opacity="0.09505402671663417" style="animation:vb-contact-icon 6.40s ease-in-out 1.8s infinite; transform-origin:193px 99px;"/>
+          <circle cx="193" cy="115" r="5" fill="#6366f1" fill-opacity="0.09505402671663417" style="animation:vb-contact-icon 6.40s ease-in-out 2.8s infinite; transform-origin:193px 115px;"/>
+<rect x="172" y="16" width="3" height="148" fill="url(#vb-sep-flow)" rx="1.5"/></g>
+  </g>
+
+  <!-- ===== LAYER 4: Variation C — Generative Noise ===== -->
+  <g id="layer-var-c">
+    <g id="var-c"><rect x="195" y="56" width="180" height="16" fill="#6366f1" fill-opacity="0.013614408704478857" rx="2" style="animation:vc-titre-fade 7.16s ease-in-out 0.393s infinite;"/>
+<rect x="195" y="78" width="180" height="12" fill="#6366f1" fill-opacity="0.01318304115449615" rx="2" style="animation:vc-contact-cascade 0.6s ease-out 0.929s 1 both;"/>
+          <rect x="195" y="94" width="160" height="12" fill="#6366f1" fill-opacity="0.009887280865872112" rx="2" style="animation:vc-contact-cascade 0.6s ease-out 1.229s 1 both;"/>
+          <rect x="195" y="110" width="170" height="12" fill="#6366f1" fill-opacity="0.011535161010184132" rx="2" style="animation:vc-contact-cascade 0.6s ease-out 1.529s 1 both;"/>
+<rect x="172" y="16" width="3" height="148" fill="#6366f1" fill-opacity="0.06969225833650963" rx="1.5"/>
+          
+        <circle cx="173.5" cy="16" r="1.5" fill="#6366f1" fill-opacity="0.22301522667683082" style="animation:vc-sep-particle 1.99s linear 0.236s infinite;"/>
+        <circle cx="173.5" cy="16" r="1.8" fill="#6366f1" fill-opacity="0.22301522667683082" style="animation:vc-sep-particle 1.99s linear 0.7335s infinite;"/>
+        <circle cx="173.5" cy="16" r="2.1" fill="#6366f1" fill-opacity="0.22301522667683082" style="animation:vc-sep-particle 1.99s linear 1.2309999999999999s infinite;"/>
+        <circle cx="173.5" cy="16" r="2.4" fill="#6366f1" fill-opacity="0.22301522667683082" style="animation:vc-sep-particle 1.99s linear 1.7285s infinite;"/></g>
+  </g>
+
+  <!-- ===== LAYER 5: Variation D — Luminous Respiration ===== -->
+  <g id="layer-var-d">
+    <g id="var-d"><rect x="195" y="70" width="160" height="2" fill="url(#vd-titre-shift)" rx="1"/>
+<rect x="185" y="75" width="200" height="60" fill="url(#vd-contact-scan-g)" rx="4"/>
+<rect x="172" y="16" width="3" height="148" fill="#c9a84c" fill-opacity="0.2324376363842603" rx="1.5"/>
+          <ellipse cx="173.5" cy="16" rx="4" ry="6" fill="url(#vd-sep-gold-pt)" style="animation:vd-sep-shine 3.62s ease-in-out 0.185s infinite;"/></g>
+  </g>
+
+  <!-- ===== LAYER 1: Static Base — Always Visible ===== -->
+  <g id="layer-base">
+    <g id="base-static">
+  <!-- Background base -->
+  <rect id="bg-base" x="0" y="0" width="600" height="180" fill="#0f0f0f" rx="12"/>
+
+  <!-- Left column: photo + logo -->
+  <g id="left-col" transform="translate(16, 16)">
+    <circle cx="60" cy="60" r="52" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="2" id="photo-ring"/>
+  <text x="60" y="67" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#ffffff">JD</text>
+    <image href="data:image/png;base64,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" x="10" y="120" width="100" height="36" preserveAspectRatio="xMidYMid meet" id="company-logo"/>
+  </g>
+
+  <!-- Separator vertical -->
+  <g id="separator-v" transform="translate(170, 16)">
+    <defs>
+    <linearGradient id="sep-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.1"/>
+      <stop offset="30%" stop-color="#6366f1" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="rgb(139,142,255)" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="rgb(139,142,255)" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <rect id="sep-bar" x="0" y="0" width="2" height="148" fill="url(#sep-grad)" rx="1"/>
+  </g>
+
+  <!-- Right column: info -->
+  <g id="right-col" transform="translate(186, 20)">
+    <!-- Name -->
+    <text id="sig-name" x="0" y="22" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" fill="#ffffff" letter-spacing="0.5">Jean Dupont</text>
+
+    <!-- Title -->
+    <text id="sig-titre" x="0" y="40" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" fill="#6366f1" letter-spacing="1.5" text-transform="uppercase">DIRECTEUR CRÉATIF</text>
+
+    <!-- Company -->
+    <text id="sig-company" x="0" y="56" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.65)">Arti-Pro Plombier</text>
+
+    <!-- Separator horizontal thin -->
+    <line x1="0" y1="64" x2="380" y2="64" stroke="#6366f1" stroke-width="1" stroke-opacity="0.4"/>
+
+    <!-- Contact info -->
+    <g id="contact-block" transform="translate(0, 72)">
+      <text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">✉  <tspan fill="#ffffff">artisan.artsrenov@gmail.com</tspan></text>
+      <text x="0" y="15" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">✆  <tspan fill="#ffffff">01 40 50 26 26</tspan></text>
+      <text x="0" y="30" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">⊕  <tspan fill="#6366f1">artipro-plomberie.fr/</tspan></text>
+    </g>
+
+    <!-- Social icons -->
+    <g id="social-icons" transform="translate(0, 120)">
+      
+    </g>
+
+    <!-- CTA -->
+    <g id="cta-block" transform="translate(220, 110)">
+      <rect x="0" y="0" width="143" height="28" rx="14" fill="#6366f1" id="cta-btn"/>
+    <text x="71.5" y="18" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#ffffff" letter-spacing="0.5">RÉSERVER UN APPEL</text>
+    </g>
+  </g>
+</g>
+  </g>
+
+</svg>
+</div>
+<!-- Signature Jean Dupont — Arti-Pro Plombier — Généré par EffectForge AI -->
+</body>
+</html>

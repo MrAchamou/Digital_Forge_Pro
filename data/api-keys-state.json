@@ -1,19 +1,19 @@
 {
-  "lastSaved": "2026-04-06T16:55:10.668Z",
+  "lastSaved": "2026-04-06T17:03:10.824Z",
   "keys": {
     "gemini_db_0340fce4": {
       "usageToday": 0,
       "status": "cooldown",
-      "cooldownUntil": "2026-04-06T16:57:37.997Z",
-      "cooldownCount": 3,
-      "errorCount": 3,
+      "cooldownUntil": "2026-04-06T17:07:38.369Z",
+      "cooldownCount": 4,
+      "errorCount": 4,
       "successCount": 0,
       "avgResponseTime": 0,
-      "healthScore": 36,
+      "healthScore": 30,
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-06T16:41:17.065Z",
       "lastUsed": null,
-      "lastError": null
+      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
     },
     "gemini_db_266137af": {
       "usageToday": 0,
@@ -101,10 +101,10 @@
     },
     "cerebras_db_72d2002a": {
       "usageToday": 0,
-      "status": "active",
+      "status": "error",
       "cooldownUntil": null,
       "cooldownCount": 0,
-      "errorCount": 2,
+      "errorCount": 3,
       "successCount": 0,
       "avgResponseTime": 0,
       "healthScore": 60,
@@ -156,17 +156,17 @@
       "lastError": null
     },
     "serper_db_97cc85a6": {
-      "usageToday": 0,
+      "usageToday": 2,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 0,
-      "avgResponseTime": 0,
-      "healthScore": 100,
-      "callsLastHour": 0,
+      "successCount": 2,
+      "avgResponseTime": 1243,
+      "healthScore": 90,
+      "callsLastHour": 2,
       "hourWindowStart": "2026-04-06T16:41:17.065Z",
-      "lastUsed": null,
+      "lastUsed": "2026-04-06T16:57:17.047Z",
       "lastError": null
     },
     "serper_db_999874f2": {
@@ -212,5 +212,7 @@
       "lastError": null
     }
   },
-  "monthlyUsage": {}
+  "monthlyUsage": {
+    "serper_2026-04": 4
+  }
 }
