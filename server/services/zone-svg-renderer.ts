@@ -48,24 +48,35 @@ function empty(): SVGEffectCode {
 // ZONE LOGO
 // ════════════════════════════════════════════
 
-function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, delay: number): SVGEffectCode {
+// Coordonnées absolues du logo dans le SVG final (left-col translate(16,16) + image x=10,y=120)
+const LOGO_X = 26, LOGO_Y = 136, LOGO_W = 100, LOGO_H = 36;
+
+function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, delay: number, logoUrl?: string): SVGEffectCode {
   const col = e.color;
   const i   = e.intensity;
   const sp  = e.speed;
   const pfx = `${varId}-logo`;
+
+  // Si on a un logo URL, on crée une copie animée positionnée exactement par-dessus le logo statique
+  const hasLogo = !!logoUrl;
 
   switch (e.effet_id) {
 
     case 'LOGO_3D_FLOAT': {
       const deg = Math.round(8 * i);
       const dur = d_fn(8, sp);
+      const animLogoEl = hasLogo
+        ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"
+            style="animation:${pfx}-float3d ${dur} ease-in-out ${delay}s infinite; transform-box:fill-box; transform-origin:center; filter:url(#${pfx}-f3d);"/>`
+        : '';
       return {
         filterDefs: `<filter id="${pfx}-f3d"><feDropShadow dx="${deg/2}" dy="0" stdDeviation="${deg}" flood-color="${col}" flood-opacity="${i * 0.4}"/></filter>`,
-        keyframes: `@keyframes ${pfx}-float {
-          0%,100% { transform: perspective(600px) rotateY(-${deg}deg) translateZ(0); filter: url(#${pfx}-f3d); }
-          50%      { transform: perspective(600px) rotateY(${deg}deg) translateZ(${Math.round(12*i)}px); filter: url(#${pfx}-f3d); }
+        keyframes: `@keyframes ${pfx}-float3d {
+          0%,100% { transform: perspective(600px) rotateY(-${deg}deg) translateZ(0px); }
+          50%      { transform: perspective(600px) rotateY(${deg}deg) translateZ(${Math.round(12*i)}px); }
         }`,
-        elements: `<ellipse id="${pfx}-shadow" cx="76" cy="152" rx="${40*i}" ry="${6*i}" fill="${col}" fill-opacity="${i*0.3}" style="animation:${pfx}-float ${dur} ease-in-out ${delay}s infinite;"/>`,
+        elements: `${animLogoEl}
+        <ellipse id="${pfx}-shadow" cx="${LOGO_X + LOGO_W/2}" cy="${LOGO_Y + LOGO_H + 6}" rx="${40*i}" ry="${6*i}" fill="${col}" fill-opacity="${i*0.3}" style="animation:${pfx}-float3d ${dur} ease-in-out ${delay}s infinite; transform-box:fill-box; transform-origin:center;"/>`,
       };
     }
 
@@ -73,13 +84,18 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
       const dur = d_fn(6, sp);
       const sx  = 1 + 0.06 * i;
       const sy  = 1 + 0.04 * i;
+      const animLogoEl = hasLogo
+        ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"
+            style="animation:${pfx}-breathe-img ${dur} cubic-bezier(.4,0,.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center; filter:url(#${pfx}-glow);"/>`
+        : '';
       return {
         filterDefs: `<filter id="${pfx}-glow"><feGaussianBlur stdDeviation="${2*i}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
-        keyframes: `@keyframes ${pfx}-breathe {
-          0%,100% { transform: scale(1,1); filter: url(#${pfx}-glow); }
-          50%      { transform: scale(${sx.toFixed(3)},${sy.toFixed(3)}); filter: url(#${pfx}-glow); }
+        keyframes: `@keyframes ${pfx}-breathe-img {
+          0%,100% { transform: scale(1,1); }
+          50%      { transform: scale(${sx.toFixed(3)},${sy.toFixed(3)}); }
         }`,
-        elements: `<circle id="${pfx}-halo" cx="76" cy="76" r="${54 + 6*i}" fill="${col}" fill-opacity="${i*0.12}" style="animation:${pfx}-breathe ${dur} cubic-bezier(.4,0,.2,1) ${delay}s infinite; transform-origin:76px 76px;"/>`,
+        elements: `${animLogoEl}
+        <circle id="${pfx}-halo" cx="${LOGO_X + LOGO_W/2}" cy="${LOGO_Y + LOGO_H/2}" r="${Math.max(LOGO_W, LOGO_H)/2 + 8 + 6*i}" fill="${col}" fill-opacity="${i*0.12}" style="animation:${pfx}-breathe-img ${dur} cubic-bezier(.4,0,.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center;"/>`,
       };
     }
 
@@ -87,42 +103,57 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
       const dur = d_fn(12, sp);
       const rx = Math.round(3 * i);
       const ry = Math.round(5 * i);
+      const animLogoEl = hasLogo
+        ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"
+            style="animation:${pfx}-gyro-img ${dur} ease-in-out ${delay}s infinite alternate; transform-box:fill-box; transform-origin:center; filter:url(#${pfx}-gyro);"/>`
+        : '';
       return {
         filterDefs: `<filter id="${pfx}-gyro"><feDropShadow dx="${ry}" dy="${rx}" stdDeviation="${ry}" flood-color="${col}" flood-opacity="${i*0.35}"/></filter>`,
-        keyframes: `@keyframes ${pfx}-gyro {
+        keyframes: `@keyframes ${pfx}-gyro-img {
           0%   { transform: perspective(800px) rotateX(-${rx}deg) rotateY(${ry}deg); }
           100% { transform: perspective(800px) rotateX(${rx}deg) rotateY(-${ry}deg); }
         }`,
-        elements: `<ellipse id="${pfx}-tilt-shadow" cx="76" cy="155" rx="${38*i}" ry="${5*i}" fill="${col}" fill-opacity="${i*0.25}" style="animation:${pfx}-gyro ${dur} ease-in-out ${delay}s infinite alternate; transform-origin:76px 76px;"/>`,
+        elements: `${animLogoEl}
+        <ellipse id="${pfx}-tilt-shadow" cx="${LOGO_X + LOGO_W/2}" cy="${LOGO_Y + LOGO_H + 5}" rx="${38*i}" ry="${5*i}" fill="${col}" fill-opacity="${i*0.25}" style="animation:${pfx}-gyro-img ${dur} ease-in-out ${delay}s infinite alternate; transform-box:fill-box; transform-origin:center;"/>`,
       };
     }
 
     case 'LOGO_HALO_PULSE': {
       const bpm = d_fn(0.83, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const R = Math.max(LOGO_W, LOGO_H) / 2;
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
       return {
         filterDefs: `<radialGradient id="${pfx}-halo-g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="${col}" stop-opacity="${i*0.8}"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient>`,
         keyframes: `@keyframes ${pfx}-halo {
-          0%,100% { r: ${50+4*i}; opacity: ${i*0.5}; }
-          50%      { r: ${58+8*i}; opacity: ${i}; }
+          0%,100% { r: ${R+4*i}; opacity: ${i*0.5}; }
+          50%      { r: ${R+12*i}; opacity: ${i}; }
         }`,
-        elements: `<circle id="${pfx}-halopulse" cx="76" cy="76" r="${50}" fill="url(#${pfx}-halo-g)" style="animation:${pfx}-halo ${bpm} ease-in-out ${delay}s infinite;"/>`,
+        elements: `<circle id="${pfx}-halopulse" cx="${CX}" cy="${CY}" r="${R}" fill="url(#${pfx}-halo-g)" style="animation:${pfx}-halo ${bpm} ease-in-out ${delay}s infinite;"/>
+        ${logoEl}`,
       };
     }
 
     case 'LOGO_ORBITAL_PARTICLES': {
       const dur = d_fn(6, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const RX_BASE = LOGO_W/2 + 6, RY_BASE = LOGO_H/2 + 4;
       const orbs = [
-        { rx:45, ry:18, delay:0 }, { rx:55, ry:22, delay:1.5 },
-        { rx:38, ry:14, delay:3 }, { rx:48, ry:20, delay:4.5 },
+        { rx: RX_BASE+10, ry: RY_BASE+4, delay:0 }, { rx: RX_BASE+18, ry: RY_BASE+8, delay:1.5 },
+        { rx: RX_BASE+4,  ry: RY_BASE+2, delay:3 }, { rx: RX_BASE+14, ry: RY_BASE+6, delay:4.5 },
       ];
-      const elements = orbs.map((orb, idx) => `
-        <ellipse id="${pfx}-orb${idx}" cx="76" cy="76" rx="${orb.rx*i+20}" ry="${orb.ry*i+8}" fill="none" stroke="${col}" stroke-width="1" stroke-opacity="${i}" stroke-dasharray="3 8" style="animation:${pfx}-orbit${idx} ${(parseFloat(dur)*0.9+idx*0.4).toFixed(1)}s linear ${delay+orb.delay}s infinite;transform-origin:76px 76px;"/>`).join('');
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
+      const orbEls = orbs.map((orb, idx) => `
+        <ellipse id="${pfx}-orb${idx}" cx="${CX}" cy="${CY}" rx="${orb.rx*i+RX_BASE}" ry="${orb.ry*i+RY_BASE}" fill="none" stroke="${col}" stroke-width="1" stroke-opacity="${i}" stroke-dasharray="3 8" style="animation:${pfx}-orbit${idx} ${(parseFloat(dur)*0.9+idx*0.4).toFixed(1)}s linear ${delay+orb.delay}s infinite;transform-box:fill-box;transform-origin:${CX}px ${CY}px;"/>`).join('');
       const keyframes = orbs.map((_, idx) => `@keyframes ${pfx}-orbit${idx} { from{transform:rotate(${idx*90}deg)}to{transform:rotate(${idx*90+360}deg)} }`).join('\n');
-      return { filterDefs: '', keyframes, elements };
+      return { filterDefs: '', keyframes, elements: `${logoEl}${orbEls}` };
     }
 
     case 'LOGO_SOUL_AURA': {
       const dur = d_fn(10, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const R = Math.max(LOGO_W, LOGO_H) / 2;
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
       return {
         filterDefs: `<radialGradient id="${pfx}-aura1" cx="40%" cy="40%"><stop offset="0%" stop-color="${col}" stop-opacity="${i*0.4}"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient>
           <radialGradient id="${pfx}-aura2" cx="60%" cy="60%"><stop offset="0%" stop-color="${lighten(col)}" stop-opacity="${i*0.3}"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient>`,
@@ -131,14 +162,18 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
           33%      { transform: scale(${1+0.1*i}) rotate(3deg); }
           66%      { transform: scale(${1+0.05*i}) rotate(-3deg); }
         }`,
-        elements: `<circle cx="76" cy="76" r="70" fill="url(#${pfx}-aura1)" style="animation:${pfx}-aura ${dur} ease-in-out ${delay}s infinite;transform-origin:76px 76px;"/>
-          <circle cx="76" cy="76" r="56" fill="url(#${pfx}-aura2)" style="animation:${pfx}-aura ${(parseFloat(dur)*1.3).toFixed(1)}s ease-in-out ${delay+1}s infinite alternate;transform-origin:76px 76px;"/>`,
+        elements: `<circle cx="${CX}" cy="${CY}" r="${R+14}" fill="url(#${pfx}-aura1)" style="animation:${pfx}-aura ${dur} ease-in-out ${delay}s infinite;transform-box:fill-box;transform-origin:${CX}px ${CY}px;"/>
+          <circle cx="${CX}" cy="${CY}" r="${R+6}" fill="url(#${pfx}-aura2)" style="animation:${pfx}-aura ${(parseFloat(dur)*1.3).toFixed(1)}s ease-in-out ${delay+1}s infinite alternate;transform-box:fill-box;transform-origin:${CX}px ${CY}px;"/>
+          ${logoEl}`,
       };
     }
 
     case 'LOGO_ELECTRIC_CORONA': {
       const dur = d_fn(3, sp);
       const dash = Math.round(12 * i);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const R = Math.max(LOGO_W, LOGO_H) / 2;
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
       return {
         filterDefs: `<filter id="${pfx}-glow-elec"><feGaussianBlur stdDeviation="${3*i}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
         keyframes: `@keyframes ${pfx}-corona {
@@ -146,12 +181,15 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
           50%  { opacity: ${i}; }
           100% { stroke-dashoffset: ${-dash*4}; opacity: ${i*0.8}; }
         }`,
-        elements: `<circle cx="76" cy="76" r="${56+6*i}" fill="none" stroke="${col}" stroke-width="2" stroke-dasharray="${dash} ${dash/2}" filter="url(#${pfx}-glow-elec)" style="animation:${pfx}-corona ${dur} linear ${delay}s infinite; transform-origin:76px 76px;"/>`,
+        elements: `<ellipse cx="${CX}" cy="${CY}" rx="${LOGO_W/2+8+6*i}" ry="${LOGO_H/2+6+4*i}" fill="none" stroke="${col}" stroke-width="2" stroke-dasharray="${dash} ${dash/2}" filter="url(#${pfx}-glow-elec)" style="animation:${pfx}-corona ${dur} linear ${delay}s infinite;"/>
+        ${logoEl}`,
       };
     }
 
     case 'LOGO_METAL_BRUSH': {
       const dur = d_fn(4, sp);
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet" style="filter:url(#${pfx}-metal-over);"/>`
+        : '';
       return {
         filterDefs: `<linearGradient id="${pfx}-metal" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%"   stop-color="${col}" stop-opacity="0"/>
@@ -159,27 +197,36 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
           <stop offset="55%"  stop-color="${lighten(col,80)}" stop-opacity="${i}"/>
           <stop offset="100%" stop-color="${col}" stop-opacity="0"/>
           <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="${dur}" repeatCount="indefinite"/>
-        </linearGradient>`,
+        </linearGradient>
+        <filter id="${pfx}-metal-over" x="-10%" y="-10%" width="120%" height="120%">
+          <feFlood flood-color="${lighten(col,80)}" flood-opacity="${i*0.3}" result="shine"/>
+          <feBlend in="SourceGraphic" in2="shine" mode="screen"/>
+        </filter>`,
         keyframes: '',
-        elements: `<circle cx="76" cy="76" r="52" fill="url(#${pfx}-metal)" fill-opacity="1"/>`,
+        elements: `<rect x="${LOGO_X-2}" y="${LOGO_Y-2}" width="${LOGO_W+4}" height="${LOGO_H+4}" fill="url(#${pfx}-metal)" fill-opacity="1" rx="3"/>
+        ${logoEl}`,
       };
     }
 
     case 'LOGO_GLASS_IRIS': {
       const dur = d_fn(5, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
       const colors = [col, lighten(col,50), '#ff6b9d', '#00d4ff', lighten(col,80)];
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
       return {
         filterDefs: `<linearGradient id="${pfx}-iris" x1="0%" y1="0%" x2="100%" y2="100%">
-          ${colors.map((c,idx) => `<stop offset="${idx*25}%" stop-color="${c}" stop-opacity="${i*0.6}"/>`).join('')}
-          <animateTransform attributeName="gradientTransform" type="rotate" from="0 76 76" to="360 76 76" dur="${dur}" repeatCount="indefinite"/>
+          ${colors.map((c,idx) => `<stop offset="${idx*25}%" stop-color="${c}" stop-opacity="${i*0.4}"/>`).join('')}
+          <animateTransform attributeName="gradientTransform" type="rotate" from="0 ${CX} ${CY}" to="360 ${CX} ${CY}" dur="${dur}" repeatCount="indefinite"/>
         </linearGradient>`,
         keyframes: `@keyframes ${pfx}-iris-pulse { 0%,100%{opacity:${i*0.7}} 50%{opacity:${i}} }`,
-        elements: `<circle cx="76" cy="76" r="54" fill="url(#${pfx}-iris)" style="animation:${pfx}-iris-pulse ${(parseFloat(dur)*1.5).toFixed(1)}s ease-in-out ${delay}s infinite;"/>`,
+        elements: `<rect x="${LOGO_X-2}" y="${LOGO_Y-2}" width="${LOGO_W+4}" height="${LOGO_H+4}" fill="url(#${pfx}-iris)" rx="4" style="animation:${pfx}-iris-pulse ${(parseFloat(dur)*1.5).toFixed(1)}s ease-in-out ${delay}s infinite;"/>
+        ${logoEl}`,
       };
     }
 
     case 'LOGO_GOLD_POLISH': {
       const dur = d_fn(5, sp);
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
       return {
         filterDefs: `<linearGradient id="${pfx}-gold" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%"   stop-color="#8b6914" stop-opacity="${i*0.5}"/>
@@ -190,21 +237,26 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
           <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="${dur}" repeatCount="indefinite"/>
         </linearGradient>`,
         keyframes: '',
-        elements: `<circle cx="76" cy="76" r="54" fill="url(#${pfx}-gold)"/>`,
+        elements: `<rect x="${LOGO_X-2}" y="${LOGO_Y-2}" width="${LOGO_W+4}" height="${LOGO_H+4}" fill="url(#${pfx}-gold)" rx="3"/>
+        ${logoEl}`,
       };
     }
 
     case 'LOGO_LIQUID_EDGE': {
       const dur = d_fn(10, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const RX = LOGO_W/2+4, RY = LOGO_H/2+4;
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
       return {
         filterDefs: '',
         keyframes: `@keyframes ${pfx}-liquid {
-          0%,100% { d: path("M76,24 C100,24 128,52 128,76 C128,100 100,128 76,128 C52,128 24,100 24,76 C24,52 52,24 76,24Z"); }
-          25%      { d: path("M76,20 C108,20 132,50 132,76 C132,104 108,130 76,132 C44,132 22,104 20,76 C22,50 44,20 76,20Z"); }
-          50%      { d: path("M76,26 C106,24 130,52 130,76 C130,100 106,128 76,128 C46,130 22,100 22,76 C24,52 46,24 76,26Z"); }
-          75%      { d: path("M76,22 C102,22 130,50 130,78 C130,102 102,130 76,130 C50,128 20,102 22,76 C22,52 50,24 76,22Z"); }
+          0%,100% { rx: ${RX}; ry: ${RY}; }
+          25%      { rx: ${RX+4}; ry: ${RY-2}; }
+          50%      { rx: ${RX-2}; ry: ${RY+4}; }
+          75%      { rx: ${RX+2}; ry: ${RY+2}; }
         }`,
-        elements: `<circle cx="76" cy="76" r="${52}" fill="none" stroke="${col}" stroke-width="2" stroke-opacity="${i*0.6}" style="animation:${pfx}-liquid ${dur} ease-in-out ${delay}s infinite;"/>`,
+        elements: `<ellipse cx="${CX}" cy="${CY}" rx="${RX}" ry="${RY}" fill="none" stroke="${col}" stroke-width="2" stroke-opacity="${i*0.6}" style="animation:${pfx}-liquid ${dur} ease-in-out ${delay}s infinite;"/>
+        ${logoEl}`,
       };
     }
 
@@ -768,7 +820,8 @@ export function renderZoneComposition(
   composition: ZoneComposition,
   variationIndex: 'A' | 'B' | 'C' | 'D',
   delayOffset: number,
-  palette: string[]
+  palette: string[],
+  logoUrl?: string
 ): ZoneSVGResult {
   const varId  = `v${variationIndex.toLowerCase()}`;
 
@@ -806,7 +859,7 @@ export function renderZoneComposition(
 
   const logoResult = renderZoneWithLayers(
     'logo', withColor(composition.logo, 'logo', c1), varId, logoDelay,
-    (dec, vid, delay) => renderLogoEffect(d_fn, dec, vid, delay), c1
+    (dec, vid, delay) => renderLogoEffect(d_fn, dec, vid, delay, logoUrl), c1
   );
 
   const nomResult = renderZoneWithLayers(

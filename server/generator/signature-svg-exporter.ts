@@ -18,7 +18,7 @@ export class SignatureSVGExporter {
     baseResult: SignatureBaseResult,
     variationsResult: VariationsResult
   ): SVGExportResult {
-    const { svgBase, width, height, palette } = baseResult;
+    const { svgBase, width, height, palette, logo_url } = baseResult;
     const { variations, globalDefs } = variationsResult;
     const [c0, c1, c2] = palette;
 
@@ -26,7 +26,7 @@ export class SignatureSVGExporter {
     const slug = nom.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     const filename = `signature-${slug}-${timestamp}.svg`;
 
-    const svgContent = this.buildFinalSVG(svgBase, variations, globalDefs, width, height, c0, c1, c2);
+    const svgContent = this.buildFinalSVG(svgBase, variations, globalDefs, width, height, c0, c1, c2, logo_url);
 
     return {
       svgContent,
@@ -48,13 +48,19 @@ export class SignatureSVGExporter {
     height: number,
     c0: string,
     c1: string,
-    c2: string
+    c2: string,
+    logoUrl?: string
   ): string {
     const [varA, varB, varC, varD] = variations;
 
     const timing = this.buildTimingCSS();
     const transitionCSS = this.buildTransitionCSS();
     const allVariantCSS = variations.map(v => v.cssAnimations).join('\n');
+    // Si un logo image est fourni, le logo statique est masqué car chaque variation active
+    // fournit sa propre copie animée positionnée exactement par-dessus
+    const logoHideCSS = logoUrl
+      ? `\n      /* Logo statique caché — copies animées dans chaque variation */\n      #company-logo { visibility: hidden; }`
+      : '';
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -77,6 +83,7 @@ ${timing}
 ${transitionCSS}
 
 ${allVariantCSS}
+${logoHideCSS}
 
       /* Variation layer visibility orchestration */
       #layer-var-a, #layer-var-b, #layer-var-c, #layer-var-d {
@@ -185,6 +192,12 @@ ${allVariantCSS}
   <!-- ===== LAYER 0: Static Background ===== -->
   <rect id="bg-root" x="0" y="0" width="${width}" height="${height}" fill="${c0}" rx="12"/>
 
+  <!-- ===== LAYER 1: Static Base — Always Visible ===== -->
+  <!-- Logo statique masqué par CSS ; chaque variation en fournit une copie animée -->
+  <g id="layer-base">
+    ${svgBase}
+  </g>
+
   <!-- ===== LAYER 2: Variation A — Breathing Particles ===== -->
   <g id="layer-var-a">
     ${varA.svgElements}
@@ -203,11 +216,6 @@ ${allVariantCSS}
   <!-- ===== LAYER 5: Variation D — Luminous Respiration ===== -->
   <g id="layer-var-d">
     ${varD.svgElements}
-  </g>
-
-  <!-- ===== LAYER 1: Static Base — Always Visible ===== -->
-  <g id="layer-base">
-    ${svgBase}
   </g>
 
 </svg>`;

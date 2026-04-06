@@ -23,6 +23,7 @@ export interface SignatureBaseResult {
   width: number;
   height: number;
   palette: string[];
+  logo_url?: string;
 }
 
 const SOCIAL_ICONS: Record<string, string> = {
@@ -69,7 +70,7 @@ export class SignatureBaseGenerator {
       textMuted,
     });
 
-    return { svgBase, width: 600, height: 180, palette };
+    return { svgBase, width: 600, height: 180, palette, logo_url: signature.logo_url };
   }
 
   private lightenHex(hex: string, amount: number): string {

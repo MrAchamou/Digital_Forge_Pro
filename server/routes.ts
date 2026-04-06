@@ -1071,7 +1071,7 @@ router.post('/signature/generate', async (req, res) => {
     }
 
     const baseResult = signatureBaseGenerator.generate(signature, style);
-    const variationsResult = signatureVariationsGenerator.generate(style, baseResult.palette, zone_compositions || undefined);
+    const variationsResult = signatureVariationsGenerator.generate(style, baseResult.palette, zone_compositions || undefined, baseResult.logo_url);
     const exportResult = signatureSVGExporter.export(signature.nom || 'signature', baseResult, variationsResult);
 
     return res.json({

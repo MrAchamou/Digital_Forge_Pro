@@ -31,13 +31,14 @@ export class SignatureVariationsGenerator {
   generate(
     style: StyleData,
     palette: string[],
-    zoneCompositions?: { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition }
+    zoneCompositions?: { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition },
+    logoUrl?: string
   ): VariationsResult {
     const [c0, c1, c2] = palette;
     const cfg = INTENSITY_MAP[style.intensite] || INTENSITY_MAP.medium;
 
     if (zoneCompositions) {
-      return this.buildZoneVariations(palette, zoneCompositions);
+      return this.buildZoneVariations(palette, zoneCompositions, logoUrl);
     }
 
     const varA = this.buildVariationA(c0, c1, c2, cfg, style);
@@ -51,13 +52,14 @@ export class SignatureVariationsGenerator {
 
   private buildZoneVariations(
     palette: string[],
-    zoneCompositions: { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition }
+    zoneCompositions: { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition },
+    logoUrl?: string
   ): VariationsResult {
     const [c0, c1, c2] = palette;
     const variations = (['A', 'B', 'C', 'D'] as const).map((varKey, idx) => {
       const composition = zoneCompositions[varKey];
       const delayOffset = idx === 0 ? 0 : 0;
-      const zoneResult  = renderZoneComposition(composition, varKey, delayOffset, palette);
+      const zoneResult  = renderZoneComposition(composition, varKey, delayOffset, palette, logoUrl);
       const assembled   = assembleSVGEffects(zoneResult);
 
       const varId = `var-${varKey.toLowerCase()}`;
