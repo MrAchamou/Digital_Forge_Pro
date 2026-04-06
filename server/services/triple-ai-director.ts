@@ -10,6 +10,7 @@ import {
   type ZoneSelection,
 } from './zone-effect-selector';
 import { validateHarmony, type ZoneComposition } from './harmony-validator';
+import { maximizeDiversity, logFitnessReport } from '../modules/variance-engine.module';
 
 const EFFECTS_LIBRARY = [
   'HEARTBEAT', 'SOUL_AURA', 'PLASMA_DRIFT', 'NEON_PULSE', 'GOLDEN_SHIMMER',
@@ -561,6 +562,11 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
   log(`✓ Cerveau 3 complet — A:${compA.logo.effet_id} | B:${compB.logo.effet_id} | C:${compC.logo.effet_id} | D:${compD.logo.effet_id}`, 'triple-ai');
   log(`  Diversité fonds — A:${compA.fond.effet_id} | B:${compB.fond.effet_id} | C:${compC.fond.effet_id} | D:${compD.fond.effet_id}`, 'triple-ai');
 
+  // ── VarianceEngine : maximisation génétique de la diversité A/B/C/D ───────
+  const diversityReport = maximizeDiversity({ A: compA, B: compB, C: compC, D: compD });
+  const optimizedComps  = diversityReport.compositions;
+  log(`🧬 Variance Engine — Diversité: ${(diversityReport.overall_diversity * 100).toFixed(1)}% | ${logFitnessReport(optimizedComps)} | Mutations: ${diversityReport.mutations_applied}`, 'triple-ai');
+
   const baseConfig = buildFallbackTechnical(scenario, palette);
 
   return {
@@ -569,11 +575,12 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
       'CSS animations uniquement — zéro JS',
       'Chirurgie visuelle par zones — logique métier secteur',
       'Harmony validator — 5 règles appliquées',
-      'Diversité garantie entre les 4 variations',
-      'Scoring multi-dimensionnel : secteur + émotion + note GMB + variation',
+      `Variance Engine — Diversité génétique: ${(diversityReport.overall_diversity * 100).toFixed(1)}%`,
+      'Timing Master — Durées φ et Fibonacci actives',
+      'Color Harmony Engine — Palettes enrichies par zone',
     ],
-    notes_techniques: `Zone-system actif | Secteur:${secteur} | A:${compA.logo.effet_id} B:${compB.logo.effet_id} C:${compC.logo.effet_id} D:${compD.logo.effet_id}`,
-    zone_compositions: { A: compA, B: compB, C: compC, D: compD },
+    notes_techniques: `Zone+Variance+Timing+Color | Secteur:${secteur} | A:${optimizedComps.A.logo.effet_id} B:${optimizedComps.B.logo.effet_id} C:${optimizedComps.C.logo.effet_id} D:${optimizedComps.D.logo.effet_id}`,
+    zone_compositions: { A: optimizedComps.A, B: optimizedComps.B, C: optimizedComps.C, D: optimizedComps.D },
   };
 }
 

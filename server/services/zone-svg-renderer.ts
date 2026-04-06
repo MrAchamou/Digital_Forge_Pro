@@ -1,4 +1,6 @@
 import type { ZoneEffectDecision, ZoneComposition } from './harmony-validator';
+import { getTimingProfile, buildDurationFn } from '../modules/timing-master.module';
+import { enrichZoneColors } from '../modules/color-harmony.module';
 
 export interface SVGEffectCode {
   keyframes: string;
@@ -766,51 +768,69 @@ export function renderZoneComposition(
   palette: string[]
 ): ZoneSVGResult {
   const varId  = `v${variationIndex.toLowerCase()}`;
-  const d_fn   = (base: number, sp: string) => `${(base * (SPEED_DURATION[sp] ?? 1)).toFixed(1)}s`;
+
+  // ── TimingMaster : durées basées sur le nombre d'or et Fibonacci ──────────
+  const timingProfile = getTimingProfile(variationIndex);
+  const d_fn = buildDurationFn(timingProfile);
 
   const c0 = palette[0] ?? '#0f172a';
   const c1 = palette[1] ?? '#6366f1';
   const c2 = palette[2] ?? '#e2e8f0';
 
-  const resolveColor = (decision: ZoneEffectDecision, fallback: string) =>
-    decision.color && decision.color !== '#000000' ? decision.color : fallback;
+  // ── ColorHarmonyEngine : palette enrichie par zone ────────────────────────
+  const zoneColors = enrichZoneColors(c1, c0, variationIndex);
 
-  const withColor = (z: ZoneEffectDecision, fb: string): ZoneEffectDecision => ({
+  const resolveColor = (decision: ZoneEffectDecision, zone: string, fallback: string) => {
+    if (decision.color && decision.color !== '#000000') return decision.color;
+    return (zoneColors as any)[zone] ?? fallback;
+  };
+
+  const withColor = (z: ZoneEffectDecision, zone: string, fb: string): ZoneEffectDecision => ({
     ...z,
-    color: resolveColor(z, fb),
+    color: resolveColor(z, zone, fb),
   });
 
   // Rendu multi-couches pour chaque zone
+  // ── Délais Fibonacci par zone via TimingMaster ────────────────────────────
+  const zd = timingProfile.zone_delays;
+  const logoDelay  = delayOffset + (zd['logo']       ?? 0);
+  const nomDelay   = delayOffset + (zd['nom']        ?? 0);
+  const sepDelay   = delayOffset + (zd['separateur'] ?? 0);
+  const fondDelay  = delayOffset + (zd['fond']       ?? 0);
+  const ctaDelay   = delayOffset + (zd['cta']        ?? 0);
+  const titreDelay = delayOffset + (zd['titre']      ?? 0);
+  const contDelay  = delayOffset + (zd['contact']    ?? 0);
+
   const logoResult = renderZoneWithLayers(
-    'logo', withColor(composition.logo, c1), varId, delayOffset,
+    'logo', withColor(composition.logo, 'logo', c1), varId, logoDelay,
     (dec, vid, delay) => renderLogoEffect(d_fn, dec, vid, delay), c1
   );
 
   const nomResult = renderZoneWithLayers(
-    'nom', withColor(composition.nom, c1), varId, delayOffset,
+    'nom', withColor(composition.nom, 'nom', c1), varId, nomDelay,
     (dec, vid, delay) => renderNomEffect(d_fn, dec, vid, delay), c1
   );
 
   const sepResult = renderZoneWithLayers(
-    'separateur', withColor(composition.separateur, c1), varId, delayOffset,
+    'separateur', withColor(composition.separateur, 'separateur', c1), varId, sepDelay,
     (dec, vid, delay) => renderSeparateurEffect(d_fn, dec, vid, delay), c1
   );
 
   const fondResult = renderZoneWithLayers(
-    'fond', withColor(composition.fond, c1), varId, delayOffset,
+    'fond', withColor(composition.fond, 'fond', c1), varId, fondDelay,
     (dec, vid, delay) => renderFondEffect(d_fn, dec, vid, delay), c1
   );
 
   const ctaResult = renderZoneWithLayers(
-    'cta', withColor(composition.cta, c1), varId, delayOffset,
+    'cta', withColor(composition.cta, 'cta', c1), varId, ctaDelay,
     (dec, vid, delay) => renderCtaEffect(d_fn, dec, vid, delay), c1
   );
 
   return {
     logo:       logoResult,
     nom:        nomResult,
-    titre:      renderTitreEffect(d_fn, withColor(composition.titre, c2), varId, delayOffset),
-    contact:    renderContactEffect(d_fn, withColor(composition.contact, c1), varId, delayOffset),
+    titre:      renderTitreEffect(d_fn, withColor(composition.titre, 'titre', c2), varId, titreDelay),
+    contact:    renderContactEffect(d_fn, withColor(composition.contact, 'contact', c1), varId, contDelay),
     separateur: sepResult,
     fond:       fondResult,
     cta:        ctaResult,
