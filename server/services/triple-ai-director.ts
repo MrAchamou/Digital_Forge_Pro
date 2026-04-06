@@ -24,16 +24,36 @@ export interface CreativeBrief {
   univers_visuel: string;
   contraintes: string[];
   mot_clef_narratif: string;
+  analyse_logo: string;
+  psychologie_couleurs: string;
+  personnalite_marque: string[];
+  cible_audience: string;
+  differentiateur: string;
 }
 
 export interface NarrativeScenario {
   arc_emotionnel: string;
+  fil_conducteur: string;
   variations: {
-    A: { titre: string; intention: string; fond: string; logo: string; texte: string; separateur: string };
-    B: { titre: string; intention: string; fond: string; logo: string; texte: string; separateur: string };
-    C: { titre: string; intention: string; fond: string; logo: string; texte: string; separateur: string };
-    D: { titre: string; intention: string; fond: string; logo: string; texte: string; separateur: string };
+    A: VariationNarrative;
+    B: VariationNarrative;
+    C: VariationNarrative;
+    D: VariationNarrative;
   };
+  note_du_directeur: string;
+}
+
+interface VariationNarrative {
+  titre: string;
+  sous_titre: string;
+  intention: string;
+  metaphore: string;
+  fond: string;
+  logo: string;
+  texte: string;
+  separateur: string;
+  emotion_dominante: string;
+  moment_cle: string;
 }
 
 export interface TechnicalConfig {
@@ -41,8 +61,10 @@ export interface TechnicalConfig {
   variation_b: VariationConfig;
   variation_c: VariationConfig;
   variation_d: VariationConfig;
-  transitions: { duree: number; easing: string };
+  transitions: TransitionConfig;
   cycle_total: number;
+  optimisations_email: string[];
+  notes_techniques: string;
 }
 
 interface VariationConfig {
@@ -59,6 +81,12 @@ interface EffectConfig {
   speed: string;
   color: string;
   params: Record<string, any>;
+}
+
+interface TransitionConfig {
+  duree: number;
+  easing: string;
+  type: string;
 }
 
 function parseJsonSafely<T>(text: string): T {
@@ -78,37 +106,82 @@ function buildFallbackBrief(metadata: any): CreativeBrief {
     univers_visuel: 'Espace numérique épuré avec des accents de lumière froide',
     contraintes: ['compatibilité email', 'animations CSS uniquement'],
     mot_clef_narratif: 'Précision Silencieuse',
+    analyse_logo: 'Logo professionnel sobre',
+    psychologie_couleurs: 'Palette neutre évoquant la confiance et la modernité',
+    personnalite_marque: ['fiable', 'moderne', 'professionnel'],
+    cible_audience: 'Professionnels et entreprises',
+    differentiateur: 'Excellence et précision',
   };
 }
 
 function buildFallbackScenario(): NarrativeScenario {
   return {
     arc_emotionnel: 'Calme → Précision → Profondeur → Prestige',
+    fil_conducteur: 'Une marque qui maîtrise son art dans le silence de l\'excellence',
     variations: {
-      A: { titre: "L'Autorité", intention: "Une pulsation dorée, constante, comme un cœur certain", fond: 'SOFT_GRADIENT', logo: 'HEARTBEAT', texte: 'MINIMAL_PULSE', separateur: 'GOLDEN_SHIMMER' },
-      B: { titre: "La Précision", intention: "L'exactitude géométrique d'un esprit tranchant", fond: 'DEEP_GLOW', logo: 'CRYSTAL_BREATH', texte: 'CLEAN_FADE', separateur: 'NEON_PULSE' },
-      C: { titre: "La Profondeur", intention: "Un silence habité, plein de sens et de gravité", fond: 'VOID_PULSE', logo: 'SOUL_AURA', texte: 'SUBTLE_BREATHE', separateur: 'PLASMA_DRIFT' },
-      D: { titre: "Le Prestige", intention: "L'éclat discret de l'excellence accomplie", fond: 'AURORA_FLOW', logo: 'PEARL_SHIMMER', texte: 'VELVET_FADE', separateur: 'STAR_DRIFT' },
+      A: {
+        titre: "L'Autorité",
+        sous_titre: 'Premier regard',
+        intention: 'Une pulsation dorée, constante, comme un cœur certain',
+        metaphore: 'Le battement régulier d\'un horloger suisse',
+        fond: 'SOFT_GRADIENT', logo: 'HEARTBEAT', texte: 'MINIMAL_PULSE', separateur: 'GOLDEN_SHIMMER',
+        emotion_dominante: 'Confiance',
+        moment_cle: 'L\'ouverture de l\'email',
+      },
+      B: {
+        titre: 'La Précision',
+        sous_titre: 'La maîtrise',
+        intention: 'L\'exactitude géométrique d\'un esprit tranchant',
+        metaphore: 'Un scalpel de lumière dans la nuit numérique',
+        fond: 'DEEP_GLOW', logo: 'CRYSTAL_BREATH', texte: 'CLEAN_FADE', separateur: 'NEON_PULSE',
+        emotion_dominante: 'Admiration',
+        moment_cle: 'La lecture du nom',
+      },
+      C: {
+        titre: 'La Profondeur',
+        sous_titre: 'L\'âme',
+        intention: 'Un silence habité, plein de sens et de gravité',
+        metaphore: 'Les eaux profondes d\'un lac de montagne en hiver',
+        fond: 'VOID_PULSE', logo: 'SOUL_AURA', texte: 'SUBTLE_BREATHE', separateur: 'PLASMA_DRIFT',
+        emotion_dominante: 'Mystère',
+        moment_cle: 'La contemplation',
+      },
+      D: {
+        titre: 'Le Prestige',
+        sous_titre: 'L\'apothéose',
+        intention: 'L\'éclat discret de l\'excellence accomplie',
+        metaphore: 'Un diamant qui capte toute la lumière de la pièce',
+        fond: 'AURORA_FLOW', logo: 'PEARL_SHIMMER', texte: 'VELVET_FADE', separateur: 'STAR_DRIFT',
+        emotion_dominante: 'Désir',
+        moment_cle: 'L\'appel à l\'action',
+      },
     },
+    note_du_directeur: 'Chaque variation amplifie la précédente comme les mouvements d\'une symphonie',
   };
 }
 
 function buildFallbackTechnical(scenario: NarrativeScenario, palette: string[]): TechnicalConfig {
   const primaryColor = palette?.[1] || '#6366f1';
+  const bgColor = palette?.[0] || '#0f0f0f';
+  const accentColor = palette?.[2] || '#e8e8ff';
+
   const makeConfig = (v: keyof NarrativeScenario['variations'], duree: number): VariationConfig => ({
-    fond: { effet: scenario.variations[v].fond, intensity: 0.4, speed: 'slow', color: palette?.[0] || '#0f0f0f', params: { opacity: 0.8 } },
-    logo: { effet: scenario.variations[v].logo, intensity: 0.6, speed: 'medium', color: primaryColor, params: { radius: 40 } },
-    texte: { effet: scenario.variations[v].texte, intensity: 0.3, speed: 'slow', color: palette?.[2] || '#e8e8ff', params: { blur: 0 } },
-    separateur: { effet: scenario.variations[v].separateur, intensity: 0.5, speed: 'medium', color: primaryColor, params: { width: 2 } },
+    fond: { effet: scenario.variations[v].fond, intensity: 0.4, speed: 'slow', color: bgColor, params: { opacity: 0.8, blur: 0, scale: 1.02 } },
+    logo: { effet: scenario.variations[v].logo, intensity: 0.6, speed: 'medium', color: primaryColor, params: { radius: 40, glow: 0.3, pulse_scale: 1.05 } },
+    texte: { effet: scenario.variations[v].texte, intensity: 0.3, speed: 'slow', color: accentColor, params: { blur: 0, letter_spacing: 0.02, opacity_min: 0.85 } },
+    separateur: { effet: scenario.variations[v].separateur, intensity: 0.5, speed: 'medium', color: primaryColor, params: { width: 2, glow_spread: 4 } },
     duree,
   });
+
   return {
     variation_a: makeConfig('A', 60),
     variation_b: makeConfig('B', 60),
     variation_c: makeConfig('C', 60),
     variation_d: makeConfig('D', 60),
-    transitions: { duree: 2, easing: 'cubic-bezier(0.4,0,0.2,1)' },
-    cycle_total: 240,
+    transitions: { duree: 2, easing: 'cubic-bezier(0.4,0,0.2,1)', type: 'cross-fade' },
+    cycle_total: 248,
+    optimisations_email: ['CSS animations seulement', 'Pas de JS', 'Max 600px largeur'],
+    notes_techniques: 'Configuration fallback — pipeline IA non disponible',
   };
 }
 
@@ -124,32 +197,62 @@ async function runBrain1GPT(imageBase64: string | null, metadata: any): Promise<
     baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL || undefined,
   });
 
+  const entrepriseContext = [
+    metadata?.entreprise && `Nom: ${metadata.entreprise}`,
+    metadata?.secteur && `Secteur: ${metadata.secteur}`,
+    metadata?.description && `Description: ${metadata.description}`,
+    metadata?.ton && `Ton de marque: ${metadata.ton}`,
+    metadata?.note && `Note GMB: ${metadata.note}/5 (${metadata.avis || 0} avis)`,
+    metadata?.adresse && `Localisation: ${metadata.adresse}, ${metadata.ville}`,
+    metadata?.mots_cles?.length && `Mots-clés: ${metadata.mots_cles.join(', ')}`,
+    metadata?.prix_gamme && `Gamme de prix: ${metadata.prix_gamme}`,
+    metadata?.slogan && `Slogan: ${metadata.slogan}`,
+    metadata?.annee_fondation && `Fondée en: ${metadata.annee_fondation}`,
+    metadata?.reseaux_sociaux && Object.keys(metadata.reseaux_sociaux).length > 0
+      && `Réseaux sociaux: ${Object.keys(metadata.reseaux_sociaux).join(', ')}`,
+    metadata?.palette?.length && `Palette couleurs: ${metadata.palette.join(', ')}`,
+    metadata?.logo_url && `Logo disponible: ${metadata.logo_url}`,
+  ].filter(Boolean).join('\n');
+
   const messages: any[] = [
     {
       role: 'system',
-      content: `Tu es un directeur artistique expert en branding visuel de luxe. Tu analyses une signature email statique et les métadonnées de l'entreprise.
+      content: `Tu es le Directeur Artistique Principal d'une agence de branding de luxe internationale. Tu as créé les identités visuelles de marques comme Hermès, Apple, Rolex et Balenciaga. Ton regard est chirurgical : tu décèles en une seconde l'essence profonde d'une marque et tu la transformes en langage visuel animé d'une précision absolue.
 
-Ta mission est de produire un brief créatif précis en JSON :
+Ta mission aujourd'hui : analyser cette entreprise dans ses moindres détails et produire un brief créatif qui guidera la génération de sa signature email vivante — une œuvre qui devra transmettre son identité en quelques secondes.
+
+Tu dois analyser :
+1. **L'identité profonde** : Quelle est l'âme de cette marque ? Quelles émotions doit-elle déclencher ?
+2. **Le positionnement visuel** : À quelles grandes marques ressemble-t-elle ? Quel univers graphique lui appartient ?
+3. **La psychologie des couleurs** : Que disent ses couleurs de sa personnalité et de ses ambitions ?
+4. **Son audience** : Qui reçoit ces emails ? Quelles sont leurs attentes implicites ?
+5. **Son différenciateur** : Qu'est-ce qui la rend unique dans son secteur ?
+6. **Le logo** (si disponible en image) : Forme, style, symbolique, poids visuel, complémentarité avec le mouvement.
+
+Réponds UNIQUEMENT en JSON valide, aucun texte autour :
 {
-  "style_detecte": "string",
-  "references_visuelles": ["brand1", "brand2", "brand3"],
-  "ton_emotionnel": "string",
+  "style_detecte": "description précise du style visuel en 5-10 mots",
+  "references_visuelles": ["marque1", "marque2", "marque3"],
+  "ton_emotionnel": "description du registre émotionnel en 5-8 mots",
   "intensite_mouvement": "minimal|subtil|expressif|dramatique",
-  "univers_visuel": "string description poétique",
-  "contraintes": ["contrainte1", "contrainte2"],
-  "mot_clef_narratif": "string en 2-3 mots maximum"
-}
-
-Réponds UNIQUEMENT en JSON valide. Aucun texte autour.`,
+  "univers_visuel": "description poétique et précise de l'univers visuel en 2-3 phrases",
+  "contraintes": ["contrainte1 spécifique au secteur", "contrainte2", "contrainte3"],
+  "mot_clef_narratif": "2-3 mots qui résument l'essence",
+  "analyse_logo": "analyse du logo en 1-2 phrases : forme, symbolique, énergie visuelle",
+  "psychologie_couleurs": "analyse des couleurs en 1-2 phrases : ce qu'elles disent de la marque",
+  "personnalite_marque": ["trait1", "trait2", "trait3", "trait4"],
+  "cible_audience": "description de l'audience cible en 1 phrase",
+  "differentiateur": "ce qui rend cette marque unique en 1 phrase"
+}`,
     },
     {
       role: 'user',
       content: imageBase64
         ? [
-            { type: 'text', text: `Métadonnées entreprise: ${JSON.stringify(metadata)}` },
-            { type: 'image_url', image_url: { url: `data:image/png;base64,${imageBase64}` } },
+            { type: 'text', text: `Analyse complète de l'entreprise :\n${entrepriseContext}` },
+            { type: 'image_url', image_url: { url: `data:image/png;base64,${imageBase64}`, detail: 'high' } },
           ]
-        : `Analyse cette entreprise et produis le brief créatif: ${JSON.stringify(metadata)}`,
+        : `Analyse complète de l'entreprise :\n${entrepriseContext}`,
     },
   ];
 
@@ -157,18 +260,21 @@ Réponds UNIQUEMENT en JSON valide. Aucun texte autour.`,
     const response = await client.chat.completions.create({
       model: 'gpt-4o',
       messages,
-      max_tokens: 800,
+      max_tokens: 1200,
+      temperature: 0.7,
     });
 
     const content = response.choices[0]?.message?.content || '';
-    return parseJsonSafely<CreativeBrief>(content);
+    const brief = parseJsonSafely<CreativeBrief>(content);
+    log(`Cerveau 1 (GPT-4o) — Style: ${brief.style_detecte} | Mot-clef: ${brief.mot_clef_narratif}`, 'triple-ai');
+    return brief;
   } catch (err: any) {
     log(`Cerveau 1 erreur: ${err.message}`, 'triple-ai');
     return buildFallbackBrief(metadata);
   }
 }
 
-async function runBrain2Claude(brief: CreativeBrief): Promise<NarrativeScenario> {
+async function runBrain2Claude(brief: CreativeBrief, metadata: any): Promise<NarrativeScenario> {
   const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     log('ANTHROPIC_API_KEY manquant — fallback Cerveau 2', 'triple-ai');
@@ -179,51 +285,71 @@ async function runBrain2Claude(brief: CreativeBrief): Promise<NarrativeScenario>
     apiKey,
     baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL || undefined,
   });
+
   const effectsList = EFFECTS_LIBRARY.join(', ');
 
-  try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      system: `Tu es un narrateur créatif spécialisé en motion design et storytelling visuel. Tu reçois un brief créatif et une bibliothèque d'effets disponibles.
+  const systemPrompt = `Tu es le Directeur Narratif et Poète Visuel d'un studio de motion design d'exception. Ton travail est de transformer des briefs créatifs en scénarios narratifs d'une profondeur et d'une cohérence artistique absolues. Tu as signé des signatures animées pour des marques qui font l'histoire.
 
-Ta mission est de construire le scénario narratif des 4 variations de la signature vivante :
+Ton rôle dans cette pipeline : tu reçois le brief du Directeur Artistique (Cerveau 1) et tu construis la DRAMATURGIE COMPLÈTE des 4 variations de la signature vivante. Chaque variation est un chapitre d'une même histoire. Ensemble, elles forment une symphonie visuelle.
 
-Pour chaque variation A, B, C, D tu dois définir :
-- Un titre poétique (2-3 mots)
-- Une intention narrative (1 phrase)
-- L'effet principal pour chaque zone : fond / logo / texte / separateur
-- L'arc émotionnel global A→B→C→D
+Principes sacrés de ta création :
+1. **L'arc émotionnel A→B→C→D** : Chaque variation doit progresser comme les actes d'une pièce de théâtre. L'arc doit être irrésistible et cohérent.
+2. **Le fil conducteur** : Une métaphore centrale relie les 4 variations. Elle doit être profonde et ancrée dans l'univers de la marque.
+3. **La non-répétition** : Les 4 effets par zone (fond/logo/texte/separateur) doivent être tous différents. Aucune redondance tolérée.
+4. **La complémentarité** : Chaque variation révèle un aspect que les autres ne montrent pas. Ensemble elles sont complètes.
+5. **La métaphore** : Chaque variation doit avoir sa propre métaphore poétique, ancrée dans le réel et dans le monde de la marque.
 
-Les 4 variations doivent raconter une histoire cohérente. La non-répétition doit être garantie par la complémentarité des variations entre elles.
+Tu dois IMPÉRATIVEMENT choisir des effets parmi cette liste : ${effectsList}
 
 Réponds UNIQUEMENT en JSON valide :
 {
-  "arc_emotionnel": "string",
+  "arc_emotionnel": "description de l'arc A→B→C→D en 1 phrase évocatrice",
+  "fil_conducteur": "la métaphore centrale en 1-2 phrases",
   "variations": {
-    "A": { "titre": "string", "intention": "string", "fond": "NOM_EFFET", "logo": "NOM_EFFET", "texte": "NOM_EFFET", "separateur": "NOM_EFFET" },
+    "A": {
+      "titre": "2-3 mots poétiques",
+      "sous_titre": "1-3 mots complémentaires",
+      "intention": "l'intention narrative de cette variation en 1 phrase forte",
+      "metaphore": "la métaphore spécifique à cette variation en 1 phrase",
+      "fond": "NOM_EFFET_EXACT",
+      "logo": "NOM_EFFET_EXACT",
+      "texte": "NOM_EFFET_EXACT",
+      "separateur": "NOM_EFFET_EXACT",
+      "emotion_dominante": "1 mot",
+      "moment_cle": "le moment de la lecture de l'email que capture cette variation"
+    },
     "B": { ... },
     "C": { ... },
     "D": { ... }
-  }
-}`,
+  },
+  "note_du_directeur": "ta note d'intention en tant que directeur en 1-2 phrases"
+}`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-opus-4-5',
+      max_tokens: 2000,
+      temperature: 0.8,
+      system: systemPrompt,
       messages: [
         {
           role: 'user',
-          content: `Brief créatif: ${JSON.stringify(brief)}\n\nEffets disponibles (utilise UNIQUEMENT ces noms): ${effectsList}`,
+          content: `Brief créatif du Directeur Artistique :\n${JSON.stringify(brief, null, 2)}\n\nContexte entreprise complémentaire :\nEntreprise: ${metadata?.entreprise || 'Inconnue'}\nSecteur: ${metadata?.secteur || 'Inconnu'}\nTon: ${metadata?.ton || 'Professionnel'}\nPalette: ${JSON.stringify(metadata?.palette || [])}\n\nConstruit le scénario narratif des 4 variations. Rappel effets disponibles: ${effectsList}`,
         },
       ],
     });
 
     const content = response.content[0]?.type === 'text' ? response.content[0].text : '';
-    return parseJsonSafely<NarrativeScenario>(content);
+    const scenario = parseJsonSafely<NarrativeScenario>(content);
+    log(`Cerveau 2 (Claude) — Arc: ${scenario.arc_emotionnel?.slice(0, 60)}...`, 'triple-ai');
+    return scenario;
   } catch (err: any) {
     log(`Cerveau 2 erreur: ${err.message}`, 'triple-ai');
     return buildFallbackScenario();
   }
 }
 
-async function runBrain3Gemini(scenario: NarrativeScenario, palette: string[]): Promise<TechnicalConfig> {
+async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief, palette: string[]): Promise<TechnicalConfig> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     log('GEMINI_API_KEY manquant — fallback Cerveau 3', 'triple-ai');
@@ -231,47 +357,77 @@ async function runBrain3Gemini(scenario: NarrativeScenario, palette: string[]): 
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-pro',
+    generationConfig: { temperature: 0.4, maxOutputTokens: 2500 },
+  });
 
-  const prompt = `Tu es un ingénieur créatif expert en optimisation d'effets visuels pour email. Tu reçois un scénario narratif et tu dois produire la configuration technique finale optimisée.
+  const bgColor = palette?.[0] || '#0f0f0f';
+  const primaryColor = palette?.[1] || '#6366f1';
+  const accentColor = palette?.[2] || '#e8e8ff';
 
-Pour chaque effet sélectionné tu dois définir :
-- L'intensité exacte (0.0 à 1.0)
-- La vitesse (slow|medium|fast)
-- La couleur dominante en hex
-- La durée de la variation en secondes
-- Les paramètres spécifiques à l'effet
+  const prompt = `Tu es l'Ingénieur Créatif Senior et expert en animation SVG/CSS pour email. Tu maîtrises parfaitement les contraintes techniques des clients email (Gmail, Outlook, Apple Mail, Yahoo) et tu sais transformer des intentions narratives en configurations d'effets mathématiquement parfaites.
 
-Contraintes techniques absolues :
+Tu reçois le scénario narratif du Directeur Narratif et le brief du Directeur Artistique. Ton rôle : traduire chaque intention créative en valeurs techniques précises et optimisées.
+
+**Contraintes techniques absolues (non négociables) :**
 - Zéro JavaScript dans le SVG final
-- Animations CSS natives uniquement
-- Largeur max 600px
-- Compatibilité Gmail + Outlook garantie
-- Cycle total entre 200s et 280s
+- CSS animations et SVG SMIL uniquement
+- Largeur maximum 600px
+- Compatibilité Gmail + Outlook 2019+ garantie
+- Cycle total entre 200s et 280s (optimal 240-260s pour engagement maximal)
+- Intensités calibrées pour ne jamais fatiguer l'œil sur un écran email
+- Performance : aucun effet ne doit dépasser 60fps équivalent en CSS
+
+**Principes de calibration :**
+- Fond : intensity 0.2-0.5 (doit rester discret, support du contenu)
+- Logo : intensity 0.4-0.8 (point focal principal, peut être expressif)
+- Texte : intensity 0.1-0.4 (lisibilité primordiale, mouvement subtil)
+- Séparateur : intensity 0.3-0.7 (lien visuel, rythme de lecture)
+
+**Palette à utiliser :**
+- Fond/Background: ${bgColor}
+- Primaire/Accent: ${primaryColor}
+- Secondaire/Texte: ${accentColor}
+
+Pour chaque variation, définis des paramètres SPÉCIFIQUES à l'effet nommé (par ex: pour HEARTBEAT → {bpm: 72, amplitude: 0.08}, pour NEON_PULSE → {frequency: 0.5, glow_radius: 8}).
 
 Réponds UNIQUEMENT en JSON valide :
 {
   "variation_a": {
-    "fond": { "effet": "NOM", "intensity": 0.0, "speed": "string", "color": "#hex", "params": {} },
+    "fond": { "effet": "NOM_EXACT", "intensity": 0.0-1.0, "speed": "slow|medium|fast", "color": "#hex", "params": { "parametres_specifiques": "valeurs" } },
     "logo": { ... },
     "texte": { ... },
     "separateur": { ... },
-    "duree": 60
+    "duree": 55-65
   },
   "variation_b": { ... },
   "variation_c": { ... },
   "variation_d": { ... },
-  "transitions": { "duree": 2, "easing": "cubic-bezier(0.4,0,0.2,1)" },
-  "cycle_total": 240
+  "transitions": {
+    "duree": 1.5-3.0,
+    "easing": "cubic-bezier(x,x,x,x)",
+    "type": "cross-fade|slide|dissolve"
+  },
+  "cycle_total": 200-280,
+  "optimisations_email": ["optimisation1 spécifique", "optimisation2", "optimisation3"],
+  "notes_techniques": "tes remarques techniques importantes en 1-2 phrases"
 }
 
-Scénario narratif: ${JSON.stringify(scenario)}
-Palette de couleurs: ${JSON.stringify(palette)}`;
+Scénario narratif à traduire :
+${JSON.stringify(scenario, null, 2)}
+
+Brief créatif de référence :
+Intensité mouvement souhaitée: ${brief.intensite_mouvement}
+Univers visuel: ${brief.univers_visuel}
+Contraintes: ${JSON.stringify(brief.contraintes)}`;
 
   try {
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    return parseJsonSafely<TechnicalConfig>(text);
+    const config = parseJsonSafely<TechnicalConfig>(text);
+    log(`Cerveau 3 (Gemini) — Cycle: ${config.cycle_total}s | Optimisations: ${config.optimisations_email?.length || 0}`, 'triple-ai');
+    return config;
   } catch (err: any) {
     log(`Cerveau 3 erreur: ${err.message}`, 'triple-ai');
     return buildFallbackTechnical(scenario, palette);
@@ -288,22 +444,25 @@ export async function runTripleAIPipeline(
   configuration_technique: TechnicalConfig;
   status_pipeline: string;
 }> {
-  log('Démarrage pipeline 3 cerveaux IA', 'triple-ai');
+  log('=== Démarrage pipeline 3 cerveaux IA ===', 'triple-ai');
+  log(`Entreprise: ${metadata?.entreprise || 'Inconnue'} | Secteur: ${metadata?.secteur || 'Inconnu'}`, 'triple-ai');
 
-  onProgress?.(1, { status: 'running', label: 'Cerveau 1 — GPT-4o Vision' });
+  onProgress?.(1, { status: 'running', label: 'Cerveau 1 — GPT-4o Vision : Analyse artistique' });
   const brief = await runBrain1GPT(signatureImageBase64, metadata);
-  log(`Cerveau 1 terminé: ${brief.mot_clef_narratif}`, 'triple-ai');
+  log(`✓ Cerveau 1 — ${brief.mot_clef_narratif} | ${brief.intensite_mouvement}`, 'triple-ai');
   onProgress?.(1, { status: 'done', data: brief });
 
-  onProgress?.(2, { status: 'running', label: 'Cerveau 2 — Claude Sonnet' });
-  const scenario = await runBrain2Claude(brief);
-  log(`Cerveau 2 terminé: ${scenario.arc_emotionnel}`, 'triple-ai');
+  onProgress?.(2, { status: 'running', label: 'Cerveau 2 — Claude Opus : Construction narrative' });
+  const scenario = await runBrain2Claude(brief, metadata);
+  log(`✓ Cerveau 2 — Arc: ${scenario.arc_emotionnel?.slice(0, 50)}`, 'triple-ai');
   onProgress?.(2, { status: 'done', data: scenario });
 
-  onProgress?.(3, { status: 'running', label: 'Cerveau 3 — Gemini Flash' });
-  const config = await runBrain3Gemini(scenario, metadata?.palette || []);
-  log(`Cerveau 3 terminé: cycle ${config.cycle_total}s`, 'triple-ai');
+  onProgress?.(3, { status: 'running', label: 'Cerveau 3 — Gemini Pro : Optimisation technique' });
+  const config = await runBrain3Gemini(scenario, brief, metadata?.palette || []);
+  log(`✓ Cerveau 3 — Cycle ${config.cycle_total}s | ${config.optimisations_email?.length || 0} optimisations`, 'triple-ai');
   onProgress?.(3, { status: 'done', data: config });
+
+  log('=== Pipeline 3 cerveaux complète ===', 'triple-ai');
 
   return {
     brief_creatif: brief,
