@@ -11,14 +11,20 @@ export interface EffetCandidat {
   duree_cycle?: string;
 }
 
+// Zones avec catégories (multi-couches)
+export interface CategoryCandidates {
+  [category: string]: EffetCandidat[];  // ex: { dimension: [...], matiere: [...], energie: [...] }
+}
+
+// Zones plates (1 à 2 effets en séquence)
 export interface ZoneSelection {
-  logo: EffetCandidat[];
-  nom: EffetCandidat[];
-  titre: EffetCandidat[];
-  contact: EffetCandidat[];
-  separateur: EffetCandidat[];
-  fond: EffetCandidat[];
-  cta: EffetCandidat[];
+  logo: CategoryCandidates;       // multi-couches par catégorie
+  nom: CategoryCandidates;        // multi-couches par catégorie
+  titre: EffetCandidat[];         // 1 effet max
+  contact: EffetCandidat[];       // 1 effet max
+  separateur: EffetCandidat[];    // 1-2 effets (primary + secondary optionnel)
+  fond: EffetCandidat[];          // 1-2 effets (primary + secondary optionnel)
+  cta: EffetCandidat[];           // 1-2 effets (primary + secondary optionnel)
 }
 
 export type VariationContext = 'A' | 'B' | 'C' | 'D';
@@ -491,6 +497,51 @@ function applyInterZoneBoosts(
 }
 
 // ═══════════════════════════════════════════════════════
+// SÉLECTION PAR CATÉGORIE — pour zones multi-couches
+// ═══════════════════════════════════════════════════════
+function selectCategoryCandidates(
+  zoneData: any,
+  secteurNorm: string,
+  sectorProfile: SectorProfile,
+  intensiteMouvement: IntensiteMouvement,
+  variation: VariationContext,
+  noteGMB: number,
+  prixGamme: string,
+  usedEffects: Set<string>,
+  maxPerCategory = 3
+): CategoryCandidates {
+  const categories = zoneData.categories ?? {};
+  const result: CategoryCandidates = {};
+
+  for (const [catName, catData] of Object.entries(categories) as [string, any][]) {
+    const effets: any[] = catData.effets ?? [];
+    const variationMult = VARIATION_PROFILES[variation].intensite_mult;
+
+    const scored = effets.map((effet: any) => {
+      const score = scoreEffect(effet, secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects);
+      const intensiteBase = effet.intensite?.defaut ?? 0.3;
+      const intensiteMax  = effet.intensite?.max ?? intensiteBase;
+      const intensiteRec  = Math.min(intensiteMax, Math.max(effet.intensite?.min ?? 0.1, intensiteBase * variationMult * (sectorProfile.intensite_naturelle / 0.45)));
+
+      return {
+        id: effet.id,
+        nom: effet.nom,
+        description: effet.description,
+        score: parseFloat(score.toFixed(3)),
+        intensite_recommandee: parseFloat(intensiteRec.toFixed(3)),
+        css_technique: effet.css_technique,
+        duree_cycle: effet.duree_cycle,
+      } as EffetCandidat;
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    result[catName] = scored.slice(0, maxPerCategory);
+  }
+
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════
 // FONCTION PRINCIPALE D'EXPORT
 // ═══════════════════════════════════════════════════════
 export function selectCandidatesForAllZones(
@@ -510,35 +561,68 @@ export function selectCandidatesForAllZones(
   const prixGamme = options?.prixGamme ?? '';
   const usedEffects = options?.usedEffects ?? new Set<string>();
 
+  // Zones à catégories (multi-couches)
+  const logoCats  = selectCategoryCandidates(lib.zones.logo, secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
+  const nomCats   = selectCategoryCandidates(lib.zones.nom,  secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
+
+  // Zones plates (effets simples + dual optionnel)
+  const titre      = selectZoneCandidates(lib.zones.titre,      secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
+  const contact    = selectZoneCandidates(lib.zones.contact,    secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
+  const separateur = selectZoneCandidates(lib.zones.separateur, secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 5);
+  const fond       = selectZoneCandidates(lib.zones.fond,       secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 5);
+  const cta        = selectZoneCandidates(lib.zones.cta,        secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 5);
+
   const result: ZoneSelection = {
-    logo:       selectZoneCandidates(lib.zones.logo,       secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 5),
-    nom:        selectZoneCandidates(lib.zones.nom,        secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 4),
-    titre:      selectZoneCandidates(lib.zones.titre,      secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3),
-    contact:    selectZoneCandidates(lib.zones.contact,    secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3),
-    separateur: selectZoneCandidates(lib.zones.separateur, secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 5),
-    fond:       selectZoneCandidates(lib.zones.fond,       secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 4),
-    cta:        selectZoneCandidates(lib.zones.cta,        secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 4),
+    logo: logoCats,
+    nom:  nomCats,
+    titre,
+    contact,
+    separateur,
+    fond,
+    cta,
   };
 
-  // Top choices actuels (avant inter-zone)
-  const topChoices: Record<keyof ZoneSelection, string> = {
-    logo:       result.logo[0]?.id || '',
-    nom:        result.nom[0]?.id || '',
-    titre:      result.titre[0]?.id || '',
-    contact:    result.contact[0]?.id || '',
-    separateur: result.separateur[0]?.id || '',
-    fond:       result.fond[0]?.id || '',
-    cta:        result.cta[0]?.id || '',
+  // Règles inter-zones sur le top-1 de la catégorie principale
+  const topChoicesForInterZone: Record<string, string> = {
+    logo:       logoCats.dimension?.[0]?.id || logoCats.energie?.[0]?.id || '',
+    nom:        nomCats.lumiere?.[0]?.id || '',
+    titre:      titre[0]?.id || '',
+    contact:    contact[0]?.id || '',
+    separateur: separateur[0]?.id || '',
+    fond:       fond[0]?.id || '',
+    cta:        cta[0]?.id || '',
   };
 
-  // Application des règles de cohérence inter-zones
-  applyInterZoneBoosts(result, topChoices);
+  // Appliquer les règles inter-zones sur les zones plates
+  const flatResult = { logo: fond, nom: fond, titre, contact, separateur, fond, cta };
+  applyInterZoneBoosts(flatResult as any, topChoicesForInterZone as any);
 
   return result;
 }
 
 // ═══════════════════════════════════════════════════════
-// CONSTRUCTION DU PROMPT GEMINI — riche et précis
+// HELPER — formater les candidats d'une catégorie
+// ═══════════════════════════════════════════════════════
+function formatCategoryZone(cats: CategoryCandidates): string {
+  return Object.entries(cats).map(([catName, effets]) =>
+    `  ► Catégorie "${catName}" (choisir 1) :\n` +
+    effets.map(e =>
+      `      • [${e.id}] ${e.nom} — ${e.description} | score:${e.score} | intensité:${e.intensite_recommandee}`
+    ).join('\n')
+  ).join('\n');
+}
+
+function formatFlatZone(effets: EffetCandidat[], maxSelect: number): string {
+  const label = maxSelect > 1
+    ? `(choisir primary + optionnel secondary parmi) :`
+    : `(choisir 1) :`;
+  return `  ${label}\n` + effets.map(e =>
+    `      • [${e.id}] ${e.nom} — ${e.description} | score:${e.score} | intensité:${e.intensite_recommandee}`
+  ).join('\n');
+}
+
+// ═══════════════════════════════════════════════════════
+// CONSTRUCTION DU PROMPT GEMINI — MULTI-COUCHES
 // ═══════════════════════════════════════════════════════
 export function buildGeminiPromptZones(
   secteur: string,
@@ -564,13 +648,8 @@ export function buildGeminiPromptZones(
   const primaryColor = palette[1] || '#6366f1';
   const bgColor = palette[0] || '#0f0f0f';
 
-  const formatZone = (zone: EffetCandidat[]) =>
-    zone.map(e =>
-      `  • [${e.id}] ${e.nom} — ${e.description}\n    Score métier: ${e.score} | Intensité recommandée: ${e.intensite_recommandee} | Technique: ${e.css_technique}`
-    ).join('\n');
-
   const interdits = options?.effets_interdits?.length
-    ? `\nEFFETS INTERDITS (déjà utilisés dans d'autres variations — diversité absolue requise) :\n${options.effets_interdits.map(e => `  ✗ ${e}`).join('\n')}`
+    ? `\nEFFETS INTERDITS (déjà utilisés dans autres variations) :\n${options.effets_interdits.map(e => `  ✗ ${e}`).join('\n')}`
     : '';
 
   const metaContext = options?.metadata ? [
@@ -589,82 +668,106 @@ export function buildGeminiPromptZones(
     options.brief.psychologie_couleurs && `Psychologie couleurs : ${options.brief.psychologie_couleurs}`,
   ].filter(Boolean).join('\n') : '';
 
-  return `Tu es le Chirurgien Visuel IA — expert en orchestration d'effets CSS pour signatures email vivantes.
-Ta mission : sélectionner avec une précision chirurgicale 1 effet par zone pour créer une variation qui RESPIRE l'identité de cette marque.
+  return `Tu es le Compositeur Visuel IA — maître en superposition d'effets CSS pour signatures email "God Tier".
+Ta mission : composer des COUCHES D'EFFETS simultanées par zone pour créer un résultat WOW — comme un chef qui superpose des saveurs.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 IDENTITÉ DE LA MARQUE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Secteur : ${secteur} (profil : ${sectorProfile.label})
 Valeurs secteur : ${sectorProfile.valeurs_cles.join(', ')}
-Ton émotionnel : ${ton}
-Intensité globale : ${intensiteLabel}
+Ton émotionnel : ${ton} | Intensité : ${intensiteLabel}
 ${metaContext}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-BRIEF CRÉATIF (Cerveau 1 — GPT-4o)
+BRIEF CRÉATIF (GPT-4o)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${briefContext}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 VARIATION ${variation} — ${varProfile.label}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Émotion dominante : ${varProfile.emotion}
-Énergie : ${varProfile.energie}
-Vitesse naturelle : ${varProfile.speed_bias}
-Intention narrative : "${intention}"
+Émotion : ${varProfile.emotion} | Énergie : ${varProfile.energie} | Vitesse : ${varProfile.speed_bias}
+Intention : "${intention}"
 ${options?.metaphore ? `Métaphore : "${options.metaphore}"` : ''}
-${options?.arc_emotionnel ? `Arc global A→D : ${options.arc_emotionnel}` : ''}
-
-Mots-clés de cette variation : ${varProfile.keywords.join(', ')}
-Couleur primaire palette : ${primaryColor} | Fond : ${bgColor}
+${options?.arc_emotionnel ? `Arc A→D : ${options.arc_emotionnel}` : ''}
+Palette : ${primaryColor} (primaire) | ${bgColor} (fond)
 ${interdits}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CANDIDATS PRÉ-VALIDÉS PAR ZONE
-(classés par score métier décroissant)
+CANDIDATS MULTI-COUCHES PAR ZONE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-LOGO (pièce maîtresse — intensité maximale) :
-${formatZone(selection.logo)}
+🎯 LOGO — SUPERPOSITION DE 3-4 COUCHES (résultat WOW garanti) :
+  [RÈGLE] Sélectionne 1 effet par catégorie — ils s'empilent visuellement !
+  [RÈGLE] La catégorie "transformation" est OPTIONNELLE mais recommandée pour D
+${formatCategoryZone(selection.logo)}
 
-NOM (identité textuelle primaire) :
-${formatZone(selection.nom)}
+🔤 NOM — 2 COUCHES (lumière + mouvement) :
+  [RÈGLE] 1 effet "lumiere" obligatoire + 1 effet "mouvement" optionnel
+${formatCategoryZone(selection.nom)}
 
-TITRE / POSTE (hiérarchie secondaire) :
-${formatZone(selection.titre)}
+📋 TITRE :
+${formatFlatZone(selection.titre as EffetCandidat[], 1)}
 
-CONTACT (discrétion requise) :
-${formatZone(selection.contact)}
+📞 CONTACT :
+${formatFlatZone(selection.contact as EffetCandidat[], 1)}
 
-SÉPARATEUR (rythme et respiration) :
-${formatZone(selection.separateur)}
+〡SÉPARATEUR — 2 COUCHES POSSIBLES :
+  [RÈGLE] primary obligatoire, secondary optionnel (intensité réduite)
+${formatFlatZone(selection.separateur as EffetCandidat[], 2)}
 
-FOND (atmosphère ambiante) :
-${formatZone(selection.fond)}
+🌌 FOND — 2 COUCHES ATMOSPHÉRIQUES :
+  [RÈGLE] primary obligatoire, secondary optionnel (très subtil, intensité max 0.12)
+${formatFlatZone(selection.fond as EffetCandidat[], 2)}
 
-CTA / BOUTON (appel à l'action) :
-${formatZone(selection.cta)}
+🎯 CTA — 2 COUCHES (impact + finesse) :
+  [RÈGLE] primary obligatoire, secondary optionnel pour amplifier l'appel à l'action
+${formatFlatZone(selection.cta as EffetCandidat[], 2)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RÈGLES ABSOLUES DE SÉLECTION
+RÈGLES DE COMPOSITION MULTI-COUCHES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Hiérarchie intensité OBLIGATOIRE : Logo > Nom > CTA > Séparateur > Fond > Titre > Contact
-2. Cohérence de vitesse : si logo est slow, fond aussi — pas d'incohérence rythmique
-3. Cohérence d'univers : les 7 zones doivent raconter la MÊME histoire visuelle
-4. Aucun effet interdit (liste ci-dessus) — diversité absolue entre les 4 variations
-5. Les couleurs doivent être des codes hex valides tirés de la palette ou proches
-6. Pour une marque ${sectorProfile.label}, respecter les valeurs : ${sectorProfile.valeurs_cles.join(', ')}
-7. L'intensité doit rester dans les limites recommandées par zone
+1. SUPERPOSITION : Les couches d'un même zone s'empilent — elles doivent être COMPLÉMENTAIRES pas concurrentes
+2. HIÉRARCHIE intensité : Logo(total) > Nom(total) > CTA(total) > Séparateur > Fond > Titre > Contact
+3. Chaque couche supplémentaire doit avoir une intensité INFÉRIEURE à la couche précédente (éviter la surcharge)
+4. Cohérence de vitesse au sein d'une même zone : toutes les couches d'une zone ont la même vitesse
+5. Cohérence d'univers global : les 7 zones racontent la MÊME histoire émotionnelle
+6. AUCUN effet interdit — diversité absolue entre les 4 variations A/B/C/D
+7. Couleurs : codes hex valides, tirés de la palette de la marque
+
+PHILOSOPHIE MULTI-COUCHES (exemple logo) :
+- dimension (LOGO_3D_FLOAT) : donne la profondeur physique
+- matiere (LOGO_GOLD_POLISH) : habille la surface en or
+- energie (LOGO_HALO_PULSE) : émet une aura vivante
+- transformation (LOGO_LIQUID_EDGE) : les bords respirent
+→ RÉSULTAT : Un logo qui existe dans l'espace, brillant, vivant, en mouvement
 
 Réponds UNIQUEMENT en JSON strict (aucun texte avant ou après) :
 {
-  "logo":       { "effet_id": "string", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "explication précise en lien avec l'identité de la marque" },
-  "nom":        { "effet_id": "string", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-  "titre":      { "effet_id": "string", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-  "contact":    { "effet_id": "string", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-  "separateur": { "effet_id": "string", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-  "fond":       { "effet_id": "string", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-  "cta":        { "effet_id": "string", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+  "logo": {
+    "dimension":     { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "courte explication" },
+    "matiere":       { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "energie":       { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "transformation": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+  },
+  "nom": {
+    "lumiere":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "mouvement": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+  },
+  "titre":      { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+  "contact":    { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+  "separateur": {
+    "primary":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "secondary": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+  },
+  "fond": {
+    "primary":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "secondary": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+  },
+  "cta": {
+    "primary":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+    "secondary": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
+  }
 }`;
 }

@@ -694,6 +694,68 @@ function renderCtaEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, d
 }
 
 // ════════════════════════════════════════════
+// MOTEUR MULTI-COUCHES
+// ════════════════════════════════════════════
+
+function mergeEffects(effects: SVGEffectCode[]): SVGEffectCode {
+  return {
+    keyframes:  effects.map(e => e.keyframes).filter(Boolean).join('\n'),
+    elements:   effects.map(e => e.elements).filter(Boolean).join('\n'),
+    filterDefs: effects.map(e => e.filterDefs).filter(Boolean).join('\n'),
+  };
+}
+
+// Ordre de rendu des catégories pour chaque zone (du fond vers le premier plan)
+const LAYER_RENDER_ORDER: Record<string, string[]> = {
+  logo:       ['energie', 'matiere', 'dimension', 'transformation'],  // aura → matière → 3D → morph
+  nom:        ['lumiere', 'mouvement'],
+  separateur: ['secondary', 'primary'],  // fond d'abord, puis effet principal
+  fond:       ['secondary', 'primary'],
+  cta:        ['secondary', 'primary'],
+};
+
+function renderZoneWithLayers(
+  zoneName: string,
+  decision: ZoneEffectDecision,
+  baseVarId: string,
+  baseDelay: number,
+  renderFn: (decision: ZoneEffectDecision, layerVarId: string, delay: number) => SVGEffectCode,
+  fallbackColor: string
+): SVGEffectCode {
+  const layers = decision.layers;
+
+  // Pas de couches → rendu mono-effet (backward compat)
+  if (!layers || layers.length === 0) {
+    const dec = { ...decision, color: decision.color || fallbackColor };
+    return renderFn(dec, baseVarId, baseDelay);
+  }
+
+  // Multi-couches : trier selon l'ordre de rendu puis combiner
+  const order = LAYER_RENDER_ORDER[zoneName] || [];
+  const sorted = [...layers].sort((a, b) => {
+    const ai = order.indexOf(a.category);
+    const bi = order.indexOf(b.category);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+
+  const results = sorted
+    .filter(layer => layer.effet_id && layer.effet_id !== 'null')
+    .map((layer, idx) => {
+      const layerDecision: ZoneEffectDecision = {
+        effet_id: layer.effet_id,
+        intensity: layer.intensity,
+        speed: layer.speed,
+        color: (layer.color && layer.color !== '#000000') ? layer.color : fallbackColor,
+        raison: layer.raison,
+      };
+      // Chaque couche a un varId unique pour éviter les conflits d'IDs SVG
+      return renderFn(layerDecision, `${baseVarId}-${layer.category.slice(0,3)}${idx}`, baseDelay + idx * 0.15);
+    });
+
+  return mergeEffects(results);
+}
+
+// ════════════════════════════════════════════
 // MOTEUR PRINCIPAL
 // ════════════════════════════════════════════
 
@@ -706,26 +768,52 @@ export function renderZoneComposition(
   const varId  = `v${variationIndex.toLowerCase()}`;
   const d_fn   = (base: number, sp: string) => `${(base * (SPEED_DURATION[sp] ?? 1)).toFixed(1)}s`;
 
-  const resolveColor = (decision: ZoneEffectDecision, fallback: string) =>
-    decision.color && decision.color !== '#000000' ? decision.color : fallback;
-
   const c0 = palette[0] ?? '#0f172a';
   const c1 = palette[1] ?? '#6366f1';
   const c2 = palette[2] ?? '#e2e8f0';
+
+  const resolveColor = (decision: ZoneEffectDecision, fallback: string) =>
+    decision.color && decision.color !== '#000000' ? decision.color : fallback;
 
   const withColor = (z: ZoneEffectDecision, fb: string): ZoneEffectDecision => ({
     ...z,
     color: resolveColor(z, fb),
   });
 
+  // Rendu multi-couches pour chaque zone
+  const logoResult = renderZoneWithLayers(
+    'logo', withColor(composition.logo, c1), varId, delayOffset,
+    (dec, vid, delay) => renderLogoEffect(d_fn, dec, vid, delay), c1
+  );
+
+  const nomResult = renderZoneWithLayers(
+    'nom', withColor(composition.nom, c1), varId, delayOffset,
+    (dec, vid, delay) => renderNomEffect(d_fn, dec, vid, delay), c1
+  );
+
+  const sepResult = renderZoneWithLayers(
+    'separateur', withColor(composition.separateur, c1), varId, delayOffset,
+    (dec, vid, delay) => renderSeparateurEffect(d_fn, dec, vid, delay), c1
+  );
+
+  const fondResult = renderZoneWithLayers(
+    'fond', withColor(composition.fond, c1), varId, delayOffset,
+    (dec, vid, delay) => renderFondEffect(d_fn, dec, vid, delay), c1
+  );
+
+  const ctaResult = renderZoneWithLayers(
+    'cta', withColor(composition.cta, c1), varId, delayOffset,
+    (dec, vid, delay) => renderCtaEffect(d_fn, dec, vid, delay), c1
+  );
+
   return {
-    logo:       renderLogoEffect(d_fn,       withColor(composition.logo,       c1), varId, delayOffset),
-    nom:        renderNomEffect(d_fn,        withColor(composition.nom,        c1), varId, delayOffset),
-    titre:      renderTitreEffect(d_fn,      withColor(composition.titre,      c2), varId, delayOffset),
-    contact:    renderContactEffect(d_fn,    withColor(composition.contact,    c1), varId, delayOffset),
-    separateur: renderSeparateurEffect(d_fn, withColor(composition.separateur, c1), varId, delayOffset),
-    fond:       renderFondEffect(d_fn,       withColor(composition.fond,       c1), varId, delayOffset),
-    cta:        renderCtaEffect(d_fn,        withColor(composition.cta,        c1), varId, delayOffset),
+    logo:       logoResult,
+    nom:        nomResult,
+    titre:      renderTitreEffect(d_fn, withColor(composition.titre, c2), varId, delayOffset),
+    contact:    renderContactEffect(d_fn, withColor(composition.contact, c1), varId, delayOffset),
+    separateur: sepResult,
+    fond:       fondResult,
+    cta:        ctaResult,
   };
 }
 

@@ -1,9 +1,23 @@
-export interface ZoneEffectDecision {
+// ═══════════════════════════════════════════════════════
+// TYPES MULTI-COUCHES
+// ═══════════════════════════════════════════════════════
+
+export interface EffectLayer {
   effet_id: string;
+  category: string;  // 'dimension' | 'matiere' | 'energie' | 'transformation' | 'lumiere' | 'mouvement' | 'primary' | 'secondary'
   intensity: number;
   speed: 'slow' | 'medium' | 'fast';
   color: string;
   raison?: string;
+}
+
+export interface ZoneEffectDecision {
+  effet_id: string;  // effet principal (backward compat)
+  intensity: number;
+  speed: 'slow' | 'medium' | 'fast';
+  color: string;
+  raison?: string;
+  layers?: EffectLayer[];  // couches multiples — le cœur du système WOW
 }
 
 export interface ZoneComposition {
@@ -61,6 +75,10 @@ function contrastRatio(lum1: number, lum2: number): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+// ═══════════════════════════════════════════════════════
+// VALIDATION D'HARMONIE MULTI-COUCHES
+// ═══════════════════════════════════════════════════════
+
 export function validateHarmony(
   composition: ZoneComposition,
   palette: string[]
@@ -70,7 +88,7 @@ export function validateHarmony(
 
   const zones = Object.keys(config) as ZoneName[];
 
-  // RÈGLE 1 — Densité visuelle
+  // RÈGLE 1 — Densité visuelle globale
   const animatedZones = zones.filter(z => {
     const effect = config[z];
     return effect.intensity > 0 && effect.effet_id !== 'CTA_STATIC_PRESENCE' && effect.effet_id !== 'FOND_CLEAN_DARK';
@@ -78,39 +96,40 @@ export function validateHarmony(
   if (animatedZones.length > 6) {
     if (config.fond.intensity > 0) {
       config.fond.intensity = parseFloat((config.fond.intensity * 0.6).toFixed(3));
-      corrections.push(`Règle 1: Densité visuelle élevée — fond réduit à ${config.fond.intensity}`);
+      if (config.fond.layers) {
+        config.fond.layers.forEach(l => l.intensity = parseFloat((l.intensity * 0.6).toFixed(3)));
+      }
+      corrections.push(`Règle 1: Densité élevée — fond atténué à ${config.fond.intensity}`);
     }
   }
 
   // RÈGLE 2 — Hiérarchie visuelle
   const intensities: Partial<Record<ZoneName, number>> = {};
-  for (const z of zones) {
-    intensities[z] = config[z]?.intensity ?? 0;
+  for (const z of zones) intensities[z] = config[z]?.intensity ?? 0;
+
+  const logoInt = intensities['logo'] ?? 0;
+  const nomInt  = intensities['nom']  ?? 0;
+
+  if (nomInt > logoInt && logoInt > 0) {
+    config.nom.intensity = parseFloat((logoInt * 0.85).toFixed(3));
+    corrections.push(`Règle 2: Nom recalibré à ${config.nom.intensity} (< logo ${logoInt})`);
   }
 
-  const logoIntensity = intensities['logo'] ?? 0;
-  const nomIntensity  = intensities['nom']  ?? 0;
-
-  if (nomIntensity > logoIntensity && logoIntensity > 0) {
-    config.nom.intensity = parseFloat((logoIntensity * 0.85).toFixed(3));
-    corrections.push(`Règle 2: Nom recalibré à ${config.nom.intensity} (< logo ${logoIntensity})`);
-  }
-
-  const ctaIntensity = intensities['cta'] ?? 0;
-  const sepIntensity = intensities['separateur'] ?? 0;
-  if (sepIntensity > ctaIntensity && ctaIntensity > 0) {
-    config.separateur.intensity = parseFloat((ctaIntensity * 0.9).toFixed(3));
+  const ctaInt = intensities['cta'] ?? 0;
+  const sepInt = intensities['separateur'] ?? 0;
+  if (sepInt > ctaInt && ctaInt > 0) {
+    config.separateur.intensity = parseFloat((ctaInt * 0.9).toFixed(3));
     corrections.push(`Règle 2: Séparateur recalibré sous CTA`);
   }
 
-  const fondIntensity  = intensities['fond']    ?? 0;
-  const titreIntensity = intensities['titre']   ?? 0;
-  if (fondIntensity > sepIntensity && sepIntensity > 0) {
-    config.fond.intensity = parseFloat((sepIntensity * 0.7).toFixed(3));
+  const fondInt  = intensities['fond']  ?? 0;
+  const titreInt = intensities['titre'] ?? 0;
+  if (fondInt > sepInt && sepInt > 0) {
+    config.fond.intensity = parseFloat((sepInt * 0.7).toFixed(3));
     corrections.push(`Règle 2: Fond recalibré sous séparateur`);
   }
-  if (titreIntensity > fondIntensity && fondIntensity > 0) {
-    config.titre.intensity = parseFloat((fondIntensity * 0.85).toFixed(3));
+  if (titreInt > fondInt && fondInt > 0) {
+    config.titre.intensity = parseFloat((fondInt * 0.85).toFixed(3));
     corrections.push(`Règle 2: Titre recalibré sous fond`);
   }
 
@@ -120,24 +139,26 @@ export function validateHarmony(
     if (z === 'logo') continue;
     const speedVal = SPEED_VALUES[config[z]?.speed ?? 'medium'];
     if (Math.abs(speedVal - logoSpeed) > 1) {
-      const harmonized = logoSpeed <= 1 ? 'slow' : logoSpeed >= 3 ? 'medium' : 'medium';
+      const harmonized = logoSpeed <= 1 ? 'slow' : 'medium';
       config[z].speed = harmonized as any;
-      corrections.push(`Règle 3: Vitesse de ${z} harmonisée à '${harmonized}' (cohérence logo)`);
+      corrections.push(`Règle 3: Vitesse ${z} → '${harmonized}'`);
     }
   }
 
-  // RÈGLE 4 — Compatibilité palette
-  const validColors = new Set(palette.map(c => c.toLowerCase()));
+  // RÈGLE 4 — Intensités des couches secondaires atténuées
+  // Pour éviter la surcharge visuelle, les couches 2/3/4 doivent être plus douces
   for (const z of zones) {
-    const color = config[z]?.color?.toLowerCase();
-    if (color && color !== '#000000' && !validColors.has(color)) {
-      const closestColor = palette[0] ?? '#6366f1';
-      config[z].color = closestColor;
-      corrections.push(`Règle 4: Couleur de ${z} remplacée par palette (${closestColor})`);
+    const layers = config[z]?.layers;
+    if (layers && layers.length > 1) {
+      layers.forEach((layer, idx) => {
+        if (idx > 0 && layer.intensity > config[z].intensity * 0.8) {
+          layer.intensity = parseFloat((config[z].intensity * (0.7 - idx * 0.1)).toFixed(3));
+        }
+      });
     }
   }
 
-  // RÈGLE 5 — Test lisibilité (contraste)
+  // RÈGLE 5 — Test lisibilité fond
   const bgColor = palette[0] ?? '#0f172a';
   const bgLum = luminanceFromHex(bgColor);
   const effectLum = luminanceFromHex(config.fond?.color ?? bgColor);
@@ -145,11 +166,10 @@ export function validateHarmony(
 
   if (cr < 1.5 && config.fond.intensity > 0.1) {
     config.fond.intensity = parseFloat(Math.min(config.fond.intensity, 0.08).toFixed(3));
-    corrections.push(`Règle 5: Fond atténué (contraste insuffisant, ratio: ${cr.toFixed(2)})`);
+    corrections.push(`Règle 5: Fond atténué (contraste insuffisant: ${cr.toFixed(2)})`);
   }
 
-  // Score d'harmonie
-  const score_harmonie = Math.max(0, 1 - corrections.length * 0.08);
+  const score_harmonie = Math.max(0, 1 - corrections.length * 0.07);
 
   return {
     valid: true,

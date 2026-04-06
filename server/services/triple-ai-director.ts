@@ -409,56 +409,115 @@ async function runZoneSelectionForVariation(
   );
 
   const fallbackComposition = (): ZoneComposition => {
-    const pick = (zone: any[]) => zone[0];
-    const makeDecision = (z: any[]): import('./harmony-validator').ZoneEffectDecision => ({
-      effet_id:  pick(z)?.id || 'LOGO_VOLUME_BREATHE',
-      intensity: pick(z)?.intensite_recommandee || 0.3,
+    // Pour les zones catégorisées (logo, nom), on prend le premier candidat de la première catégorie
+    const pickCat = (cats: any): import('./harmony-validator').ZoneEffectDecision => {
+      const firstCat = Object.values(cats)[0] as any[];
+      const first = firstCat?.[0];
+      return {
+        effet_id:  first?.id || 'LOGO_VOLUME_BREATHE',
+        intensity: first?.intensite_recommandee || 0.3,
+        speed:     'medium',
+        color:     primaryColor,
+        raison:    'fallback automatique',
+      };
+    };
+    const pickFlat = (arr: any[]): import('./harmony-validator').ZoneEffectDecision => ({
+      effet_id:  arr[0]?.id || 'SEP_BREATHING_CALM',
+      intensity: arr[0]?.intensite_recommandee || 0.25,
       speed:     'medium',
       color:     primaryColor,
       raison:    'fallback automatique',
     });
     return {
-      logo:       makeDecision(selection.logo),
-      nom:        makeDecision(selection.nom),
-      titre:      makeDecision(selection.titre),
-      contact:    makeDecision(selection.contact),
-      separateur: makeDecision(selection.separateur),
-      fond:       makeDecision(selection.fond),
-      cta:        makeDecision(selection.cta),
+      logo:       pickCat(selection.logo),
+      nom:        pickCat(selection.nom),
+      titre:      pickFlat(selection.titre as any[]),
+      contact:    pickFlat(selection.contact as any[]),
+      separateur: pickFlat(selection.separateur as any[]),
+      fond:       pickFlat(selection.fond as any[]),
+      cta:        pickFlat(selection.cta as any[]),
     };
   };
 
   try {
-    const text = await callGemini(prompt, { temperature: 0.25, maxTokens: 1400 });
-    const raw  = parseJsonSafely<ZoneComposition>(text);
+    const text = await callGemini(prompt, { temperature: 0.25, maxTokens: 1800 });
+    const rawMulti = parseJsonSafely<any>(text);
 
-    const zones: Array<keyof ZoneComposition> = ['logo', 'nom', 'titre', 'contact', 'separateur', 'fond', 'cta'];
-    for (const z of zones) {
-      if (!raw[z]) {
-        const fb = fallbackComposition();
-        raw[z]   = fb[z];
+    // ─── Convertit la réponse multi-couches de Gemini en ZoneComposition ───
+    const convertLayered = (zoneRaw: any, zoneName: string): import('./harmony-validator').ZoneEffectDecision => {
+      if (!zoneRaw) return fallbackComposition()[zoneName as keyof ZoneComposition];
+
+      // Zone plate (titre, contact) → objet simple avec effet_id
+      if (zoneRaw.effet_id) {
+        return {
+          effet_id:  zoneRaw.effet_id,
+          intensity: zoneRaw.intensity || 0.2,
+          speed:     zoneRaw.speed || 'medium',
+          color:     (zoneRaw.color && zoneRaw.color !== '#000000') ? zoneRaw.color : primaryColor,
+          raison:    zoneRaw.raison,
+        };
       }
-      if (!raw[z].color || raw[z].color === '#000000') {
-        raw[z].color = primaryColor;
-      }
-      // Si l'effet choisi est interdit (déjà utilisé), forcer le 2e candidat de la zone
-      if (effets_interdits.includes(raw[z].effet_id)) {
-        const zoneCandidates = selection[z as keyof ZoneSelection];
-        const alternative = zoneCandidates.find(c => !effets_interdits.includes(c.id));
-        if (alternative) {
-          log(`Cerveau 3 [${variation}/${z}] — remplacement ${raw[z].effet_id} → ${alternative.id} (diversité)`, 'triple-ai');
-          raw[z].effet_id = alternative.id;
-          raw[z].intensity = alternative.intensite_recommandee;
-          raw[z].raison = `Diversité garantie — ${alternative.description}`;
+
+      // Zone multi-couches (logo, nom, separateur, fond, cta)
+      const layers: import('./harmony-validator').EffectLayer[] = [];
+      for (const [catName, catDecision] of Object.entries(zoneRaw) as [string, any][]) {
+        if (!catDecision?.effet_id || catDecision.effet_id === 'null') continue;
+        if (effets_interdits.includes(catDecision.effet_id)) {
+          // Si interdit, chercher alternative dans la sélection
+          const zoneSel = selection[zoneName as keyof ZoneSelection];
+          const alternatives = Array.isArray(zoneSel)
+            ? zoneSel
+            : (zoneSel as any)[catName] || [];
+          const alt = alternatives.find((c: any) => !effets_interdits.includes(c.id));
+          if (alt) {
+            log(`Cerveau 3 [${variation}/${zoneName}/${catName}] → ${alt.id} (diversité)`, 'triple-ai');
+            layers.push({ effet_id: alt.id, category: catName, intensity: alt.intensite_recommandee, speed: catDecision.speed || 'medium', color: primaryColor, raison: 'Diversité inter-variations' });
+          }
+          continue;
         }
+        layers.push({
+          effet_id:  catDecision.effet_id,
+          category:  catName,
+          intensity: catDecision.intensity || 0.25,
+          speed:     catDecision.speed || 'medium',
+          color:     (catDecision.color && catDecision.color !== '#000000') ? catDecision.color : primaryColor,
+          raison:    catDecision.raison,
+        });
       }
-    }
+
+      if (layers.length === 0) return fallbackComposition()[zoneName as keyof ZoneComposition];
+
+      // La couche primaire (dimension pour logo, lumiere pour nom, primary pour flat)
+      const primaryLayer = layers.find(l => l.category === 'dimension' || l.category === 'primary' || l.category === 'lumiere') || layers[0];
+
+      return {
+        effet_id:  primaryLayer.effet_id,
+        intensity: primaryLayer.intensity,
+        speed:     primaryLayer.speed,
+        color:     primaryLayer.color,
+        raison:    primaryLayer.raison,
+        layers,  // ← toutes les couches pour le rendu multi-layer SVG
+      };
+    };
+
+    const raw: ZoneComposition = {
+      logo:       convertLayered(rawMulti.logo,       'logo'),
+      nom:        convertLayered(rawMulti.nom,        'nom'),
+      titre:      convertLayered(rawMulti.titre,      'titre'),
+      contact:    convertLayered(rawMulti.contact,    'contact'),
+      separateur: convertLayered(rawMulti.separateur, 'separateur'),
+      fond:       convertLayered(rawMulti.fond,       'fond'),
+      cta:        convertLayered(rawMulti.cta,        'cta'),
+    };
 
     const validated = validateHarmony(raw, palette);
     if (validated.corrections.length > 0) {
       log(`Cerveau 3 zones ${variation} — ${validated.corrections.length} corrections harmoniques`, 'triple-ai');
     }
-    log(`✓ Variation ${variation} — Logo:${validated.config.logo.effet_id} | Nom:${validated.config.nom.effet_id} | Fond:${validated.config.fond.effet_id} | Score harmonie:${validated.score_harmonie}`, 'triple-ai');
+
+    const logoLayers = validated.config.logo.layers?.map(l => l.effet_id).join('+') || validated.config.logo.effet_id;
+    const nomLayers  = validated.config.nom.layers?.map(l => l.effet_id).join('+') || validated.config.nom.effet_id;
+    log(`✓ Variation ${variation} — Logo:[${logoLayers}] | Nom:[${nomLayers}] | Harmonie:${validated.score_harmonie}`, 'triple-ai');
     return validated.config;
   } catch (err: any) {
     log(`Cerveau 3 zone ${variation} erreur: ${err.message} — fallback`, 'triple-ai');

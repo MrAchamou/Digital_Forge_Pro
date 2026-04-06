@@ -1,48 +1,48 @@
 {
-  "lastSaved": "2026-04-06T12:08:36.808Z",
+  "lastSaved": "2026-04-06T12:15:40.310Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
       "status": "cooldown",
-      "cooldownUntil": "2026-04-06T12:09:09.353Z",
-      "cooldownCount": 4,
-      "errorCount": 4,
+      "cooldownUntil": "2026-04-06T12:19:40.640Z",
+      "cooldownCount": 5,
+      "errorCount": 5,
       "successCount": 0,
       "avgResponseTime": 0
     },
     "gemini_2": {
       "usageToday": 0,
       "status": "cooldown",
-      "cooldownUntil": "2026-04-06T12:04:09.436Z",
-      "cooldownCount": 3,
-      "errorCount": 3,
+      "cooldownUntil": "2026-04-06T12:19:40.723Z",
+      "cooldownCount": 4,
+      "errorCount": 4,
       "successCount": 0,
       "avgResponseTime": 0
     },
     "gemini_3": {
       "usageToday": 0,
       "status": "cooldown",
-      "cooldownUntil": "2026-04-06T12:09:09.552Z",
-      "cooldownCount": 4,
-      "errorCount": 4,
+      "cooldownUntil": "2026-04-06T12:19:40.847Z",
+      "cooldownCount": 5,
+      "errorCount": 5,
       "successCount": 0,
       "avgResponseTime": 0
     },
     "gemini_4": {
       "usageToday": 0,
       "status": "cooldown",
-      "cooldownUntil": "2026-04-06T12:09:09.696Z",
-      "cooldownCount": 4,
-      "errorCount": 4,
+      "cooldownUntil": "2026-04-06T12:19:40.977Z",
+      "cooldownCount": 5,
+      "errorCount": 5,
       "successCount": 0,
       "avgResponseTime": 0
     },
     "gemini_5": {
       "usageToday": 0,
       "status": "cooldown",
-      "cooldownUntil": "2026-04-06T12:04:09.806Z",
-      "cooldownCount": 3,
-      "errorCount": 3,
+      "cooldownUntil": "2026-04-06T12:19:41.059Z",
+      "cooldownCount": 4,
+      "errorCount": 4,
       "successCount": 0,
       "avgResponseTime": 0
     },
