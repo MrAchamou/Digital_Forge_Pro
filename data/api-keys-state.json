@@ -1,6 +1,77 @@
 {
-  "lastSaved": "2026-04-06T17:09:10.790Z",
-  "keys": {},
+  "lastSaved": "2026-04-06T17:10:57.963Z",
+  "keys": {
+    "gemini_1": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:09:57.872Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "gemini_2": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:09:57.872Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "gemini_3": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:09:57.872Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "gemini_4": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:09:57.872Z",
+      "lastUsed": null,
+      "lastError": null
+    },
+    "gemini_5": {
+      "usageToday": 0,
+      "status": "active",
+      "cooldownUntil": null,
+      "cooldownCount": 0,
+      "errorCount": 0,
+      "successCount": 0,
+      "avgResponseTime": 0,
+      "healthScore": 100,
+      "callsLastHour": 0,
+      "hourWindowStart": "2026-04-06T17:09:57.872Z",
+      "lastUsed": null,
+      "lastError": null
+    }
+  },
   "monthlyUsage": {
     "serper_2026-04": 4
   }
