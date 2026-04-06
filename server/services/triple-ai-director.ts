@@ -11,6 +11,9 @@ import {
 } from './zone-effect-selector';
 import { validateHarmony, type ZoneComposition } from './harmony-validator';
 import { maximizeDiversity, logFitnessReport } from '../modules/variance-engine.module';
+import { moderateComposition, normalizeSecteur } from '../modules/contextual-intelligence.module';
+import { optimizeComposition, analyzeSignatureContent } from '../modules/smart-optimizer.module';
+import { applyVisualFocus } from '../modules/visual-focus.module';
 
 const EFFECTS_LIBRARY = [
   'HEARTBEAT', 'SOUL_AURA', 'PLASMA_DRIFT', 'NEON_PULSE', 'GOLDEN_SHIMMER',
@@ -527,6 +530,32 @@ async function runZoneSelectionForVariation(
   }
 }
 
+/**
+ * 🔧 Pipeline Priorité 2 : Modération → Optimisation → Focus visuel
+ * Appliqué à chaque variation juste après la sélection Gemini.
+ */
+function applyPriority2Pipeline(
+  comp:      ZoneComposition,
+  variation: 'A' | 'B' | 'C' | 'D',
+  secteur:   string,
+  metadata:  any,
+  brief:     CreativeBrief
+): ZoneComposition {
+  const intensite = brief.intensite_mouvement as any ?? 'subtil';
+
+  // 1. Modération contextuelle — écrêtage selon secteur + complexité
+  const moderated = moderateComposition(comp, secteur, variation, intensite);
+
+  // 2. Optimisation SmartOptimizer — calibration des intensités/vitesses
+  const sigContent = analyzeSignatureContent(metadata, secteur);
+  const optimized  = optimizeComposition(moderated.composition, variation, secteur, { ...sigContent, intensite });
+
+  // 3. Focus visuel — guide l'œil logo → nom → CTA
+  const focused = applyVisualFocus(optimized.composition, variation);
+
+  return focused.composition;
+}
+
 async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief, palette: string[], secteur: string, metadata: any): Promise<TechnicalConfig> {
   log('Cerveau 3 — Sélection zones par variation (séquentiel pour garantir diversité)...', 'triple-ai');
 
@@ -545,22 +574,26 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
   };
 
   log('Cerveau 3 — Variation A...', 'triple-ai');
-  const compA = await runZoneSelectionForVariation('A', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  const rawA  = await runZoneSelectionForVariation('A', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  const compA = applyPriority2Pipeline(rawA, 'A', secteur, metadata, brief);
   extractUsedEffects(compA);
 
   log('Cerveau 3 — Variation B...', 'triple-ai');
-  const compB = await runZoneSelectionForVariation('B', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  const rawB  = await runZoneSelectionForVariation('B', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  const compB = applyPriority2Pipeline(rawB, 'B', secteur, metadata, brief);
   extractUsedEffects(compB);
 
   log('Cerveau 3 — Variation C...', 'triple-ai');
-  const compC = await runZoneSelectionForVariation('C', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  const rawC  = await runZoneSelectionForVariation('C', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  const compC = applyPriority2Pipeline(rawC, 'C', secteur, metadata, brief);
   extractUsedEffects(compC);
 
   log('Cerveau 3 — Variation D...', 'triple-ai');
-  const compD = await runZoneSelectionForVariation('D', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  const rawD  = await runZoneSelectionForVariation('D', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  const compD = applyPriority2Pipeline(rawD, 'D', secteur, metadata, brief);
 
-  log(`✓ Cerveau 3 complet — A:${compA.logo.effet_id} | B:${compB.logo.effet_id} | C:${compC.logo.effet_id} | D:${compD.logo.effet_id}`, 'triple-ai');
-  log(`  Diversité fonds — A:${compA.fond.effet_id} | B:${compB.fond.effet_id} | C:${compC.fond.effet_id} | D:${compD.fond.effet_id}`, 'triple-ai');
+  log(`✓ Cerveau 3 + P2 complet — A:${compA.logo.effet_id} | B:${compB.logo.effet_id} | C:${compC.logo.effet_id} | D:${compD.logo.effet_id}`, 'triple-ai');
+  log(`  Intensités logo — A:${compA.logo.intensity?.toFixed(2)} | B:${compB.logo.intensity?.toFixed(2)} | C:${compC.logo.intensity?.toFixed(2)} | D:${compD.logo.intensity?.toFixed(2)}`, 'triple-ai');
 
   // ── VarianceEngine : maximisation génétique de la diversité A/B/C/D ───────
   const diversityReport = maximizeDiversity({ A: compA, B: compB, C: compC, D: compD });

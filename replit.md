@@ -1,82 +1,157 @@
-# EffectForge AI
+# EffectForge AI — Signatures Email Animées "God Tier"
 
-## Overview
+## Vue d'ensemble
 
-EffectForge AI is a revolutionary visual effects generation platform that transforms text descriptions into professional-grade JavaScript effect code. The system uses advanced AI processing to analyze natural language descriptions and automatically generate optimized, customizable visual effects for web platforms, React components, and video editing software.
+Application full-stack (React + Express + TypeScript) qui génère des **signatures email animées premium** via un **pipeline Triple-IA** (GPT-4o → Claude Opus → Gemini Flash). Le rendu utilise une architecture multi-couches par zones avec une bibliothèque de 55 effets premium et un système de modules intelligents.
 
-The application features a modern full-stack architecture with real-time effect generation, comprehensive effect libraries, file upload processing, and live preview capabilities. It's designed to democratize visual effects creation by making complex programming accessible through simple text descriptions.
+**Langue de communication** : Français.
 
-## User Preferences
+---
 
-Preferred communication style: Simple, everyday language.
+## Architecture Générale
 
-## System Architecture
+```
+Frontend (React + Vite)           Backend (Express + TypeScript)
+─────────────────────────         ──────────────────────────────────────
+client/src/                       server/
+  pages/                            index.ts          ← Serveur principal
+  hooks/                            routes.ts         ← API REST
+    use-effect-generator.ts         services/         ← Pipeline IA
+  components/                         triple-ai-director.ts  ← Orchestrateur 3 IA
+  lib/                                zone-effect-selector.ts
+    queryClient.ts                    zone-svg-renderer.ts
+                                      harmony-validator.ts
+                                      gemini-wrapper.ts
+                                    modules/          ← Modules intelligents
+                                    data/
+                                      zone-effects-library.json
+```
 
-### Frontend Architecture
-The client-side application is built with React and TypeScript, utilizing a modern component-based architecture with shadcn/ui components for consistent design. The frontend uses Wouter for lightweight routing and TanStack Query for efficient server state management with real-time updates. The styling system combines Tailwind CSS with custom CSS variables for a cohesive "Digital Forge" theme featuring dark backgrounds and vibrant accent colors (cyan, plasma pink, electric blue, gold).
+---
 
-Key architectural decisions include:
-- **Component Organization**: Modular UI components separated into reusable elements (buttons, cards, forms) and page-specific components
-- **State Management**: React Query for server state with optimistic updates and background refetching for real-time status monitoring
-- **Real-time Updates**: Polling-based approach for job status, system health, and queue monitoring with configurable intervals
-- **Performance**: Lazy loading of effect previews and code syntax highlighting to optimize bundle size
+## Pipeline Triple-IA
 
-### Backend Architecture
-The server implements a sophisticated multi-module architecture designed for autonomous operation and high-performance effect generation. The core system uses an orchestrator pattern that coordinates specialized modules for different effect types.
+```
+1. GPT-4o (Cerveau 1)
+   → Analyse de la signature (secteur, palette, ton, marque)
+   → Génère le CreativeBrief + NarrativeScenario (4 variations A/B/C/D)
 
-**Core Engine Components**:
-- **Orchestrator**: Central coordinator that analyzes descriptions and selects appropriate modules
-- **AI Engine**: Local NLP processing using embedded models for concept extraction and parameter optimization
-- **Module System**: Specialized generators for particles, physics, lighting, and morphing effects
-- **Queue System**: Job processing with Bull.js for handling concurrent effect generation
-- **Template Engine**: Code generation system with optimizable templates
+2. Claude Opus (Cerveau 2)
+   → Reçoit le brief de GPT-4o
+   → Génère la TechnicalConfig (intensités, vitesses, paramètres par zone)
 
-**Decision Engine**: Uses rule-based AI to select optimal modules based on natural language analysis, considering factors like effect complexity, performance requirements, and platform targets.
+3. Gemini Flash (Cerveau 3)
+   → Sélection multi-couches par zone (zone-effect-selector.ts)
+   → 4 passes séquentielles A→B→C→D pour garantir diversité
+   → Validation harmonique (harmony-validator.ts)
+   → Post-traitement par les modules Priorité 1+2
 
-**Code Generation Pipeline**: Multi-stage process including concept extraction, module selection, parameter optimization, and template-based code generation with platform-specific adaptations.
+4. zone-svg-renderer.ts
+   → Convertit les ZoneComposition en SVG+CSS animé
+   → Rendu multi-couches (renderZoneWithLayers + mergeEffects)
+```
 
-### Data Storage Solutions
-The application uses a hybrid storage approach optimized for development and scalability:
+---
 
-**Primary Storage**: PostgreSQL database with Drizzle ORM for type-safe database operations and schema management. The schema includes tables for users, effects, jobs, uploads, and system metrics with proper relationships and indexing.
+## Architecture Multi-Couches par Zone
 
-**In-Memory Storage**: Fallback MemStorage implementation for development and testing, providing the same interface as the database layer.
+Chaque signature est composée de **7 zones** :
 
-**File Storage**: Local filesystem storage for uploaded files with support for multiple formats (TXT, MD, JSON, CSV, DOCX, PDF) and automatic cleanup.
+| Zone | Type | Couches max |
+|------|------|-------------|
+| `logo` | Multi-couches | 4 (dimension + matière + énergie + transformation) |
+| `nom` | Multi-couches | 2 (lumière + mouvement) |
+| `titre` | Plat | 1 |
+| `contact` | Plat | 1 |
+| `séparateur` | 2 couches | primary + secondary optionnel |
+| `fond` | 2 couches | primary + secondary (très subtil) |
+| `cta` | 2 couches | primary + secondary |
 
-**Performance Considerations**: Database queries are optimized with proper indexing, pagination support, and connection pooling. The storage layer abstracts implementation details allowing for easy migration between storage backends.
+---
 
-### Authentication and Authorization
-Currently implements a basic user system with username/password authentication stored in the database. The architecture supports session-based authentication and is designed to accommodate future enhancements like OAuth integration or role-based permissions.
+## Modules Intelligents (server/modules/)
 
-## External Dependencies
+### ✅ Priorité 1 — Fondamentaux visuels
 
-### Database and ORM
-- **PostgreSQL**: Primary database with connection via DATABASE_URL environment variable
-- **Drizzle ORM**: Type-safe database operations with automatic migration support
-- **Neon Database**: Serverless PostgreSQL provider for cloud deployment
+| Module | Fichier | Rôle |
+|--------|---------|------|
+| **ColorHarmonyEngine** | `color-harmony.module.ts` | Harmonies triadiques/analogues/split-comp à partir de la couleur de marque. Couleur unique par zone selon la hiérarchie visuelle. 4 mappings différents selon la variation A/B/C/D. |
+| **TimingMaster** | `timing-master.module.ts` | Durées basées sur le nombre d'or (φ=1.618) et la suite Fibonacci. Profil par variation : A=×φ lent majestueux, B=×1.0 précis, C=×1.27 atmosphérique, D=×0.618 explosif. Micro-jitter anti-monotonie. |
+| **VarianceEngine** | `variance-engine.module.ts` | Algorithme génétique garantissant la diversité A/B/C/D. Distance Jaccard sur les effets + L1 intensité + vitesse. Mutations automatiques si deux variations < 45% de distance. |
 
-### AI and Processing
-- **Local AI Engine**: Embedded natural language processing without external API dependencies
-- **TensorFlow.js**: Client-side machine learning capabilities for real-time analysis
-- **Bull.js**: Redis-based job queue for processing management
+### ✅ Priorité 2 — Intelligence de rendu
 
-### Frontend Libraries
-- **React**: Component framework with TypeScript support
-- **TanStack Query**: Server state management with caching and background updates
-- **Wouter**: Lightweight routing solution
-- **shadcn/ui**: Component library built on Radix UI primitives
-- **Tailwind CSS**: Utility-first styling framework
+| Module | Fichier | Rôle |
+|--------|---------|------|
+| **ContextualIntelligenceModerator** | `contextual-intelligence.module.ts` | Analyse la complexité des compositions générées. Écrête les couches excessives. Protège les zones lisibilité (titre, contact). Règles par secteur (finance=discret, startup=explosif). |
+| **SmartOptimizer** | `smart-optimizer.module.ts` | Calibre les intensités/vitesses selon le secteur, le profil de variation (A/B/C/D), la complexité du logo et le ton émotionnel. Matrices secteur × variation × contenu. |
+| **VisualFocusEngine** | `visual-focus.module.ts` | Guide l'œil selon un chemin adaptatif : A=logo→nom→CTA, B=logo→CTA→nom, C=fond→logo→nom→CTA, D=logo→CTA. Cascade Fibonacci d'apparition. Contraste adaptatif par zone. |
 
-### Development and Build Tools
-- **Vite**: Development server and build tool with HMR support
-- **TypeScript**: Type safety across the entire application
-- **ESBuild**: Fast bundling for production builds
-- **Replit Integration**: Development environment optimizations and deployment support
+### Modules existants (hérités)
 
-### File Processing
-- **Multer**: File upload handling with size limits and type validation
-- **Node.js File System**: Native file operations for document processing
-- **Multi-format Parsers**: Support for various document types with error handling
+| Module | Rôle |
+|--------|------|
+| `quality-assurance.module.ts` | QA du rendu final |
+| `physics.module.ts` | Calculs physiques pour effets dynamiques |
+| `particles.module.ts` | Système de particules |
+| `morphing.module.ts` | Transformations morphologiques |
+| `lighting.module.ts` | Éclairage et ombres |
+| `library-expansion.module.ts` | Extension de la bibliothèque d'effets |
+| `error-detection.module.ts` | Détection et correction automatique d'erreurs |
+| `batch-generator.module.ts` | Génération en lot |
 
-The system is designed to be largely self-contained with minimal external service dependencies, ensuring reliable operation and easier deployment across different environments.
+---
+
+## Bibliothèque d'effets
+
+**55 effets premium** dans `server/data/zone-effects-library.json`, organisés par zones et catégories :
+
+- **Logo** : dimension (3D_FLOAT, GYROSCOPE…), matière (GOLD_POLISH, CRYSTAL…), énergie (HALO_PULSE, ELECTRIC_FIELD…), transformation (LIQUID_EDGE…)
+- **Nom** : lumière (NEON_GLOW, GOLDEN_SHIMMER…), mouvement (WAVE_MOTION, FLOAT…)
+- **Titre / Contact** : effets subtils (FADE_IN, SLIDE, TYPEWRITER…)
+- **Séparateur** : lignes animées (WAVE, PULSE, ELECTRIC…)
+- **Fond** : ambiances (AURORA, COSMIC, PLASMA_DRIFT…)
+- **CTA** : impacts forts (HEARTBEAT, FIRE_BORDER, PRISM…)
+
+---
+
+## Types clés
+
+```typescript
+// harmony-validator.ts
+interface EffectLayer { effet_id, category, intensity, speed, color }
+interface ZoneEffectDecision { effet_id, intensity, speed, color, layers?: EffectLayer[] }
+interface ZoneComposition { logo, nom, titre, contact, separateur, fond, cta }
+
+// zone-effect-selector.ts
+interface CategoryCandidates { [category: string]: EffetCandidat[] }
+interface ZoneSelection { logo: CategoryCandidates, nom: CategoryCandidates, ... }
+```
+
+---
+
+## Dépendances principales
+
+- **OpenAI** (GPT-4o) + **Anthropic** (Claude Opus) + **Google Gemini Flash** — pipeline Triple-IA
+- **Express** + **TypeScript** + **tsx** — serveur (via `npx --yes tsx server/index.ts`)
+- **React** + **Vite** + **TanStack Query** — frontend
+- **shadcn/ui** + **Tailwind CSS** + **Wouter** — UI
+
+---
+
+## Lancement
+
+```bash
+# Workflow : NODE_ENV=development npx --yes tsx server/index.ts
+# Port : 5000 (Express + Vite proxy)
+```
+
+---
+
+## État du projet (Priorités restantes)
+
+- **P1** ✅ ColorHarmonyEngine + TimingMaster + VarianceEngine
+- **P2** ✅ ContextualIntelligenceModerator + SmartOptimizer + VisualFocusEngine
+- **P3** ⏳ DynamicFusionOrchestrator + EffectFusionEngine + ExperienceOrchestrator
+- **P4** ⏳ AdaptiveRenderingEngine + ContentAnalyzer + AnalyticsModule
+- **P5** ⏳ PredictiveTransitionEngine + AttentionGuide + VisualSignatureEngine + UserPreferencesEngine + PresetManager
