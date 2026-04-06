@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { log } from '../vite';
+import { callGemini } from './gemini-wrapper';
 
 const EFFECTS_LIBRARY = [
   'HEARTBEAT', 'SOUL_AURA', 'PLASMA_DRIFT', 'NEON_PULSE', 'GOLDEN_SHIMMER',
@@ -350,18 +350,6 @@ Réponds UNIQUEMENT en JSON valide :
 }
 
 async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief, palette: string[]): Promise<TechnicalConfig> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    log('GEMINI_API_KEY manquant — fallback Cerveau 3', 'triple-ai');
-    return buildFallbackTechnical(scenario, palette);
-  }
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
-    generationConfig: { temperature: 0.4, maxOutputTokens: 2500 },
-  });
-
   const bgColor = palette?.[0] || '#0f0f0f';
   const primaryColor = palette?.[1] || '#6366f1';
   const accentColor = palette?.[2] || '#e8e8ff';
@@ -423,8 +411,7 @@ Univers visuel: ${brief.univers_visuel}
 Contraintes: ${JSON.stringify(brief.contraintes)}`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const text = await callGemini(prompt, { temperature: 0.4, maxTokens: 2500 });
     const config = parseJsonSafely<TechnicalConfig>(text);
     log(`Cerveau 3 (Gemini) — Cycle: ${config.cycle_total}s | Optimisations: ${config.optimisations_email?.length || 0}`, 'triple-ai');
     return config;

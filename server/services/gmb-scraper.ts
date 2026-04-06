@@ -1,4 +1,5 @@
 import { log } from '../vite';
+import { callSerper } from './serper-wrapper';
 
 export interface GmbScrapedData {
   nom: string;
@@ -153,13 +154,6 @@ function extractSocialLinks(links: any[]): Record<string, string> {
 }
 
 async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
-  const apiKey = process.env.SERPER_API_KEY;
-
-  if (!apiKey) {
-    log('SERPER_API_KEY manquant — utilisation des données de démo', 'gmb-scraper');
-    return generateDemoData(gmbUrl);
-  }
-
   try {
     const rawName = decodeURIComponent(gmbUrl)
       .replace(/.*maps\/place\//, '')
@@ -167,24 +161,10 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
       .replace(/\+/g, ' ')
       .trim();
 
-    // Requête 1 : endpoint /places pour les données GMB
-    const [placesRes, searchRes] = await Promise.all([
-      fetch('https://google.serper.dev/places', {
-        method: 'POST',
-        headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ q: rawName, gl: 'fr', hl: 'fr' }),
-      }),
-      fetch('https://google.serper.dev/search', {
-        method: 'POST',
-        headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ q: `${rawName} site officiel contact email`, gl: 'fr', hl: 'fr', num: 5 }),
-      }),
+    const [placesData, searchData] = await Promise.all([
+      callSerper(rawName, { type: 'places', num: 5 }),
+      callSerper(`${rawName} site officiel contact email`, { type: 'search', num: 5 }),
     ]);
-
-    if (!placesRes.ok) throw new Error(`Serper places API error: ${placesRes.status}`);
-
-    const placesData = await placesRes.json();
-    const searchData = searchRes.ok ? await searchRes.json() : {};
 
     const place = placesData.places?.[0];
     if (!place) return generateDemoData(gmbUrl);

@@ -1087,23 +1087,6 @@ router.post('/signature/detect-style', async (req, res) => {
     const { metadata } = req.body;
     if (!metadata) return res.status(400).json({ error: 'metadata requis' });
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.json({
-        style_visuel: 'Élégance numérique minimaliste',
-        univers: 'Espace sombre avec des éclats de lumière froide et géométrique',
-        mots_cles: ['épuré', 'précis', 'luxe discret'],
-        justification: 'Style par défaut — clé Gemini non disponible',
-      });
-    }
-
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      generationConfig: { temperature: 0.9, maxOutputTokens: 1000 },
-    });
-
     const context = [
       metadata.entreprise && `Entreprise : ${metadata.entreprise}`,
       metadata.secteur && `Secteur : ${metadata.secteur}`,
@@ -1135,8 +1118,8 @@ Ta réponse doit être visionnaire et précise à la fois. Réponds UNIQUEMENT e
   "justification": "pourquoi ce style est inévitable pour cette marque en 1-2 phrases"
 }`;
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const { callGemini } = await import('./services/gemini-wrapper');
+    const text = await callGemini(prompt, { temperature: 0.9, maxTokens: 1000 });
     const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const styleData = JSON.parse(cleaned);
     return res.json(styleData);
@@ -1273,6 +1256,68 @@ router.get('/signature/export/:id/:type', async (req, res) => {
     res.setHeader('Content-Type', file.contentType);
     res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
     return res.send(file.content);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// =============================================
+// GET /api/keys/status — Statut des clés API
+// =============================================
+router.get('/keys/status', async (_req, res) => {
+  try {
+    const { rotator } = await import('./services/api-key-rotator');
+    const status = rotator.getPoolStatus();
+
+    const now = new Date();
+    const daysInMonth = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 0).getDate();
+    const dayOfMonth = now.getUTCDate();
+    const daysLeft = daysInMonth - dayOfMonth;
+    const monthKey = now.toISOString().slice(0, 7);
+    const serperMonthly = status.monthlyUsage[`serper_${monthKey}`] || 0;
+
+    const serializedKeys = status.keys.map(k => ({
+      id: k.id,
+      service: k.service,
+      status: k.status,
+      usageToday: k.usageToday,
+      dailyLimit: k.dailyLimit,
+      successCount: k.successCount,
+      avgResponseTime: k.avgResponseTime,
+      cooldownUntil: k.cooldownUntil?.toISOString() || null,
+      lastError: k.lastError,
+    }));
+
+    return res.json({
+      keys: serializedKeys,
+      summary: status.summary,
+      serperMonthly,
+      serperMonthlyLimit: 2500,
+      daysLeft,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/keys/reset — Réinitialisation forcée
+router.post('/keys/reset', async (req, res) => {
+  try {
+    const { service } = req.body as { service?: 'gemini' | 'cerebras' | 'serper' };
+    const { rotator } = await import('./services/api-key-rotator');
+    await rotator.forceReset(service);
+    return res.json({ success: true, message: `Reset effectué pour: ${service || 'tous'}` });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/keys/test — Test de toutes les clés
+router.post('/keys/test', async (_req, res) => {
+  try {
+    const { rotator } = await import('./services/api-key-rotator');
+    const results = await rotator.testAllKeys();
+    return res.json({ results });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }

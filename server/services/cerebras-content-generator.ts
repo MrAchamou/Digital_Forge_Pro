@@ -1,33 +1,9 @@
 import { log } from '../vite';
-
-const CEREBRAS_API_URL = 'https://api.cerebras.ai/v1/chat/completions';
-const CEREBRAS_MODEL = 'llama-3.3-70b';
+import { callCerebras } from './cerebras-wrapper';
 
 async function cerebrasGenerate(prompt: string): Promise<any> {
-  const apiKey = process.env.CEREBRAS_API_KEY;
-  if (!apiKey) throw new Error('CEREBRAS_API_KEY non configurée');
-
-  const response = await fetch(CEREBRAS_API_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: CEREBRAS_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 2000,
-    }),
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Cerebras API erreur: ${response.status} — ${err}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices?.[0]?.message?.content || '';
-  const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const text = await callCerebras(prompt, { maxTokens: 2000, temperature: 0.7 });
+  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   return JSON.parse(cleaned);
 }
 
