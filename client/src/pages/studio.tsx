@@ -4,6 +4,7 @@ import {
   Sparkles, Download, CheckCircle2, Circle, Loader2, Brain, Cpu, Zap, Bot,
   RefreshCw, Link2, Upload, ImageIcon, Wand2, Star, MapPin, Phone, Mail,
   Globe, Building2, User, Briefcase, ChevronDown, ChevronUp, Eye, EyeOff,
+  Package, Send, ExternalLink, Copy, Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,22 @@ interface PipelineState {
   brain3: StepStatus; svgGen: StepStatus;
 }
 
+interface DeliveryStepStatus {
+  step: string;
+  label: string;
+  status: 'pending' | 'running' | 'done' | 'error';
+  error?: string;
+}
+
+interface DeliveryResult {
+  signature_id: string;
+  preview_url: string;
+  download_url: string;
+  email_sent: boolean;
+  package_contents: string[];
+  steps: DeliveryStepStatus[];
+}
+
 interface FormData {
   nom: string; titre: string; entreprise: string;
   telephone: string; email: string; site: string;
@@ -30,6 +47,7 @@ interface FormData {
   style_visuel: string; slogan: string;
   mots_cles: string[]; ton: string;
   reseaux_sociaux: Record<string, string>;
+  client_email: string;
 }
 
 interface StyleDetectResult {
@@ -514,7 +532,235 @@ const DEFAULT_FORM: FormData = {
   note: 0, avis: 0, description: "", logo_url: "", logo_base64: "",
   style_visuel: "", slogan: "", mots_cles: [], ton: "professionnel et moderne",
   reseaux_sociaux: {},
+  client_email: "",
 };
+
+// ─── DeliverySection ──────────────────────────────────────────────────────────
+
+const DELIVERY_STEP_ICONS: Record<string, string> = {
+  png: '🖼', formats: '📄', cerebras: '🧠', pdfs: '📋', preview: '🌐', zip: '📦', email: '📧',
+};
+
+function DeliverySection({
+  svgContent, form, result, onDelivered,
+}: {
+  svgContent: string;
+  form: FormData;
+  result: PipelineResult | null;
+  onDelivered: (dr: DeliveryResult) => void;
+}) {
+  const { toast } = useToast();
+  const [clientEmail, setClientEmail] = useState(form.client_email || form.email || '');
+  const [deliveryResult, setDeliveryResult] = useState<DeliveryResult | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const deliveryMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        svg_content: svgContent,
+        client_email: clientEmail || undefined,
+        metadata: {
+          ...form,
+          palette: form.palette,
+        },
+        creative_config: {
+          brief: result?.brief_creatif || null,
+          scenario: result?.scenario_narratif || null,
+          technique: result?.configuration_technique || null,
+        },
+      };
+
+      const res = await fetch('/api/signature/deliver', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Erreur serveur');
+      }
+
+      return res.json() as Promise<DeliveryResult>;
+    },
+    onSuccess: (data) => {
+      setDeliveryResult(data);
+      onDelivered(data);
+      toast({ title: '✅ Livraison complète !', description: 'Votre package God Tier est prêt.' });
+    },
+    onError: (err: Error) => {
+      toast({ title: 'Erreur de livraison', description: err.message, variant: 'destructive' });
+    },
+  });
+
+  const isRunning = deliveryMutation.isPending;
+
+  const copyLink = () => {
+    if (deliveryResult?.preview_url) {
+      navigator.clipboard.writeText(deliveryResult.preview_url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  if (!svgContent) return null;
+
+  return (
+    <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-4 space-y-4 mt-4">
+      {/* En-tête */}
+      <div className="flex items-center gap-2">
+        <Package className="w-4 h-4 text-violet-400" />
+        <h3 className="text-sm font-semibold text-violet-300 uppercase tracking-widest">
+          Livraison God Tier
+        </h3>
+      </div>
+
+      {/* Email client */}
+      {!deliveryResult && (
+        <div className="space-y-2">
+          <Label className="text-white/40 text-xs flex items-center gap-1.5">
+            <Mail className="w-3 h-3" /> Email client (optionnel)
+          </Label>
+          <Input
+            type="email"
+            value={clientEmail}
+            onChange={e => setClientEmail(e.target.value)}
+            placeholder="client@entreprise.com"
+            className="bg-white/5 border-white/10 text-white text-xs h-8"
+            data-testid="input-client-email"
+          />
+          <p className="text-xs text-white/30">
+            Si renseigné, l'email de livraison avec les 3 PDFs sera envoyé automatiquement.
+          </p>
+        </div>
+      )}
+
+      {/* Bouton lancer */}
+      {!deliveryResult && (
+        <Button
+          onClick={() => deliveryMutation.mutate()}
+          disabled={isRunning}
+          className="w-full h-10 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-sm rounded-xl hover:opacity-90"
+          data-testid="button-launch-delivery"
+        >
+          {isRunning ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" /> Pipeline livraison en cours…
+            </span>
+          ) : (
+            <span className="flex items-center gap-2">
+              <Send className="w-4 h-4" /> Lancer la Livraison Complète
+            </span>
+          )}
+        </Button>
+      )}
+
+      {/* Statut en temps réel */}
+      {(isRunning || deliveryResult) && (
+        <div className="space-y-2">
+          {(deliveryResult?.steps || [
+            { step: 'png', label: 'Génération du fallback PNG', status: isRunning ? 'running' : 'pending' },
+            { step: 'formats', label: 'Création versions Outlook + Gmail', status: 'pending' },
+            { step: 'cerebras', label: 'Cerebras rédige les instructions', status: 'pending' },
+            { step: 'pdfs', label: 'Génération des PDFs', status: 'pending' },
+            { step: 'preview', label: 'Construction de la page preview', status: 'pending' },
+            { step: 'zip', label: 'Assemblage du package ZIP', status: 'pending' },
+            { step: 'email', label: 'Envoi de l\'email client', status: 'pending' },
+          ] as DeliveryStepStatus[]).map((s) => (
+            <div key={s.step} className="flex items-center gap-3 py-1">
+              <span className="text-base w-5 text-center">{DELIVERY_STEP_ICONS[s.step] || '•'}</span>
+              <span className="text-xs text-white/60 flex-1">{s.label}</span>
+              {s.status === 'running' && <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin" />}
+              {s.status === 'done' && <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />}
+              {s.status === 'error' && <span className="text-xs text-red-400">✗</span>}
+              {s.status === 'pending' && <Circle className="w-3.5 h-3.5 text-white/20" />}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Résultat */}
+      {deliveryResult && (
+        <div className="space-y-3 pt-2 border-t border-white/10">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-400" />
+            <span className="text-sm font-semibold text-green-400">LIVRAISON COMPLÈTE</span>
+            {deliveryResult.email_sent && (
+              <span className="ml-auto text-xs text-white/40 flex items-center gap-1">
+                <Send className="w-3 h-3" /> Email envoyé
+              </span>
+            )}
+          </div>
+
+          {/* Boutons d'action */}
+          <a
+            href={deliveryResult.preview_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button
+              className="w-full h-9 bg-violet-600/20 border border-violet-500/40 text-violet-300 hover:bg-violet-600/30 text-xs"
+              data-testid="button-view-preview"
+            >
+              <ExternalLink className="w-3.5 h-3.5 mr-2" /> Voir la page de prévisualisation
+            </Button>
+          </a>
+
+          <a
+            href={deliveryResult.download_url}
+            className="block"
+          >
+            <Button
+              className="w-full h-9 bg-green-600/20 border border-green-500/40 text-green-300 hover:bg-green-600/30 text-xs"
+              data-testid="button-download-package"
+            >
+              <Download className="w-3.5 h-3.5 mr-2" /> Télécharger le package complet
+            </Button>
+          </a>
+
+          <Button
+            onClick={() => deliveryMutation.mutate()}
+            variant="outline"
+            className="w-full h-9 border-white/15 text-white/40 hover:text-white text-xs"
+            data-testid="button-resend-delivery"
+          >
+            <Send className="w-3.5 h-3.5 mr-2" /> Renvoyer l'email client
+          </Button>
+
+          {/* Lien de prévisualisation */}
+          <div className="rounded-lg bg-black/30 p-3 space-y-2">
+            <p className="text-xs text-white/30">Lien de prévisualisation client</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-white/60 font-mono flex-1 truncate">
+                {deliveryResult.preview_url}
+              </p>
+              <button
+                onClick={copyLink}
+                className="text-white/40 hover:text-white transition-colors"
+                data-testid="button-copy-preview-link"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Contenu du package */}
+          <div className="rounded-lg bg-black/20 p-3">
+            <p className="text-xs text-white/30 mb-2">Package ZIP contient</p>
+            <div className="flex flex-wrap gap-1">
+              {deliveryResult.package_contents.map((f) => (
+                <span key={f} className="text-xs px-2 py-0.5 rounded bg-white/5 text-white/40 border border-white/8 font-mono">
+                  {f}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const idle: StepStatus = { status: 'idle' };
 
@@ -891,6 +1137,16 @@ export default function Studio() {
               </div>
               <div className="rounded-lg overflow-hidden border border-white/10" dangerouslySetInnerHTML={{ __html: svgContent }} />
             </div>
+          )}
+
+          {/* Section Livraison */}
+          {svgContent && (
+            <DeliverySection
+              svgContent={svgContent}
+              form={form}
+              result={result}
+              onDelivered={(_dr) => {}}
+            />
           )}
 
           {/* CTA principal */}

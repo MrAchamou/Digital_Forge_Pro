@@ -1,0 +1,434 @@
+Tu vas créer dans EffectForge AI un module complet 
+de livraison professionnelle qui transforme le SVG 
+final généré en un package de livraison God Tier complet.
+
+═══════════════════════════════════════════════════════
+ARCHITECTURE DU MODULE LIVRAISON
+═══════════════════════════════════════════════════════
+
+Créer server/services/delivery-engine.ts
+
+Ce module prend en entrée :
+- Le SVG final généré
+- Les métadonnées client (nom, entreprise, email, secteur)
+- La configuration créative des 3 cerveaux (JSON)
+- Un signature_id unique généré (UUID)
+
+Et produit en sortie un package complet de livraison.
+
+═══════════════════════════════════════════════════════
+PARTIE 1 — GÉNÉRATION DES FICHIERS DU PACKAGE
+═══════════════════════════════════════════════════════
+
+Créer server/services/package-builder.ts
+
+Ce module génère tous les fichiers du package :
+
+---
+
+FICHIER 1 — signature.svg
+Le SVG God Tier final tel quel.
+Déjà généré par la pipeline principale.
+
+---
+
+FICHIER 2 — signature-fallback.png
+Convertir le SVG en PNG statique haute résolution
+(600x180px, @2x pour retina)
+En utilisant sharp ou canvas-node.
+Ce fallback s'affiche quand le client mail
+bloque les SVG animés.
+
+---
+
+FICHIER 3 — signature-outlook.htm
+Outlook ne supporte pas les SVG.
+Générer une version HTML spéciale Outlook avec :
+- Tables HTML imbriquées (seul layout fiable Outlook)
+- Images inline en base64
+- Animations CSS limitées compatibles Outlook 2016+
+- Fallback statique pour Outlook 2013 et avant
+- Commentaires conditionnels <!--[if mso]> 
+  pour cibler les versions spécifiques
+
+Structure :
+<!--[if mso]>
+<table cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="140">
+      <!-- Zone photo/logo -->
+    </td>
+    <td width="2" style="background: linear-gradient...">
+      <!-- Séparateur -->
+    </td>
+    <td>
+      <!-- Zone infos -->
+    </td>
+  </tr>
+</table>
+<![endif]-->
+
+---
+
+FICHIER 4 — signature-gmail.html
+Version optimisée pour Gmail avec :
+- SVG inline dans le HTML
+- Animations CSS compatibles Gmail
+- Images hébergées (pas de base64 lourd)
+- Largeur fixe 600px
+- Test de rendu mobile inclus
+
+---
+
+FICHIER 5 — config.json
+Sauvegarde complète de la configuration :
+{
+  "signature_id": "uuid",
+  "generated_at": "ISO date",
+  "client": {
+    "nom": "string",
+    "entreprise": "string",
+    "secteur": "string"
+  },
+  "creative_decisions": {
+    "brief_creatif": { ...cerveau 1 },
+    "scenario_narratif": { ...cerveau 2 },
+    "configuration_technique": { ...cerveau 3 }
+  },
+  "effects_used": ["EFFET_1", "EFFET_2", "EFFET_3"],
+  "cycle_total": 240,
+  "variations": ["A", "B", "C", "D"],
+  "version": "1.0"
+}
+
+═══════════════════════════════════════════════════════
+PARTIE 2 — CEREBRAS GÉNÈRE LE CONTENU TEXTE
+═══════════════════════════════════════════════════════
+
+Créer server/services/cerebras-content-generator.ts
+
+Cerebras s'occupe de générer en parallèle et 
+à vitesse maximale tout le contenu textuel 
+du package de livraison.
+
+Utiliser l'API Cerebras (modèle llama-3.3-70b) :
+
+const response = await fetch(
+  "https://api.cerebras.ai/v1/chat/completions",
+  {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.CEREBRAS_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 2000
+    })
+  }
+)
+
+---
+
+GÉNÉRATION 1 — Instructions Gmail (PDF)
+Prompt Cerebras :
+"Tu es un rédacteur technique expert UX.
+Génère des instructions d'installation 
+claires et élégantes pour Gmail en JSON :
+{
+  'titre': 'Installer votre signature dans Gmail',
+  'intro': 'phrase accrocheuse personnalisée',
+  'etapes': [
+    {
+      'numero': 1,
+      'titre': 'string',
+      'description': 'string détaillé',
+      'conseil': 'string astuce pro'
+    }
+  ],
+  'note_finale': 'string encourageant'
+}
+Client : [nom] de [entreprise] secteur [secteur].
+Ton : professionnel mais chaleureux.
+3 étapes maximum. Réponds UNIQUEMENT en JSON."
+
+---
+
+GÉNÉRATION 2 — Instructions Outlook (PDF)
+Même structure que Gmail mais adapté à Outlook.
+Mentionner les spécificités Outlook 
+(utiliser le fichier .htm fourni, 
+ne pas copier-coller le SVG directement).
+
+---
+
+GÉNÉRATION 3 — Instructions Apple Mail (PDF)
+Même structure adaptée à Apple Mail.
+
+---
+
+GÉNÉRATION 4 — Email de livraison
+Prompt Cerebras :
+"Tu es un copywriter expert en emails 
+de livraison premium pour agences créatives.
+Génère un email de livraison professionnel 
+et mémorable en JSON :
+{
+  'sujet': 'string accrocheur',
+  'intro': 'string personnalisé warm',
+  'corps': 'string décrivant ce qui est livré',
+  'section_magic': 'string décrivant 
+                    pourquoi cette signature 
+                    est unique et vivante',
+  'instructions_rapides': 'string 1 phrase',
+  'cta': 'string texte bouton',
+  'signature_expediteur': 'string',
+  'ps': 'string conseil exclusif'
+}
+Client : [nom], [entreprise], [secteur].
+Effets utilisés : [liste des effets].
+Arc narratif : [arc du cerveau 2].
+Ton : premium, exclusif, mémorable.
+Réponds UNIQUEMENT en JSON."
+
+---
+
+GÉNÉRATION 5 — Page de prévisualisation (HTML)
+Prompt Cerebras :
+"Tu es un développeur frontend expert.
+Génère le HTML complet d'une page de 
+prévisualisation premium pour une signature 
+email vivante en JSON :
+{
+  'titre_page': 'string',
+  'headline': 'string accrocheur',
+  'description': 'string 1-2 phrases',
+  'section_effets': 'string décrivant 
+                     les effets utilisés',
+  'texte_bouton_gmail': 'string',
+  'texte_bouton_outlook': 'string',
+  'texte_bouton_apple': 'string',
+  'texte_bouton_download': 'string',
+  'footer': 'string'
+}
+Client : [nom], [entreprise].
+Ton : exclusif, technologique, premium."
+
+Ces 5 générations Cerebras tournent en parallèle
+via Promise.all() pour une vitesse maximale.
+
+═══════════════════════════════════════════════════════
+PARTIE 3 — CONSTRUCTION DES PDFs
+═══════════════════════════════════════════════════════
+
+Créer server/services/pdf-generator.ts
+
+Utiliser PDFKit ou Puppeteer pour générer 
+les PDFs d'instructions.
+
+Chaque PDF d'instructions (Gmail/Outlook/Apple) :
+- Format A4, orientation portrait
+- En-tête avec le nom du client et son entreprise
+- Aperçu miniature de la signature en haut à droite
+- Les étapes numérotées avec icônes
+- Screenshots illustratifs (SVG intégrés)
+- Pied de page avec signature_id et date
+- Branding premium (couleurs de la charte client)
+- Max 1 page recto
+
+Structure visuelle du PDF :
+┌─────────────────────────────────────┐
+│ [Logo EffectForge]    [Mini sig]    │
+│                                     │
+│ Installer votre signature           │
+│ dans Gmail                          │
+│ ─────────────────────────────────── │
+│ Bonjour [Nom],                      │
+│ [intro personnalisée]               │
+│                                     │
+│ ① [Titre étape 1]                  │
+│   [Description détaillée]           │
+│   💡 [Conseil pro]                  │
+│                                     │
+│ ② [Titre étape 2]                  │
+│   [Description détaillée]           │
+│   💡 [Conseil pro]                  │
+│                                     │
+│ ③ [Titre étape 3]                  │
+│   [Description détaillée]           │
+│   💡 [Conseil pro]                  │
+│                                     │
+│ [Note finale encourageante]         │
+│ ─────────────────────────────────── │
+│ ID: [signature_id] | [date]         │
+└─────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════
+PARTIE 4 — PAGE DE PRÉVISUALISATION UNIQUE
+═══════════════════════════════════════════════════════
+
+Créer server/services/preview-page-generator.ts
+
+Générer une page HTML standalone hébergée 
+avec une URL unique :
+preview/[signature_id].html
+
+Cette page contient :
+
+SECTION 1 — Hero
+- Headline générée par Cerebras
+- La signature SVG vivante centrée
+  dans un mock d'interface email réaliste
+  (simulant Gmail avec une fausse boîte mail)
+- Compteur discret du cycle en cours (A/B/C/D)
+
+SECTION 2 — Les effets vivants expliqués
+- Pour chaque variation A/B/C/D :
+  Son titre poétique (issu du Cerveau 2 Claude)
+  Une description de l'intention artistique
+  Les effets utilisés listés élégamment
+
+SECTION 3 — Boutons d'installation
+3 boutons distincts :
+[Installer dans Gmail]
+[Installer dans Outlook] 
+[Installer dans Apple Mail]
+Chacun télécharge le fichier approprié
+et ouvre les instructions PDF correspondantes.
+
+SECTION 4 — Télécharger le package complet
+Un bouton premium :
+[⬇ Télécharger mon package complet]
+Déclenche le téléchargement du ZIP complet.
+
+SECTION 5 — Footer discret
+"Signature créée par EffectForge AI"
+avec lien vers la landing page.
+
+Design de la page :
+- Fond sombre (#0f172a)
+- Couleurs de la palette du client utilisées
+- Typographie premium (Georgia + Arial)
+- Animations CSS subtiles sur la page elle-même
+- Responsive mobile
+
+═══════════════════════════════════════════════════════
+PARTIE 5 — ASSEMBLAGE DU ZIP FINAL
+═══════════════════════════════════════════════════════
+
+Créer server/services/zip-assembler.ts
+
+Utiliser la librairie archiver pour assembler :
+
+signature-[nom-entreprise]-[id].zip
+├── 📄 signature.svg
+├── 📄 signature-fallback.png  
+├── 📄 signature-outlook.htm
+├── 📄 signature-gmail.html
+├── 📄 instructions-gmail.pdf
+├── 📄 instructions-outlook.pdf
+├── 📄 instructions-apple-mail.pdf
+├── 📄 config.json
+└── 📄 LISEZ-MOI.txt
+
+Le LISEZ-MOI.txt est généré par Cerebras :
+Un texte simple et chaleureux qui explique
+le contenu du dossier en 10 lignes maximum.
+
+═══════════════════════════════════════════════════════
+PARTIE 6 — EMAIL DE LIVRAISON AUTOMATIQUE
+═══════════════════════════════════════════════════════
+
+Créer server/services/delivery-email.ts
+
+Utiliser Nodemailer ou Resend pour envoyer 
+automatiquement l'email de livraison au client.
+
+L'email contient :
+- Sujet généré par Cerebras
+- Corps HTML premium avec le contenu Cerebras
+- Un grand bouton CTA vers la page de preview unique
+- Un second bouton pour télécharger le package
+- En pièce jointe : les 3 PDFs d'instructions
+- Design HTML email responsive et premium
+
+Variables d'environnement :
+RESEND_API_KEY= ou SMTP_CONFIG=
+
+═══════════════════════════════════════════════════════
+PARTIE 7 — INTERFACE STUDIO : SECTION LIVRAISON
+═══════════════════════════════════════════════════════
+
+Dans l'onglet Studio existant, après la génération,
+ajouter une section "Livraison" qui s'active 
+automatiquement quand le SVG est prêt.
+
+Cette section affiche en temps réel :
+
+[🔄] Génération du fallback PNG...     ✓
+[🔄] Création version Outlook...       ✓
+[🔄] Cerebras rédige les instructions. ✓
+[🔄] Génération des PDFs...            ✓
+[🔄] Construction de la page preview.. ✓
+[🔄] Assemblage du package ZIP...      ✓
+[🔄] Envoi de l'email client...        ✓
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ LIVRAISON COMPLÈTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[👁 Voir la page de prévisualisation]
+[⬇ Télécharger le package complet]
+[📧 Renvoyer l'email client]
+
+Lien de prévisualisation client :
+preview.effectforge.ai/[signature_id]
+[Copier le lien] [Partager]
+
+═══════════════════════════════════════════════════════
+VARIABLES D'ENVIRONNEMENT À AJOUTER
+═══════════════════════════════════════════════════════
+
+CEREBRAS_API_KEY=     (génération contenu texte)
+SERPER_API_KEY=       (scraping GMB)
+RESEND_API_KEY=       (envoi emails)
+PREVIEW_BASE_URL=     (URL de base des previews)
+
+═══════════════════════════════════════════════════════
+ORDRE D'EXÉCUTION
+═══════════════════════════════════════════════════════
+
+1. Créer package-builder.ts 
+   (signature-fallback.png + outlook.htm + gmail.html)
+
+2. Créer cerebras-content-generator.ts
+   (5 générations en Promise.all parallèle)
+
+3. Créer pdf-generator.ts
+   (3 PDFs d'instructions illustrés)
+
+4. Créer preview-page-generator.ts
+   (page HTML standalone avec mock Gmail)
+
+5. Créer zip-assembler.ts
+   (package complet avec LISEZ-MOI)
+
+6. Créer delivery-email.ts
+   (email automatique avec pièces jointes)
+
+7. Mettre à jour l'interface Studio
+   (section livraison avec statut temps réel)
+
+8. Créer l'endpoint principal :
+   POST /api/signature/deliver
+   Body: { signature_id, client_email, svg_content, metadata }
+   Response: {
+     preview_url: "string",
+     download_url: "string", 
+     email_sent: boolean,
+     package_contents: ["liste des fichiers"]
+   }
+
+9. Tester de bout en bout avec un client exemple
+   et vérifier chaque fichier du package ZIP.

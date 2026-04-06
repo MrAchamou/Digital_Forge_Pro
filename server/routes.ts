@@ -1147,6 +1147,93 @@ Ta réponse doit être visionnaire et précise à la fois. Réponds UNIQUEMENT e
 });
 
 // =============================================
+// POST /api/signature/deliver
+// Pipeline de livraison complète God Tier
+// =============================================
+router.post('/signature/deliver', async (req, res) => {
+  try {
+    const { svg_content, client_email, metadata, creative_config } = req.body;
+    if (!svg_content || !metadata) {
+      return res.status(400).json({ error: 'svg_content et metadata requis' });
+    }
+
+    const baseUrl = process.env.PREVIEW_BASE_URL ||
+      `${req.protocol}://${req.get('host')}`;
+
+    const { runDeliveryEngine } = await import('./services/delivery-engine');
+    const result = await runDeliveryEngine(
+      {
+        svgContent: svg_content,
+        clientEmail: client_email,
+        metadata,
+        creativeConfig: creative_config || {},
+      },
+      baseUrl
+    );
+
+    return res.json(result);
+  } catch (err: any) {
+    console.error('Erreur livraison:', err);
+    return res.status(500).json({ error: err.message || 'Erreur interne' });
+  }
+});
+
+// =============================================
+// GET /api/signature/preview/:id
+// Sert la page de prévisualisation HTML
+// =============================================
+router.get('/signature/preview/:id', async (req, res) => {
+  try {
+    const { getDeliveryFile } = await import('./services/delivery-engine');
+    const file = await getDeliveryFile(req.params.id, 'preview');
+    if (!file) return res.status(404).json({ error: 'Preview introuvable' });
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(file.buffer);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// =============================================
+// GET /api/signature/download/:id
+// Téléchargement du ZIP complet
+// =============================================
+router.get('/signature/download/:id', async (req, res) => {
+  try {
+    const { getDeliveryFile } = await import('./services/delivery-engine');
+    const file = await getDeliveryFile(req.params.id, 'zip');
+    if (!file) return res.status(404).json({ error: 'Package ZIP introuvable' });
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
+    return res.send(file.buffer);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// =============================================
+// GET /api/signature/export-file/:id/:type
+// Téléchargement fichier individuel du package
+// =============================================
+router.get('/signature/export-file/:id/:type', async (req, res) => {
+  try {
+    const { id, type } = req.params;
+    const validTypes = ['svg', 'outlook', 'gmail', 'pdf-gmail', 'pdf-outlook', 'pdf-apple', 'png', 'config'];
+    if (!validTypes.includes(type)) return res.status(400).json({ error: 'type invalide' });
+
+    const { getDeliveryFile } = await import('./services/delivery-engine');
+    const file = await getDeliveryFile(id, type as any);
+    if (!file) return res.status(404).json({ error: 'Fichier introuvable' });
+
+    res.setHeader('Content-Type', file.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
+    return res.send(file.buffer);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// =============================================
 // POST /api/signature/export
 // Export SVG + guide + config JSON
 // =============================================
