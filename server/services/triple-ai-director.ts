@@ -368,15 +368,27 @@ async function runZoneSelectionForVariation(
   scenario: NarrativeScenario,
   brief: CreativeBrief,
   secteur: string,
-  palette: string[]
+  palette: string[],
+  metadata: any,
+  usedEffectsInOtherVariations: Set<string>
 ): Promise<ZoneComposition> {
   const intensite = brief.intensite_mouvement as IntensiteMouvement;
-  const selection = selectCandidatesForAllZones(secteur, intensite, variation);
+  const noteGMB = parseFloat(metadata?.note) || 0;
+  const prixGamme = metadata?.prix_gamme || '';
+
+  const selection = selectCandidatesForAllZones(secteur, intensite, variation, {
+    noteGMB,
+    prixGamme,
+    usedEffects: usedEffectsInOtherVariations,
+  });
+
   const varData   = scenario.variations[variation];
   const intention = varData?.intention || `Variation ${variation}`;
   const ton       = brief.ton_emotionnel;
-
   const primaryColor = palette[1] || '#6366f1';
+
+  // Liste des effets déjà sélectionnés dans les autres variations (pour garantir la diversité)
+  const effets_interdits = Array.from(usedEffectsInOtherVariations);
 
   const prompt = buildGeminiPromptZones(
     secteur,
@@ -384,7 +396,16 @@ async function runZoneSelectionForVariation(
     intensite,
     variation,
     intention,
-    selection
+    selection,
+    {
+      brief,
+      metadata,
+      arc_emotionnel: scenario.arc_emotionnel,
+      metaphore: varData?.metaphore,
+      note_gmb: noteGMB,
+      palette,
+      effets_interdits,
+    }
   );
 
   const fallbackComposition = (): ZoneComposition => {
@@ -408,7 +429,7 @@ async function runZoneSelectionForVariation(
   };
 
   try {
-    const text = await callGemini(prompt, { temperature: 0.3, maxTokens: 1200 });
+    const text = await callGemini(prompt, { temperature: 0.25, maxTokens: 1400 });
     const raw  = parseJsonSafely<ZoneComposition>(text);
 
     const zones: Array<keyof ZoneComposition> = ['logo', 'nom', 'titre', 'contact', 'separateur', 'fond', 'cta'];
@@ -420,12 +441,24 @@ async function runZoneSelectionForVariation(
       if (!raw[z].color || raw[z].color === '#000000') {
         raw[z].color = primaryColor;
       }
+      // Si l'effet choisi est interdit (déjà utilisé), forcer le 2e candidat de la zone
+      if (effets_interdits.includes(raw[z].effet_id)) {
+        const zoneCandidates = selection[z as keyof ZoneSelection];
+        const alternative = zoneCandidates.find(c => !effets_interdits.includes(c.id));
+        if (alternative) {
+          log(`Cerveau 3 [${variation}/${z}] — remplacement ${raw[z].effet_id} → ${alternative.id} (diversité)`, 'triple-ai');
+          raw[z].effet_id = alternative.id;
+          raw[z].intensity = alternative.intensite_recommandee;
+          raw[z].raison = `Diversité garantie — ${alternative.description}`;
+        }
+      }
     }
 
     const validated = validateHarmony(raw, palette);
     if (validated.corrections.length > 0) {
-      log(`Cerveau 3 zones ${variation} — ${validated.corrections.length} corrections: ${validated.corrections[0]}`, 'triple-ai');
+      log(`Cerveau 3 zones ${variation} — ${validated.corrections.length} corrections harmoniques`, 'triple-ai');
     }
+    log(`✓ Variation ${variation} — Logo:${validated.config.logo.effet_id} | Nom:${validated.config.nom.effet_id} | Fond:${validated.config.fond.effet_id} | Score harmonie:${validated.score_harmonie}`, 'triple-ai');
     return validated.config;
   } catch (err: any) {
     log(`Cerveau 3 zone ${variation} erreur: ${err.message} — fallback`, 'triple-ai');
@@ -434,24 +467,49 @@ async function runZoneSelectionForVariation(
   }
 }
 
-async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief, palette: string[], secteur: string): Promise<TechnicalConfig> {
-  log('Cerveau 3 — Sélection zones par variation (4 appels parallèles)...', 'triple-ai');
+async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief, palette: string[], secteur: string, metadata: any): Promise<TechnicalConfig> {
+  log('Cerveau 3 — Sélection zones par variation (séquentiel pour garantir diversité)...', 'triple-ai');
 
-  const [compA, compB, compC, compD] = await Promise.all([
-    runZoneSelectionForVariation('A', scenario, brief, secteur, palette),
-    runZoneSelectionForVariation('B', scenario, brief, secteur, palette),
-    runZoneSelectionForVariation('C', scenario, brief, secteur, palette),
-    runZoneSelectionForVariation('D', scenario, brief, secteur, palette),
-  ]);
+  // Traitement séquentiel A→B→C→D pour accumuler les effets déjà utilisés
+  // et garantir une diversité totale entre les 4 variations
+  const usedEffects = new Set<string>();
 
-  log(`Cerveau 3 (Gemini Zone) — Compositions: A(${compA.logo.effet_id}) B(${compB.logo.effet_id}) C(${compC.logo.effet_id}) D(${compD.logo.effet_id})`, 'triple-ai');
+  const extractUsedEffects = (comp: ZoneComposition) => {
+    Object.values(comp).forEach(zone => {
+      if (zone?.effet_id) usedEffects.add(zone.effet_id);
+    });
+  };
+
+  log('Cerveau 3 — Variation A...', 'triple-ai');
+  const compA = await runZoneSelectionForVariation('A', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  extractUsedEffects(compA);
+
+  log('Cerveau 3 — Variation B...', 'triple-ai');
+  const compB = await runZoneSelectionForVariation('B', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  extractUsedEffects(compB);
+
+  log('Cerveau 3 — Variation C...', 'triple-ai');
+  const compC = await runZoneSelectionForVariation('C', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+  extractUsedEffects(compC);
+
+  log('Cerveau 3 — Variation D...', 'triple-ai');
+  const compD = await runZoneSelectionForVariation('D', scenario, brief, secteur, palette, metadata, new Set(usedEffects));
+
+  log(`✓ Cerveau 3 complet — A:${compA.logo.effet_id} | B:${compB.logo.effet_id} | C:${compC.logo.effet_id} | D:${compD.logo.effet_id}`, 'triple-ai');
+  log(`  Diversité fonds — A:${compA.fond.effet_id} | B:${compB.fond.effet_id} | C:${compC.fond.effet_id} | D:${compD.fond.effet_id}`, 'triple-ai');
 
   const baseConfig = buildFallbackTechnical(scenario, palette);
 
   return {
     ...baseConfig,
-    optimisations_email: ['CSS animations uniquement — zéro JS', 'Chirurgie visuelle par zones actives', 'Harmony validator — 5 règles appliquées'],
-    notes_techniques: `Système zone-effects actif : ${compA.logo.effet_id} | ${compB.nom.effet_id} | ${compC.separateur.effet_id}`,
+    optimisations_email: [
+      'CSS animations uniquement — zéro JS',
+      'Chirurgie visuelle par zones — logique métier secteur',
+      'Harmony validator — 5 règles appliquées',
+      'Diversité garantie entre les 4 variations',
+      'Scoring multi-dimensionnel : secteur + émotion + note GMB + variation',
+    ],
+    notes_techniques: `Zone-system actif | Secteur:${secteur} | A:${compA.logo.effet_id} B:${compB.logo.effet_id} C:${compC.logo.effet_id} D:${compD.logo.effet_id}`,
     zone_compositions: { A: compA, B: compB, C: compC, D: compD },
   };
 }
@@ -480,7 +538,7 @@ export async function runTripleAIPipeline(
   onProgress?.(2, { status: 'done', data: scenario });
 
   onProgress?.(3, { status: 'running', label: 'Cerveau 3 — Gemini Flash : Chirurgie visuelle par zones' });
-  const config = await runBrain3Gemini(scenario, brief, metadata?.palette || [], metadata?.secteur || '');
+  const config = await runBrain3Gemini(scenario, brief, metadata?.palette || [], metadata?.secteur || '', metadata);
   log(`✓ Cerveau 3 — Cycle ${config.cycle_total}s | ${config.optimisations_email?.length || 0} optimisations`, 'triple-ai');
   onProgress?.(3, { status: 'done', data: config });
 

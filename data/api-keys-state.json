@@ -1,5 +1,5 @@
 {
-  "lastSaved": "2026-04-06T12:01:59.024Z",
+  "lastSaved": "2026-04-06T12:08:36.808Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
@@ -92,22 +92,22 @@
       "avgResponseTime": 0
     },
     "serper_1": {
-      "usageToday": 2,
+      "usageToday": 3,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 2,
-      "avgResponseTime": 687
+      "successCount": 3,
+      "avgResponseTime": 909
     },
     "serper_2": {
-      "usageToday": 0,
+      "usageToday": 1,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 0,
-      "avgResponseTime": 0
+      "successCount": 1,
+      "avgResponseTime": 617
     },
     "serper_3": {
       "usageToday": 0,
@@ -138,6 +138,6 @@
     }
   },
   "monthlyUsage": {
-    "serper_2026-04": 2
+    "serper_2026-04": 4
   }
 }
