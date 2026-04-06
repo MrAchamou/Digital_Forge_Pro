@@ -536,6 +536,10 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
   const extractUsedEffects = (comp: ZoneComposition) => {
     Object.values(comp).forEach(zone => {
       if (zone?.effet_id) usedEffects.add(zone.effet_id);
+      // Extraire aussi toutes les couches secondaires pour garantir diversité totale
+      zone?.layers?.forEach(layer => {
+        if (layer?.effet_id) usedEffects.add(layer.effet_id);
+      });
     });
   };
 

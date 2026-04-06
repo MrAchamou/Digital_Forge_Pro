@@ -474,25 +474,40 @@ function selectZoneCandidates(
 // ═══════════════════════════════════════════════════════
 function applyInterZoneBoosts(
   selection: ZoneSelection,
-  topChoices: Record<keyof ZoneSelection, string>
+  topChoices: Record<string, string>
 ): void {
   for (const rule of INTER_ZONE_RULES) {
-    const triggerTopId = topChoices[rule.trigger_zone] || '';
+    const triggerTopId = topChoices[rule.trigger_zone as string] || '';
     if (!triggerTopId.includes(rule.trigger_effect_contains)) continue;
 
-    const targetList = selection[rule.target_zone];
-    for (const candidat of targetList) {
-      const matches = rule.target_effects_containing.some(kw => candidat.id.includes(kw));
-      if (matches) {
-        if (rule.action === 'boost') {
-          candidat.score = Math.min(1, candidat.score + rule.factor);
-        } else {
-          candidat.score = Math.max(0, candidat.score - rule.factor);
+    const targetZoneData = selection[rule.target_zone];
+
+    // Zone plate (EffetCandidat[])
+    if (Array.isArray(targetZoneData)) {
+      for (const candidat of targetZoneData) {
+        const matches = rule.target_effects_containing.some(kw => candidat.id.includes(kw));
+        if (matches) {
+          candidat.score = rule.action === 'boost'
+            ? Math.min(1, candidat.score + rule.factor)
+            : Math.max(0, candidat.score - rule.factor);
         }
       }
+      targetZoneData.sort((a, b) => b.score - a.score);
+    } else {
+      // Zone multi-couches (CategoryCandidates) — appliquer sur toutes les catégories
+      const cats = targetZoneData as CategoryCandidates;
+      for (const catEffets of Object.values(cats)) {
+        for (const candidat of catEffets) {
+          const matches = rule.target_effects_containing.some(kw => candidat.id.includes(kw));
+          if (matches) {
+            candidat.score = rule.action === 'boost'
+              ? Math.min(1, candidat.score + rule.factor)
+              : Math.max(0, candidat.score - rule.factor);
+          }
+        }
+        catEffets.sort((a, b) => b.score - a.score);
+      }
     }
-    // Retrier après modification
-    targetList.sort((a, b) => b.score - a.score);
   }
 }
 
@@ -593,9 +608,8 @@ export function selectCandidatesForAllZones(
     cta:        cta[0]?.id || '',
   };
 
-  // Appliquer les règles inter-zones sur les zones plates
-  const flatResult = { logo: fond, nom: fond, titre, contact, separateur, fond, cta };
-  applyInterZoneBoosts(flatResult as any, topChoicesForInterZone as any);
+  // Appliquer les règles inter-zones — supporte zones plates ET multi-couches
+  applyInterZoneBoosts(result, topChoicesForInterZone);
 
   return result;
 }
