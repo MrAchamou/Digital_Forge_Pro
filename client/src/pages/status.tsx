@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { useSystemStatus } from "@/hooks/use-system-status";
 import { 
   BarChart3, 
@@ -21,7 +25,9 @@ import {
   Key,
   RefreshCw,
   Zap,
-  Search
+  Search,
+  Plus,
+  Trash2
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import type { SystemHealth, Job } from "@shared/schema";
@@ -49,6 +55,11 @@ interface KeysStatus {
 export default function Status() {
   const { systemHealth, queueStats, recentJobs } = useSystemStatus();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const [newKeyService, setNewKeyService] = useState<'gemini' | 'cerebras' | 'serper'>('gemini');
+  const [newKeyValue, setNewKeyValue] = useState('');
+  const [newKeyLabel, setNewKeyLabel] = useState('');
 
   const { data: health, isLoading: healthLoading } = useQuery<SystemHealth>({
     queryKey: ["/api/system/health"],
@@ -73,6 +84,31 @@ export default function Status() {
   const testMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/keys/test", {}),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/keys/status"] }),
+  });
+
+  const addKeyMutation = useMutation({
+    mutationFn: (data: { service: string; key: string; label: string }) =>
+      apiRequest("POST", "/api/keys/add", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/keys/status"] });
+      setNewKeyValue('');
+      setNewKeyLabel('');
+      toast({ title: "Clé ajoutée", description: `Clé ${newKeyService} ajoutée et persistée en base de données.` });
+    },
+    onError: (err: any) => {
+      toast({ title: "Erreur", description: err.message || "Impossible d'ajouter la clé", variant: "destructive" });
+    },
+  });
+
+  const removeKeyMutation = useMutation({
+    mutationFn: (keyId: string) => apiRequest("DELETE", `/api/keys/${keyId}`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/keys/status"] });
+      toast({ title: "Clé supprimée", description: "La clé a été retirée de la rotation." });
+    },
+    onError: (err: any) => {
+      toast({ title: "Erreur", description: err.message || "Impossible de supprimer la clé", variant: "destructive" });
+    },
   });
 
   const getKeyStatusEmoji = (status: ApiKeyInfo['status']) => {
@@ -162,7 +198,7 @@ export default function Status() {
             </div>
             <h3 className="text-lg font-semibold mb-2 text-green-400">System Health</h3>
             <p className="text-2xl font-bold text-green-400" data-testid="text-system-health">
-              {health?.overall || 98.7}%
+              {health?.overall ? Math.round(health.overall) : 98}%
             </p>
             <p className="text-sm text-gray-400">All systems operational</p>
           </CardContent>
@@ -525,6 +561,17 @@ export default function Status() {
                                   {key.avgResponseTime}ms
                                 </span>
                               )}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                onClick={() => removeKeyMutation.mutate(key.id)}
+                                disabled={removeKeyMutation.isPending}
+                                data-testid={`button-remove-key-${key.id}`}
+                                title="Supprimer cette clé"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
                             </div>
                           );
                         })
@@ -563,6 +610,59 @@ export default function Status() {
               })}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Ajouter une clé API */}
+      <Card className="glass-morphism border-forge-cyan/30 bg-transparent">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-forge-cyan flex items-center gap-2">
+            <Plus className="w-5 h-5" />
+            Ajouter une clé API
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-400 text-sm mb-4">
+            Les clés ajoutées ici sont persistées en base de données — elles ne seront <span className="text-forge-cyan font-medium">jamais redemandées</span> au prochain démarrage.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Select
+              value={newKeyService}
+              onValueChange={(v) => setNewKeyService(v as any)}
+            >
+              <SelectTrigger className="w-full sm:w-36 bg-forge-dark/50 border-forge-purple/40 text-white" data-testid="select-key-service">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-forge-dark border-forge-purple/40">
+                <SelectItem value="gemini">Gemini</SelectItem>
+                <SelectItem value="cerebras">Cerebras</SelectItem>
+                <SelectItem value="serper">Serper</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              placeholder="Clé API (ex: AIza... / csk-... / ...)"
+              value={newKeyValue}
+              onChange={(e) => setNewKeyValue(e.target.value)}
+              className="flex-1 bg-forge-dark/50 border-forge-purple/40 text-white placeholder:text-gray-500 font-mono text-sm"
+              data-testid="input-key-value"
+            />
+            <Input
+              placeholder="Label (optionnel)"
+              value={newKeyLabel}
+              onChange={(e) => setNewKeyLabel(e.target.value)}
+              className="w-full sm:w-40 bg-forge-dark/50 border-forge-purple/40 text-white placeholder:text-gray-500"
+              data-testid="input-key-label"
+            />
+            <Button
+              onClick={() => addKeyMutation.mutate({ service: newKeyService, key: newKeyValue, label: newKeyLabel })}
+              disabled={!newKeyValue.trim() || addKeyMutation.isPending}
+              className="bg-forge-cyan hover:bg-forge-cyan/80 text-black font-semibold"
+              data-testid="button-add-key"
+            >
+              {addKeyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4 mr-1" />}
+              Ajouter
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

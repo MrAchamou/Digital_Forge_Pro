@@ -1427,20 +1427,29 @@ router.post('/keys/test', async (_req, res) => {
 // GET /api/keys/replit — État des clés Replit (OpenAI / Anthropic)
 router.get('/keys/replit', async (_req, res) => {
   try {
-    const openaiOk    = !!process.env.OPENAI_API_KEY?.startsWith('sk-');
-    const anthropicOk = !!process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-');
+    // Supporte les intégrations Replit (AI_INTEGRATIONS_*) ET les clés classiques
+    const openaiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+    const anthropicKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
+
+    const openaiOk    = !!(openaiKey?.length && openaiKey.length > 10);
+    const anthropicOk = !!(anthropicKey?.length && anthropicKey.length > 10);
+
+    // Source selon l'origine de la clé
+    const openaiSource = process.env.AI_INTEGRATIONS_OPENAI_API_KEY ? 'replit-ai-integration' : 'env-secret';
+    const anthropicSource = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY ? 'replit-ai-integration' : 'env-secret';
+
     return res.json({
       openai: {
         configured: openaiOk,
         model: 'gpt-4o',
-        suffix: openaiOk ? `...${process.env.OPENAI_API_KEY!.slice(-4)}` : null,
-        source: 'replit-integration',
+        suffix: openaiOk ? `...${openaiKey!.slice(-4)}` : null,
+        source: openaiSource,
       },
       anthropic: {
         configured: anthropicOk,
         model: 'claude-opus-4-5',
-        suffix: anthropicOk ? `...${process.env.ANTHROPIC_API_KEY!.slice(-4)}` : null,
-        source: 'replit-integration',
+        suffix: anthropicOk ? `...${anthropicKey!.slice(-4)}` : null,
+        source: anthropicSource,
       },
     });
   } catch (err: any) {
