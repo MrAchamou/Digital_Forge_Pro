@@ -1,47 +1,48 @@
 {
+  "lastSaved": "2026-04-06T11:59:59.023Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 0,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-06T12:09:09.353Z",
+      "cooldownCount": 4,
+      "errorCount": 4,
       "successCount": 0,
       "avgResponseTime": 0
     },
     "gemini_2": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 0,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-06T12:04:09.436Z",
+      "cooldownCount": 3,
+      "errorCount": 3,
       "successCount": 0,
       "avgResponseTime": 0
     },
     "gemini_3": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 0,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-06T12:09:09.552Z",
+      "cooldownCount": 4,
+      "errorCount": 4,
       "successCount": 0,
       "avgResponseTime": 0
     },
     "gemini_4": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 0,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-06T12:09:09.696Z",
+      "cooldownCount": 4,
+      "errorCount": 4,
       "successCount": 0,
       "avgResponseTime": 0
     },
     "gemini_5": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 0,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-06T12:04:09.806Z",
+      "cooldownCount": 3,
+      "errorCount": 3,
       "successCount": 0,
       "avgResponseTime": 0
     },
@@ -91,13 +92,13 @@
       "avgResponseTime": 0
     },
     "serper_1": {
-      "usageToday": 0,
+      "usageToday": 2,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 0,
-      "avgResponseTime": 0
+      "successCount": 2,
+      "avgResponseTime": 687
     },
     "serper_2": {
       "usageToday": 0,
@@ -136,5 +137,7 @@
       "avgResponseTime": 0
     }
   },
-  "monthlyUsage": {}
+  "monthlyUsage": {
+    "serper_2026-04": 2
+  }
 }

@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="600" height="180" viewBox="0 0 600 180"
+     role="img" aria-label="Email Signature">
+  <title>Email Signature</title>
+
+  <defs>
+    <!-- Gradients de base pour toutes les variations -->
+    <linearGradient id="grad-bg-a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0f0f"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="grad-bg-b" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#e8e8ff" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="grad-shimmer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#6366f1" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="grad-halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="grad-sep-flow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#6366f1" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#e8e8ff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#e8e8ff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="va-logo-glow"><feGaussianBlur stdDeviation="0.376" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<radialGradient id="va-fond-atm" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.0216"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0"/></radialGradient>
+<filter id="va-cta-shadow"><feDropShadow dx="0" dy="0.524" stdDeviation="1.048" flood-color="#6366f1" flood-opacity="0.131"/></filter>
+<filter id="vb-logo-f3d"><feDropShadow dx="1.5" dy="0" stdDeviation="3" flood-color="#6366f1" flood-opacity="0.16000000000000003"/></filter>
+<linearGradient id="vb-nom-scan" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#6366f1" stop-opacity="0"/>
+          <stop offset="48%"  stop-color="#6366f1" stop-opacity="0"/>
+          <stop offset="50%"  stop-color="#b3b6ff" stop-opacity="0.2"/>
+          <stop offset="52%"  stop-color="#6366f1" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="0 -2" to="0 2" dur="8.0s" repeatCount="indefinite"/>
+        </linearGradient>
+<linearGradient id="vb-sep-flow" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#6366f1" stop-opacity="0"/>
+          <stop offset="30%"  stop-color="#6366f1" stop-opacity="0.315"/>
+          <stop offset="50%"  stop-color="#8b8eff" stop-opacity="0.315"/>
+          <stop offset="70%"  stop-color="#6366f1" stop-opacity="0.315"/>
+          <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="0 -1" to="0 1" dur="3.0s" repeatCount="indefinite"/>
+        </linearGradient>
+<filter id="vb-cta-shadow"><feDropShadow dx="0" dy="0.7" stdDeviation="1.4" flood-color="#6366f1" flood-opacity="0.175"/></filter>
+<radialGradient id="vc-logo-halo-g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.20400000000000001"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0"/></radialGradient>
+<linearGradient id="vc-nom-shimmer" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#6366f1" stop-opacity="0"/>
+          <stop offset="40%"  stop-color="#9fa2ff" stop-opacity="0.1953"/>
+          <stop offset="60%"  stop-color="#b3b6ff" stop-opacity="0.217"/>
+          <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="-2 0" to="2 0" dur="6.0s" repeatCount="indefinite"/>
+        </linearGradient>
+<filter id="vc-cta-shadow"><feDropShadow dx="0" dy="0.594" stdDeviation="1.188" flood-color="#6366f1" flood-opacity="0.1485"/></filter>
+<filter id="vd-logo-f3d"><feDropShadow dx="2" dy="0" stdDeviation="4" flood-color="#6366f1" flood-opacity="0.192"/></filter>
+<filter id="vd-nom-neon"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="vd-cta-shadow"><feDropShadow dx="0" dy="0.84" stdDeviation="1.68" flood-color="#6366f1" flood-opacity="0.21"/></filter>
+
+    <style>
+      /* =============================================
+         EFFECTFORGE AI — Living Email Signature SVG
+         Cycle: 240s total | 4 Variations | Pure CSS
+         No JavaScript | Email-compatible
+         ============================================= */
+
+      /* Timing custom properties */
+      :root {
+        --cycle: 240s;
+        --fade-dur: 2s;
+      }
+
+      /* Smooth cross-fade transitions between variations */
+      .var-layer-enter {
+        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .var-layer-exit {
+        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+/* === VARIATION A: Stable et Rassurant — Zone System === */
+@keyframes va-logo-breathe {
+          0%,100% { transform: scale(1,1); filter: url(#va-logo-glow); }
+          50%      { transform: scale(1.011,1.008); filter: url(#va-logo-glow); }
+        }
+@keyframes va-nom-breathe {
+          0%,100% { opacity: 1; }
+          50%      { opacity: 0.98875; }
+        }
+@keyframes va-titre-slide {
+          0%   { transform: translateX(-12px); opacity: 0; }
+          100% { transform: translateX(0);     opacity: 1; }
+        }
+@keyframes va-contact-icon {
+          0%,100% { transform: scale(1);    opacity: 0.7; }
+          50%      { transform: scale(1.0168); opacity: 1; }
+        }
+@keyframes va-sep-calm {
+          0%,100% { opacity: 0.09000000000000001; transform: scaleX(1); }
+          50%      { opacity: 0.225;     transform: scaleX(1.1125); }
+        }
+@keyframes va-fond-atm {
+          0%,100% { transform: scale(0.85); opacity: 0.0324; }
+          50%      { transform: scale(1.1);  opacity: 0.054; }
+        }
+@keyframes va-cta-pulse {
+          0%,100% { transform: scale(1);         filter: url(#va-cta-shadow); }
+          50%      { transform: scale(1.00786); filter: url(#va-cta-shadow); }
+        }
+/* === VARIATION B: Précis et Dynamique — Zone System === */
+@keyframes vb-logo-float {
+          0%,100% { transform: perspective(600px) rotateY(-3deg) translateZ(0); filter: url(#vb-logo-f3d); }
+          50%      { transform: perspective(600px) rotateY(3deg) translateZ(5px); filter: url(#vb-logo-f3d); }
+        }
+@keyframes vb-titre-slide {
+          0%   { transform: translateX(-12px); opacity: 0; }
+          100% { transform: translateX(0);     opacity: 1; }
+        }
+@keyframes vb-fond-star {
+          0%   { transform: translate(0,0); }
+          100% { transform: translate(1px,1px); }
+        }
+@keyframes vb-cta-pulse {
+          0%,100% { transform: scale(1);         filter: url(#vb-cta-shadow); }
+          50%      { transform: scale(1.0105); filter: url(#vb-cta-shadow); }
+        }
+/* === VARIATION C: Profond et Atmosphérique — Zone System === */
+@keyframes vc-logo-halo {
+          0%,100% { r: 51.02; opacity: 0.1275; }
+          50%      { r: 60.04; opacity: 0.255; }
+        }
+@keyframes vc-titre-slide {
+          0%   { transform: translateX(-12px); opacity: 0; }
+          100% { transform: translateX(0);     opacity: 1; }
+        }
+@keyframes vc-sep-particle {
+          0%   { transform: translateY(0);      opacity: 0; }
+          10%  { opacity: 0.297; }
+          90%  { opacity: 0.297; }
+          100% { transform: translateY(148px); opacity: 0; }
+        }
+@keyframes vc-fond-star {
+          0%   { transform: translate(0,0); }
+          100% { transform: translate(1px,0px); }
+        }
+@keyframes vc-cta-pulse {
+          0%,100% { transform: scale(1);         filter: url(#vc-cta-shadow); }
+          50%      { transform: scale(1.00891); filter: url(#vc-cta-shadow); }
+        }
+/* === VARIATION D: Puissant et Mémorable — Zone System === */
+@keyframes vd-logo-float {
+          0%,100% { transform: perspective(600px) rotateY(-4deg) translateZ(0); filter: url(#vd-logo-f3d); }
+          50%      { transform: perspective(600px) rotateY(4deg) translateZ(6px); filter: url(#vd-logo-f3d); }
+        }
+@keyframes vd-nom-neon {
+          0%,100% { filter: drop-shadow(0 0 2px #6366f1) drop-shadow(0 0 5px #6366f1); }
+          50%      { filter: drop-shadow(0 0 4px #6366f1) drop-shadow(0 0 10px #6366f1); }
+        }
+@keyframes vd-titre-slide {
+          0%   { transform: translateX(-12px); opacity: 0; }
+          100% { transform: translateX(0);     opacity: 1; }
+        }
+@keyframes vd-contact-icon {
+          0%,100% { transform: scale(1);    opacity: 0.7; }
+          50%      { transform: scale(1.027); opacity: 1; }
+        }
+@keyframes vd-sep-particle {
+          0%   { transform: translateY(0);      opacity: 0; }
+          10%  { opacity: 0.42; }
+          90%  { opacity: 0.42; }
+          100% { transform: translateY(148px); opacity: 0; }
+        }
+@keyframes vd-fond-star {
+          0%   { transform: translate(0,0); }
+          100% { transform: translate(1px,1px); }
+        }
+@keyframes vd-cta-pulse {
+          0%,100% { transform: scale(1);         filter: url(#vd-cta-shadow); }
+          50%      { transform: scale(1.0126); filter: url(#vd-cta-shadow); }
+        }
+
+      /* Variation layer visibility orchestration */
+      #layer-var-a, #layer-var-b, #layer-var-c, #layer-var-d {
+        opacity: 0;
+      }
+
+      /* === TIMING ORCHESTRATION (240s cycle) === */
+
+      /* VAR A: appears at 0s, fades at 8s, gone by 10s */
+      #layer-var-a {
+        animation: layer-fade-a 240s ease-in-out 0s infinite;
+      }
+      /* VAR B: appears at 60s, fades at 70s */
+      #layer-var-b {
+        animation: layer-fade-b 240s ease-in-out 0s infinite;
+      }
+      /* VAR C: appears at 120s, fades at 130s */
+      #layer-var-c {
+        animation: layer-fade-c 240s ease-in-out 0s infinite;
+      }
+      /* VAR D: appears at 180s, fades at 190s */
+      #layer-var-d {
+        animation: layer-fade-d 240s ease-in-out 0s infinite;
+      }
+
+      @keyframes layer-fade-a {
+        0%       { opacity: 0; }
+        0.5%     { opacity: 0; }
+        2%       { opacity: 1; }
+        22%      { opacity: 1; }
+        24%      { opacity: 0; }
+        100%     { opacity: 0; }
+      }
+
+      @keyframes layer-fade-b {
+        0%       { opacity: 0; }
+        24%      { opacity: 0; }
+        25.5%    { opacity: 1; }
+        48%      { opacity: 1; }
+        49.5%    { opacity: 0; }
+        100%     { opacity: 0; }
+      }
+
+      @keyframes layer-fade-c {
+        0%       { opacity: 0; }
+        49.5%    { opacity: 0; }
+        51%      { opacity: 1; }
+        73%      { opacity: 1; }
+        74.5%    { opacity: 0; }
+        100%     { opacity: 0; }
+      }
+
+      @keyframes layer-fade-d {
+        0%       { opacity: 0; }
+        74.5%    { opacity: 0; }
+        76%      { opacity: 1; }
+        98%      { opacity: 1; }
+        99.5%    { opacity: 0; }
+        100%     { opacity: 0; }
+      }
+
+      /* Internal variation animations timing */
+      /* VAR A internal elements */
+      #var-a, #var-a-particles > *, #var-a-halo, #var-a-shimmer, #var-a-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+      /* VAR B internal elements */
+      #var-b, #var-b-wave1, #var-b-wave2, #var-b-logo-glow, #var-b-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+      /* VAR C internal elements */
+      #var-c, #var-c-particles > *, #var-c-ring, #var-c-shimmer, #var-c-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+      /* VAR D internal elements */
+      #var-d, #var-d-outer, #var-d-inner, #var-d-cta, #var-d-sep, #var-d-logo {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+      /* Micro-variation on repetitions: subtle scale + hue shift */
+      #layer-var-a { animation-timing-function: ease-in-out; }
+      #layer-var-b { animation-timing-function: ease-in-out; }
+      #layer-var-c { animation-timing-function: ease-in-out; }
+      #layer-var-d { animation-timing-function: ease-in-out; }
+
+      /* Base layer always on top */
+      #layer-base {
+        opacity: 1;
+      }
+
+      /* Static background always visible */
+      #bg-base {
+        opacity: 1;
+      }
+
+    </style>
+  </defs>
+
+  <!-- ===== LAYER 0: Static Background ===== -->
+  <rect id="bg-root" x="0" y="0" width="600" height="180" fill="#0f0f0f" rx="12"/>
+
+  <!-- ===== LAYER 2: Variation A — Breathing Particles ===== -->
+  <g id="layer-var-a">
+    <g id="var-a"><circle id="va-logo-halo" cx="76" cy="76" r="55.128" fill="#6366f1" fill-opacity="0.02256" style="animation:va-logo-breathe 6.0s cubic-bezier(.4,0,.2,1) 0s infinite; transform-origin:76px 76px;"/>
+<rect x="195" y="28" width="220" height="28" fill="#6366f1" fill-opacity="0.0045" rx="2" style="animation:va-nom-breathe 10.0s ease-in-out 0s infinite;"/>
+<rect x="195" y="56" width="180" height="16" fill="#6366f1" fill-opacity="0.00368" rx="2" style="animation:va-titre-slide 0.8s ease-out 0s 1 both;"/>
+<circle cx="193" cy="83"  r="5" fill="#6366f1" fill-opacity="0.044800000000000006" style="animation:va-contact-icon 4.0s ease-in-out 0s infinite; transform-origin:193px 83px;"/>
+          <circle cx="193" cy="99"  r="5" fill="#6366f1" fill-opacity="0.044800000000000006" style="animation:va-contact-icon 4.0s ease-in-out 1s infinite; transform-origin:193px 99px;"/>
+          <circle cx="193" cy="115" r="5" fill="#6366f1" fill-opacity="0.044800000000000006" style="animation:va-contact-icon 4.0s ease-in-out 2s infinite; transform-origin:193px 115px;"/>
+<rect x="172" y="16" width="2" height="148" fill="#6366f1" fill-opacity="1" rx="1" style="animation:va-sep-calm 8.0s ease-in-out 0s infinite; transform-origin:173px 90px;"/>
+<ellipse cx="300" cy="90" rx="240" ry="81" fill="url(#va-fond-atm)" style="animation:va-fond-atm 16.0s ease-in-out 0s infinite; transform-origin:300px 90px;"/>
+<rect x="406" y="110" width="160" height="28" rx="14" fill="#6366f1" fill-opacity="0.0524" style="animation:va-cta-pulse 3.0s ease-in-out 0s infinite; transform-origin:486px 124px;"/></g>
+  </g>
+
+  <!-- ===== LAYER 3: Variation B — Chromatic Wave ===== -->
+  <g id="layer-var-b">
+    <g id="var-b"><ellipse id="vb-logo-shadow" cx="76" cy="152" rx="16" ry="2.4000000000000004" fill="#6366f1" fill-opacity="0.12" style="animation:vb-logo-float 8.0s ease-in-out 0s infinite;"/>
+<rect x="195" y="28" width="220" height="28" fill="url(#vb-nom-scan)" rx="2"/>
+<rect x="195" y="56" width="180" height="16" fill="#6366f1" fill-opacity="0.00608" rx="2" style="animation:vb-titre-slide 0.8s ease-out 0s 1 both;"/>
+<rect x="172" y="16" width="3" height="148" fill="url(#vb-sep-flow)" rx="1.5"/>
+<g id="vb-fond-stars"><circle cx="426" cy="128" r="1.6" fill="#6366f1" fill-opacity="0.06388632710681122" style="animation:vb-fond-star 30.0s linear 21.3s infinite;"/><circle cx="137" cy="129" r="1.2" fill="#6366f1" fill-opacity="0.08768414311358355" style="animation:vb-fond-star 30.0s linear 10.2s infinite;"/><circle cx="407" cy="97" r="1.9" fill="#6366f1" fill-opacity="0.018007253880500684" style="animation:vb-fond-star 30.0s linear 4.0s infinite;"/><circle cx="85" cy="3" r="1.8" fill="#6366f1" fill-opacity="0.08775422286465072" style="animation:vb-fond-star 30.0s linear 11.8s infinite;"/><circle cx="455" cy="15" r="0.5" fill="#6366f1" fill-opacity="0.0681528031754533" style="animation:vb-fond-star 30.0s linear 6.9s infinite;"/><circle cx="88" cy="2" r="1.5" fill="#6366f1" fill-opacity="0.07605162096674122" style="animation:vb-fond-star 30.0s linear 20.2s infinite;"/><circle cx="382" cy="138" r="0.7" fill="#6366f1" fill-opacity="0.07793884691017411" style="animation:vb-fond-star 30.0s linear 10.3s infinite;"/><circle cx="226" cy="48" r="1.1" fill="#6366f1" fill-opacity="0.05242196104363756" style="animation:vb-fond-star 30.0s linear 6.8s infinite;"/><circle cx="210" cy="3" r="1.3" fill="#6366f1" fill-opacity="0.01663671758091368" style="animation:vb-fond-star 30.0s linear 13.3s infinite;"/><circle cx="376" cy="4" r="1.9" fill="#6366f1" fill-opacity="0.07100019956717006" style="animation:vb-fond-star 30.0s linear 9.8s infinite;"/><circle cx="160" cy="97" r="1.6" fill="#6366f1" fill-opacity="0.00881410436690203" style="animation:vb-fond-star 30.0s linear 20.5s infinite;"/><circle cx="227" cy="129" r="1.0" fill="#6366f1" fill-opacity="0.024373799608547415" style="animation:vb-fond-star 30.0s linear 12.6s infinite;"/><circle cx="29" cy="7" r="0.8" fill="#6366f1" fill-opacity="0.060333143976831705" style="animation:vb-fond-star 30.0s linear 3.9s infinite;"/><circle cx="500" cy="156" r="1.7" fill="#6366f1" fill-opacity="0.006620125383378763" style="animation:vb-fond-star 30.0s linear 15.2s infinite;"/><circle cx="371" cy="117" r="1.5" fill="#6366f1" fill-opacity="0.07905614140512625" style="animation:vb-fond-star 30.0s linear 26.8s infinite;"/><circle cx="568" cy="31" r="1.0" fill="#6366f1" fill-opacity="0.08701500144121838" style="animation:vb-fond-star 30.0s linear 25.6s infinite;"/><circle cx="81" cy="85" r="0.7" fill="#6366f1" fill-opacity="0.002257308398911846" style="animation:vb-fond-star 30.0s linear 25.4s infinite;"/><circle cx="277" cy="139" r="1.6" fill="#6366f1" fill-opacity="0.011477905491419733" style="animation:vb-fond-star 30.0s linear 3.2s infinite;"/><circle cx="567" cy="113" r="1.9" fill="#6366f1" fill-opacity="0.06948869665711527" style="animation:vb-fond-star 30.0s linear 29.5s infinite;"/><circle cx="569" cy="30" r="1.2" fill="#6366f1" fill-opacity="0.04072565486494568" style="animation:vb-fond-star 30.0s linear 10.3s infinite;"/><circle cx="334" cy="79" r="1.0" fill="#6366f1" fill-opacity="0.050074682450394904" style="animation:vb-fond-star 30.0s linear 11.4s infinite;"/><circle cx="500" cy="166" r="1.8" fill="#6366f1" fill-opacity="0.04382163863651186" style="animation:vb-fond-star 30.0s linear 22.1s infinite;"/><circle cx="357" cy="143" r="1.2" fill="#6366f1" fill-opacity="0.07163624234650343" style="animation:vb-fond-star 30.0s linear 26.8s infinite;"/><circle cx="268" cy="164" r="0.7" fill="#6366f1" fill-opacity="0.01947419403852109" style="animation:vb-fond-star 30.0s linear 1.7s infinite;"/><circle cx="458" cy="24" r="1.4" fill="#6366f1" fill-opacity="0.04342491200426593" style="animation:vb-fond-star 30.0s linear 5.5s infinite;"/><circle cx="35" cy="134" r="1.1" fill="#6366f1" fill-opacity="0.05260543164255068" style="animation:vb-fond-star 30.0s linear 8.1s infinite;"/><circle cx="485" cy="70" r="0.9" fill="#6366f1" fill-opacity="0.06833556405275885" style="animation:vb-fond-star 30.0s linear 8.8s infinite;"/><circle cx="550" cy="4" r="1.8" fill="#6366f1" fill-opacity="0.005209477082130433" style="animation:vb-fond-star 30.0s linear 13.6s infinite;"/></g>
+<rect x="406" y="110" width="160" height="28" rx="14" fill="#6366f1" fill-opacity="0.06999999999999999" style="animation:vb-cta-pulse 3.0s ease-in-out 0s infinite; transform-origin:486px 124px;"/></g>
+  </g>
+
+  <!-- ===== LAYER 4: Variation C — Generative Noise ===== -->
+  <g id="layer-var-c">
+    <g id="var-c"><circle id="vc-logo-halopulse" cx="76" cy="76" r="50" fill="url(#vc-logo-halo-g)" style="animation:vc-logo-halo 0.8s ease-in-out 0s infinite;"/>
+<rect x="195" y="28" width="220" height="28" fill="url(#vc-nom-shimmer)" rx="2"/>
+<rect x="195" y="56" width="180" height="16" fill="#6366f1" fill-opacity="0.005200000000000001" rx="2" style="animation:vc-titre-slide 0.8s ease-out 0s 1 both;"/>
+<rect x="172" y="16" width="3" height="148" fill="#6366f1" fill-opacity="0.07425" rx="1.5"/>
+          
+        <circle cx="173.5" cy="16" r="1.5" fill="#6366f1" fill-opacity="0.2376" style="animation:vc-sep-particle 4.0s linear 0s infinite;"/>
+        <circle cx="173.5" cy="16" r="1.8" fill="#6366f1" fill-opacity="0.2376" style="animation:vc-sep-particle 4.0s linear 1s infinite;"/>
+        <circle cx="173.5" cy="16" r="2.1" fill="#6366f1" fill-opacity="0.2376" style="animation:vc-sep-particle 4.0s linear 2s infinite;"/>
+        <circle cx="173.5" cy="16" r="2.4" fill="#6366f1" fill-opacity="0.2376" style="animation:vc-sep-particle 4.0s linear 3s infinite;"/>
+<g id="vc-fond-stars"><circle cx="426" cy="128" r="1.6" fill="#6366f1" fill-opacity="0.05465830208027182" style="animation:vc-fond-star 30.0s linear 21.3s infinite;"/><circle cx="137" cy="129" r="1.2" fill="#6366f1" fill-opacity="0.07501865577495483" style="animation:vc-fond-star 30.0s linear 10.2s infinite;"/><circle cx="407" cy="97" r="1.9" fill="#6366f1" fill-opacity="0.015406206097761697" style="animation:vc-fond-star 30.0s linear 4.0s infinite;"/><circle cx="85" cy="3" r="1.8" fill="#6366f1" fill-opacity="0.07507861289531229" style="animation:vc-fond-star 30.0s linear 11.8s infinite;"/><circle cx="455" cy="15" r="0.5" fill="#6366f1" fill-opacity="0.058308509383443376" style="animation:vc-fond-star 30.0s linear 6.9s infinite;"/><circle cx="88" cy="2" r="1.5" fill="#6366f1" fill-opacity="0.06506638682710081" style="animation:vc-fond-star 30.0s linear 20.2s infinite;"/><circle cx="382" cy="138" r="0.7" fill="#6366f1" fill-opacity="0.0666810134675934" style="animation:vc-fond-star 30.0s linear 10.3s infinite;"/><circle cx="226" cy="48" r="1.1" fill="#6366f1" fill-opacity="0.04484990000400103" style="animation:vc-fond-star 30.0s linear 6.8s infinite;"/><circle cx="210" cy="3" r="1.3" fill="#6366f1" fill-opacity="0.014233636152559483" style="animation:vc-fond-star 30.0s linear 13.3s infinite;"/><circle cx="376" cy="4" r="1.9" fill="#6366f1" fill-opacity="0.060744615185245494" style="animation:vc-fond-star 30.0s linear 9.8s infinite;"/><circle cx="160" cy="97" r="1.6" fill="#6366f1" fill-opacity="0.007540955958349514" style="animation:vc-fond-star 30.0s linear 20.5s infinite;"/><circle cx="227" cy="129" r="1.0" fill="#6366f1" fill-opacity="0.020853139665090566" style="animation:vc-fond-star 30.0s linear 12.6s infinite;"/><circle cx="29" cy="7" r="0.8" fill="#6366f1" fill-opacity="0.05161835651351157" style="animation:vc-fond-star 30.0s linear 3.9s infinite;"/><circle cx="500" cy="156" r="1.7" fill="#6366f1" fill-opacity="0.005663885050224053" style="animation:vc-fond-star 30.0s linear 15.2s infinite;"/><circle cx="371" cy="117" r="1.5" fill="#6366f1" fill-opacity="0.06763692097994135" style="animation:vc-fond-star 30.0s linear 26.8s infinite;"/><circle cx="568" cy="31" r="1.0" fill="#6366f1" fill-opacity="0.07444616789970905" style="animation:vc-fond-star 30.0s linear 25.6s infinite;"/><circle cx="81" cy="85" r="0.7" fill="#6366f1" fill-opacity="0.0019312527412912459" style="animation:vc-fond-star 30.0s linear 25.4s infinite;"/><circle cx="277" cy="139" r="1.6" fill="#6366f1" fill-opacity="0.009819985809325771" style="animation:vc-fond-star 30.0s linear 3.2s infinite;"/><circle cx="567" cy="113" r="1.9" fill="#6366f1" fill-opacity="0.05945144047330973" style="animation:vc-fond-star 30.0s linear 29.5s infinite;"/><circle cx="569" cy="30" r="1.2" fill="#6366f1" fill-opacity="0.03484306027334241" style="animation:vc-fond-star 30.0s linear 10.3s infinite;"/><circle cx="334" cy="79" r="1.0" fill="#6366f1" fill-opacity="0.04284167276311564" style="animation:vc-fond-star 30.0s linear 11.4s infinite;"/><circle cx="500" cy="166" r="1.8" fill="#6366f1" fill-opacity="0.037491846389015704" style="animation:vc-fond-star 30.0s linear 22.1s infinite;"/><circle cx="357" cy="143" r="1.2" fill="#6366f1" fill-opacity="0.06128878511867515" style="animation:vc-fond-star 30.0s linear 26.8s infinite;"/><circle cx="268" cy="164" r="0.7" fill="#6366f1" fill-opacity="0.016661254899623598" style="animation:vc-fond-star 30.0s linear 1.7s infinite;"/><circle cx="458" cy="24" r="1.4" fill="#6366f1" fill-opacity="0.03715242471476085" style="animation:vc-fond-star 30.0s linear 5.5s infinite;"/><circle cx="35" cy="134" r="1.1" fill="#6366f1" fill-opacity="0.04500686929418225" style="animation:vc-fond-star 30.0s linear 8.1s infinite;"/><circle cx="485" cy="70" r="0.9" fill="#6366f1" fill-opacity="0.05846487146736035" style="animation:vc-fond-star 30.0s linear 8.8s infinite;"/><circle cx="550" cy="4" r="1.8" fill="#6366f1" fill-opacity="0.004456997059156038" style="animation:vc-fond-star 30.0s linear 13.6s infinite;"/></g>
+<rect x="406" y="110" width="160" height="28" rx="14" fill="#6366f1" fill-opacity="0.0594" style="animation:vc-cta-pulse 3.0s ease-in-out 0s infinite; transform-origin:486px 124px;"/></g>
+  </g>
+
+  <!-- ===== LAYER 5: Variation D — Luminous Respiration ===== -->
+  <g id="layer-var-d">
+    <g id="var-d"><ellipse id="vd-logo-shadow" cx="76" cy="152" rx="19.2" ry="2.88" fill="#6366f1" fill-opacity="0.144" style="animation:vd-logo-float 8.0s ease-in-out 0s infinite;"/>
+<rect x="195" y="28" width="220" height="28" fill="none" rx="2" style="animation:vd-nom-neon 4.0s ease-in-out 0s infinite;"/>
+<rect x="195" y="56" width="180" height="16" fill="#6366f1" fill-opacity="0.00736" rx="2" style="animation:vd-titre-slide 0.8s ease-out 0s 1 both;"/>
+<circle cx="193" cy="83"  r="5" fill="#6366f1" fill-opacity="0.072" style="animation:vd-contact-icon 4.0s ease-in-out 0s infinite; transform-origin:193px 83px;"/>
+          <circle cx="193" cy="99"  r="5" fill="#6366f1" fill-opacity="0.072" style="animation:vd-contact-icon 4.0s ease-in-out 1s infinite; transform-origin:193px 99px;"/>
+          <circle cx="193" cy="115" r="5" fill="#6366f1" fill-opacity="0.072" style="animation:vd-contact-icon 4.0s ease-in-out 2s infinite; transform-origin:193px 115px;"/>
+<rect x="172" y="16" width="3" height="148" fill="#6366f1" fill-opacity="0.105" rx="1.5"/>
+          
+        <circle cx="173.5" cy="16" r="1.5" fill="#6366f1" fill-opacity="0.336" style="animation:vd-sep-particle 4.0s linear 0s infinite;"/>
+        <circle cx="173.5" cy="16" r="1.8" fill="#6366f1" fill-opacity="0.336" style="animation:vd-sep-particle 4.0s linear 1s infinite;"/>
+        <circle cx="173.5" cy="16" r="2.1" fill="#6366f1" fill-opacity="0.336" style="animation:vd-sep-particle 4.0s linear 2s infinite;"/>
+        <circle cx="173.5" cy="16" r="2.4" fill="#6366f1" fill-opacity="0.336" style="animation:vd-sep-particle 4.0s linear 3s infinite;"/>
+<g id="vd-fond-stars"><circle cx="426" cy="128" r="1.6" fill="#6366f1" fill-opacity="0.07666359252817347" style="animation:vd-fond-star 30.0s linear 21.3s infinite;"/><circle cx="137" cy="129" r="1.2" fill="#6366f1" fill-opacity="0.10522097173630027" style="animation:vd-fond-star 30.0s linear 10.2s infinite;"/><circle cx="407" cy="97" r="1.9" fill="#6366f1" fill-opacity="0.021608704656600822" style="animation:vd-fond-star 30.0s linear 4.0s infinite;"/><circle cx="85" cy="3" r="1.8" fill="#6366f1" fill-opacity="0.10530506743758088" style="animation:vd-fond-star 30.0s linear 11.8s infinite;"/><circle cx="455" cy="15" r="0.5" fill="#6366f1" fill-opacity="0.08178336381054396" style="animation:vd-fond-star 30.0s linear 6.9s infinite;"/><circle cx="88" cy="2" r="1.5" fill="#6366f1" fill-opacity="0.09126194516008945" style="animation:vd-fond-star 30.0s linear 20.2s infinite;"/><circle cx="382" cy="138" r="0.7" fill="#6366f1" fill-opacity="0.09352661629220893" style="animation:vd-fond-star 30.0s linear 10.3s infinite;"/><circle cx="226" cy="48" r="1.1" fill="#6366f1" fill-opacity="0.06290635325236509" style="animation:vd-fond-star 30.0s linear 6.8s infinite;"/><circle cx="210" cy="3" r="1.3" fill="#6366f1" fill-opacity="0.01996406109709642" style="animation:vd-fond-star 30.0s linear 13.3s infinite;"/><circle cx="376" cy="4" r="1.9" fill="#6366f1" fill-opacity="0.08520023948060407" style="animation:vd-fond-star 30.0s linear 9.8s infinite;"/><circle cx="160" cy="97" r="1.6" fill="#6366f1" fill-opacity="0.010576925240282435" style="animation:vd-fond-star 30.0s linear 20.5s infinite;"/><circle cx="227" cy="129" r="1.0" fill="#6366f1" fill-opacity="0.029248559530256898" style="animation:vd-fond-star 30.0s linear 12.6s infinite;"/><circle cx="29" cy="7" r="0.8" fill="#6366f1" fill-opacity="0.07239977277219804" style="animation:vd-fond-star 30.0s linear 3.9s infinite;"/><circle cx="500" cy="156" r="1.7" fill="#6366f1" fill-opacity="0.007944150460054516" style="animation:vd-fond-star 30.0s linear 15.2s infinite;"/><circle cx="371" cy="117" r="1.5" fill="#6366f1" fill-opacity="0.0948673696861515" style="animation:vd-fond-star 30.0s linear 26.8s infinite;"/><circle cx="568" cy="31" r="1.0" fill="#6366f1" fill-opacity="0.10441800172946204" style="animation:vd-fond-star 30.0s linear 25.6s infinite;"/><circle cx="81" cy="85" r="0.7" fill="#6366f1" fill-opacity="0.002708770078694215" style="animation:vd-fond-star 30.0s linear 25.4s infinite;"/><circle cx="277" cy="139" r="1.6" fill="#6366f1" fill-opacity="0.01377348658970368" style="animation:vd-fond-star 30.0s linear 3.2s infinite;"/><circle cx="567" cy="113" r="1.9" fill="#6366f1" fill-opacity="0.08338643598853833" style="animation:vd-fond-star 30.0s linear 29.5s infinite;"/><circle cx="569" cy="30" r="1.2" fill="#6366f1" fill-opacity="0.04887078583793482" style="animation:vd-fond-star 30.0s linear 10.3s infinite;"/><circle cx="334" cy="79" r="1.0" fill="#6366f1" fill-opacity="0.060089618940473884" style="animation:vd-fond-star 30.0s linear 11.4s infinite;"/><circle cx="500" cy="166" r="1.8" fill="#6366f1" fill-opacity="0.052585966363814234" style="animation:vd-fond-star 30.0s linear 22.1s infinite;"/><circle cx="357" cy="143" r="1.2" fill="#6366f1" fill-opacity="0.08596349081580411" style="animation:vd-fond-star 30.0s linear 26.8s infinite;"/><circle cx="268" cy="164" r="0.7" fill="#6366f1" fill-opacity="0.02336903284622531" style="animation:vd-fond-star 30.0s linear 1.7s infinite;"/><circle cx="458" cy="24" r="1.4" fill="#6366f1" fill-opacity="0.05210989440511912" style="animation:vd-fond-star 30.0s linear 5.5s infinite;"/><circle cx="35" cy="134" r="1.1" fill="#6366f1" fill-opacity="0.06312651797106082" style="animation:vd-fond-star 30.0s linear 8.1s infinite;"/><circle cx="485" cy="70" r="0.9" fill="#6366f1" fill-opacity="0.08200267686331063" style="animation:vd-fond-star 30.0s linear 8.8s infinite;"/><circle cx="550" cy="4" r="1.8" fill="#6366f1" fill-opacity="0.0062513724985565206" style="animation:vd-fond-star 30.0s linear 13.6s infinite;"/></g>
+<rect x="406" y="110" width="160" height="28" rx="14" fill="#6366f1" fill-opacity="0.084" style="animation:vd-cta-pulse 3.0s ease-in-out 0s infinite; transform-origin:486px 124px;"/></g>
+  </g>
+
+  <!-- ===== LAYER 1: Static Base — Always Visible ===== -->
+  <g id="layer-base">
+    <g id="base-static">
+  <!-- Background base -->
+  <rect id="bg-base" x="0" y="0" width="600" height="180" fill="#0f0f0f" rx="12"/>
+
+  <!-- Left column: photo + logo -->
+  <g id="left-col" transform="translate(16, 16)">
+    <circle cx="60" cy="60" r="52" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="2" id="photo-ring"/>
+  <text x="60" y="67" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#ffffff">JM</text>
+    <rect x="10" y="122" width="120" height="26" rx="4" fill="#6366f1" fill-opacity="0.15" id="logo-bg"/>
+  <text x="70" y="139" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#6366f1" letter-spacing="1" id="company-logo-text">ARTI-PRO PLO</text>
+  </g>
+
+  <!-- Separator vertical -->
+  <g id="separator-v" transform="translate(170, 16)">
+    <defs>
+    <linearGradient id="sep-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.1"/>
+      <stop offset="30%" stop-color="#6366f1" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="rgb(139,142,255)" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="rgb(139,142,255)" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <rect id="sep-bar" x="0" y="0" width="2" height="148" fill="url(#sep-grad)" rx="1"/>
+  </g>
+
+  <!-- Right column: info -->
+  <g id="right-col" transform="translate(186, 20)">
+    <!-- Name -->
+    <text id="sig-name" x="0" y="22" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" fill="#ffffff" letter-spacing="0.5">Jean Martin</text>
+
+    <!-- Title -->
+    <text id="sig-titre" x="0" y="40" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" fill="#6366f1" letter-spacing="1.5" text-transform="uppercase">PLOMBIER PARIS</text>
+
+    <!-- Company -->
+    <text id="sig-company" x="0" y="56" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.65)">Arti-Pro Plombier</text>
+
+    <!-- Separator horizontal thin -->
+    <line x1="0" y1="64" x2="380" y2="64" stroke="#6366f1" stroke-width="1" stroke-opacity="0.4"/>
+
+    <!-- Contact info -->
+    <g id="contact-block" transform="translate(0, 72)">
+      <text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">✉  <tspan fill="#ffffff">artisan.artsrenov@gmail.com</tspan></text>
+      <text x="0" y="15" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">✆  <tspan fill="#ffffff">01 40 50 26 26</tspan></text>
+      <text x="0" y="30" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">⊕  <tspan fill="#6366f1">artipro-plomberie.fr/</tspan></text>
+    </g>
+
+    <!-- Social icons -->
+    <g id="social-icons" transform="translate(0, 120)">
+      
+    </g>
+
+    <!-- CTA -->
+    <g id="cta-block" transform="translate(220, 110)">
+      <rect x="0" y="0" width="115" height="28" rx="14" fill="#6366f1" id="cta-btn"/>
+    <text x="57.5" y="18" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#ffffff" letter-spacing="0.5">DEVIS GRATUIT</text>
+    </g>
+  </g>
+</g>
+  </g>
+
+</svg>
