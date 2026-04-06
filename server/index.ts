@@ -4,6 +4,7 @@ import { registerRoutes } from "./routes";
 import { DependencyChecker } from "./utils/dependency-checker";
 import { errorDetection } from './modules/error-detection.module';
 import { loadPremiumEffects } from './utils/premium-effects-loader';
+import { cleanOldExports } from './services/exports-cleaner';
 
 const app = express();
 app.use(express.json());
@@ -179,7 +180,11 @@ app.use((req, res, next) => {
       });
     }).catch(() => {});
 
-    // Chargement des effets premium après démarrage
+    // Nettoyage automatique exports > 7 jours au démarrage
+    cleanOldExports(7).catch(err =>
+      console.warn('⚠️ Nettoyage exports au démarrage échoué:', err.message)
+    );
+
     console.log('📦 Chargement des effets premium...');
     loadPremiumEffects().then(result => {
       if (result.loaded > 0) {

@@ -1,0 +1,48 @@
+Voici le plan complet jusqu'à la perfection du module output, phase par phase :
+
+Phase 2 — Robustesse du pipeline (4 corrections)
+2.1 — Validation SVG à l'entrée (delivery-engine.ts)
+Problème : un SVG vide, null ou malformé passe dans tout le pipeline — sharp plante, les PDFs sont générés avec rien à l'intérieur, le ZIP est assemblé inutilement.
+Solution : garde-fou au tout début de runDeliveryEngine — vérification que le SVG contient bien la balise <svg, une longueur minimale de 100 caractères, et un viewBox ou des dimensions. Si invalide → erreur immédiate avec message clair avant même l'étape 1.
+
+2.2 — Timeout par étape (delivery-engine.ts)
+Problème : si Cerebras, sharp ou archiver se bloque (réseau, deadlock, ressource), le pipeline entier est suspendu indéfiniment — aucun timeout côté serveur.
+Solution : wrapper withTimeout(promise, ms, label) appliqué à chaque étape. Délais calibrés : PNG 30s, Cerebras 45s, PDFs 60s, ZIP 30s, email 20s. Si timeout → l'étape passe en error avec message "Délai dépassé" mais le pipeline continue si l'étape est non-bloquante (preview, email), ou throw si critique (PNG, ZIP).
+
+2.3 — PNG fallback intelligent (package-builder.ts)
+Problème : quand sharp échoue sur un SVG animé complexe, le fallback est un rectangle noir de 1200×360 — aucune information utile pour l'utilisateur Outlook qui reçoit ça à la place de sa signature.
+Solution : si sharp échoue, générer un PNG de remplacement avec les données texte réelles (nom, titre, entreprise, email, palette d'accent) via sharp en mode create + dessin de texte en svg simple sans animation. L'utilisateur Outlook voit au minimum son nom et son titre dans les bonnes couleurs.
+
+2.4 — Compression ZIP niveau 6 + manifest.json (zip-assembler.ts)
+Problème : compression niveau 9 = CPU maximal pour un gain marginal. Pas de manifest dans le ZIP → impossible de vérifier programmatiquement le contenu de l'archive.
+Solution : passer à zlib: { level: 6 }. Ajouter un fichier manifest.json dans le ZIP avec la liste des fichiers, leurs tailles, la date de génération, le signatureId et les métadonnées client.
+
+Phase 3 — Qualité premium (4 améliorations)
+3.1 — PDF avec miniature SVG (pdf-generator.ts)
+Problème : le paramètre svgContent est reçu dans generateInstructionsPdf mais n'est jamais utilisé. Le PDF ne montre nulle part à quoi ressemble la signature.
+Solution : ajouter une section "Aperçu de votre signature" dans le PDF — on encode le SVG en base64 data URI et on l'embed comme image dans le PDF via doc.image(). Avec une mention "rendu approximatif — voir le fichier SVG pour l'animation complète".
+
+3.2 — Boutons "Copier le code" dans la preview (preview-page-generator.ts)
+Problème : pour installer dans Gmail, l'utilisateur doit télécharger le .html, l'ouvrir, tout sélectionner, copier. C'est 4 étapes alors que ça pourrait être 1 clic.
+Solution : ajouter un bouton "📋 Copier le code HTML" dans chaque carte d'installation. Le contenu du fichier est encodé en base64 dans un attribut data-code, un script lit et copie via navigator.clipboard. Feedback visuel "Copié !" pendant 2 secondes.
+
+3.3 — Open Graph + meta tags dans la preview (preview-page-generator.ts)
+Problème : si la preview est partagée sur LinkedIn, WhatsApp ou par email, elle s'affiche sans aperçu, sans titre, sans description — juste une URL brute.
+Solution : ajout des balises og:title, og:description, og:image (pointant vers le PNG fallback), og:url, twitter:card. Titre personnalisé avec nom et entreprise.
+
+3.4 — Métriques timing dans DeliveryResult (delivery-engine.ts)
+Problème : DeliveryResult retourne les steps avec leur statut mais sans timing — impossible de savoir quelle étape prend du temps, impossible d'optimiser.
+Solution : ajouter duration_ms et started_at dans DeliveryStatus. Mesure Date.now() avant/après chaque étape. Le résultat final inclut aussi total_duration_ms. Ces métriques alimenteront plus tard le dashboard System Matrix.
+
+Phase 4 — TTL et nettoyage automatique (1 système)
+4.1 — Nettoyage automatique du dossier exports (delivery-engine.ts + nouveau exports-cleaner.ts)
+Problème : chaque génération crée ~12 fichiers dans exports/. Sans nettoyage, le disque se remplit indéfiniment — en production c'est critique.
+Solution : service exports-cleaner.ts avec une fonction cleanOldExports(maxAgeDays: number) qui supprime tous les fichiers dont la date de modification dépasse X jours. Appelé automatiquement au démarrage du serveur (nettoyage des fichiers > 7 jours) et après chaque livraison réussie en background (sans bloquer la réponse). Log du nombre de fichiers supprimés et de l'espace libéré.
+
+Récapitulatif des phases
+Phase	Bugs/Améliorations	Impact
+✅ Phase 1	4 bugs critiques corrigés	Pipeline ne crash plus, PDF complet, ZIP fiable, XSS éliminé
+🔵 Phase 2	4 corrections robustesse	Pipeline blindé : validation entrée, timeouts, PNG utile, ZIP optimisé
+🔵 Phase 3	4 améliorations qualité	PDF avec aperçu, copie 1 clic, partage social, métriques timing
+🔵 Phase 4	1 système nettoyage	Disque propre, production stable
+Total : 13 interventions sur 7 fichiers pour porter le module au même niveau que le reste du système.

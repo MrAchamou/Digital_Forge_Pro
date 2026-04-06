@@ -1,4 +1,5 @@
 import PDFDocument from 'pdfkit';
+import sharp from 'sharp';
 import { log } from '../vite';
 import type { InstructionsContent } from './cerebras-content-generator';
 
@@ -10,6 +11,10 @@ const FOOTER_H = 45;
 const HEADER_H = 80;
 const SAFE_BOTTOM = PAGE_H - FOOTER_H - 20;
 
+// Largeur et hauteur de l'aperçu SVG dans le PDF (ratio 10:3)
+const PREVIEW_W = CONTENT_W;
+const PREVIEW_H = Math.round(PREVIEW_W * 0.3);
+
 export async function generateInstructionsPdf(
   instructions: InstructionsContent,
   clientName: string,
@@ -18,6 +23,18 @@ export async function generateInstructionsPdf(
   svgContent: string,
   palette: string[]
 ): Promise<Buffer> {
+  // ── Pré-conversion SVG → PNG pour l'aperçu dans le PDF ──
+  let svgPreviewBuffer: Buffer | null = null;
+  try {
+    svgPreviewBuffer = await sharp(Buffer.from(svgContent))
+      .resize(Math.round(PREVIEW_W * 2), Math.round(PREVIEW_H * 2)) // 2× pour la densité
+      .png({ quality: 90 })
+      .toBuffer();
+  } catch (err) {
+    log(`Aperçu SVG non disponible dans le PDF (non bloquant): ${err}`, 'pdf-generator');
+    svgPreviewBuffer = null;
+  }
+
   return new Promise((resolve, reject) => {
     const [bg, accent] = palette.length >= 3 ? palette : ['#0f0f0f', '#6366f1', '#e8e8ff'];
     const accentRgb = hexToRgb(accent) || [99, 102, 241];
@@ -122,6 +139,39 @@ export async function generateInstructionsPdf(
        .lineWidth(1).strokeColor(accentToColor(accentRgb)).stroke();
     y += 14;
 
+    // ── APERÇU DE LA SIGNATURE ──────────────────────────────────────────────
+    if (svgPreviewBuffer) {
+      const previewBlockH = PREVIEW_H + 50;
+      ensureSpace(previewBlockH);
+
+      // Encadré titre section
+      doc.fillColor(accentToColor(accentRgb, 0.12))
+         .rect(MARGIN, y, CONTENT_W, 22).fill();
+      doc.fillColor(accentToColor(accentRgb))
+         .fontSize(9).font('Helvetica-Bold')
+         .text('APERÇU DE VOTRE SIGNATURE', MARGIN + 8, y + 6);
+      y += 28;
+
+      // Image PNG de la signature
+      try {
+        doc.image(svgPreviewBuffer, MARGIN, y, { width: PREVIEW_W, height: PREVIEW_H });
+        y += PREVIEW_H + 6;
+      } catch {
+        // Si l'embed image échoue on passe silencieusement
+      }
+
+      // Mention sous l'aperçu
+      doc.fillColor(lightColor(0.3))
+         .fontSize(8).font('Helvetica-Oblique')
+         .text('Rendu approximatif — voir le fichier SVG pour l\'animation complète', MARGIN, y);
+      y += 22;
+
+      // Ligne séparatrice
+      doc.moveTo(MARGIN, y).lineTo(PAGE_W - MARGIN, y)
+         .lineWidth(0.5).strokeColor(lightColor(0.15)).stroke();
+      y += 16;
+    }
+
     // Intro
     const introH = doc.heightOfString(instructions.intro, { width: CONTENT_W });
     ensureSpace(introH + 20);
@@ -187,7 +237,7 @@ export async function generateInstructionsPdf(
     }
 
     doc.end();
-    log(`PDF genere (${pageNum} page(s)): ${instructions.titre}`, 'pdf-generator');
+    log(`PDF généré (${pageNum} page(s)): ${instructions.titre}${svgPreviewBuffer ? ' [avec aperçu]' : ''}`, 'pdf-generator');
   });
 }
 

@@ -21,8 +21,14 @@ export async function generatePreviewPage(params: {
   pageContent: PreviewPageContent;
   baseUrl: string;
   outputDir: string;
+  gmailHtml?: string;
+  outlookHtml?: string;
 }): Promise<string> {
-  const { signatureId, svgContent, metadata, scenario, pageContent, baseUrl, outputDir } = params;
+  const {
+    signatureId, svgContent, metadata, scenario,
+    pageContent, baseUrl, outputDir,
+    gmailHtml = '', outlookHtml = '',
+  } = params;
   const { nom = 'Client', entreprise = 'Entreprise', palette = [] } = metadata;
   const [bg, accent] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
 
@@ -41,22 +47,46 @@ export async function generatePreviewPage(params: {
     </div>`;
   }).join('');
 
-  const previewUrl = `${baseUrl}/api/signature/preview/${signatureId}`;
-  const downloadUrl = `${baseUrl}/api/signature/download/${signatureId}`;
-  const gmailFileUrl = `${baseUrl}/api/signature/export-file/${signatureId}/gmail`;
+  const previewUrl   = `${baseUrl}/api/signature/preview/${signatureId}`;
+  const downloadUrl  = `${baseUrl}/api/signature/download/${signatureId}`;
+  const gmailFileUrl  = `${baseUrl}/api/signature/export-file/${signatureId}/gmail`;
   const outlookFileUrl = `${baseUrl}/api/signature/export-file/${signatureId}/outlook`;
-  const appleFileUrl = `${baseUrl}/api/signature/export-file/${signatureId}/svg`;
-  const gmailPdfUrl = `${baseUrl}/api/signature/export-file/${signatureId}/pdf-gmail`;
+  const appleFileUrl  = `${baseUrl}/api/signature/export-file/${signatureId}/svg`;
+  const gmailPdfUrl   = `${baseUrl}/api/signature/export-file/${signatureId}/pdf-gmail`;
   const outlookPdfUrl = `${baseUrl}/api/signature/export-file/${signatureId}/pdf-outlook`;
-  const applePdfUrl = `${baseUrl}/api/signature/export-file/${signatureId}/pdf-apple`;
+  const applePdfUrl   = `${baseUrl}/api/signature/export-file/${signatureId}/pdf-apple`;
+  const pngUrl        = `${baseUrl}/api/signature/export-file/${signatureId}/png`;
+
+  // ── Encodage base64 des fichiers pour copie 1-clic ──
+  const gmailCodeB64    = Buffer.from(gmailHtml || '',   'utf-8').toString('base64');
+  const outlookCodeB64  = Buffer.from(outlookHtml || '', 'utf-8').toString('base64');
+  const svgCodeB64      = Buffer.from(svgContent || '',  'utf-8').toString('base64');
+
+  const ogTitle       = `Signature ${esc(nom)} — ${esc(entreprise)}`;
+  const ogDescription = `${esc(pageContent.description || 'Signature email animée générée par EffectForge AI')}`;
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${pageContent.titre_page}</title>
-<meta name="description" content="${pageContent.description}">
+<title>${esc(pageContent.titre_page)}</title>
+<meta name="description" content="${ogDescription}">
+
+<!-- Open Graph -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="${ogTitle} | EffectForge AI">
+<meta property="og:description" content="${ogDescription}">
+<meta property="og:image"       content="${pngUrl}">
+<meta property="og:url"         content="${previewUrl}">
+<meta property="og:site_name"   content="EffectForge AI">
+
+<!-- Twitter Card -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="${ogTitle} | EffectForge AI">
+<meta name="twitter:description" content="${ogDescription}">
+<meta name="twitter:image"       content="${pngUrl}">
+
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -244,9 +274,36 @@ export async function generatePreviewPage(params: {
     margin-top: 4px;
     transition: all 0.2s ease;
     text-decoration: none;
+    cursor: pointer;
   }
   .install-card:hover .install-btn {
     background: ${accent}44;
+  }
+  /* ── BOUTON COPIER CODE ── */
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(232,232,255,0.55);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+  }
+  .copy-btn:hover {
+    border-color: ${accent}55;
+    color: var(--accent);
+    background: ${accent}11;
+  }
+  .copy-btn.copied {
+    border-color: #22c55e88;
+    color: #22c55e;
+    background: #22c55e11;
   }
   /* ── TÉLÉCHARGEMENT ── */
   .download-zone {
@@ -347,24 +404,40 @@ export async function generatePreviewPage(params: {
   <div class="section-title">Installation</div>
   <div class="section-headline">Choisissez votre client email</div>
   <div class="install-grid">
+
+    <!-- Gmail -->
     <div class="install-card">
       <div class="install-icon">📧</div>
       <div class="install-name">Gmail</div>
       <a href="${gmailFileUrl}" class="install-btn" download data-testid="btn-install-gmail">${pageContent.texte_bouton_gmail}</a>
       <a href="${gmailPdfUrl}" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-gmail"
+        data-code="${gmailCodeB64}"
+        onclick="copyCode(this)">📋 Copier le code HTML</button>
     </div>
+
+    <!-- Outlook -->
     <div class="install-card">
       <div class="install-icon">🖥️</div>
       <div class="install-name">Outlook</div>
       <a href="${outlookFileUrl}" class="install-btn" download data-testid="btn-install-outlook">${pageContent.texte_bouton_outlook}</a>
       <a href="${outlookPdfUrl}" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-outlook"
+        data-code="${outlookCodeB64}"
+        onclick="copyCode(this)">📋 Copier le code HTML</button>
     </div>
+
+    <!-- Apple Mail -->
     <div class="install-card">
       <div class="install-icon">🍎</div>
       <div class="install-name">Apple Mail</div>
       <a href="${appleFileUrl}" class="install-btn" download data-testid="btn-install-apple">${pageContent.texte_bouton_apple}</a>
       <a href="${applePdfUrl}" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-apple"
+        data-code="${svgCodeB64}"
+        onclick="copyCode(this)">📋 Copier le SVG</button>
     </div>
+
   </div>
 </section>
 
@@ -374,7 +447,7 @@ export async function generatePreviewPage(params: {
     <span>⬇</span> ${pageContent.texte_bouton_download}
   </a>
   <p style="margin-top:16px;font-size:13px;color:rgba(232,232,255,0.4);">
-    Package ZIP complet · SVG · PNG · Outlook · Gmail · 3 guides PDF
+    Package ZIP complet · SVG · PNG · Outlook · Gmail · 3 guides PDF · manifest.json
   </p>
 </div>
 
@@ -385,7 +458,7 @@ export async function generatePreviewPage(params: {
 </footer>
 
 <script>
-  // Cycle counter
+  // ── Cycle counter ──
   (function() {
     const variants = ['A', 'B', 'C', 'D'];
     const cycleTotal = ${metadata.cycle_total || 240};
@@ -402,6 +475,44 @@ export async function generatePreviewPage(params: {
       el.textContent = 'CYCLE ' + variants[varIdx] + ' · ' + m + ':' + s;
     }, 1000);
   })();
+
+  // ── Copie 1-clic ──
+  function copyCode(btn) {
+    const b64 = btn.getAttribute('data-code');
+    if (!b64) return;
+    let decoded;
+    try {
+      decoded = decodeURIComponent(escape(atob(b64)));
+    } catch(e) {
+      decoded = atob(b64);
+    }
+    navigator.clipboard.writeText(decoded).then(function() {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✅ Copié !';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(function() {
+      // Fallback pour les navigateurs sans clipboard API
+      const ta = document.createElement('textarea');
+      ta.value = decoded;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✅ Copié !';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
 </script>
 </body>
 </html>`;
@@ -411,6 +522,6 @@ export async function generatePreviewPage(params: {
   const previewPath = path.join(previewDir, `${signatureId}.html`);
   await fs.writeFile(previewPath, html, 'utf-8');
 
-  log(`Page preview générée: ${signatureId}.html`, 'preview-page-generator');
+  log(`Page preview générée: ${signatureId}.html [OG tags + copy buttons]`, 'preview-page-generator');
   return previewPath;
 }
