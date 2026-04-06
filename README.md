@@ -208,6 +208,13 @@ npm start
 | **DynamicFusionOrchestrator** | `server/modules/dynamic-fusion-orchestrator.module.ts` | Blueprint cross-zones + matrice de compatibilité, niveaux Standard/Pro/Ultimate |
 | **ExperienceOrchestrator** | `server/modules/experience-orchestrator.module.ts` | Arc émotionnel Intro→Développement→Climax→Outro + micro-récompenses visuelles |
 
+### ✅ Priorité 4 — Optimisation technique
+| Module | Fichier | Rôle |
+|--------|---------|------|
+| **AdaptiveRenderingEngine** | `server/modules/adaptive-rendering-engine.module.ts` | 5 profils de rendu (Ultra/High/Balanced/Performance/Low) — sélection auto par secteur + variation |
+| **ContentAnalyzer** | `server/modules/content-analyzer.module.ts` | Analyse palette, densité texte, complexité visuelle — calcule les seuils dynamiques du pipeline |
+| **AnalyticsModule** | `server/modules/analytics.module.ts` | Collecte métriques de génération, rapports d'optimisation auto — endpoints `/api/analytics/report` et `/api/analytics/stats` |
+
 ---
 
 ## Structure du Projet
@@ -229,7 +236,10 @@ effectforge-ai/
 │   │   ├── visual-focus.module.ts      # P2 — Guide œil logo→CTA
 │   │   ├── effect-fusion-engine.module.ts      # P3 — Recettes hybrides
 │   │   ├── dynamic-fusion-orchestrator.module.ts # P3 — Blueprint cross-zones
-│   │   └── experience-orchestrator.module.ts   # P3 — Arc émotionnel
+│   │   ├── experience-orchestrator.module.ts   # P3 — Arc émotionnel
+│   │   ├── content-analyzer.module.ts          # P4 — Profil de contenu + seuils dynamiques
+│   │   ├── adaptive-rendering-engine.module.ts # P4 — Profils Ultra/High/Balanced/Perf/Low
+│   │   └── analytics.module.ts                 # P4 — Métriques génération + rapports auto
 │   ├── routes.ts                       # API endpoints
 │   └── index.ts                        # Serveur Express
 ├── client/src/

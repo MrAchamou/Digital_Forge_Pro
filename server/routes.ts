@@ -1367,6 +1367,31 @@ router.post('/keys/test', async (_req, res) => {
   }
 });
 
+// ─── Analytics P4 ────────────────────────────────────────────────────────────
+
+// GET /api/analytics/report — Rapport complet des métriques de génération
+router.get('/analytics/report', async (req, res) => {
+  try {
+    const { generateReport } = await import('./modules/analytics.module');
+    const days = parseInt(String(req.query.days ?? '30'), 10);
+    const report = generateReport(days);
+    return res.json(report);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/analytics/stats — Statistiques rapides pour le dashboard
+router.get('/analytics/stats', async (_req, res) => {
+  try {
+    const { getQuickStats } = await import('./modules/analytics.module');
+    const stats = getQuickStats();
+    return res.json(stats);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 export function registerRoutes(app: express.Application) {
   app.use(cors());
   app.use('/api', router);

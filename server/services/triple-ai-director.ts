@@ -17,6 +17,9 @@ import { applyVisualFocus } from '../modules/visual-focus.module';
 import { applyEffectFusion } from '../modules/effect-fusion-engine.module';
 import { orchestrateFusion } from '../modules/dynamic-fusion-orchestrator.module';
 import { orchestrateExperience } from '../modules/experience-orchestrator.module';
+import { analyzeContent, type ContentProfile } from '../modules/content-analyzer.module';
+import { applyAdaptiveRendering, selectRenderingProfile } from '../modules/adaptive-rendering-engine.module';
+import { recordGeneration } from '../modules/analytics.module';
 
 const EFFECTS_LIBRARY = [
   'HEARTBEAT', 'SOUL_AURA', 'PLASMA_DRIFT', 'NEON_PULSE', 'GOLDEN_SHIMMER',
@@ -560,6 +563,23 @@ function applyPriority2Pipeline(
 }
 
 /**
+ * ⚡ Pipeline Priorité 4 : Rendu adaptatif — dernier maillon avant le renderer SVG.
+ * Applique le profil de rendu optimal selon le ContentProfile et la variation.
+ */
+function applyPriority4Pipeline(
+  comp:      ZoneComposition,
+  variation: 'A' | 'B' | 'C' | 'D',
+  content:   ContentProfile
+): { composition: ZoneComposition; profile: string; performance: number } {
+  const result = applyAdaptiveRendering(comp, content, variation);
+  return {
+    composition:  result.composition,
+    profile:      result.profile_selected,
+    performance:  result.performance_score,
+  };
+}
+
+/**
  * 🎛️ Pipeline Priorité 3 : Fusion des effets → Orchestration → Arc d'expérience
  * Appliqué à chaque variation après le VarianceEngine.
  * Rend les effets hybrides, orchestrés et narrativement engageants.
@@ -625,6 +645,10 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
   const optimizedComps  = diversityReport.compositions;
   log(`🧬 Variance Engine — Diversité: ${(diversityReport.overall_diversity * 100).toFixed(1)}% | ${logFitnessReport(optimizedComps)} | Mutations: ${diversityReport.mutations_applied}`, 'triple-ai');
 
+  // ── ContentAnalyzer P4 : profil de contenu avant fusion ─────────────────
+  const contentProfile = analyzeContent(metadata, optimizedComps.A);
+  log(`🔬 Content Analyzer — Complexité:${(contentProfile.visual_complexity * 100).toFixed(0)}% | Profil:${contentProfile.recommended_profile} | Budget:${(contentProfile.thresholds.animation_budget * 100).toFixed(0)}%`, 'triple-ai');
+
   // ── Priorité 3 : Fusion + Orchestration + Arc d'expérience ───────────────
   const cycleMs = (metadata?.cycle_total ?? 8) * 1000;
   const p3A = applyPriority3Pipeline(optimizedComps.A, 'A', cycleMs);
@@ -632,6 +656,13 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
   const p3C = applyPriority3Pipeline(optimizedComps.C, 'C', cycleMs);
   const p3D = applyPriority3Pipeline(optimizedComps.D, 'D', cycleMs);
   log(`🎛️ P3 complet — Fusion+Orchestration+Expérience appliquées sur A/B/C/D`, 'triple-ai');
+
+  // ── Priorité 4 : Rendu adaptatif — calibration finale par profil ─────────
+  const r4A = applyPriority4Pipeline(p3A, 'A', contentProfile);
+  const r4B = applyPriority4Pipeline(p3B, 'B', contentProfile);
+  const r4C = applyPriority4Pipeline(p3C, 'C', contentProfile);
+  const r4D = applyPriority4Pipeline(p3D, 'D', contentProfile);
+  log(`⚡ P4 Adaptive Rendering — Profils: A:${r4A.profile} | B:${r4B.profile} | C:${r4C.profile} | D:${r4D.profile}`, 'triple-ai');
 
   const baseConfig = buildFallbackTechnical(scenario, palette);
 
@@ -647,9 +678,17 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
       'Effect Fusion Engine — Recettes hybrides cross-effets',
       'Dynamic Fusion Orchestrator — Blueprint cross-zones Standard/Pro/Ultimate',
       'Experience Orchestrator — Arc émotionnel Intro→Climax→Outro',
+      `Content Analyzer — Profil:${contentProfile.recommended_profile} | Budget animation:${(contentProfile.thresholds.animation_budget * 100).toFixed(0)}%`,
+      `Adaptive Rendering — Profils A:${r4A.profile} B:${r4B.profile} C:${r4C.profile} D:${r4D.profile}`,
     ],
-    notes_techniques: `Zone+Variance+P3-Fusion+Orchestration+Experience | Secteur:${secteur} | A:${p3A.logo.effet_id} B:${p3B.logo.effet_id} C:${p3C.logo.effet_id} D:${p3D.logo.effet_id}`,
-    zone_compositions: { A: p3A, B: p3B, C: p3C, D: p3D },
+    notes_techniques: `P1+P2+P3+P4 | Secteur:${secteur} | A:${r4A.composition.logo.effet_id}(${r4A.profile}) B:${r4B.composition.logo.effet_id}(${r4B.profile}) C:${r4C.composition.logo.effet_id}(${r4C.profile}) D:${r4D.composition.logo.effet_id}(${r4D.profile})`,
+    zone_compositions: { A: r4A.composition, B: r4B.composition, C: r4C.composition, D: r4D.composition },
+    _analytics_data: {
+      rendering_profiles: { A: r4A.profile, B: r4B.profile, C: r4C.profile, D: r4D.profile },
+      diversity_score:    diversityReport.overall_diversity,
+      content_profile:    contentProfile,
+      performance_scores: { A: r4A.performance, B: r4B.performance, C: r4C.performance, D: r4D.performance },
+    },
   };
 }
 
@@ -663,6 +702,7 @@ export async function runTripleAIPipeline(
   configuration_technique: TechnicalConfig;
   status_pipeline: string;
 }> {
+  const pipelineStart = Date.now();
   log('=== Démarrage pipeline 3 cerveaux IA ===', 'triple-ai');
   log(`Entreprise: ${metadata?.entreprise || 'Inconnue'} | Secteur: ${metadata?.secteur || 'Inconnu'}`, 'triple-ai');
 
@@ -682,6 +722,41 @@ export async function runTripleAIPipeline(
   onProgress?.(3, { status: 'done', data: config });
 
   log('=== Pipeline 3 cerveaux complète ===', 'triple-ai');
+
+  // ── Analytics : enregistrement de la génération ───────────────────────────
+  const pipelineDuration = Date.now() - pipelineStart;
+  const analyticsData = (config as any)._analytics_data ?? {};
+  try {
+    const zoneComps = config.zone_compositions ?? {};
+    const makeVariantMetrics = (vk: 'A' | 'B' | 'C' | 'D') => {
+      const comp = (zoneComps as any)[vk];
+      const zones = ['logo', 'nom', 'titre', 'contact', 'separateur', 'fond', 'cta'];
+      const totalLayers = zones.reduce((s: number, z: string) => s + ((comp?.[z]?.layers?.length ?? 0)), 0);
+      const avgIntensity = zones.reduce((s: number, z: string) => s + ((comp?.[z]?.intensity ?? 0.5)), 0) / zones.length;
+      return {
+        key: vk, logo_effect: comp?.logo?.effet_id ?? '', cta_effect: comp?.cta?.effet_id ?? '',
+        layer_count: totalLayers, avg_intensity: avgIntensity, profile: analyticsData.rendering_profiles?.[vk] ?? 'balanced',
+      };
+    };
+    recordGeneration({
+      secteur:     metadata?.secteur ?? 'unknown',
+      entreprise:  metadata?.entreprise ?? 'unknown',
+      duration_ms: pipelineDuration,
+      variations:  { A: makeVariantMetrics('A'), B: makeVariantMetrics('B'), C: makeVariantMetrics('C'), D: makeVariantMetrics('D') },
+      pipeline_scores: {
+        diversity:    analyticsData.diversity_score ?? 0,
+        fusion:       0.7,
+        engagement:   0.7,
+        performance:  Object.values(analyticsData.performance_scores ?? {}).reduce((s: number, v) => s + (v as number), 0) / 4,
+        content:      analyticsData.content_profile?.content_richness ?? 0,
+      },
+      rendering_profiles:  analyticsData.rendering_profiles ?? {},
+      optimisations_count: config.optimisations_email?.length ?? 0,
+      status: 'success',
+    });
+  } catch (_err) {
+    // Analytics non bloquant — ne doit jamais interrompre la génération
+  }
 
   return {
     brief_creatif: brief,
