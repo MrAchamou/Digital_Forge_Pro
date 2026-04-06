@@ -1,0 +1,171 @@
+Tu vas étendre le système EffectForge AI existant pour y intégrer 
+une pipeline complète de génération de signatures email vivantes 
+en SVG autonome. Tu dois utiliser au maximum les fonctions et 
+modules déjà en place dans le projet et compléter uniquement 
+ce qui manque.
+
+---
+
+OBJECTIF FINAL :
+Transformer un JSON de données client en un fichier SVG autonome 
+de signature email "vivante" — sans serveur externe, sans 
+JavaScript dans le livrable, compatible avec tous les clients 
+mail (Gmail, Outlook, Apple Mail).
+
+---
+
+INPUT DE LA PIPELINE :
+Un JSON structuré avec deux blocs :
+
+{
+  "signature": {
+    "nom": "string",
+    "titre": "string", 
+    "entreprise": "string",
+    "email": "string",
+    "telephone": "string",
+    "site": "string",
+    "reseaux": ["linkedin", "instagram", "twitter"],
+    "cta": "string",
+    "logo_url": "string",
+    "photo_url": "string"
+  },
+  "style": {
+    "palette": ["#hex1", "#hex2", "#hex3"],
+    "ambiance": "string descriptif naturel",
+    "intensite": "low | medium | high",
+    "secteur": "string"
+  }
+}
+
+---
+
+OUTPUT FINAL :
+Un fichier SVG autonome unique avec :
+- La signature statique premium en couche de base 
+  (nom, titre, entreprise, contact, logo, réseaux, CTA)
+- 4 variations d'effets visuels (A, B, C, D) en CSS 
+  animations natives SVG
+- Des transitions fluides entre variations qui camouflent 
+  les coutures visuellement
+- Un cycle total de 240 secondes avant répétition exacte
+- Zéro JavaScript dans le SVG final
+- Zéro dépendance serveur
+- Compatible email (dimensions max 600px largeur)
+
+---
+
+PIPELINE À CONSTRUIRE EN 3 ÉTAPES :
+
+ÉTAPE 1 — SIGNATURE BASE STATIQUE PREMIUM
+Créer un nouveau module server/generator/signature-base-generator.ts
+Ce module reçoit le bloc "signature" du JSON input et génère 
+le SVG de base structuré avec :
+- Layout en colonnes (photo/logo gauche, infos droite)
+- Typographie hiérarchisée (nom grand, titre moyen, infos petit)
+- Palette de couleurs issue du bloc "style"
+- Icônes réseaux sociaux SVG natifs (pas d'images externes)
+- Bouton CTA cliquable
+- Séparateur designé
+- Dimensions : 600px largeur, hauteur auto
+
+ÉTAPE 2 — GÉNÉRATION DES 4 VARIATIONS D'EFFETS
+Utiliser le système de génération existant d'EffectForge 
+(le Particles System Generator, le Morphing Effects Generator, 
+le Lighting Effects Generator et le template engine avancé) 
+pour générer 4 variations d'effets visuels cohérentes 
+avec l'ambiance et la palette reçues.
+
+Chaque variation doit produire des effets sur :
+- Le fond (particules subtiles, ondulation chromatique, 
+  bruit génératif, respiration)
+- Le logo (pulsation, halo lumineux, micro-rotation)
+- Le texte (légère vibration, shimmer, opacité variable)
+- Le séparateur (flux animé, progression)
+
+Les 4 variations doivent partager le même ADN visuel 
+mais être perceptuellement différentes.
+
+Créer le module server/generator/signature-variations-generator.ts
+qui orchestre les générateurs existants pour produire 
+ces 4 variations au format CSS animations SVG compatibles.
+
+ÉTAPE 3 — FUSION ET EXPORT SVG AUTONOME
+Créer le module server/generator/signature-svg-exporter.ts
+qui fusionne :
+- Le SVG base statique (étape 1)
+- Les 4 variations CSS (étape 2)
+- Les transitions entre variations (durée 2s chacune, 
+  camouflage des coutures par easing et opacity)
+- Les keyframes CSS avec timing décalé pour créer 
+  l'illusion de non-répétition sur 240 secondes
+
+Structure des couches dans le SVG final :
+- Couche 0 : fond avec animations
+- Couche 1 : base statique premium (toujours visible)
+- Couche 2 : effets variation A (0s→8s, fade out 8s→10s)
+- Couche 3 : effets variation B (8s→16s, fade out 16s→18s)
+- Couche 4 : effets variation C (16s→24s, fade out 24s→26s)
+- Couche 5 : effets variation D (24s→32s, fade out 32s→34s)
+- Puis micro-variations sur les répétitions suivantes 
+  (scale, hue-rotate, opacity légèrement différents)
+
+---
+
+NOUVEL ENDPOINT API À CRÉER :
+Ajouter dans server/routes.ts :
+
+POST /api/signature/generate
+Body : le JSON input décrit ci-dessus
+Response : 
+{
+  "svg_content": "string SVG complet",
+  "filename": "signature-[nom]-[timestamp].svg",
+  "metadata": {
+    "cycle_total": 240,
+    "variations_count": 4,
+    "dimensions": "600px x auto",
+    "compatible_clients": ["gmail", "outlook", "apple_mail"]
+  }
+}
+
+---
+
+INTERFACE UTILISATEUR :
+Ajouter un nouvel onglet "Signature Vivante" dans le frontend 
+existant avec :
+- Formulaire de saisie des données client (tous les champs 
+  du JSON input)
+- Sélecteur de palette couleurs
+- Sélecteur d'ambiance (liste de descriptions prédéfinies 
+  + champ libre)
+- Sélecteur d'intensité (low / medium / high)
+- Bouton "Générer la Signature"
+- Prévisualisation du SVG en temps réel
+- Bouton de téléchargement du fichier SVG final
+
+---
+
+CONTRAINTES IMPORTANTES :
+- Ne pas modifier les modules existants, seulement les étendre
+- Utiliser les générateurs existants (Particles, Lighting, 
+  Morphing, Template Engine) comme briques de base
+- Le SVG final ne doit contenir aucun script JavaScript
+- Toutes les animations doivent être en CSS natif SVG 
+  (keyframes, animation, transform)
+- Les icônes réseaux sociaux doivent être en SVG path 
+  natif (pas d'images externes ni de fonts icons)
+- Compatibilité email : pas de filters CSS complexes, 
+  pas de clip-path complexe, pas de foreignObject
+- Tester le SVG généré dans Gmail et Outlook avant 
+  de valider
+
+---
+
+ORDRE D'EXÉCUTION :
+1. Créer signature-base-generator.ts
+2. Créer signature-variations-generator.ts  
+3. Créer signature-svg-exporter.ts
+4. Ajouter l'endpoint POST /api/signature/generate
+5. Ajouter l'onglet frontend "Signature Vivante"
+6. Tester la pipeline complète avec un JSON exemple

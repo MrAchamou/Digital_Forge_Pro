@@ -39,3 +39,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Run"
+
+[agent]
+expertMode = true

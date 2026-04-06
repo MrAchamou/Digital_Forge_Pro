@@ -8,13 +8,15 @@ import {
   Eye, 
   BarChart3,
   Settings,
-  Brain
+  Brain,
+  Mail
 } from "lucide-react";
 
 const navItems = [
   { path: "/", label: "Command Center", icon: Home, shortLabel: "Home" },
   { path: "/generator", label: "God Generator", icon: Wand2, shortLabel: "Gen" },
   { path: "/library", label: "Neural Library", icon: Database, shortLabel: "Lib" },
+  { path: "/signature", label: "Signature Vivante", icon: Mail, shortLabel: "Sign" },
   { path: "/expansion", label: "AI Expansion", icon: Brain, shortLabel: "AI" },
   { path: "/preview", label: "Reality Preview", icon: Eye, shortLabel: "View" },
   { path: "/status", label: "System Matrix", icon: BarChart3, shortLabel: "Stats" },

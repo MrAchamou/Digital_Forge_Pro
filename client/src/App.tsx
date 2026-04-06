@@ -13,6 +13,7 @@ import Dashboard from "@/pages/dashboard";
 import Generator from "@/pages/generator";
 import Library from "@/pages/library";
 import Modules from "@/pages/modules";
+import Signature from "@/pages/signature";
 import Navigation from "@/components/ui/navigation";
 import ParticleBackground from "@/components/ui/particle-background";
 import { useEffect } from "react";
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/status" component={Status} />
       <Route path="/modules" component={Modules} />
       <Route path="/expansion" element={<Expansion />} />
+      <Route path="/signature" component={Signature} />
       <Route component={NotFound} />
     </Switch>
   );
