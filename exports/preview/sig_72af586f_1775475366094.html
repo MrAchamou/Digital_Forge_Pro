@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signature Premium | Jean Dupont - Arti-Pro Plombier</title>
+<meta name="description" content="Une signature email nouvelle génération qui capte l'attention et reflète l'excellence de vos services. Jean Dupont, démarquez-vous à chaque envoi.">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f0f;
+    --accent: #6366f1;
+    --text: #e8e8ff;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Arial', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 20px 60px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse at center, #6366f122 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid #6366f144;
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin-bottom: 24px;
+    animation: fadeInDown 0.6s ease;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.8s ease;
+  }
+  .hero p {
+    font-size: 16px;
+    color: rgba(232,232,255,0.6);
+    max-width: 500px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+    animation: fadeInUp 1s ease;
+  }
+  /* ── MOCK GMAIL ── */
+  .gmail-mock {
+    max-width: 700px;
+    margin: 0 auto 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    animation: scaleIn 1.2s ease;
+  }
+  .gmail-header {
+    background: #202124;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #333;
+  }
+  .gmail-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .gmail-label {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #9aa0a6;
+    margin-left: auto;
+  }
+  .gmail-body {
+    background: #1a1a2e;
+    padding: 24px 28px;
+  }
+  .gmail-from { font-family: Arial; font-size: 13px; color: #fff; margin-bottom: 4px; }
+  .gmail-subject { font-family: Arial; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .gmail-message { font-family: Arial; font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 24px; }
+  .gmail-sig-zone {
+    border-top: 1px solid #333;
+    padding-top: 20px;
+  }
+  .cycle-counter {
+    font-family: monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    text-align: right;
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+  /* ── SECTION VARIATIONS ── */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 20px;
+  }
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .section-headline {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+  .variations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .variation-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .variation-card:hover {
+    border-color: #6366f155;
+    transform: translateY(-4px);
+  }
+  .variation-label {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-family: 'Georgia', serif;
+  }
+  .variation-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .variation-subtitle { font-size: 11px; color: rgba(232,232,255,0.4); margin-bottom: 8px; }
+  .variation-intention { font-size: 11px; color: rgba(232,232,255,0.6); line-height: 1.5; margin-bottom: 8px; }
+  .variation-emotion { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  /* ── BOUTONS INSTALLATION ── */
+  .install-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .install-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .install-card:hover {
+    border-color: #6366f166;
+    background: #6366f111;
+    transform: translateY(-4px);
+  }
+  .install-icon { font-size: 32px; }
+  .install-name { font-size: 14px; font-weight: 600; }
+  .install-btn {
+    display: inline-block;
+    background: #6366f122;
+    border: 1px solid #6366f155;
+    color: var(--accent);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    margin-top: 4px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .install-card:hover .install-btn {
+    background: #6366f144;
+  }
+  /* ── TÉLÉCHARGEMENT ── */
+  .download-zone {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #6366f108, transparent);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin: 0;
+  }
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #6366f1, #6366f1bb);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 30px #6366f144;
+  }
+  .download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px #6366f166;
+  }
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 13px;
+    color: rgba(232,232,255,0.3);
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 40px 16px 40px; }
+    .install-grid { grid-template-columns: 1fr; }
+    .variations-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="badge">EffectForge AI — God Tier Signature</div>
+  <h1>Votre signature vivante est prête à impressionner</h1>
+  <p>Une signature email nouvelle génération qui capte l'attention et reflète l'excellence de vos services. Jean Dupont, démarquez-vous à chaque envoi.</p>
+
+  <!-- Mock Gmail -->
+  <div class="gmail-mock">
+    <div class="gmail-header">
+      <div class="gmail-dot" style="background:#ff5f57"></div>
+      <div class="gmail-dot" style="background:#ffbd2e"></div>
+      <div class="gmail-dot" style="background:#28ca41"></div>
+      <div class="gmail-label">Gmail — Boîte de réception</div>
+    </div>
+    <div class="gmail-body">
+      <div class="gmail-from">De : Jean Dupont &lt;contact@artipro-plomberie.fr&gt;</div>
+      <div class="gmail-subject">Objet : Présentation de notre collaboration</div>
+      <div class="gmail-message">Bonjour,<br><br>Merci pour notre échange. Je reste disponible pour toute question.<br><br>Cordialement,</div>
+      <div class="gmail-sig-zone">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="600" height="200" viewBox="0 0 600 200"
+  style="font-family:system-ui,-apple-system,sans-serif;background:#0f0f0f">
+
+  <defs>
+    <style>
+      /* === ANIMATIONS GOD TIER === */
+      @keyframes pulse_logo {
+        0%,100%{opacity:0.85;transform:scale(1)}
+        50%{opacity:1;transform:scale(1.04)}
+      }
+      @keyframes sep_glow_a {
+        0%,100%{stroke:#6366f1;stroke-width:2;filter:drop-shadow(0 0 4px #6366f1)}
+        50%{stroke:#6366f1;stroke-width:3;filter:drop-shadow(0 0 10px #6366f1)}
+      }
+      @keyframes sep_glow_b {
+        0%,100%{stroke:#6366f1;stroke-width:2;filter:drop-shadow(0 0 4px #6366f1)}
+        50%{stroke:#6366f1;stroke-width:3;filter:drop-shadow(0 0 10px #6366f1)}
+      }
+      @keyframes sep_glow_c {
+        0%,100%{stroke:#6366f1;stroke-width:2;filter:drop-shadow(0 0 4px #6366f1)}
+        50%{stroke:#6366f1;stroke-width:3;filter:drop-shadow(0 0 10px #6366f1)}
+      }
+      @keyframes sep_glow_d {
+        0%,100%{stroke:#6366f1;stroke-width:2;filter:drop-shadow(0 0 4px #6366f1)}
+        50%{stroke:#6366f1;stroke-width:3;filter:drop-shadow(0 0 10px #6366f1)}
+      }
+      @keyframes text_shimmer {
+        0%,100%{opacity:0.9}
+        50%{opacity:1}
+      }
+      @keyframes bg_cycle_a {
+        0%{opacity:1} 25.0%{opacity:1} 25.8%{opacity:0} 99.2%{opacity:0} 100%{opacity:1}
+      }
+      @keyframes bg_cycle_b {
+        0%{opacity:0} 24.2%{opacity:0} 25.0%{opacity:1} 50.0%{opacity:1} 50.8%{opacity:0} 100%{opacity:0}
+      }
+      @keyframes bg_cycle_c {
+        0%{opacity:0} 49.2%{opacity:0} 50.0%{opacity:1} 75.0%{opacity:1} 75.8%{opacity:0} 100%{opacity:0}
+      }
+      @keyframes bg_cycle_d {
+        0%{opacity:0} 74.2%{opacity:0} 75.0%{opacity:1} 99.2%{opacity:1} 100%{opacity:0}
+      }
+
+      .layer-a { animation: bg_cycle_a 248s linear infinite; }
+      .layer-b { animation: bg_cycle_b 248s linear infinite; }
+      .layer-c { animation: bg_cycle_c 248s linear infinite; }
+      .layer-d { animation: bg_cycle_d 248s linear infinite; }
+      .logo-pulse { animation: pulse_logo 4s ease-in-out infinite; transform-origin: center; }
+      .text-shimmer { animation: text_shimmer 6s ease-in-out infinite; }
+    </style>
+
+    <radialGradient id="aura_a" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura_b" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura_c" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura_d" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bg_gradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f0f0f"/>
+      <stop offset="100%" stop-color="#0f0f0fdd"/>
+    </linearGradient>
+    <clipPath id="avatar_clip">
+      <circle cx="70" cy="100" r="55"/>
+    </clipPath>
+  </defs>
+
+  <!-- Fond principal -->
+  <rect width="600" height="200" fill="url(#bg_gradient)"/>
+
+  <!-- Auras des variations -->
+  <g class="layer-a"><ellipse cx="70" cy="100" rx="80" ry="80" fill="url(#aura_a)" opacity="0.4"/></g>
+  <g class="layer-b"><ellipse cx="70" cy="100" rx="80" ry="80" fill="url(#aura_b)" opacity="0.4"/></g>
+  <g class="layer-c"><ellipse cx="70" cy="100" rx="80" ry="80" fill="url(#aura_c)" opacity="0.4"/></g>
+  <g class="layer-d"><ellipse cx="70" cy="100" rx="80" ry="80" fill="url(#aura_d)" opacity="0.4"/></g>
+
+  <!-- Avatar -->
+  <circle cx="70" cy="100" r="52" fill="#6366f122" class="logo-pulse"/>
+  <circle cx="70" cy="100" r="52" fill="none" stroke="#6366f1" stroke-width="1.5" opacity="0.6"/>
+  <text x="70" y="107" text-anchor="middle" font-size="28" font-weight="700" fill="#6366f1" opacity="0.9">
+    JD
+  </text>
+
+  <!-- Séparateurs par variation -->
+  <g class="layer-a">
+    <line x1="142" y1="20" x2="142" y2="180" style="animation: sep_glow_a 3s ease-in-out infinite;stroke:#6366f1;stroke-width:2"/>
+  </g>
+  <g class="layer-b">
+    <line x1="142" y1="20" x2="142" y2="180" style="animation: sep_glow_b 3s ease-in-out infinite;stroke:#6366f1;stroke-width:2"/>
+  </g>
+  <g class="layer-c">
+    <line x1="142" y1="20" x2="142" y2="180" style="animation: sep_glow_c 3s ease-in-out infinite;stroke:#6366f1;stroke-width:2"/>
+  </g>
+  <g class="layer-d">
+    <line x1="142" y1="20" x2="142" y2="180" style="animation: sep_glow_d 3s ease-in-out infinite;stroke:#6366f1;stroke-width:2"/>
+  </g>
+
+  <!-- Contenu texte -->
+  <g transform="translate(158, 0)">
+    <!-- Nom -->
+    <text x="0" y="60" font-size="22" font-weight="700" fill="#e8e8ff" class="text-shimmer">Jean Dupont</text>
+    <!-- Titre -->
+    <text x="0" y="82" font-size="12" fill="#6366f1" opacity="0.9" letter-spacing="1">DIRECTEUR CRÉATIF</text>
+    <!-- Entreprise -->
+    <text x="0" y="100" font-size="13" fill="#e8e8ff" opacity="0.7">Arti-Pro Plombier</text>
+
+    <!-- Séparateur horizontal -->
+    <line x1="0" y1="112" x2="200" y2="112" stroke="#e8e8ff" stroke-width="0.5" opacity="0.3"/>
+
+    <!-- Contact -->
+    <text x="0" y="128" font-size="11" fill="#e8e8ff" opacity="0.65">✉ artisan.artsrenov@gmail.com</text>
+    <text x="0" y="143" font-size="11" fill="#e8e8ff" opacity="0.65">✆ 01 40 50 26 26</text>
+    <text x="0" y="158" font-size="11" fill="#6366f1" opacity="0.8" text-decoration="underline">artipro-plomberie.fr/</text>
+
+    <!-- Variation label (discret) -->
+    <g class="layer-a"><text x="0" y="185" font-size="8" fill="#e8e8ff" opacity="0.2" letter-spacing="2">SOURCE DORMANTE</text></g>
+    <g class="layer-b"><text x="0" y="185" font-size="8" fill="#e8e8ff" opacity="0.2" letter-spacing="2">FLUX MAÎTRISÉ</text></g>
+    <g class="layer-c"><text x="0" y="185" font-size="8" fill="#e8e8ff" opacity="0.2" letter-spacing="2">CANALISATION PURE</text></g>
+    <g class="layer-d"><text x="0" y="185" font-size="8" fill="#e8e8ff" opacity="0.2" letter-spacing="2">HORIZON LIMPIDE</text></g>
+  </g>
+
+  <!-- CTA -->
+  
+  <g transform="translate(420, 80)">
+    <rect width="160" height="36" rx="18" fill="none" stroke="#6366f1" stroke-width="1.5" opacity="0.8"/>
+    <rect width="160" height="36" rx="18" fill="#6366f1" opacity="0.1"/>
+    <text x="80" y="23" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">Réserver un appel</text>
+  </g>
+  
+
+</svg>
+      </div>
+      <div class="cycle-counter" id="cycle-counter">CYCLE A · 00:00</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VARIATIONS ── -->
+<section class="section">
+  <div class="section-title">Les 4 variations vivantes</div>
+  <div class="section-headline">Effets premium activés : Animation Respiration Subtile pour une présence élégante, Vague Chromée pour un reflet métallique sophistiqué, et Lueur Profonde pour un impact visuel mémorable.</div>
+  <div class="variations-grid">
+    
+    <div class="variation-card">
+      <div class="variation-label" style="color:#6366f1">A</div>
+      <div class="variation-title">Source Dormante</div>
+      <div class="variation-subtitle">L'éveil</div>
+      <div class="variation-intention">Capturer l'instant suspendu avant l'intervention — la confiance qui s'installe dès le premier regard.</div>
+      <div class="variation-emotion" style="color:#6366f1">sérénité</div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#6366f1">B</div>
+      <div class="variation-title">Flux Maîtrisé</div>
+      <div class="variation-subtitle">La précision</div>
+      <div class="variation-intention">Révéler la technicité derrière l'apparente simplicité — chaque geste compte.</div>
+      <div class="variation-emotion" style="color:#6366f1">compétence</div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#6366f1">C</div>
+      <div class="variation-title">Canalisation Pure</div>
+      <div class="variation-subtitle">L'efficacité</div>
+      <div class="variation-intention">Incarner la résolution — le problème qui s'efface, la solution qui s'impose.</div>
+      <div class="variation-emotion" style="color:#6366f1">fiabilité</div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#6366f1">D</div>
+      <div class="variation-title">Horizon Limpide</div>
+      <div class="variation-subtitle">La permanence</div>
+      <div class="variation-intention">Laisser l'empreinte d'une relation durable — au-delà de l'intervention, la certitude du partenaire.</div>
+      <div class="variation-emotion" style="color:#6366f1">confiance</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INSTALLATION ── -->
+<section class="section" style="padding-top: 0;">
+  <div class="section-title">Installation</div>
+  <div class="section-headline">Choisissez votre client email</div>
+  <div class="install-grid">
+    <div class="install-card">
+      <div class="install-icon">📧</div>
+      <div class="install-name">Gmail</div>
+      <a href="http://336cf8f2-24bd-4592-a5dc-9e3ab4ac4485-00-1gykzh34o0o0v.picard.replit.dev/api/signature/export-file/sig_72af586f_1775475366094/gmail" class="install-btn" download data-testid="btn-install-gmail">Installer sur Gmail</a>
+      <a href="http://336cf8f2-24bd-4592-a5dc-9e3ab4ac4485-00-1gykzh34o0o0v.picard.replit.dev/api/signature/export-file/sig_72af586f_1775475366094/pdf-gmail" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+    </div>
+    <div class="install-card">
+      <div class="install-icon">🖥️</div>
+      <div class="install-name">Outlook</div>
+      <a href="http://336cf8f2-24bd-4592-a5dc-9e3ab4ac4485-00-1gykzh34o0o0v.picard.replit.dev/api/signature/export-file/sig_72af586f_1775475366094/outlook" class="install-btn" download data-testid="btn-install-outlook">Installer sur Outlook</a>
+      <a href="http://336cf8f2-24bd-4592-a5dc-9e3ab4ac4485-00-1gykzh34o0o0v.picard.replit.dev/api/signature/export-file/sig_72af586f_1775475366094/pdf-outlook" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+    </div>
+    <div class="install-card">
+      <div class="install-icon">🍎</div>
+      <div class="install-name">Apple Mail</div>
+      <a href="http://336cf8f2-24bd-4592-a5dc-9e3ab4ac4485-00-1gykzh34o0o0v.picard.replit.dev/api/signature/export-file/sig_72af586f_1775475366094/svg" class="install-btn" download data-testid="btn-install-apple">Installer sur Apple Mail</a>
+      <a href="http://336cf8f2-24bd-4592-a5dc-9e3ab4ac4485-00-1gykzh34o0o0v.picard.replit.dev/api/signature/export-file/sig_72af586f_1775475366094/pdf-apple" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── TÉLÉCHARGEMENT ── -->
+<div class="download-zone">
+  <a href="http://336cf8f2-24bd-4592-a5dc-9e3ab4ac4485-00-1gykzh34o0o0v.picard.replit.dev/api/signature/download/sig_72af586f_1775475366094" class="download-btn" data-testid="btn-download-package">
+    <span>⬇</span> Télécharger ma signature
+  </a>
+  <p style="margin-top:16px;font-size:13px;color:rgba(232,232,255,0.4);">
+    Package ZIP complet · SVG · PNG · Outlook · Gmail · 3 guides PDF
+  </p>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <p>© Arti-Pro Plombier — Signature exclusive générée avec technologie premium</p>
+  <p style="margin-top:8px;font-size:11px;opacity:0.4;">ID: sig_72af586f_1775475366094</p>
+</footer>
+
+<script>
+  // Cycle counter
+  (function() {
+    const variants = ['A', 'B', 'C', 'D'];
+    const cycleTotal = 240;
+    const varDur = cycleTotal / 4;
+    let elapsed = 0;
+    const el = document.getElementById('cycle-counter');
+    if (!el) return;
+    setInterval(() => {
+      elapsed = (elapsed + 1) % cycleTotal;
+      const varIdx = Math.floor(elapsed / varDur);
+      const varElapsed = elapsed % varDur;
+      const m = Math.floor(varElapsed / 60).toString().padStart(2, '0');
+      const s = (varElapsed % 60).toString().padStart(2, '0');
+      el.textContent = 'CYCLE ' + variants[varIdx] + ' · ' + m + ':' + s;
+    }, 1000);
+  })();
+</script>
+</body>
+</html>

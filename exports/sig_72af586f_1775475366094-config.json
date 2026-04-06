@@ -1,0 +1,510 @@
+{
+  "signature_id": "sig_72af586f_1775475366094",
+  "generated_at": "2026-04-06T11:36:18.233Z",
+  "client": {
+    "nom": "Jean Dupont",
+    "entreprise": "Arti-Pro Plombier",
+    "secteur": "Plombier"
+  },
+  "creative_decisions": {
+    "brief_creatif": {
+      "style_detecte": "moderne, minimaliste, fonctionnel, robuste",
+      "references_visuelles": [
+        "Geberit",
+        "Hansgrohe",
+        "Grohe"
+      ],
+      "ton_emotionnel": "fiabilité, compétence, sérénité, efficacité",
+      "intensite_mouvement": "subtil",
+      "univers_visuel": "Un style épuré évoquant la précision technique, avec une touche de modernité incarnée par des lignes nettes et des contrastes élégants. Une esthétique qui inspire confiance et professionnalisme.",
+      "contraintes": [
+        "lisibilité sur petits écrans",
+        "conformité aux standards du secteur",
+        "éviter une surcharge visuelle"
+      ],
+      "mot_clef_narratif": "efficacité moderne",
+      "analyse_logo": "Le logo est carré et fonctionnel, avec des formes simples et une palette limitée, symbolisant la robustesse et la précision de l'artisanat.",
+      "psychologie_couleurs": "Le noir (#0f0f0f) représente la fiabilité et la solidité, le bleu violet (#6366f1) évoque la modernité et la compétence, et le blanc cassé (#e8e8ff) apporte une touche de légèreté et de pureté.",
+      "personnalite_marque": [
+        "fiable",
+        "moderne",
+        "précis",
+        "professionnel"
+      ],
+      "cible_audience": "Particuliers et entreprises recherchant des solutions de plomberie professionnelles et modernes à Paris.",
+      "differentiateur": "Combinaison d'expertise artisanale et de modernité visuelle dans un secteur traditionnel."
+    },
+    "scenario_narratif": {
+      "arc_emotionnel": "Du silence de l'attente à la certitude de la maîtrise — l'eau qui trouve son chemin parfait.",
+      "fil_conducteur": "L'eau comme métaphore de l'expertise : elle ne force jamais, elle trouve. Comme le plombier d'exception, elle épouse les formes, contourne les obstacles, et arrive toujours à destination avec une précision silencieuse.",
+      "variations": {
+        "A": {
+          "titre": "Source Dormante",
+          "sous_titre": "L'éveil",
+          "intention": "Capturer l'instant suspendu avant l'intervention — la confiance qui s'installe dès le premier regard.",
+          "metaphore": "La nappe phréatique sous la ville : invisible mais essentielle, prête à surgir au bon moment.",
+          "fond": "SUBTLE_BREATHE",
+          "logo": "MINIMAL_PULSE",
+          "texte": "CLEAN_FADE",
+          "separateur": "SOFT_GRADIENT",
+          "emotion_dominante": "sérénité",
+          "moment_cle": "L'ouverture de l'email — première impression de professionnalisme calme"
+        },
+        "B": {
+          "titre": "Flux Maîtrisé",
+          "sous_titre": "La précision",
+          "intention": "Révéler la technicité derrière l'apparente simplicité — chaque geste compte.",
+          "metaphore": "Le siphon parfait : une courbe calculée qui transforme le chaos en ordre liquide.",
+          "fond": "CHROME_WAVE",
+          "logo": "SAPPHIRE_GLOW",
+          "texte": "SILK_WAVE",
+          "separateur": "SILVER_RAIN",
+          "emotion_dominante": "compétence",
+          "moment_cle": "La lecture des coordonnées — moment où l'expertise devient tangible"
+        },
+        "C": {
+          "titre": "Canalisation Pure",
+          "sous_titre": "L'efficacité",
+          "intention": "Incarner la résolution — le problème qui s'efface, la solution qui s'impose.",
+          "metaphore": "Le joint étanche : invisible mais indispensable, il fait toute la différence entre l'inquiétude et la tranquillité.",
+          "fond": "DEEP_GLOW",
+          "logo": "FROST_VEIL",
+          "texte": "PEARL_SHIMMER",
+          "separateur": "LIGHT_BEAM",
+          "emotion_dominante": "fiabilité",
+          "moment_cle": "La décision de contact — le moment où la confiance se cristallise"
+        },
+        "D": {
+          "titre": "Horizon Limpide",
+          "sous_titre": "La permanence",
+          "intention": "Laisser l'empreinte d'une relation durable — au-delà de l'intervention, la certitude du partenaire.",
+          "metaphore": "L'eau claire qui coule sans qu'on y pense : le luxe ultime de l'oubli serein.",
+          "fond": "VELVET_FADE",
+          "logo": "CRYSTAL_BREATH",
+          "texte": "AURORA_FLOW",
+          "separateur": "PRISM_CASCADE",
+          "emotion_dominante": "confiance",
+          "moment_cle": "La fermeture de l'email — l'impression qui reste, le souvenir qui s'ancre"
+        }
+      },
+      "note_du_directeur": "Cette symphonie en quatre mouvements traduit le paradoxe noble de la plomberie d'excellence : être si efficace qu'on en devient invisible. Chaque variation respecte la sobriété du secteur tout en insufflant une modernité qui distingue Arti-Pro de l'artisanat ordinaire."
+    },
+    "configuration_technique": {
+      "variation_a": {
+        "fond": {
+          "effet": "SUBTLE_BREATHE",
+          "intensity": 0.4,
+          "speed": "slow",
+          "color": "#0f0f0f",
+          "params": {
+            "opacity": 0.8,
+            "blur": 0,
+            "scale": 1.02
+          }
+        },
+        "logo": {
+          "effet": "MINIMAL_PULSE",
+          "intensity": 0.6,
+          "speed": "medium",
+          "color": "#6366f1",
+          "params": {
+            "radius": 40,
+            "glow": 0.3,
+            "pulse_scale": 1.05
+          }
+        },
+        "texte": {
+          "effet": "CLEAN_FADE",
+          "intensity": 0.3,
+          "speed": "slow",
+          "color": "#e8e8ff",
+          "params": {
+            "blur": 0,
+            "letter_spacing": 0.02,
+            "opacity_min": 0.85
+          }
+        },
+        "separateur": {
+          "effet": "SOFT_GRADIENT",
+          "intensity": 0.5,
+          "speed": "medium",
+          "color": "#6366f1",
+          "params": {
+            "width": 2,
+            "glow_spread": 4
+          }
+        },
+        "duree": 60
+      },
+      "variation_b": {
+        "fond": {
+          "effet": "CHROME_WAVE",
+          "intensity": 0.4,
+          "speed": "slow",
+          "color": "#0f0f0f",
+          "params": {
+            "opacity": 0.8,
+            "blur": 0,
+            "scale": 1.02
+          }
+        },
+        "logo": {
+          "effet": "SAPPHIRE_GLOW",
+          "intensity": 0.6,
+          "speed": "medium",
+          "color": "#6366f1",
+          "params": {
+            "radius": 40,
+            "glow": 0.3,
+            "pulse_scale": 1.05
+          }
+        },
+        "texte": {
+          "effet": "SILK_WAVE",
+          "intensity": 0.3,
+          "speed": "slow",
+          "color": "#e8e8ff",
+          "params": {
+            "blur": 0,
+            "letter_spacing": 0.02,
+            "opacity_min": 0.85
+          }
+        },
+        "separateur": {
+          "effet": "SILVER_RAIN",
+          "intensity": 0.5,
+          "speed": "medium",
+          "color": "#6366f1",
+          "params": {
+            "width": 2,
+            "glow_spread": 4
+          }
+        },
+        "duree": 60
+      },
+      "variation_c": {
+        "fond": {
+          "effet": "DEEP_GLOW",
+          "intensity": 0.4,
+          "speed": "slow",
+          "color": "#0f0f0f",
+          "params": {
+            "opacity": 0.8,
+            "blur": 0,
+            "scale": 1.02
+          }
+        },
+        "logo": {
+          "effet": "FROST_VEIL",
+          "intensity": 0.6,
+          "speed": "medium",
+          "color": "#6366f1",
+          "params": {
+            "radius": 40,
+            "glow": 0.3,
+            "pulse_scale": 1.05
+          }
+        },
+        "texte": {
+          "effet": "PEARL_SHIMMER",
+          "intensity": 0.3,
+          "speed": "slow",
+          "color": "#e8e8ff",
+          "params": {
+            "blur": 0,
+            "letter_spacing": 0.02,
+            "opacity_min": 0.85
+          }
+        },
+        "separateur": {
+          "effet": "LIGHT_BEAM",
+          "intensity": 0.5,
+          "speed": "medium",
+          "color": "#6366f1",
+          "params": {
+            "width": 2,
+            "glow_spread": 4
+          }
+        },
+        "duree": 60
+      },
+      "variation_d": {
+        "fond": {
+          "effet": "VELVET_FADE",
+          "intensity": 0.4,
+          "speed": "slow",
+          "color": "#0f0f0f",
+          "params": {
+            "opacity": 0.8,
+            "blur": 0,
+            "scale": 1.02
+          }
+        },
+        "logo": {
+          "effet": "CRYSTAL_BREATH",
+          "intensity": 0.6,
+          "speed": "medium",
+          "color": "#6366f1",
+          "params": {
+            "radius": 40,
+            "glow": 0.3,
+            "pulse_scale": 1.05
+          }
+        },
+        "texte": {
+          "effet": "AURORA_FLOW",
+          "intensity": 0.3,
+          "speed": "slow",
+          "color": "#e8e8ff",
+          "params": {
+            "blur": 0,
+            "letter_spacing": 0.02,
+            "opacity_min": 0.85
+          }
+        },
+        "separateur": {
+          "effet": "PRISM_CASCADE",
+          "intensity": 0.5,
+          "speed": "medium",
+          "color": "#6366f1",
+          "params": {
+            "width": 2,
+            "glow_spread": 4
+          }
+        },
+        "duree": 60
+      },
+      "transitions": {
+        "duree": 2,
+        "easing": "cubic-bezier(0.4,0,0.2,1)",
+        "type": "cross-fade"
+      },
+      "cycle_total": 248,
+      "optimisations_email": [
+        "CSS animations uniquement — zéro JS",
+        "Chirurgie visuelle par zones actives",
+        "Harmony validator — 5 règles appliquées"
+      ],
+      "notes_techniques": "Système zone-effects actif : LOGO_HALO_PULSE | NOM_HOLOGRAM_SCAN | SEP_ENERGY_FLOW",
+      "zone_compositions": {
+        "A": {
+          "logo": {
+            "effet_id": "LOGO_HALO_PULSE",
+            "intensity": 0.35,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Le halo lent évoque la fiabilité d'un professionnel — confiance qui pulse calmement."
+          },
+          "nom": {
+            "effet_id": "NOM_CLEAN_BREATHE",
+            "intensity": 0.28,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Respiration subtile incarnant la présence stable et rassurante du plombier compétent."
+          },
+          "titre": {
+            "effet_id": "TITRE_SLIDE_IN",
+            "intensity": 0.076,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Apparition glissée sobre — le titre s'installe avec l'assurance tranquille de l'expert."
+          },
+          "contact": {
+            "effet_id": "CONTACT_HIGHLIGHT_HOVER",
+            "intensity": 0.1,
+            "speed": "medium",
+            "color": "#0f0f0f",
+            "raison": "Interactivité discrète au survol — invitation claire sans distraction."
+          },
+          "separateur": {
+            "effet_id": "SEP_BREATHING_CALM",
+            "intensity": 0.18,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Ligne qui respire doucement — fluidité évoquant l'eau maîtrisée."
+          },
+          "fond": {
+            "effet_id": "FOND_ATMOSPHERIC_BREATH",
+            "intensity": 0.09,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Atmosphère sereine respirant imperceptiblement — sérénité avant l'intervention."
+          },
+          "cta": {
+            "effet_id": "CTA_GRAVITY_PULSE",
+            "intensity": 0.22,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Pulsation magnétique douce — efficacité qui attire naturellement le clic."
+          }
+        },
+        "B": {
+          "logo": {
+            "effet_id": "LOGO_3D_FLOAT",
+            "intensity": 0.45,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "La rotation Y subtile évoque la précision technique et la maîtrise du geste professionnel."
+          },
+          "nom": {
+            "effet_id": "NOM_HOLOGRAM_SCAN",
+            "intensity": 0.38,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Le scan holographique révèle la technicité cachée derrière chaque intervention."
+          },
+          "titre": {
+            "effet_id": "TITRE_SLIDE_IN",
+            "intensity": 0.061,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "L'entrée glissée suggère l'arrivée efficace et précise du professionnel."
+          },
+          "contact": {
+            "effet_id": "CONTACT_HIGHLIGHT_HOVER",
+            "intensity": 0.15,
+            "speed": "medium",
+            "color": "#0f0f0f",
+            "raison": "L'interactivité CSS pure garantit fiabilité et réactivité au contact client."
+          },
+          "separateur": {
+            "effet_id": "SEP_ENERGY_FLOW",
+            "intensity": 0.25,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Le flux descendant évoque l'eau maîtrisée — métaphore directe du métier."
+          },
+          "fond": {
+            "effet_id": "FOND_ATMOSPHERIC_BREATH",
+            "intensity": 0.072,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "La respiration atmosphérique apporte sérénité sans distraire de l'essentiel."
+          },
+          "cta": {
+            "effet_id": "CTA_GRAVITY_PULSE",
+            "intensity": 0.32,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Le pulse magnétique attire naturellement vers l'action avec efficacité contenue."
+          }
+        },
+        "C": {
+          "logo": {
+            "effet_id": "LOGO_HALO_PULSE",
+            "intensity": 0.45,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Lumière certaine évoquant la fiabilité du plombier qui résout le problème avec assurance."
+          },
+          "nom": {
+            "effet_id": "NOM_CLEAN_BREATHE",
+            "intensity": 0.35,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Respiration subtile incarnant la sérénité d'un professionnel compétent et posé."
+          },
+          "titre": {
+            "effet_id": "TITRE_FADE_PRESENCE",
+            "intensity": 0.102,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Présence qui s'impose doucement comme une solution évidente qui émerge."
+          },
+          "contact": {
+            "effet_id": "CONTACT_HIGHLIGHT_HOVER",
+            "intensity": 0.15,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Interactivité discrète reflétant l'efficacité et la disponibilité du service."
+          },
+          "separateur": {
+            "effet_id": "SEP_ENERGY_FLOW",
+            "intensity": 0.25,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Flux descendant symbolisant l'eau maîtrisée et le problème qui s'évacue."
+          },
+          "fond": {
+            "effet_id": "FOND_ATMOSPHERIC_BREATH",
+            "intensity": 0.08,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Atmosphère profonde créant un environnement serein où la résolution opère."
+          },
+          "cta": {
+            "effet_id": "CTA_GRAVITY_PULSE",
+            "intensity": 0.3,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Aimant doux attirant naturellement vers l'action avec confiance."
+          }
+        },
+        "D": {
+          "logo": {
+            "effet_id": "LOGO_3D_FLOAT",
+            "intensity": 0.45,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Rotation Y douce évoquant la solidité d'un partenaire fiable, profondeur qui inspire confiance durable."
+          },
+          "nom": {
+            "effet_id": "NOM_NEON_GLOW",
+            "intensity": 0.38,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Lueur néon subtile qui ancre le nom dans la mémoire, présence rassurante sans ostentation."
+          },
+          "titre": {
+            "effet_id": "TITRE_SLIDE_IN",
+            "intensity": 0.102,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Entrée glissée professionnelle, compétence qui s'installe naturellement."
+          },
+          "contact": {
+            "effet_id": "CONTACT_HIGHLIGHT_HOVER",
+            "intensity": 0.15,
+            "speed": "medium",
+            "color": "#0f0f0f",
+            "raison": "Interactivité pure CSS, efficacité immédiate au service de la prise de contact."
+          },
+          "separateur": {
+            "effet_id": "SEP_ENERGY_FLOW",
+            "intensity": 0.28,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Flux descendant évoquant l'eau maîtrisée, métaphore du métier et de la sérénité."
+          },
+          "fond": {
+            "effet_id": "FOND_ATMOSPHERIC_BREATH",
+            "intensity": 0.08,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Respiration atmosphérique apaisante, environnement serein pour une relation durable."
+          },
+          "cta": {
+            "effet_id": "CTA_GRAVITY_PULSE",
+            "intensity": 0.32,
+            "speed": "slow",
+            "color": "#0f0f0f",
+            "raison": "Aimant doux qui attire naturellement, puissance mémorable sans agressivité."
+          }
+        }
+      }
+    }
+  },
+  "effects_used": [
+    "SUBTLE_BREATHE",
+    "CHROME_WAVE",
+    "DEEP_GLOW"
+  ],
+  "cycle_total": 248,
+  "variations": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "version": "1.0"
+}

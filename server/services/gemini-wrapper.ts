@@ -2,7 +2,9 @@ import { rotator } from './api-key-rotator';
 import Anthropic from '@anthropic-ai/sdk';
 import { log } from '../vite';
 
-const MAX_RETRIES = 3;
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_API_VERSION = 'v1';
+const MAX_RETRIES = 5;
 
 export async function callGemini(
   prompt: string,
@@ -44,7 +46,7 @@ export async function callGemini(
     };
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key.key}`,
+      `https://generativelanguage.googleapis.com/${GEMINI_API_VERSION}/models/${GEMINI_MODEL}:generateContent?key=${key.key}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,6 +58,17 @@ export async function callGemini(
     if (!response.ok) {
       const errText = await response.text();
       await rotator.handleError(key, response.status, errText);
+
+      if (response.status === 404) {
+        log(`Gemini ${key.id} modèle introuvable (404) — clé suivante`, 'gemini-wrapper');
+        return callGemini(prompt, { ...options, retryCount: retryCount + 1 });
+      }
+
+      if (response.status === 429) {
+        log(`Gemini ${key.id} rate limit (429) — rotation clé`, 'gemini-wrapper');
+        return callGemini(prompt, { ...options, retryCount: retryCount + 1 });
+      }
+
       log(`Gemini ${key.id} erreur ${response.status} — retry`, 'gemini-wrapper');
       return callGemini(prompt, { ...options, retryCount: retryCount + 1 });
     }
@@ -65,6 +78,7 @@ export async function callGemini(
     if (!text) throw new Error('Réponse Gemini vide');
 
     await rotator.recordSuccess(key, Date.now() - start);
+    log(`Gemini ${key.id} succès en ${Date.now() - start}ms`, 'gemini-wrapper');
     return text;
   } catch (err: any) {
     if (err.name === 'TimeoutError') {

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signature Gmail — Jean Dupont</title>
+<style>
+  body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
+  .sig-container { max-width: 600px; background: #0f0f0f; border-radius: 8px; overflow: hidden; }
+  .sig-svg { display: block; width: 100%; }
+  @media (prefers-color-scheme: light) {
+    .sig-container { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+  }
+  @media only screen and (max-width: 480px) {
+    .sig-container { width: 100% !important; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="sig-container">
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="600" height="200" viewBox="0 0 600 200"
+  style="font-family:system-ui,-apple-system,sans-serif;background:#0f0f0f">
+
+  <defs>
+    <style>
+      /* === ANIMATIONS GOD TIER === */
+      @keyframes pulse_logo {
+        0%,100%{opacity:0.85;transform:scale(1)}
+        50%{opacity:1;transform:scale(1.04)}
+      }
+      @keyframes sep_glow_a {
+        0%,100%{stroke:#6366f1;stroke-width:2;filter:drop-shadow(0 0 4px #6366f1)}
+        50%{stroke:#6366f1;stroke-width:3;filter:drop-shadow(0 0 10px #6366f1)}
+      }
+      @keyframes sep_glow_b {
+        0%,100%{stroke:#6366f1;stroke-width:2;filter:drop-shadow(0 0 4px #6366f1)}
+        50%{stroke:#6366f1;stroke-width:3;filter:drop-shadow(0 0 10px #6366f1)}
+      }
+      @keyframes sep_glow_c {
+        0%,100%{stroke:#6366f1;stroke-width:2;filter:drop-shadow(0 0 4px #6366f1)}
+        50%{stroke:#6366f1;stroke-width:3;filter:drop-shadow(0 0 10px #6366f1)}
+      }
+      @keyframes sep_glow_d {
+        0%,100%{stroke:#6366f1;stroke-width:2;filter:drop-shadow(0 0 4px #6366f1)}
+        50%{stroke:#6366f1;stroke-width:3;filter:drop-shadow(0 0 10px #6366f1)}
+      }
+      @keyframes text_shimmer {
+        0%,100%{opacity:0.9}
+        50%{opacity:1}
+      }
+      @keyframes bg_cycle_a {
+        0%{opacity:1} 25.0%{opacity:1} 25.8%{opacity:0} 99.2%{opacity:0} 100%{opacity:1}
+      }
+      @keyframes bg_cycle_b {
+        0%{opacity:0} 24.2%{opacity:0} 25.0%{opacity:1} 50.0%{opacity:1} 50.8%{opacity:0} 100%{opacity:0}
+      }
+      @keyframes bg_cycle_c {
+        0%{opacity:0} 49.2%{opacity:0} 50.0%{opacity:1} 75.0%{opacity:1} 75.8%{opacity:0} 100%{opacity:0}
+      }
+      @keyframes bg_cycle_d {
+        0%{opacity:0} 74.2%{opacity:0} 75.0%{opacity:1} 99.2%{opacity:1} 100%{opacity:0}
+      }
+
+      .layer-a { animation: bg_cycle_a 248s linear infinite; }
+      .layer-b { animation: bg_cycle_b 248s linear infinite; }
+      .layer-c { animation: bg_cycle_c 248s linear infinite; }
+      .layer-d { animation: bg_cycle_d 248s linear infinite; }
+      .logo-pulse { animation: pulse_logo 4s ease-in-out infinite; transform-origin: center; }
+      .text-shimmer { animation: text_shimmer 6s ease-in-out infinite; }
+    </style>
+
+    <radialGradient id="aura_a" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura_b" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura_c" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura_d" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bg_gradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f0f0f"/>
+      <stop offset="100%" stop-color="#0f0f0fdd"/>
+    </linearGradient>
+    <clipPath id="avatar_clip">
+      <circle cx="70" cy="100" r="55"/>
+    </clipPath>
+  </defs>
+
+  <!-- Fond principal -->
+  <rect width="600" height="200" fill="url(#bg_gradient)"/>
+
+  <!-- Auras des variations -->
+  <g class="layer-a"><ellipse cx="70" cy="100" rx="80" ry="80" fill="url(#aura_a)" opacity="0.4"/></g>
+  <g class="layer-b"><ellipse cx="70" cy="100" rx="80" ry="80" fill="url(#aura_b)" opacity="0.4"/></g>
+  <g class="layer-c"><ellipse cx="70" cy="100" rx="80" ry="80" fill="url(#aura_c)" opacity="0.4"/></g>
+  <g class="layer-d"><ellipse cx="70" cy="100" rx="80" ry="80" fill="url(#aura_d)" opacity="0.4"/></g>
+
+  <!-- Avatar -->
+  <circle cx="70" cy="100" r="52" fill="#6366f122" class="logo-pulse"/>
+  <circle cx="70" cy="100" r="52" fill="none" stroke="#6366f1" stroke-width="1.5" opacity="0.6"/>
+  <text x="70" y="107" text-anchor="middle" font-size="28" font-weight="700" fill="#6366f1" opacity="0.9">
+    JD
+  </text>
+
+  <!-- Séparateurs par variation -->
+  <g class="layer-a">
+    <line x1="142" y1="20" x2="142" y2="180" style="animation: sep_glow_a 3s ease-in-out infinite;stroke:#6366f1;stroke-width:2"/>
+  </g>
+  <g class="layer-b">
+    <line x1="142" y1="20" x2="142" y2="180" style="animation: sep_glow_b 3s ease-in-out infinite;stroke:#6366f1;stroke-width:2"/>
+  </g>
+  <g class="layer-c">
+    <line x1="142" y1="20" x2="142" y2="180" style="animation: sep_glow_c 3s ease-in-out infinite;stroke:#6366f1;stroke-width:2"/>
+  </g>
+  <g class="layer-d">
+    <line x1="142" y1="20" x2="142" y2="180" style="animation: sep_glow_d 3s ease-in-out infinite;stroke:#6366f1;stroke-width:2"/>
+  </g>
+
+  <!-- Contenu texte -->
+  <g transform="translate(158, 0)">
+    <!-- Nom -->
+    <text x="0" y="60" font-size="22" font-weight="700" fill="#e8e8ff" class="text-shimmer">Jean Dupont</text>
+    <!-- Titre -->
+    <text x="0" y="82" font-size="12" fill="#6366f1" opacity="0.9" letter-spacing="1">DIRECTEUR CRÉATIF</text>
+    <!-- Entreprise -->
+    <text x="0" y="100" font-size="13" fill="#e8e8ff" opacity="0.7">Arti-Pro Plombier</text>
+
+    <!-- Séparateur horizontal -->
+    <line x1="0" y1="112" x2="200" y2="112" stroke="#e8e8ff" stroke-width="0.5" opacity="0.3"/>
+
+    <!-- Contact -->
+    <text x="0" y="128" font-size="11" fill="#e8e8ff" opacity="0.65">✉ artisan.artsrenov@gmail.com</text>
+    <text x="0" y="143" font-size="11" fill="#e8e8ff" opacity="0.65">✆ 01 40 50 26 26</text>
+    <text x="0" y="158" font-size="11" fill="#6366f1" opacity="0.8" text-decoration="underline">artipro-plomberie.fr/</text>
+
+    <!-- Variation label (discret) -->
+    <g class="layer-a"><text x="0" y="185" font-size="8" fill="#e8e8ff" opacity="0.2" letter-spacing="2">SOURCE DORMANTE</text></g>
+    <g class="layer-b"><text x="0" y="185" font-size="8" fill="#e8e8ff" opacity="0.2" letter-spacing="2">FLUX MAÎTRISÉ</text></g>
+    <g class="layer-c"><text x="0" y="185" font-size="8" fill="#e8e8ff" opacity="0.2" letter-spacing="2">CANALISATION PURE</text></g>
+    <g class="layer-d"><text x="0" y="185" font-size="8" fill="#e8e8ff" opacity="0.2" letter-spacing="2">HORIZON LIMPIDE</text></g>
+  </g>
+
+  <!-- CTA -->
+  
+  <g transform="translate(420, 80)">
+    <rect width="160" height="36" rx="18" fill="none" stroke="#6366f1" stroke-width="1.5" opacity="0.8"/>
+    <rect width="160" height="36" rx="18" fill="#6366f1" opacity="0.1"/>
+    <text x="80" y="23" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">Réserver un appel</text>
+  </g>
+  
+
+</svg>
+</div>
+<!-- Signature Jean Dupont — Arti-Pro Plombier — Généré par EffectForge AI -->
+</body>
+</html>

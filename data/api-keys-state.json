@@ -1,5 +1,4 @@
 {
-  "lastSaved": "2026-04-06T11:32:41.740Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
@@ -92,40 +91,40 @@
       "avgResponseTime": 0
     },
     "serper_1": {
-      "usageToday": 5,
+      "usageToday": 0,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 5,
-      "avgResponseTime": 923
+      "successCount": 0,
+      "avgResponseTime": 0
     },
     "serper_2": {
-      "usageToday": 1,
+      "usageToday": 0,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 1,
-      "avgResponseTime": 4090
+      "successCount": 0,
+      "avgResponseTime": 0
     },
     "serper_3": {
-      "usageToday": 1,
+      "usageToday": 0,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 1,
-      "avgResponseTime": 870
+      "successCount": 0,
+      "avgResponseTime": 0
     },
     "serper_4": {
-      "usageToday": 1,
+      "usageToday": 0,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 1,
-      "avgResponseTime": 2478
+      "successCount": 0,
+      "avgResponseTime": 0
     },
     "serper_5": {
       "usageToday": 0,
@@ -137,7 +136,5 @@
       "avgResponseTime": 0
     }
   },
-  "monthlyUsage": {
-    "serper_2026-04": 8
-  }
+  "monthlyUsage": {}
 }

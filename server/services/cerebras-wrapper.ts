@@ -1,8 +1,9 @@
 import { rotator } from './api-key-rotator';
+import Anthropic from '@anthropic-ai/sdk';
 import { log } from '../vite';
 
-const MAX_RETRIES = 3;
-const CEREBRAS_MODEL = 'llama-3.3-70b';
+const MAX_RETRIES = 5;
+const CEREBRAS_MODEL = 'llama3.3-70b';
 
 export async function callCerebras(
   prompt: string,
@@ -15,16 +16,16 @@ export async function callCerebras(
 ): Promise<string> {
   const retryCount = options.retryCount || 0;
   if (retryCount >= MAX_RETRIES) {
-    log('Cerebras: max retries atteint — fallback Gemini', 'cerebras-wrapper');
-    return callCerebrasGeminiFallback(prompt, options);
+    log('Cerebras: max retries atteint — fallback Claude', 'cerebras-wrapper');
+    return callCerebrasClaudeFallback(prompt, options);
   }
 
   let key;
   try {
     key = await rotator.selectBestKey('cerebras');
   } catch (err: any) {
-    log(`Cerebras pool épuisé: ${err.message} — fallback Gemini`, 'cerebras-wrapper');
-    return callCerebrasGeminiFallback(prompt, options);
+    log(`Cerebras pool épuisé: ${err.message} — fallback Claude`, 'cerebras-wrapper');
+    return callCerebrasClaudeFallback(prompt, options);
   }
 
   const start = Date.now();
@@ -54,6 +55,22 @@ export async function callCerebras(
     if (!response.ok) {
       const errText = await response.text();
       await rotator.handleError(key, response.status, errText);
+
+      if (response.status === 404) {
+        log(`Cerebras ${key.id} modèle introuvable (404) — clé suivante`, 'cerebras-wrapper');
+        return callCerebras(prompt, { ...options, retryCount: retryCount + 1 });
+      }
+
+      if (response.status === 429) {
+        log(`Cerebras ${key.id} rate limit (429) — rotation clé`, 'cerebras-wrapper');
+        return callCerebras(prompt, { ...options, retryCount: retryCount + 1 });
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        log(`Cerebras ${key.id} clé invalide (${response.status}) — clé suivante`, 'cerebras-wrapper');
+        return callCerebras(prompt, { ...options, retryCount: retryCount + 1 });
+      }
+
       log(`Cerebras ${key.id} erreur ${response.status} — retry`, 'cerebras-wrapper');
       return callCerebras(prompt, { ...options, retryCount: retryCount + 1 });
     }
@@ -63,6 +80,7 @@ export async function callCerebras(
     if (!text) throw new Error('Réponse Cerebras vide');
 
     await rotator.recordSuccess(key, Date.now() - start);
+    log(`Cerebras ${key.id} succès en ${Date.now() - start}ms`, 'cerebras-wrapper');
     return text;
   } catch (err: any) {
     if (err.name === 'TimeoutError') {
@@ -75,15 +93,33 @@ export async function callCerebras(
   }
 }
 
-async function callCerebrasGeminiFallback(prompt: string, options: any): Promise<string> {
+async function callCerebrasClaudeFallback(prompt: string, options: any): Promise<string> {
   try {
-    const { callGemini } = await import('./gemini-wrapper');
-    const fullPrompt = options.systemPrompt
-      ? `${options.systemPrompt}\n\n${prompt}`
-      : prompt;
-    log('Cerebras → fallback Gemini', 'cerebras-wrapper');
-    return await callGemini(fullPrompt, { maxTokens: options.maxTokens });
+    const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      const { callGemini } = await import('./gemini-wrapper');
+      const fullPrompt = options.systemPrompt ? `${options.systemPrompt}\n\n${prompt}` : prompt;
+      log('Cerebras → fallback Gemini (pas de clé Claude)', 'cerebras-wrapper');
+      return await callGemini(fullPrompt, { maxTokens: options.maxTokens });
+    }
+
+    const anthropic = new Anthropic({
+      apiKey,
+      baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL || undefined,
+    });
+
+    const messages: any[] = [{ role: 'user', content: prompt }];
+
+    const response = await anthropic.messages.create({
+      model: 'claude-haiku-4-5',
+      max_tokens: options.maxTokens ?? 2000,
+      system: options.systemPrompt,
+      messages,
+    });
+
+    log('Cerebras → fallback Claude Haiku réussi', 'cerebras-wrapper');
+    return response.content[0]?.type === 'text' ? response.content[0].text : '';
   } catch (err: any) {
-    throw new Error(`Cerebras + Gemini fallback échoués: ${err.message}`);
+    throw new Error(`Cerebras + Claude fallback échoués: ${err.message}`);
   }
 }
