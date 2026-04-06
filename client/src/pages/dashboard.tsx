@@ -97,7 +97,7 @@ export default function Dashboard() {
             {stats?.expansionRate > 0 ? 'AI Expansion Active' : 'Quantum Standby'}
           </Badge>
           <Badge className="bg-forge-plasma text-white px-4 py-2">
-            Quality Score: {(stats?.qualityScore || 0).toFixed(1)}%
+            Quality Score: {stats?.qualityScore ? (stats.qualityScore * 100).toFixed(0) : 0}%
           </Badge>
         </div>
       </div>
