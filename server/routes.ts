@@ -1392,6 +1392,151 @@ router.get('/analytics/stats', async (_req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PREFERENCES ENGINE — P5, Module 16
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /api/preferences — Récupérer les préférences de l'utilisateur
+router.get('/preferences', async (req, res) => {
+  try {
+    const { getOrCreatePreferences } = await import('./modules/user-preferences-engine.module');
+    const userId = String(req.query.user_id ?? 'default');
+    const prefs  = getOrCreatePreferences(userId);
+    return res.json(prefs);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/preferences/record — Enregistrer un choix (select/star/reject)
+router.post('/preferences/record', async (req, res) => {
+  try {
+    const { recordPreference } = await import('./modules/user-preferences-engine.module');
+    const userId = String(req.query.user_id ?? 'default');
+    const { effect_id, action, variation, secteur, intensity } = req.body;
+    if (!effect_id || !action) return res.status(400).json({ error: 'effect_id et action requis' });
+    const updated = recordPreference({
+      effect_id, action, variation: variation ?? 'A',
+      secteur: secteur ?? 'default',
+      intensity: Number(intensity ?? 0.5),
+      timestamp: Date.now(),
+    }, userId);
+    return res.json(updated);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/preferences/reset — Réinitialiser les préférences
+router.delete('/preferences/reset', async (req, res) => {
+  try {
+    const { resetPreferences } = await import('./modules/user-preferences-engine.module');
+    const userId = String(req.query.user_id ?? 'default');
+    resetPreferences(userId);
+    return res.json({ success: true, message: `Préférences réinitialisées pour ${userId}` });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/preferences/weights — Poids pour le pipeline (usage interne + dev)
+router.get('/preferences/weights', async (req, res) => {
+  try {
+    const { computePreferenceWeights } = await import('./modules/user-preferences-engine.module');
+    const userId  = String(req.query.user_id ?? 'default');
+    const weights = computePreferenceWeights(userId);
+    return res.json(weights);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PRESET MANAGER — P5, Module 17
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /api/presets — Liste tous les presets
+router.get('/presets', async (_req, res) => {
+  try {
+    const { getAllPresets } = await import('./modules/preset-manager.module');
+    return res.json(getAllPresets());
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/presets — Créer un preset
+router.post('/presets', async (req, res) => {
+  try {
+    const { createPreset } = await import('./modules/preset-manager.module');
+    const { name, description, secteur, configuration, tags } = req.body;
+    if (!name || !secteur || !configuration) {
+      return res.status(400).json({ error: 'name, secteur et configuration requis' });
+    }
+    const preset = createPreset({ name, description, secteur, configuration, tags });
+    return res.status(201).json(preset);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/presets/smart/:secteur — Presets intelligents pour un secteur
+router.get('/presets/smart/:secteur', async (req, res) => {
+  try {
+    const { getSmartPresets } = await import('./modules/preset-manager.module');
+    const secteur = req.params.secteur;
+    return res.json(getSmartPresets(secteur));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/presets/sector/:secteur — Presets filtrés par secteur
+router.get('/presets/sector/:secteur', async (req, res) => {
+  try {
+    const { getPresetsBySector } = await import('./modules/preset-manager.module');
+    return res.json(getPresetsBySector(req.params.secteur));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/presets/:id — Récupérer un preset par ID
+router.get('/presets/:id', async (req, res) => {
+  try {
+    const { getPresetById } = await import('./modules/preset-manager.module');
+    const preset = getPresetById(req.params.id);
+    if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
+    return res.json(preset);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/presets/:id/use — Marquer un preset comme utilisé
+router.post('/presets/:id/use', async (req, res) => {
+  try {
+    const { usePreset } = await import('./modules/preset-manager.module');
+    const preset = usePreset(req.params.id);
+    if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
+    return res.json(preset);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/presets/:id — Supprimer un preset
+router.delete('/presets/:id', async (req, res) => {
+  try {
+    const { deletePreset } = await import('./modules/preset-manager.module');
+    const deleted = deletePreset(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Preset introuvable ou preset smart non-supprimable' });
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 export function registerRoutes(app: express.Application) {
   app.use(cors());
   app.use('/api', router);

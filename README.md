@@ -215,6 +215,15 @@ npm start
 | **ContentAnalyzer** | `server/modules/content-analyzer.module.ts` | Analyse palette, densité texte, complexité visuelle — calcule les seuils dynamiques du pipeline |
 | **AnalyticsModule** | `server/modules/analytics.module.ts` | Collecte métriques de génération, rapports d'optimisation auto — endpoints `/api/analytics/report` et `/api/analytics/stats` |
 
+### ✅ Priorité 5 — Personnalisation & Identité
+| Module | Fichier | Rôle |
+|--------|---------|------|
+| **VisualSignatureEngine** | `server/modules/visual-signature-engine.module.ts` | Empreinte visuelle unique par rendu (fingerprint LCG + style_token) — garantit qu'aucune signature n'est identique |
+| **PredictiveTransitionEngine** | `server/modules/predictive-transition-engine.module.ts` | Easings procéduraux (Fibonacci/GoldenRatio/Organic/Neural) + métronome BPM global par variation |
+| **AttentionGuide** | `server/modules/attention-guide.module.ts` | Aimants visuels (soft_glow, micro_pulse, focus_bloom) + chemin d'œil logo→nom→CTA par variation |
+| **UserPreferencesEngine** | `server/modules/user-preferences-engine.module.ts` | Mémoire utilisateur des effets favoris/rejetés, intensité préférée, variation dominante — endpoints `/api/preferences` |
+| **PresetManager** | `server/modules/preset-manager.module.ts` | 10 presets intelligents pré-chargés (finance/luxe/tech/creative/medical/default) + CRUD custom — endpoints `/api/presets` |
+
 ---
 
 ## Structure du Projet
@@ -239,7 +248,12 @@ effectforge-ai/
 │   │   ├── experience-orchestrator.module.ts   # P3 — Arc émotionnel
 │   │   ├── content-analyzer.module.ts          # P4 — Profil de contenu + seuils dynamiques
 │   │   ├── adaptive-rendering-engine.module.ts # P4 — Profils Ultra/High/Balanced/Perf/Low
-│   │   └── analytics.module.ts                 # P4 — Métriques génération + rapports auto
+│   │   ├── analytics.module.ts                 # P4 — Métriques génération + rapports auto
+│   │   ├── visual-signature-engine.module.ts   # P5 — Empreinte unique anti-clone (LCG + style_token)
+│   │   ├── predictive-transition-engine.module.ts # P5 — Easing Fibonacci/GoldenRatio + BPM sync
+│   │   ├── attention-guide.module.ts           # P5 — Aimants visuels logo→nom→CTA
+│   │   ├── user-preferences-engine.module.ts   # P5 — Mémoire préférences utilisateur
+│   │   └── preset-manager.module.ts            # P5 — 10 presets smart + CRUD custom
 │   ├── routes.ts                       # API endpoints
 │   └── index.ts                        # Serveur Express
 ├── client/src/

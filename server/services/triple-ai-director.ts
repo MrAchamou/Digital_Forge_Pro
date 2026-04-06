@@ -20,6 +20,9 @@ import { orchestrateExperience } from '../modules/experience-orchestrator.module
 import { analyzeContent, type ContentProfile } from '../modules/content-analyzer.module';
 import { applyAdaptiveRendering, selectRenderingProfile } from '../modules/adaptive-rendering-engine.module';
 import { recordGeneration } from '../modules/analytics.module';
+import { generateVisualSignature } from '../modules/visual-signature-engine.module';
+import { buildTransitionPipeline } from '../modules/predictive-transition-engine.module';
+import { applyAttentionGuide } from '../modules/attention-guide.module';
 
 const EFFECTS_LIBRARY = [
   'HEARTBEAT', 'SOUL_AURA', 'PLASMA_DRIFT', 'NEON_PULSE', 'GOLDEN_SHIMMER',
@@ -664,6 +667,30 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
   const r4D = applyPriority4Pipeline(p3D, 'D', contentProfile);
   log(`⚡ P4 Adaptive Rendering — Profils: A:${r4A.profile} | B:${r4B.profile} | C:${r4C.profile} | D:${r4D.profile}`, 'triple-ai');
 
+  // ── Priorité 5 — VisualSignature + PredictiveTransitions + AttentionGuide ─
+  const sectorBoost = contentProfile.visual_complexity * 0.5 + 0.5;
+
+  // 1. VisualSignatureEngine — empreinte unique anti-clone
+  const sig5A = generateVisualSignature(r4A.composition, 'A', secteur);
+  const sig5B = generateVisualSignature(r4B.composition, 'B', secteur);
+  const sig5C = generateVisualSignature(r4C.composition, 'C', secteur);
+  const sig5D = generateVisualSignature(r4D.composition, 'D', secteur);
+  log(`🔏 P5 Signatures — A:${sig5A.fingerprint.style_token} B:${sig5B.fingerprint.style_token} C:${sig5C.fingerprint.style_token} D:${sig5D.fingerprint.style_token}`, 'triple-ai');
+
+  // 2. PredictiveTransitionEngine — easing procédural + sync BPM
+  const t5A = buildTransitionPipeline(sig5A.composition, 'A');
+  const t5B = buildTransitionPipeline(sig5B.composition, 'B');
+  const t5C = buildTransitionPipeline(sig5C.composition, 'C');
+  const t5D = buildTransitionPipeline(sig5D.composition, 'D');
+  log(`🔮 P5 Transitions — BPM: A:${t5A.global_bpm} B:${t5B.global_bpm} C:${t5C.global_bpm} D:${t5D.global_bpm} | Sync score: A:${t5A.transition_score.toFixed(2)} D:${t5D.transition_score.toFixed(2)}`, 'triple-ai');
+
+  // 3. AttentionGuide — aimants visuels logo→nom→CTA
+  const att5A = applyAttentionGuide(t5A.composition, 'A', sectorBoost);
+  const att5B = applyAttentionGuide(t5B.composition, 'B', sectorBoost);
+  const att5C = applyAttentionGuide(t5C.composition, 'C', sectorBoost);
+  const att5D = applyAttentionGuide(t5D.composition, 'D', sectorBoost);
+  log(`👁️ P5 AttentionGuide — Guide scores: A:${att5A.guide_score.toFixed(2)} B:${att5B.guide_score.toFixed(2)} C:${att5C.guide_score.toFixed(2)} D:${att5D.guide_score.toFixed(2)}`, 'triple-ai');
+
   const baseConfig = buildFallbackTechnical(scenario, palette);
 
   return {
@@ -680,14 +707,20 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
       'Experience Orchestrator — Arc émotionnel Intro→Climax→Outro',
       `Content Analyzer — Profil:${contentProfile.recommended_profile} | Budget animation:${(contentProfile.thresholds.animation_budget * 100).toFixed(0)}%`,
       `Adaptive Rendering — Profils A:${r4A.profile} B:${r4B.profile} C:${r4C.profile} D:${r4D.profile}`,
+      `Visual Signature — A:${sig5A.fingerprint.style_token} B:${sig5B.fingerprint.style_token} C:${sig5C.fingerprint.style_token} D:${sig5D.fingerprint.style_token}`,
+      `Predictive Transitions — BPM global: A:${t5A.global_bpm} B:${t5B.global_bpm} C:${t5C.global_bpm} D:${t5D.global_bpm}`,
+      `Attention Guide — Magnets visuels actifs | Score guide: A:${att5A.guide_score.toFixed(2)} D:${att5D.guide_score.toFixed(2)}`,
     ],
-    notes_techniques: `P1+P2+P3+P4 | Secteur:${secteur} | A:${r4A.composition.logo.effet_id}(${r4A.profile}) B:${r4B.composition.logo.effet_id}(${r4B.profile}) C:${r4C.composition.logo.effet_id}(${r4C.profile}) D:${r4D.composition.logo.effet_id}(${r4D.profile})`,
-    zone_compositions: { A: r4A.composition, B: r4B.composition, C: r4C.composition, D: r4D.composition },
+    notes_techniques: `P1→P5 | Secteur:${secteur} | A:${att5A.composition.logo.effet_id}[${sig5A.fingerprint.style_token}] B:${att5B.composition.logo.effet_id}[${sig5B.fingerprint.style_token}] C:${att5C.composition.logo.effet_id}[${sig5C.fingerprint.style_token}] D:${att5D.composition.logo.effet_id}[${sig5D.fingerprint.style_token}]`,
+    zone_compositions: { A: att5A.composition, B: att5B.composition, C: att5C.composition, D: att5D.composition },
     _analytics_data: {
-      rendering_profiles: { A: r4A.profile, B: r4B.profile, C: r4C.profile, D: r4D.profile },
-      diversity_score:    diversityReport.overall_diversity,
-      content_profile:    contentProfile,
-      performance_scores: { A: r4A.performance, B: r4B.performance, C: r4C.performance, D: r4D.performance },
+      rendering_profiles:  { A: r4A.profile, B: r4B.profile, C: r4C.profile, D: r4D.profile },
+      diversity_score:     diversityReport.overall_diversity,
+      content_profile:     contentProfile,
+      performance_scores:  { A: r4A.performance, B: r4B.performance, C: r4C.performance, D: r4D.performance },
+      signatures:          { A: sig5A.fingerprint.style_token, B: sig5B.fingerprint.style_token, C: sig5C.fingerprint.style_token, D: sig5D.fingerprint.style_token },
+      guide_scores:        { A: att5A.guide_score, B: att5B.guide_score, C: att5C.guide_score, D: att5D.guide_score },
+      transition_bpm:      { A: t5A.global_bpm, B: t5B.global_bpm, C: t5C.global_bpm, D: t5D.global_bpm },
     },
   };
 }
