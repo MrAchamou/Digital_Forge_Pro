@@ -1,0 +1,49 @@
+## 🎭 EFFET 1 : TYPEWRITER
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** TypeWriter  
+**ID UNIQUE :** typewriter-classic-001  
+**NOM AFFICHAGE :** Machine à Écrire Classique  
+
+**DESCRIPTION :** Effet de machine à écrire vintage avec curseur clignotant, son de frappe simulé visuellement, et micro-tremblements réalistes. Chaque lettre apparaît avec un délai naturel variable, des pauses aux espaces et ponctuations. Le curseur pulse avec un rythme organique et disparaît progressivement après la fin.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Rythme irrégulier de frappe (70% régulier, 30% variations)
+- Micro-corrections et hésitations simulées
+- Curseur avec pulsation respiratoire naturelle
+- Effet de machine vintage (tremblements subtils)
+
+-----------------------------------------------------------------------
+
+🎭 TYPEWRITER CLASSIC EFFET CRÉÉ !
+✨ CARACTÉRISTIQUES ADDICTIVES IMPLÉMENTÉES :
+🎯 FACTEUR ADDICTION 70/30:
+
+Rythme organique : Variations naturelles de frappe (80-200ms base)
+Hésitations simulées : 10% des caractères avec pauses 200-1000ms
+Micro-corrections : 5% d'erreurs temporaires avec correction automatique
+Surprises contrôlées : 30% de variations de timing imprévisibles
+
+🔥 DÉTAILS HYPNOTIQUES:
+
+Curseur respiratoire : Pulsation organique avec sin() naturel
+Tremblements vintage : Micro-oscillations X/Y pour effet machine
+Particules de frappe : Débris visuels à chaque caractère
+Disparition progressive : Curseur s'estompe après la fin
+
+⚡ OPTIMISATIONS PERFORMANCE:
+
+Object pooling : 20 particules réutilisables
+Calculs différés : Hésitations/corrections pré-calculées
+Rendu conditionnel : Particules inactives ignorées
+Text wrapping intelligent
+
+🎨 PARAMÈTRES CONFIGURABLES:
+
+vitesse : Multiplicateur de rapidité de frappe
+intensite : Intensité globale des effets
+couleur : Couleur du texte principal
+couleurCurseur : Couleur du curseur clignotant
+tremblements : Intensité des micro-tremblements
+
+🚀 READY FOR INTEGRATION ! L'effet créé des GIF publicitaires CAPTIVANTS avec un réalisme de machine à écrire qui garde les yeux rivés sur l'écran !

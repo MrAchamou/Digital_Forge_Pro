@@ -1,0 +1,82 @@
+🌪️ EFFET 30 : TORNADO TWIST
+CATÉGORIE : TEXT  
+EFFET DEMANDÉ : Tornado_Twist  
+ID UNIQUE : vortex-spiral-deformation-030  
+NOM AFFICHAGE : Déformation Vortex Spiral  
+DESCRIPTION : Torsion en tourbillon avec formation de vortex atmosphérique. Physics de fluide tourbillonnaire, déformation progressive en spirale, particules aspirées dans le vortex, effet Coriolis simulé. Centre du vortex hypnotique avec vitesse angulaire variable.
+SPÉCIFICATIONS ADDICTION :
+- Vortex avec physics tourbillonnaire réaliste
+- Particules aspirées créant des trails hypnotiques
+- Centre du tourbillon avec densité d'énergie variable
+- Déformation progressive révélant la structure interne
+
+---------------------------------------------------------
+
+🌪️ TORNADO TWIST EFFECT - CRÉÉ AVEC SUCCÈS !
+✨ FONCTIONNALITÉS HYPNOTIQUES IMPLÉMENTÉES :
+🌀 PHYSICS TOURBILLONNAIRE RÉALISTE :
+
+Vortex dual : Combinaison vortex forcé (rotation solide) + vortex libre (circulation constante)
+Profil de vitesse authentique : Vitesse tangentielle variant selon la distance du centre
+Champ de pression : Dépression centrale créant l'aspiration caractéristique
+Turbulence multi-échelle : Bruit procédural superposé aux équations de base
+
+💨 PARTICULES ASPIRÉES HYPNOTIQUES :
+
+180 debris avec trails de 12 points chacun
+Mouvement 3D : Aspiration verticale dans le cœur + retombée en périphérie
+Phase spirale : Rotation hélicoïdale réaliste autour de l'axe du vortex
+Pool d'objets : 400 debris réutilisables pour performance optimale
+
+🎭 DÉFORMATION PROGRESSIVE ADDICTIVE :
+
+Maillage textuel dense : Points sur 7 hauteurs différentes pour effet 3D
+Torsion progressive : Déformation augmentant vers le centre du vortex
+Rotation différentielle : Chaque caractère tourne selon sa distance du centre
+Perspective dynamique : Effet 3D basé sur la hauteur des éléments
+
+⚡ CENTRE HYPNOTIQUE VARIABLE :
+
+Œil du cyclone : Zone de calme relatif avec pulsation organique
+Densité d'énergie : Concentration maximale au centre avec gradient radial
+Instabilité contrôlée : Wobble subtil du centre pour éviter la monotonie
+Glow adaptatif : Intensité lumineuse liée à la vitesse angulaire
+
+🌊 EFFET CORIOLIS SIMULÉ :
+
+Déviation des trajectoires : Force perpendiculaire à la vitesse (physique réelle)
+Influence paramétrable : Contrôle de l'intensité de l'effet Coriolis
+Courbure des trails : Trajectoires courbes caractéristiques des fluides en rotation
+
+🎨 SYSTÈMES VISUELS AVANCÉS :
+
+Champ de vitesse visualisé : Lignes de flux optionnelles montrant la structure
+Couleur thermodynamique : Teintes chaudes au centre, froides en périphérie
+Trails avec fade : Disparition progressive des traînées (alpha dégradé)
+Glow multi-couche : Effets lumineux sur debris, texte et centre
+
+⚙️ OPTIMISATIONS PERFORMANCE :
+
+Object pooling : Réutilisation de 400 debris pré-alloués
+Cache de champ : Évite les recalculs répétitifs du champ de vitesse
+Intégration efficace : Physique optimisée pour 60 FPS constant
+Culling intelligent : Recyclage automatique des debris hors zone
+
+🎛️ PARAMÈTRES CONFIGURABLES :
+
+vitesse : Vitesse angulaire du vortex (0.1x à 3x)
+intensite : Intensité globale des forces tourbillonnaires
+taille : Rayon d'influence du vortex (0.3x à 2x)
+aspiration : Force d'aspiration radiale vers le centre
+particules : Nombre de debris (50 à 300)
+coriolis : Intensité de la force de Coriolis
+
+🔬 DÉTAILS TECHNIQUES REMARQUABLES :
+
+Équations de Navier-Stokes simplifiées pour le comportement fluide
+Intégration temporelle avec friction atmosphérique réaliste
+Champ de pression calculé dynamiquement
+Transition fluide entre régimes de vortex forcé/libre
+
+L'effet produit un tourbillon atmosphérique authentique où le texte se déforme progressivement en spirale tandis que des centaines de debris sont aspirés dans des trajectoires hypnotiques. Le centre pulsant et les trails courbes créent une fascination visuelle irrésistible, parfaite pour captiver l'attention dans des GIF publicitaires !
+🌪️ RÉSULTAT : Un vortex addictif qui ne se répète jamais exactement, avec une complexité physique qui récompense l'observation prolongée !

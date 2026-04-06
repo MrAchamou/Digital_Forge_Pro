@@ -1,0 +1,59 @@
+## 🧲 EFFET 43 : MAGNETIC PULL
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Magnetic_Pull  
+**ID UNIQUE :** electromagnetic-attraction-field-043  
+**NOM AFFICHAGE :** Champ d'Attraction Électromagnétique  
+
+**DESCRIPTION :** Attraction magnétique vers sources invisibles avec déformation de l'image. Étirement progressif vers les pôles magnétiques, lignes de champ visibles, particules métalliques de l'image qui réagissent différemment. Inversions de polarité créant des mouvements de rejet/attraction cycliques.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Déformations suivant les lignes de champ magnétique
+- Particules métalliques simulées réagissant indépendamment
+- Inversions de polarité créant des renversements dramatiques
+- Champ magnétique visualisé par ondulations de l'espace
+
+--------------------------------------------------------------------------
+
+🧲 MAGNETIC PULL CRÉÉ !
+✨ EFFET ÉLECTROMAGNÉTIQUE HYPNOTIQUE
+⚡ ATTRACTION MAGNÉTIQUE RÉALISTE :
+
+Pôles magnétiques invisibles : 3 sources avec polarités opposées
+Déformation progressive : Étirement de l'image suivant lignes de champ
+Forces inversement proportionnelles : Physique magnétique authentique
+Grille de déformation : 20x20 points calculant forces locales
+
+🎯 SPÉCIFICATIONS ADDICTION INTÉGRÉES
+🔄 INVERSIONS DRAMATIQUES (30% IMPRÉVISIBILITÉ) :
+
+Renversements de polarité : Attraction ↔ Répulsion cycliques
+Ondes de choc visuelles : Particules émises lors des inversions
+Transition smooth : Évite les à-coups, maintient la fluidité
+
+🌊 LIGNES DE CHAMP VISIBLES :
+
+Courbes paraboliques animées entre pôles opposés
+Intensité variable : Brillance selon force du champ
+Ondulations spatiales : 8 zones de distorsion de l'espace
+
+⚙️ PARTICULES MÉTALLIQUES INDÉPENDANTES :
+
+15 particules simulées dans l'image avec masse/charge différentes
+Physique individuelle : Chaque particule réagit selon ses propriétés
+3 types métalliques : Argent, or, cuivre avec comportements distincts
+
+🚀 MICRO-ANIMATIONS RÉCOMPENSANTES
+
+Auras des pôles pulsantes selon intensité
+Brillance métallique des particules avec reflets
+Déformation respiratoire de l'élément principal
+Traînées magnétiques suivant les mouvements
+
+🔬 PERFORMANCE OPTIMISÉE
+
+Object pooling : 30 particules réutilisées
+Grille de déformation calculée une fois par frame
+Régénération périodique des lignes de champ (évite surcharge)
+
+L'effet crée une attraction électromagnétique viscérale avec renversements dramatiques !

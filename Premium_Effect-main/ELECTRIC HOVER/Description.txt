@@ -1,0 +1,93 @@
+## ⚡ EFFET 48 : ELECTRIC HOVER
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Electric_Hover  
+**ID UNIQUE :** electrostatic-levitation-field-048  
+**NOM AFFICHAGE :** Lévitation Électrostatique Chargée  
+
+**DESCRIPTION :** Lévitation électrique avec champ électrostatique visible. Micro-oscillations dues aux fluctuations électriques, arcs électriques stabilisateurs, répulsion/attraction selon la charge simulée. Halo électromagnétique pulsant avec l'intensité du champ.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Micro-oscillations électriques imprévisibles
+- Arcs stabilisateurs créant des patterns géométriques
+- Halo électromagnétique révélant l'intensité de charge
+- Fluctuations de champ créant des instabilités contrôlées
+
+------------------------------------------------------------------------
+
+🎭 SYSTÈME DE LÉVITATION ÉLECTROSTATIQUE RÉALISTE :
+⚛️ CHAMP DE CHARGES ÉLECTRIQUES :
+
+1 charge principale positive (objet en lévitation)
+6 charges stabilisatrices négatives en cercle
+Calcul des forces selon la loi de Coulomb simplifiée
+24 lignes de champ avec déflection dynamique
+
+🌀 OSCILLATIONS MULTI-FRÉQUENTIELLES :
+
+8 phases d'oscillation avec fréquences individuelles (0.001-0.006)
+Combinaison sine/cosine pour mouvement organique
+Bruit électrique haute fréquence (Perlin noise)
+Lévitation sinusoïdale principale (8px d'amplitude)
+
+🌈 PHYSIQUE ÉLECTRIQUE ET CHAOS :
+💡 SYSTÈME D'ARCS ÉLECTRIQUES :
+
+Pool de 50 arcs réutilisés pour optimisation
+Génération procédurale avec 8 segments par arc
+Points de branchement secondaires (0-3 par arc)
+Durée de vie variable (0.1-0.4 secondes)
+
+✨ HALO ÉLECTROMAGNÉTIQUE :
+
+Gradient radial avec 4 stops de couleur
+3 anneaux électriques pulsants
+Intensité basée sur l'activité des arcs
+Rayon dynamique avec variation de 30%
+
+🔮 LIGNES DE CHAMP MAGNÉTIQUE :
+
+24 lignes avec points calculés selon le champ
+Cache de champ électrique pour performance
+Régénération périodique (toutes les 5 secondes)
+Intensité oscillante avec phases individuelles
+
+🎭 CYCLE DE LÉVITATION ADDICTIF :
+📈 PHASES DYNAMIQUES :
+
+Stabilisation : Charges s'équilibrent, oscillations douces
+Instabilité : Arcs électriques se multiplient, chaos croissant
+Décharge : Explosion d'activité électrique, halo maximal
+Récupération : Retour graduel à l'équilibre
+
+🎨 DÉTAILS PROGRESSIFS :
+
+Micro-vibrations révélant la tension électrostatique
+Arcs avec géométrie chaotique mais physiquement cohérente
+Indicateurs de charges négatives avec pulsation
+Effets de glow et ombres électromagnétiques
+
+⚡ OPTIMISATIONS AVANCÉES :
+🔄 OBJECT POOLING ET CACHES :
+
+Pool de 50 arcs avec réutilisation automatique
+Cache Map pour calculs de champ électrique
+Nettoyage périodique du cache (toutes les 3 secondes)
+Hash function optimisée pour bruit de Perlin
+
+🎛️ PARAMÈTRES CONFIGURABLES :
+
+Vitesse : Multiplicateur temporel global (0.1-3, défaut: 1.5)
+Intensité : Force du champ électrique (0-1, défaut: 0.8)
+Instabilité : Niveau de chaos et vibrations (0-1, défaut: 0.4)
+Arcs Count : Nombre maximum d'arcs simultanés (5-30, défaut: 12)
+Halo Size : Taille du halo électromagnétique (0.5-3, défaut: 1.2)
+
+🔬 ALGORITHMES PHYSIQUES :
+
+Loi de Coulomb pour forces inter-charges
+Bruit de Perlin avec seed aléatoire pour réalisme
+Interpolation Bézier pour arcs électriques fluides
+Calcul de déflection des lignes de champ
+
+L'effet simule une véritable lévitation électrostatique avec physique électromagnétique réaliste et chaos contrôlé fascinant ! 🚀⚡

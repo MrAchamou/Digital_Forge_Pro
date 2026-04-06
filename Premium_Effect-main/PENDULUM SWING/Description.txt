@@ -1,0 +1,86 @@
+## ⏰ EFFET 45 : PENDULUM SWING
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Pendulum_Swing  
+**ID UNIQUE :** harmonic-pendular-oscillation-045  
+**NOM AFFICHAGE :** Oscillation Pendulaire Harmonique  
+
+**DESCRIPTION :** Balancier naturel avec physics pendulaire authentique. Oscillations harmoniques avec amortissement progressif, point de suspension invisible mais déductible, effet de la "longueur de corde" sur la période. Déformations dues aux forces centrifuges aux extrémités du mouvement.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Oscillations avec amortissement et relance mystérieuse
+- Déformations centrifuges aux points d'inversion
+- Variations de période révélant la "longueur" du pendule
+- Points morts créant des moments de tension suspendue
+
+------------------------------------------------------------------------
+
+⏰ PENDULUM SWING CRÉÉ !
+✨ OSCILLATION PENDULAIRE HYPNOTIQUE
+⚖️ PHYSIQUE PENDULAIRE AUTHENTIQUE :
+
+Équation différentielle exacte : T = 2π√(L/g) avec intégration Verlet
+Point de suspension invisible : Position déductible par observation
+Amortissement progressif : Décroissance naturelle avec coefficient réglable
+3 harmoniques superposées : Complexité subtile dans l'oscillation
+
+🎯 SPÉCIFICATIONS ADDICTION INTÉGRÉES
+🔄 RELANCE MYSTÉRIEUSE D'ÉNERGIE (30% IMPRÉVISIBILITÉ) :
+
+Détection amplitude faible : Boost automatique quand pendule ralentit
+Timing aléatoire : 4-12 secondes entre relances
+Effet visuel : 6 particules d'énergie depuis le point de suspension
+Conservation du mystère : Source d'énergie non visible
+
+⚡ DÉFORMATIONS CENTRIFUGES AUX EXTRÊMES :
+
+Forces calculées : F = mv²/r authentique
+Étirement radial : ScaleX/Y basés sur direction centrifuge
+Rotation dynamique : Angle élément = 30% angle pendule
+Flou de mouvement : Motion blur proportionnel à la vitesse
+
+🎭 POINTS MORTS DRAMATIQUES :
+
+Détection seuil : Vitesse angulaire < 0.01 rad/s
+Aura de tension : Gradient radial pulsant
+Ondes de suspens : 3 cercles concentriques
+Particules potentielles : Émission d'énergie statique
+
+🔗 CORDE VIRTUELLE VISIBLE
+
+20 segments simulés : Points avec tension individuelle
+Oscillations propres : 5 modes de vibration superposés
+Épaisseur variable : Thickness ∝ tension locale
+Vibrations haute fréquence : 15 Hz pour réalisme
+
+🚀 MICRO-ANIMATIONS RÉCOMPENSANTES
+
+Traînée historique : 60 points avec dégradé temporel
+Oscillation suspension : Point de fixation breathing subtil
+Stroboscope : Opacity modulée par vitesse
+Modes vibratoires : Corde ondule selon physique
+
+🔬 PERFORMANCE OPTIMISÉE
+
+Object pooling : 15 particules réutilisées
+Intégration stable : Pas de divergence numérique
+Historique limité : 60 points maximum pour éviter surcharge mémoire
+
+Calculs différés : Régénération corde selon besoin
+
+🌊 RÉVÉLATION PROGRESSIVE
+
+Période observable : Longueur déductible par chronométrage
+Harmoniques subtiles : 3 fréquences révélant complexité interne
+Compteur points morts : Pattern révélé après observation
+Énergie résiduelle : Particules persistent après boost
+
+📐 PRÉCISION MATHÉMATIQUE
+
+Loi de conservation : Énergie cinétique ↔ potentielle
+Approximation petits angles : sin(θ) ≈ θ pour fluidité
+Résonance naturelle : Fréquence propre respectée
+Amortissement exponentiel : Décroissance physiquement correcte
+
+L'effet crée un balancier mesmérant avec physique rigoureuse et moments de tension suspendue ! L'imprévisibilité des relances d'énergie maintient l'attention tandis que les déformations centrifuges aux extrêmes créent des accélérations dramatiques.
+Le point de suspension invisible mais déductible engage l'observation active, et les points morts génèrent ces moments addictifs de suspens où l'œil attend la reprise du mouvement ! ⏰

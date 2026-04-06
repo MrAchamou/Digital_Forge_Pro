@@ -1,0 +1,55 @@
+## ✨ EFFET 57 : SOUL AURA
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Soul_Aura  
+**ID UNIQUE :** personalized-energy-aura-057  
+**NOM AFFICHAGE :** Aura Énergétique Personnalisée  
+
+**DESCRIPTION :** Aura énergétique unique qui émane de l'image avec signature vibratoire personnalisée. Couleurs auriques évolutives selon l'émotion simulée, pulsations synchronisées avec un "rythme vital", interactions avec l'environnement énergétique invisible.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Signature vibratoire unique créant des patterns auriques reconnaissables
+- Évolution chromatique selon les états émotionnels simulés
+- Interactions énergétiques avec l'environnement invisible
+- Pulsations vitales révélant la "personnalité" de l'image
+
+--------------------------------------------------------------------------------------
+
+🔮 CARACTÉRISTIQUES HYPNOTIQUES INTÉGRÉES :
+🌟 ADDICTION FACTORS :
+
+Signature vibratoire unique : Système d'harmoniques personnalisées créant des patterns auriques reconnaissables
+Évolution chromatique émotionnelle : 8 états émotionnels (sérénité, joie, colère, tristesse, passion, peur, amour, neutre) avec transitions fluides
+Interactions énergétiques invisibles : Champs attractifs/répulsifs modifiant la trajectoire des particules
+Pulsations vitales personnalisées : Rythme cardiaque et respiratoire simulés synchronisés avec l'aura
+
+🎨 EFFETS VISUELS SPIRITUELS :
+
+Couches auriques multiples : 3-12 couches concentriques avec vibrations individuelles
+Système de chakras : 7 chakras principaux avec rotations spirituelles et couleurs authentiques
+Particules énergétiques : 2 types (normale/chakra) avec oscillations personnalisées et connexions énergétiques
+Distorsions spatiales : Rotation, échelle et phase synchronisées avec la signature vibratoire
+
+🔬 INTELLIGENCE ÉMOTIONNELLE :
+
+Détection d'état automatique : Analyse de la signature vibratoire pour déterminer l'émotion
+Chromatothérapie dynamique : Couleurs auriques évoluant selon l'état psychique simulé
+Résonance harmonique : Fréquences multiples créant des battements complexes
+Mémoire vibratoire : Persistance des patterns émotionnels avec transitions graduelles
+
+⚡ OPTIMISATIONS PERFORMANCE :
+
+Object pooling : 250 particules réutilisables
+Rendu conditionnel : Blend modes optimisés (screen, lighter)
+Calculs harmoniques : Signature vibratoire précalculée
+Interactions sélectives : Champs énergétiques activables
+
+🎛️ PARAMÈTRES CONFIGURABLES :
+
+intensiteAura : Puissance de l'émanation énergétique (0.2-2.0)
+couchesAuriques : Nombre de couches auriques (3-12)
+rythmeVital : Fréquence cardiaque/respiratoire (0.3-3.0)
+sensibiliteEmotionnelle : Réactivité aux changements d'état (0.1-1.0)
+interactionEnvironnement : Force des champs énergétiques (0.0-1.0)
+
+L'effet crée une aura spirituelle vivante qui révèle la "personnalité" de l'image à travers des signatures vibratoires uniques, des états émotionnels évolutifs et des interactions énergétiques invisibles ! 🌈💫

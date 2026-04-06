@@ -1,0 +1,48 @@
+## 🔄 EFFET 56 : GRAVITY REVERSE
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Gravity_Reverse  
+**ID UNIQUE :** inverted-gravitational-field-056  
+**NOM AFFICHAGE :** Inversion Gravitationnelle Sélective  
+
+**DESCRIPTION :** Gravité inversée affectant sélectivement différentes parties de l'image. Éléments qui "tombent" vers le haut, autres qui restent normaux, champ gravitationnel visible par distorsions spatiales. Zones de gravité nulle créant des effets de lévitation localisée.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Sélectivité gravitationnelle défiant la logique physique
+- Champs gravitationnels visualisés par courbure de l'espace
+- Zones de transition créant des effets d'anti-gravité
+- Particules virtuelles révélant les directions gravitationnelles
+
+------------------------------------------------------------------------
+
+🎯 CARACTÉRISTIQUES HYPNOTIQUES INTÉGRÉES :
+⚡ ADDICTION FACTORS :
+
+Sélectivité gravitationnelle défiant la logique : Zones alternant entre gravité normale et inversée
+Imprévisibilité contrôlée : Changements occasionnels de type de zone (30% surprise)
+Micro-animations récompensantes : Pulsations des champs, particules avec traînées dynamiques
+Finition fluide : Transitions douces entre les états gravitationnels
+
+🔬 EFFETS VISUELS CINÉMATOGRAPHIQUES :
+
+Champs gravitationnels visibles : Gradients radiaux colorés révélant les zones d'influence
+Distorsion de l'espace-temps : Grille déformée montrant la courbure spatiale
+Particules indicatrices : Système avancé avec traînées, rebonds et physique réaliste
+Segmentation d'image : Distorsion progressive par segments avec rotation et échelle
+
+⚙️ OPTIMISATIONS PERFORMANCE :
+
+Object pooling : 300 particules réutilisables pour 60 FPS constant
+Système de zones : Calculs gravitationnels optimisés par proximité
+Rendu conditionnel : Alpha testing pour éviter le sur-rendu
+Grille adaptative : Résolution 20px pour équilibre qualité/performance
+
+🎨 PARAMÈTRES CONFIGURABLES :
+
+intensiteGravite : Force des champs (0.1-2.0)
+nombreZones : Quantité de zones gravitationnelles (2-8)
+vitesseTransition : Rapidité des changements (0.5-3.0)
+densiteParticules : Nombre de particules indicatrices (20-200)
+courbureEspace : Intensité de distorsion spatiale (0.2-1.5)
+
+L'effet crée une illusion de gravité sélective où certaines parties de l'image semblent "tomber vers le haut" tandis que d'autres restent normales, avec une visualisation complète des champs gravitationnels par des distorsions de l'espace-temps ! 🚀✨

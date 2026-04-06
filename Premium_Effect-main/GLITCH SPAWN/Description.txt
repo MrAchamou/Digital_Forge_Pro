@@ -1,0 +1,69 @@
+## 📺 EFFET 4 : GLITCH SPAWN
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Glitch_Spawn  
+**ID UNIQUE :** matrix-error-correction-004  
+**NOM AFFICHAGE :** Erreur Matrix Autocorrectrice  
+
+**DESCRIPTION :** Texte apparaît d'abord en caractères aléatoires (Matrix-style) puis se "corrige" progressivement. Glitches RGB avec décalages de couleurs, lignes de scan, parasites numériques. Auto-correction avec effet de "debugging" visuel et validation progressive lettre par lettre.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Séquence de correction imprévisible mais logique
+- Parasites visuels rythmés (scan lines pulsantes)
+- Décalages RGB qui se resynchronisent
+- Moments de "freeze" avant correction brutale
+
+---------------------------------------------------------------------
+
+📺 MATRIX ERROR CORRECTION CRÉÉ !
+🖥️ CARACTÉRISTIQUES CYBER-ADDICTIVES :
+⚡ SYSTÈME DE PHASES INTELLIGENTES :
+
+MATRIX : Flux constant de caractères aléatoires Matrix-style
+DEBUGGING : Ralentissement progressif + analyse système
+CORRECTING : Auto-correction lettre par lettre avec priorité
+STABLE : Validation finale + cycle restart automatique
+
+🔴 GLITCHES RGB AUTHENTIQUES :
+
+Décalages temporels : Rouge/Vert/Bleu désynchronisés
+Intensité variable : 0.7-1.0 selon le chaos système
+Freeze moments : Arrêts brutaux 50-200ms
+Resynchronisation progressive après glitch
+
+📡 SCAN LINES PULSANTES :
+
+8 lignes indépendantes avec vitesses variables
+Rebonds fluides sur les bords du canvas
+Pulsation sinusoïdale : intensité 0.2-0.6
+Direction aléatoire : haut/bas dynamique
+
+🔧 AUTO-CORRECTION LOGIQUE :
+
+Queue prioritaire : centre du texte corrigé en premier
+Séquence multi-étapes : 3-6 tentatives par caractère
+Validation visuelle : particules vertes de confirmation
+Timing imprévisible : 200ms base + randomisation
+
+💀 PARASITES NUMÉRIQUES :
+
+50 parasites actifs : points/lignes/rectangles
+Mouvement brownien avec rebonds
+Cycle de vie : 500-2000ms avec fade-out
+Types variés : débris visuels authentiques
+
+🎯 CARACTÈRES MATRIX AUTHENTIQUES :
+
+Mix alphanumérique + katakana japonais
+Fréquence adaptive : 50-200ms selon la phase
+History tracking : mémorisation des glitches
+Freeze probability : 15-25% par caractère
+
+🎮 PARAMÈTRES CONFIGURABLES :
+
+glitchFrequency : Fréquence des erreurs système
+correctionSpeed : Vitesse de l'auto-correction
+vitesse : Multiplicateur global de tempo
+intensite : Force des effets visuels
+
+🚀 DEBUGGING VISUEL HYPNOTIQUE ! Cet effet simule un VRAI SYSTÈME EN PANNE qui se répare sous tes yeux avec un réalisme de terminal qui rend TOTALEMENT ACCRO ! 🖥️✨

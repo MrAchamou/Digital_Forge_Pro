@@ -1,0 +1,55 @@
+## 🧲 EFFET 14 : MAGNETIC FIELD
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Magnetic_Field  
+**ID UNIQUE :** electromagnetic-attraction-014  
+**NOM AFFICHAGE :** Champ Magnétique Interactif  
+
+**DESCRIPTION :** Lettres se comportent comme des aimants avec attraction/répulsion mutuelle. Physics magnétique réaliste, lignes de champ visibles, particules métalliques attirées vers les lettres. Polarités qui changent cycliquement créant des danses magnétiques complexes.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Interactions magnétiques imprévisibles entre lettres
+- Lignes de champ magnétique ondulantes et hypnotiques
+- Particules métalliques qui dansent selon les forces
+- Inversions de polarité créant des réorganisations dramatiques
+
+---------------------------------------------------------------------------
+
+🧲 EFFET MAGNÉTIQUE HYPNOTIQUE CRÉÉ !
+⚡ CARACTÉRISTIQUES ADDICTIVES INTÉGRÉES :
+🎯 PHYSIQUE MAGNÉTIQUE RÉALISTE :
+
+✅ Interactions dipôle-dipôle entre lettres avec polarités alternées
+✅ Forces de Lorentz sur particules métalliques en mouvement
+✅ Décroissance en 1/r² pour réalisme physique parfait
+✅ Cycles d'inversion de polarité créant des réorganisations dramatiques
+
+🌊 HYPNOSE VISUELLE :
+
+✅ 70% prévisible : Physique cohérente et lignes de champ fluides
+✅ 30% imprévisible : Inversions cycliques et interactions chaotiques
+✅ Lignes de champ ondulantes avec gradients colorés dynamiques
+✅ Micro-animations : Flèches directionnelles et pulsations énergétiques
+
+✨ DÉTAILS RÉCOMPENSANT L'ATTENTION :
+
+✅ Trails de particules métalliques avec fade progressif
+✅ Auras magnétiques différenciées par polarité (rouge N / bleu S)
+✅ Indicateurs de charge sur particules haute énergie
+✅ Distorsions atmosphériques électromagnétiques subtiles
+
+🎭 PERFORMANCE CINÉMATOGRAPHIQUE :
+
+✅ Object pooling pour particules et lignes de champ
+✅ Easing naturel avec forces physiques et friction atmosphérique
+✅ Loop parfait grâce aux oscillations sinusoïdales harmoniques
+✅ 60 FPS garanti avec calculs optimisés et mise en cache des forces
+
+🔥 EFFETS SPECTACULAIRES :
+
+Danses magnétiques complexes entre lettres avec attractions/répulsions
+Particules métalliques qui orbiteront et danseront selon les champs
+Inversions de polarité cycliques créant des moments dramatiques
+Champs électromagnétiques visibles avec rendu scientifiquement précis
+
+L'effet est prêt ! Les lettres vont se comporter comme de vrais aimants avec une physique parfaitement réaliste et hypnotique ! 🧲✨

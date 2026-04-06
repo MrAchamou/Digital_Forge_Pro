@@ -1,0 +1,59 @@
+✨ EFFET 32 : PARTICLE DISSOLVE
+CATÉGORIE : IMAGE  
+EFFET DEMANDÉ : Particle_Dissolve  
+ID UNIQUE : pixel-particle-disintegration-032  
+NOM AFFICHAGE : Désintégration Particulaire Quantique  
+DESCRIPTION : Dissolution en millions de particules colorées avec physics quantique. Chaque pixel devient une particule avec vélocité et masse uniques, conservation de l'énergie chromatique, dispersion selon les lois de diffusion. Particules qui gardent mémoire de leur position originale.
+SPÉCIFICATIONS ADDICTION :
+- Particules avec comportement quantique imprévisible
+- Conservation chromatique créant des nuages colorés
+- Mémoire positionnelle créant des reformations partielles
+- Diffusion avec patterns fractals émergents
+
+-------------------------------------------------------------------------
+
+🔬 PARTICLE DISSOLVE EFFECT - DÉSINTÉGRATION PARTICULAIRE QUANTIQUE CRÉÉ !
+✨ CARACTÉRISTIQUES QUANTIQUES IMPLÉMENTÉES :
+⚛️ PHYSIQUE QUANTIQUE AUTHENTIQUE :
+
+États quantiques : ground, excited, superposition, entangled
+Comportement imprévisible : Principe d'incertitude de Heisenberg
+Conservation d'énergie : Niveaux énergétiques basés sur luminance
+Entanglement : Particules corrélées par couleur similaire
+
+🌈 CONSERVATION CHROMATIQUE AVANCÉE :
+
+Nuages colorés : Groupement automatique par couleur
+Mémoire positionnelle : Force de rappel vers origine
+Reformation partielle : Régénération basée sur conservation d'énergie
+Densité chromatique : Masse des particules selon luminance
+
+🌀 PATTERNS FRACTALS ÉMERGENTS :
+
+4 types de diffusion : Radial, Spiral, Wave, Chaos
+Bruit de Perlin : Mouvement brownien organique
+Attracteur de Lorenz : Patterns chaotiques authentiques
+Géométrie fractale : Auto-similarité à toutes les échelles
+
+🎭 FACTEURS ADDICTION INTÉGRÉS :
+
+Imprévisibilité quantique : 30% de chaos contrôlé
+Superposition visuelle : Particules dans plusieurs états
+Entanglement hypnotique : Connexions ondulantes
+Reformation mystérieuse : Retour progressif des pixels
+
+⚡ OPTIMISATIONS PERFORMANCE :
+
+Pool de 5000 particules : Réutilisation pour 60 FPS
+Échantillonnage intelligent : Tous les 2-3 pixels
+Limitation vélocité : Stabilité garantie
+États quantiques probabilistes : Calculs optimisés
+
+🎨 RENDU CINÉMATOGRAPHIQUE :
+
+Halos énergétiques : Particules excitées brillent
+Ondulations temporelles : Mouvement basé sur phases
+Composite modes : Effet "lighter" pour nuages lumineux
+Gradients radiaux : Nuages chromatiques réalistes
+
+L'effet crée une désintégration quantique hypnotique où chaque pixel devient une particule avec comportement physique authentique et patterns fractals émergents ! ⚛️✨

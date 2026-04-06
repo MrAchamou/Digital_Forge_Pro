@@ -3,6 +3,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { registerRoutes } from "./routes";
 import { DependencyChecker } from "./utils/dependency-checker";
 import { errorDetection } from './modules/error-detection.module';
+import { loadPremiumEffects } from './utils/premium-effects-loader';
 
 const app = express();
 app.use(express.json());
@@ -148,5 +149,21 @@ app.use((req, res, next) => {
     console.log(`📊 Dashboard disponible sur http://0.0.0.0:${port}/api/system/health`);
     console.log('🎯 Système GOD entièrement opérationnel');
     console.log('🔍 Auto-détection et correction des erreurs: ACTIVE');
+
+    // Chargement des effets premium après démarrage
+    console.log('📦 Chargement des effets premium...');
+    loadPremiumEffects().then(result => {
+      if (result.loaded > 0) {
+        console.log(`✅ ${result.loaded} effets premium chargés dans la bibliothèque`);
+      }
+      if (result.skipped > 0) {
+        console.log(`⏭️  ${result.skipped} effets déjà présents (ignorés)`);
+      }
+      if (result.errors.length > 0) {
+        console.warn(`⚠️  ${result.errors.length} erreurs lors du chargement`);
+      }
+    }).catch(err => {
+      console.warn('⚠️ Chargement des effets premium échoué:', err.message);
+    });
   });
 })();

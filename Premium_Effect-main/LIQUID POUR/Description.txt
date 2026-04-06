@@ -1,0 +1,76 @@
+## 💧 EFFET 5 : LIQUID POUR
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Liquid_Pour  
+**ID UNIQUE :** viscous-text-flow-005  
+**NOM AFFICHAGE :** Écoulement Liquide Visqueux  
+
+**DESCRIPTION :** Liquide coloré coule du haut du canvas et se solidifie en formant les lettres. Physics fluide réaliste avec viscosité variable, éclaboussures, tension de surface. Le liquide pulse et ondule avant de se stabiliser. Réflexions lumineuses sur la surface.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Gouttes qui tombent avec timing irrégulier
+- Ondulations hypnotiques à la surface
+- Transition liquide → solide progressive
+- Reflets lumineux qui dansent sur le texte formé
+
+---------------------------------------------------------------------------
+
+💧 LIQUID POUR VISQUEUX CRÉÉ !
+🌊 CARACTÉRISTIQUES FLUIDES HYPNOTIQUES :
+🎯 PHYSICS LIQUIDE AUTHENTIQUE :
+
+Cohésion/Séparation : Particules s'attirent mais se repoussent si trop proches
+Viscosité variable : Paramètre viscosity affecte la fluidité
+Tension de surface : Forces réalistes entre particules voisines
+Gravité + Friction : Chute naturelle avec ralentissement
+
+💦 SYSTÈME DE SOURCES INTELLIGENT :
+
+Sources multiples : 3+ points de versement selon longueur texte
+Débit irrégulier : Pulses avec timing aléatoire 800-2000ms
+Émission contrôlée : Paramètre flowRate pour ajuster l'intensité
+Activation séquentielle : Sources s'activent progressivement
+
+⚡ 4 PHASES ADDICTIVES :
+
+COULAGE : Liquide s'écoule librement depuis les sources
+FORMATION : Attraction magnétique vers les formes de lettres
+SOLIDIFICATION : Transition progressive liquide → solide
+STABLE : Ondulations + reflets sur le texte formé
+
+✨ ÉCLABOUSSURES RÉALISTES :
+
+Détection d'impact : Éclaboussures quand vitesse > 2
+Mini-particules : 5 débris par impact avec physique indépendante
+Gravité appliquée : Retombée naturelle des projections
+Fade progressif : Alpha diminue sur 500ms
+
+🌀 ONDULATIONS HYPNOTIQUES :
+
+Génération aléatoire : 2% chance par frame sur particules stables
+Propagation circulaire : Rayons 30-70px avec vitesse variable
+Double cercle : Ondulation externe + interne à 60%
+Alpha dégressif : Transparence selon âge
+
+💎 REFLETS LUMINEUX DANSANTS :
+
+Calcul en temps réel : Sur particules solidifiées > 30%
+Position oscillante : Cos/sin avec phases différentes
+Intensité pulsante : Basée sur ondulation individuelle
+Blanc pur : RGB(255,255,255) avec alpha variable
+
+🎨 COULEURS ÉVOLUTIVES :
+
+Variation initiale : ±40 sur chaque canal RGB
+Mix solidification : Transition vers gris-bleu clair
+Gradient radial : Centre opaque → bords transparents
+Adaptation viscosité : Couleur influencée par fluidité
+
+🎮 PARAMÈTRES CONFIGURABLES :
+
+viscosity : 0.1-3.0 - Épaisseur du liquide
+flowRate : 0.3-3.0 - Débit des sources
+vitesse : Multiplicateur global de vitesse
+intensite : Intensité des effets visuels
+
+🚀 LIQUIDE VIVANT ! Cet effet simule un VRAI ÉCOULEMENT FLUIDE avec des particules qui "pensent" collectivement pour former ton texte de manière ORGANIQUE et HYPNOTIQUE ! 🌊✨

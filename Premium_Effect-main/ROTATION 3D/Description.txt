@@ -1,0 +1,62 @@
+## 🔄 EFFET 19 : ROTATION 3D
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Rotation_3D  
+**ID UNIQUE :** spatial-axis-rotation-019  
+**NOM AFFICHAGE :** Rotation Multi-Axiale Spatiale  
+
+**DESCRIPTION :** Rotation 3D complexe sur multiple axes simultanément. Effet de perspective réaliste, ombres portées dynamiques, reflets sur surfaces virtuelles. Axes de rotation qui évoluent créant des mouvements hypnotiques imprévisibles.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Rotation sur axes multiples avec précession
+- Perspective 3D réaliste avec depth-of-field
+- Ombres et reflets dynamiques
+- Axes de rotation qui évoluent organiquement
+
+-----------------------------------------------------------------------------
+
+🌀 ROTATION 3D EFFECT CRÉÉ ! 🎯
+✨ CARACTÉRISTIQUES HYPNOTIQUES INTÉGRÉES :
+🔄 Système de Rotation Multi-Axiale :
+
+3 axes simultanés avec évolution organique indépendante
+Précession dynamique : Les axes de rotation tournent eux-mêmes !
+Amplitudes variables : Intensité de rotation qui évolue continuellement
+Imprévisibilité contrôlée : 70% rythmé, 30% variations surprenantes
+
+🎭 Perspective 3D Réaliste :
+
+Projection perspective avec matrice de transformation complète
+Depth-of-Field : Flou progressif selon la distance focale
+Particules de profondeur avec effet bokeh sur éléments flous
+Échelle perspective dynamique selon la position Z
+
+💡 Système d'Éclairage Cinématographique :
+
+Éclairage directionnel avec calcul de normales 3D
+Rim lighting pour contours lumineux réalistes
+Éclairage ambiant pour profondeur visuelle
+Intensité lumineuse variant selon l'orientation 3D
+
+🪞 Surfaces Virtuelles & Reflets :
+
+Sol virtuel avec grille perspective et reflets déformés
+Ombres portées projetées avec déformation 3D réaliste
+Reflets dynamiques avec opacité selon l'angle de vue
+Surfaces latérales pour effets de profondeur additionnels
+
+🌊 Micro-Détails Addictifs :
+
+Skew et transformation simulant la vraie perspective 3D
+Particules orbitales flottant dans l'espace 3D
+Focus automatique qui suit le mouvement pour maintenir l'attention
+Combinaison de modes (overlay, screen) pour effets lumineux
+
+🎛️ PARAMÈTRES CONFIGURABLES :
+
+Vitesse : Contrôle rotation et précession (0.1-3)
+Intensité : Luminosité globale et opacité (0-1)
+Complexité : Amplitude des rotations et variations (0.2-2)
+Perspective : Intensité de l'effet 3D et profondeur (0.3-1.5)
+
+L'effet simule une véritable rotation 3D avec mathématiques matricielles complètes, créant une fascination par l'imprévisibilité des axes évolutifs et la profondeur réaliste de l'espace virtuel !

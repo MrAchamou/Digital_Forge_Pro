@@ -1,0 +1,63 @@
+## 🌊 EFFET 13 : WAVE DISTORTION
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Wave_Distortion  
+**ID UNIQUE :** fluid-wave-deformation-013  
+**NOM AFFICHAGE :** Distorsion Ondulatoire Fluide  
+
+**DESCRIPTION :** Ondulations liquides continues traversent le texte comme des vagues sous-marines. Déformation sinusoïdale avec multiple fréquences superposées, effet de réfraction lumineuse, ondulations qui interagissent et créent des interférences. Sensation de texte immergé dans un fluide invisible.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Vagues multiples avec interférences complexes
+- Réfraction lumineuse créant des rainbow effects
+- Ondulations perpétuelles sans répétition exacte
+- Points de convergence des vagues créant des explosions visuelles
+
+----------------------------------------------------------------------------------
+
+🌊⚡ WAVE DISTORTION EFFECT - TERMINÉ !
+🎯 CARACTÉRISTIQUES HYPNOTIQUES IMPLÉMENTÉES :
+💫 FACTEUR ADDICTION :
+
+Vagues multiples : 5 ondulations avec fréquences/directions différentes
+Interférences complexes : Points constructifs/destructifs créant patterns imprévisibles
+Dérive organique : Paramètres qui évoluent subtilement sans répétition exacte
+Convergences explosives : Points de rencontre créant des rainbow bursts
+
+🌈 SYSTÈME DE RÉFRACTION :
+
+Spectre décomposé : 7 couleurs avec indices de réfraction différents
+Prismes lumineux : Texte décomposé en arc-en-ciel lors des distorsions
+Gradient fluide : Transitions chromatiques basées sur les ondulations
+Réfraction adaptive : Intensité variable selon l'amplitude des vagues
+
+🌊 PHYSIQUE ONDULATOIRE RÉALISTE :
+
+Superposition : Vagues qui s'additionnent/s'annulent naturellement
+Propagation directionnelle : Chaque vague suit sa propre trajectoire
+Atténuation distance : Amplitude réduite avec l'éloignement
+Modulation temporelle : Fréquences qui dérivent organiquement
+
+💥 EXPLOSIONS VISUELLES :
+
+Détection de convergence : Monitoring automatique des amplitudes combinées
+Expansion/Implosion : Deux types d'explosions selon le type d'interférence
+Anneaux spectraux : Propagation en cercles colorés
+Timing intelligent : Cooldown pour éviter la saturation
+
+⚙️ PARAMÈTRES CONFIGURABLES :
+
+Vitesse : Fréquence de propagation des ondulations
+Intensité : Amplitude globale des distorsions
+Couleur : Teinte de base du fluide
+Complexité : Nombre et intensité des interférences
+Réfraction : Force de décomposition prismatique
+
+🔥 OPTIMISATIONS PERFORMANCE :
+
+Cache de distorsion : Float32Array pour calculs optimisés
+Échantillonnage réduit : Points d'interférence calculés par pas de 20px
+Gradients pré-calculés : Réutilisation des patterns chromatiques
+Rendu conditionnel : Effets de réfraction seulement si paramètre > 0.1
+
+L'effet simule parfaitement un fluide invisible avec propagation d'ondes, interférences physiques et décomposition prismatique - idéal pour créer une sensation d'immersion aquatique hypnotique ! 🌊✨

@@ -1,0 +1,54 @@
+## 🧬 EFFET 2 : DNA BUILD
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** DNA_Build  
+**ID UNIQUE :** dna-helix-builder-002  
+**NOM AFFICHAGE :** Construction Spirale ADN  
+
+**DESCRIPTION :** Les lettres se forment via une double hélice d'ADN qui se déroule. Chaque caractère émerge de la spirale avec des particules bio-luminescentes. La hélice tourne en 3D simulé, les brins se connectent et se déconnectent rythmiquement. Couleurs organiques évolutives (vert → bleu → violet).
+
+**SPÉCIFICATIONS ADDICTION :**
+- Rotation hypnotique continue de la spirale
+- Particules qui dansent le long des brins
+- Pulsations bioluminescentes synchronisées
+- Révélation progressive des liaisons moléculaires
+
+--------------------------------------------------------------------
+
+🧬 DNA HELIX BUILDER EFFET CRÉÉ !
+✨ CARACTÉRISTIQUES BIO-ADDICTIVES IMPLÉMENTÉES :
+🎯 ROTATION HYPNOTIQUE 3D:
+
+Double hélice authentique : Brins A/B avec décalage π parfait
+Rotation continue : Paramètre rotationSpeed pour contrôle
+Projection 3D → 2D : Profondeur et perspective réalistes
+Pulsations synchronisées : Chaque brin pulse indépendamment
+
+🔬 SYSTÈME BIO-LUMINESCENT:
+
+100 particules poolées : nucleotide, liaison, enzyme
+Attraction vers l'hélice : Forces physiques réalistes
+Pulsations respiratoires : sin() avec phases aléatoires
+Anti-gravité biologique : Particules flottent vers le haut
+
+🌈 ÉVOLUTION CHROMATIQUE:
+
+4 phases couleur : Vert → Turquoise → Violet → Rose
+Transition fluide : Interpolation RGB progressive
+Synchronisation globale : Toutes particules évoluent ensemble
+
+⚡ RÉVÉLATION PROGRESSIVE:
+
+Émergence spirale : Caractères apparaissent de la double hélice
+Explosion particulaire : 8 particules par caractère révélé
+Liaisons hydrogène : Connexions entre brins qui pulsent
+Glow dynamique : Ombres colorées sur texte + particules
+
+🎮 PARAMÈTRES CONFIGURABLES:
+
+vitesse : Rapidité de révélation des caractères
+intensite : Intensité globale des effets
+rotationSpeed : Vitesse de rotation de l'hélice
+particleDensity : Densité des particules bio-luminescentes
+
+🚀 PRÊT POUR INTÉGRATION ! Cet effet transforme ton texte en SÉQUENCE GÉNÉTIQUE HYPNOTIQUE avec un réalisme scientifique qui captive instantanément !

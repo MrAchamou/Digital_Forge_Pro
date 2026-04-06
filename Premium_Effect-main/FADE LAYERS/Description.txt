@@ -1,0 +1,65 @@
+## 🎭 EFFET 9 : FADE LAYERS
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Fade_Layers  
+**ID UNIQUE :** opacity-depth-stacking-009  
+**NOM AFFICHAGE :** Stratification Profondeur  
+
+**DESCRIPTION :** Multiples couches du même texte avec opacités différentes créent un effet de profondeur hypnotique. Chaque couche pulse à un rythme légèrement différent, créant des interférences visuelles. Jeu complexe d'ombres et de lumières entre les strates.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Pulsations des couches en décalage rythmique
+- Interférences visuelles entre les strates
+- Profondeur qui semble infinie par moments
+- Révélation progressive de détails cachés entre couches
+
+-------------------------------------------------------------------------------
+
+🎭 FADE LAYERS EFFECT TERMINÉ !
+🎯 CARACTÉRISTIQUES HYPNOTIQUES INTÉGRÉES :
+🔥 FACTEUR ADDICTION MAXIMAL :
+
+Pulsations décalées : Chaque couche pulse à sa propre fréquence avec interférences
+Profondeur infinie : Animation de profondeur dynamique qui "respire"
+Révélation progressive : Cycles de clarté où les détails cachés émergent
+Interférences visuelles : Zones constructives/destructives créent des battements hypnotiques
+
+🎨 EFFETS VISUELS PREMIUM :
+
+9 couches par défaut avec opacités et couleurs interpolées intelligemment
+5 modes de mélange : source-over, multiply, screen, overlay, soft-light
+Oscillateurs complexes : sine, cosine, triangle, interference pour rythmes organiques
+Bruit Perlin pour micro-mouvements organiques de chaque couche
+Zones d'interférence dynamiques qui créent des "points chauds" visuels
+
+🎮 SYSTÈME D'ADDICTION SCIENTIFIQUE :
+
+70% prévisible : Rythmes de base stables et rassurants
+30% surprise : Interférences et révélations imprévisibles
+Respiration globale : Effet de "souffle" unifiant toutes les couches
+Micro-détails : Contours et surbrillances qui récompensent l'attention
+
+⚡ PERFORMANCE OPTIMISÉE :
+
+Cache des gradients pour éviter recalculs répétitifs
+Oscillateurs réutilisables avec phases décalées
+Calculs d'opacité optimisés avec limitations automatiques
+Pool de zones d'interférence configurables
+
+🎨 PARAMÈTRES CONFIGURABLES :
+
+vitesse : Vitesse globale des animations
+intensite : Intensité des pulsations
+couleurBase/Profondeur : Palette dégradée entre couches
+nombreCouches : 5-15 couches configurables
+profondeurMax : Étalement spatial des couches
+interferenceRate : Intensité des battements visuels
+
+🚀 CYCLE ADDICTIF CONTINU :
+
+Phase Construction : Les couches s'alignent progressivement
+Phase Interférence : Battements visuels créent des motifs complexes
+Phase Révélation : Moment de clarté totale révélant tous les détails
+Phase Dissolution : Retour au chaos contrôlé pour recommencer
+
+L'effet créée une profondeur hypnotique infinie avec des moments de révélation qui récompensent l'attention prolongée ! 🎭✨

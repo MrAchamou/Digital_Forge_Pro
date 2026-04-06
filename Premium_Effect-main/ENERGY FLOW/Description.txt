@@ -1,0 +1,55 @@
+## ⚡ EFFET 18 : ENERGY FLOW
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Energy_Flow  
+**ID UNIQUE :** plasma-energy-stream-018  
+**NOM AFFICHAGE :** Flux Énergétique Plasma  
+
+**DESCRIPTION :** Courants d'énergie plasma traversent continuellement le texte. Flux lumineux avec particules chargées, arcs électriques secondaires, gradients de couleur selon l'intensité énergétique. Énergie qui pulse et reflue comme un système circulatoire lumineux.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Flux énergétiques avec variations d'intensité rythmées
+- Arcs électriques secondaires imprévisibles
+- Système circulatoire d'énergie complexe
+- Couleurs qui évoluent selon la charge énergétique
+
+-------------------------------------------------------------------
+
+🔥 ENERGY FLOW EFFECT CRÉÉ ! ⚡
+✨ CARACTÉRISTIQUES HYPNOTIQUES INTÉGRÉES :
+🌊 Système Circulatoire Énergétique :
+
+Nœuds énergétiques interconnectés avec charges dynamiques
+Flux plasma suivant des chemins organiques courbes
+Système de circulation complexe avec connexions multiples
+Pulsations rythmées synchronisées mais avec variations
+
+⚡ Effets Électriques Addictifs :
+
+Arcs électriques spontanés entre nœuds chargés (30% imprévisibilité)
+Particules chargées avec attraction/répulsion physique réaliste
+Décharges surprises quand la charge dépasse le seuil critique
+Turbulence électrique avec segments d'arcs régénératifs
+
+🎨 Évolution Chromatique Énergétique :
+
+Palette progressive : Bleu froid → Cyan → Jaune → Magenta électrique
+Couleurs selon intensité : L'énergie transforme la couleur dynamiquement
+Glow pulsant avec radius variant selon la charge
+Mode screen pour fusion lumineuse addictive
+
+🔄 Micro-Détails Récompensants :
+
+Trails de particules avec dégradé progressif
+Scintillement d'arcs avec régénération aléatoire des segments
+Flux en boucle parfaite sur chemins courbes
+Variations de largeur selon l'intensité énergétique
+
+🎛️ PARAMÈTRES CONFIGURABLES :
+
+Vitesse : Contrôle flux et pulsations (0.1-3)
+Intensité : Luminosité et opacité globale (0-1)
+Densité : Nombre de nœuds et fréquence particules (0.3-2)
+Turbulence : Chaos dans les arcs électriques (0-1)
+
+L'effet simule un véritable système énergétique plasma avec physique réaliste, créant une fascination par l'imprévisibilité contrôlée des décharges électriques et l'évolution hypnotique des couleurs selon l'intensité !

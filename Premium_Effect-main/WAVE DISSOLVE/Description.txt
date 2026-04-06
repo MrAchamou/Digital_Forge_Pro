@@ -1,0 +1,64 @@
+## 🌊 EFFET 40 : WAVE DISSOLVE
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Wave_Dissolve  
+**ID UNIQUE :** oceanic-wave-dissolution-040  
+**NOM AFFICHAGE :** Dissolution Ondulatoire Océanique  
+
+**DESCRIPTION :** Dissolution par vagues océaniques avec physics fluide. Vagues qui déferlent sur l'image, emportant pixels dans leur ressac, effet de marée avec flux et reflux. Mousse écumeuse révélant et cachant alternativement des portions d'image.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Vagues avec amplitude et fréquence variables
+- Effet de ressac révélant/cachant des détails cycliquement
+- Mousse écumeuse avec patterns organiques complexes
+- Marée créant des révélations progressives de l'image originale
+
+------------------------------------------------------------------
+
+🌊 WAVE DISSOLVE EFFECT CRÉÉ !
+✨ CARACTÉRISTIQUES HYPNOTIQUES IMPLÉMENTÉES :
+🌊 SYSTÈME DE VAGUES MULTI-COUCHES :
+
+4 couches de vagues avec amplitudes et fréquences différentes
+Directions alternées créant un effet de ressac naturel
+Variations organiques via noise procédural
+Physics fluide avec interactions entre couches
+
+🔄 CYCLE DE MARÉE ADDICTIF :
+
+Marée de 8 secondes avec flux et reflux hypnotique
+Révélation progressive de l'image selon le niveau de marée
+30% d'imprévisibilité via variations de noise organique
+Ressac dynamique changeant de direction aléatoirement
+
+✨ MOUSSE ÉCUMEUSE VIVANTE :
+
+150 particules en object pooling optimisé
+Scintillements aléatoires (10% de chance par frame)
+Variations de taille cycliques pour effet organique
+Dégradés radiaux avec transparence progressive
+
+🎭 DISSOLUTION INTELLIGENTE :
+
+Masque dynamique recalculé en temps réel
+Zones de révélation influencées par les vagues
+Transition fluide entre visible/dissous
+Effet de brillance dans les zones révélées
+
+🎯 PARAMÈTRES CONFIGURABLES :
+
+Vitesse : Contrôle la rapidité générale
+Intensité : Force de la dissolution
+Amplitude : Hauteur des vagues
+Fréquence : Densité des ondulations
+Marée : Intensité du flux/reflux
+Mousse : Densité des particules écumeuses
+
+🚀 OPTIMISATIONS PERFORMANCE :
+
+Object pooling pour les particules
+Rendu conditionnel (skip si alpha < 0.05)
+Résolution adaptative du masque (pas de 2px)
+Calculs incrémentaux pour les transformations
+
+Cet effet crée une expérience océanique immersive où l'image semble être emportée et révélée par des vagues naturelles, avec un cycle de marée addictif qui maintient l'attention !

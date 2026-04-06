@@ -1,0 +1,101 @@
+## 🌪️ EFFET 47 : TORNADO SPIN
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Tornado_Spin  
+**ID UNIQUE :** cyclonic-vortex-rotation-047  
+**NOM AFFICHAGE :** Rotation Cyclonique Vortex  
+
+**DESCRIPTION :** Tourbillon gravitationnel avec rotation cyclonique complexe. Image prise dans un vortex avec déformation en spirale, vitesse de rotation variable selon la distance au centre, effet Coriolis simulé. Debris virtuels aspirés dans le tourbillon créent un environnement dynamique.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Déformation spiralée avec vitesse angulaire variable
+- Effet Coriolis créant des mouvements contre-intuitifs
+- Debris virtuels révélant la structure du vortex
+- Centre du cyclone avec densité d'énergie hypnotique
+
+-------------------------------------------------------------------------
+
+🌪️ EFFET CYCLONIQUE : ROTATION CYCLONIQUE VORTEX
+CATÉGORIE : IMAGE
+EFFET DEMANDÉ : Tornado_Spin
+ID UNIQUE : cyclonic-vortex-rotation-047
+NOM AFFICHAGE : Rotation Cyclonique Vortex
+DESCRIPTION : Simulation ultra-réaliste d'un vortex cyclonique déformant l'image avec physique météorologique authentique. L'image se tord en spirale avec effet Coriolis, debris tourbillonnants, œil du cyclone hypnotique et déformation par sampling. L'effet révèle la puissance destructrice mais fascinante des phénomènes météorologiques.
+SPÉCIFICATIONS ADDICTION :
+
+Vortex avec physique météorologique complexe (Coriolis, turbulence)
+Debris intelligents suivant forces aérodynamiques réalistes
+Œil du cyclone pulsant créant fascination hypnotique
+Déformation progressive révélant la spirale cachée de l'image
+
+
+🌪️ TORNADO SPIN EFFECT - VORTEX MÉTÉOROLOGIQUE HYPNOTIQUE
+J'ai créé un simulateur de cyclone ultra-réaliste qui applique les vraies lois de la météorologie avec déformation d'image en temps réel et debris physiquement corrects :
+
+🌀 SYSTÈME MÉTÉOROLOGIQUE AUTHENTIQUE
+Physique cyclonique complète : Forces centripètes + tangentielles + effet Coriolis
+Œil du cyclone : Zone de calme (40px radius) avec transition progressive
+Rayon maximal : 350px de destruction totale avec dégradé de force
+Grille de déformation : Précalcul 20x20 des forces vectorielles pour performance
+
+💨 4 FORCES PHYSIQUES COMBINÉES
+TANGENTIELLE : Rotation cyclonique principale selon vitesse paramétrable
+RADIALE : Aspiration vers le centre (30% de la force principale)
+CORIOLIS : Déflection perpendiculaire simulant rotation terrestre (0.0008 coeff)
+TURBULENCE : Chaos atmosphérique avec sinus/cosinus temporels
+
+🌪️ DEBRIS SYSTÈME INTELLIGENT
+Pool optimisé : 200 debris pré-alloués évitant allocation/déallocation
+Spawn périphérique : Génération en bordure puis aspiration naturelle
+3 types visuels : Particules (cercles), fragments (triangles), traces (lignes)
+Cycle de vie : 5-15 secondes avec remplacement automatique
+
+⚡ DÉFORMATION IMAGE TEMPS RÉEL
+Sampling adaptatif : Grille 4x4 pixels pour performance 60fps
+Cache de déformation : Map optimisée évitant recalculs (clé basée position)
+Spirale progressive : Déformation croissante selon distance au centre
+Compression radiale : Scale décroissant simulant l'aspiration (20% max)
+
+🎯 ŒIL CYCLONIQUE HYPNOTIQUE
+Pulsation sinusoïdale : Battement cardiaque à 0.008 fréquence
+Gradient radial : Blanc central vers bleu périphérique avec transparence
+Taille variable : 70-100% du rayon selon pulsation
+Zone de calme : Debris s'évanouissent progressivement dans l'œil
+
+🌈 EFFETS VISUELS MÉTÉOROLOGIQUES
+Mask circulaire : Limitation de l'effet dans rayon de destruction
+Transition douce : Force dégradée linéairement depuis le centre
+Rotation temporelle : Spirale animée à vitesse paramétrable
+Friction atmosphérique : Debris ralentissent (98% conservation momentum)
+
+🧠 OPTIMISATIONS PERFORMANCE CRITIQUES
+Object pooling : Aucune allocation/destruction debris dynamique
+Cache déformation : 1000 entrées max avec nettoyage automatique
+Grille précalculée : Forces vectorielles calculées une seule fois
+Sampling réduit : Image traitée par blocs 4x4 au lieu de pixel par pixel
+
+🎮 PARAMÈTRES MÉTÉOROLOGIQUES
+Vitesse : 0.1-3x rotation cyclonique et forces tangentielles
+Intensité : 0-100% puissance globale du vortex et déformation
+Turbulence : 0-100% chaos atmosphérique ajouté aux forces
+Debris : 10-100 nombre de particules tourbillonnantes
+Coriolis : 0-100% effet de déflection perpendiculaire
+
+🔬 PHYSIQUE AVANCÉE
+Forces combinées : Addition vectorielle de 4 composantes distinctes
+Vitesse angulaire : Rotation debris proportionnelle à la force locale
+Fade progressif : Opacité debris réduite près de l'œil (effet d'absorption)
+Spirale temporelle : Angle de déformation évoluant avec le temps
+
+🌊 EFFETS ATMOSPHÉRIQUES
+Transition œil/mur : Changement brutal de forces simulant structure cyclonique
+Échantillonnage couleur : Préservation RGB/Alpha originaux pendant déformation
+Rotation composée : Debris subissent rotation propre + rotation orbitale
+Nettoyage cyclique : Cache purgé toutes les 5 secondes pour mémoire stable
+
+🎭 TYPES DE DEBRIS RÉALISTES
+Type 0 : Particules circulaires blanches simulant poussière/gouttelettes
+Type 1 : Fragments triangulaires gris représentant débris solides
+Type 2 : Traces linéaires blanches matérialisant les lignes de flux
+
+L'effet crée une fascination météorologique en reproduisant fidèlement la beauté terrifiante des cyclones avec leur œil hypnotique et leur pouvoir de déformation totale de la réalité !RéessayerClaude peut faire des erreurs. Assurez-vous de vérifier ses réponses.

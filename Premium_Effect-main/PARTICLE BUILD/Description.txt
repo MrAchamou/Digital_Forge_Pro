@@ -1,0 +1,62 @@
+## ✨ EFFET 3 : PARTICLE BUILD
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Particle_Build  
+**ID UNIQUE :** particle-swarm-text-003  
+**NOM AFFICHAGE :** Formation Particules Magnétiques  
+
+**DESCRIPTION :** Nuage chaotique de particules colorées qui convergent intelligemment vers la forme des lettres. Système de forces magnétiques avec attraction/répulsion. Particules brillantes avec traînées lumineuses, physics réaliste avec collisions et rebonds doux.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Mouvement organique des particules (flocking behavior)
+- Explosions et reformations cycliques
+- Gradient de couleurs évolutif sur les particules
+- Micro-orbites autour des points de formation
+
+-------------------------------------------------------------
+
+✨ PARTICLE SWARM MAGNÉTIQUE CRÉÉ !
+🌊 CARACTÉRISTIQUES FLOCKING HYPNOTIQUES :
+🎯 SYSTÈME DE PHASES CYCLIQUES :
+
+CHAOS : Flocking behavior (séparation/alignement/cohésion)
+FORMATION : Attraction magnétique vers lettres
+STABLE : Micro-orbites autour des points
+EXPLOSION : Forces centrifuges + reformation
+
+🧲 FORCES PHYSIQUES RÉALISTES :
+
+Attraction magnétique : Force proportionnelle à la masse
+Collisions douces : Rebonds avec coefficient 0.7
+Intégration Verlet : Physique stable et fluide
+Friction dynamique : Ralentissement naturel
+
+🌈 GRADIENT ÉVOLUTIF 6 COULEURS :
+
+Rouge corail → Orange → Jaune → Cyan → Bleu → Violet
+Interpolation fluide entre couleurs adjacentes
+Énergie particules affecte l'intensité chromatique
+Position temporelle fait évoluer la palette
+
+✨ TRAÎNÉES LUMINEUSES INTELLIGENTES :
+
+8 points par traînée avec alpha dégradé
+Longueur adaptative selon vitesse particule
+Glow radial proportionnel à l'énergie
+Point central blanc pour particules énergiques
+
+⚡ MICRO-ORBITES ADDICTIVES :
+
+Orbites individuelles autour des points de formation
+Rayons variables 5-20px par particule
+Vitesse orbitale synchronisée avec la pulsation
+Transition fluide formation → orbite → explosion
+
+🎮 PARAMÈTRES CONFIGURABLES :
+
+particleCount : 100-800 particules (400 par défaut)
+magnetForce : Intensité attraction magnétique
+vitesse : Multiplicateur global de vitesse
+intensite : Énergie et brillance générale
+
+🚀 SYSTÈME INTELLIGENT ! Les particules "pensent" collectivement avec un comportement de nuée qui forme ton texte de manière ORGANIQUE et HYPNOTIQUE !

@@ -1,0 +1,114 @@
+## 🔥 EFFET 35 : FIRE CONSUME
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Fire_Consume  
+**ID UNIQUE :** combustion-consumption-flame-035  
+**NOM AFFICHAGE :** Combustion Progressive Dévorante  
+
+**DESCRIPTION :** Consommation par flammes avec combustion réaliste. Propagation du feu selon les matériaux simulés de l'image, température de couleur évolutive, braises qui s'élèvent avec convection thermique. Zones carbonisées qui révèlent la structure sous-jacente.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Propagation de feu selon la "combustibilité" des pixels
+- Température de couleur révélant l'intensité de combustion
+- Braises dansantes avec convection thermique réaliste
+- Carbonisation révélant des détails cachés de l'image
+
+----------------------------------------------------------------
+
+🔥 ANALYSE DE L'EFFET FIRE CONSUME
+CATÉGORIE : IMAGE
+EFFET ANALYSÉ : FireConsumeEffect
+ID UNIQUE : combustion-consumption-flame-035
+NOM AFFICHAGE : Combustion Progressive Dévorante
+DESCRIPTION : Simulation réaliste de combustion avec propagation de feu, analyse des matériaux et carbonisation progressive. Points d'ignition multiples, flammes avec température de couleur authentique, braises dansantes et distorsion thermique. Révélation graduelle de structures carbonisées avec détails émergents.
+SPÉCIFICATIONS ADDICTION :
+
+Propagation imprévisible basée sur la combustibilité des matériaux simulés
+4 types de matériaux avec résistances au feu distinctes (papier, bois, plastique, métal)
+Révélation progressive de textures carbonisées avec micro-détails
+Couleurs de température réalistes évoluant de rouge sombre à blanc-bleu
+
+
+🎭 SYSTÈME DE COMBUSTION PHYSIQUE RÉALISTE :
+⚛️ ANALYSE MATÉRIAUX ET COMBUSTIBILITÉ :
+
+Grille 32x32 avec analyse pseudo-aléatoire déterministe
+4 classes de matériaux avec combustibilité variable (0.1-0.9)
+Vitesse de combustion et capacité thermique calculées
+Progression de carbonisation avec détails révélés (>60%)
+
+🌀 PROPAGATION THERMODYNAMIQUE :
+
+2-5 points d'ignition avec délais de propagation aléatoires
+Diffusion aux 8 cellules adjacentes selon combustibilité
+Conservation du combustible avec consommation progressive
+Extinction naturelle par épuisement ou refroidissement
+
+🌈 PHYSIQUE THERMIQUE ET CONVECTION :
+💡 CHAMP DE TEMPÉRATURE :
+
+Grille thermique avec conductivité individuelle par cellule
+Températures de 20°C (ambiant) à 1000°C (combustion intense)
+Refroidissement progressif avec dissipation réaliste
+Mise à jour optimisée toutes les 50ms
+
+✨ SYSTÈME DE CONVECTION :
+
+Calcul des gradients thermiques en temps réel
+Forces de flottabilité (air chaud monte)
+Application aux particules pour mouvement naturel
+Modulation par paramètre température
+
+🔮 PARTICULES DUAL-TYPE :
+
+Pool Flammes : 600 particules avec scintillement multi-fréquence
+Pool Braises : 300 particules avec gravité et étincelles
+Durée de vie variable (0.8-2s flammes, 2-5s braises)
+Évolution taille/intensité selon phase de vie
+
+🎭 CYCLE DE COMBUSTION ADDICTIF :
+📈 PHASES THERMODYNAMIQUES :
+
+Ignition : Activation mystérieuse des points d'amorçage
+Propagation : Expansion organique selon matériaux
+Embrasement : Pic d'activité avec maximum de particules
+Carbonisation : Révélation progressive des structures
+Extinction : Agonie des dernières braises incandescentes
+
+🎨 DÉTAILS PROGRESSIFS :
+
+Couleurs de température scientifiquement exactes (4 palettes)
+Textures carbonisées révélant micro-structures cachées
+Distorsion thermique avec overlay dynamique
+Braises scintillantes avec étincelles aléatoires (30% particules)
+
+⚡ OPTIMISATIONS AVANCÉES :
+🔄 OBJECT POOLING MASSIF :
+
+Pool 600 flammes + 300 braises réutilisées en continu
+Cache combustibilité Map pour éviter recalculs
+Mise à jour thermique différée (50ms) pour performance
+Nettoyage automatique particules expirées
+
+🎛️ PARAMÈTRES CONFIGURABLES :
+
+Vitesse : Multiplicateur temporel global (0.1-3, défaut: 1.2)
+Intensité : Force de propagation et luminosité (0-1, défaut: 0.8)
+Température : Intensité thermique et convection (0.3-2, défaut: 1.0)
+Propagation : Vitesse d'expansion du feu (0.1-1, défaut: 0.6)
+Couleur : Teinte de base pour distorsion thermique (défaut: #ff4500)
+
+🔬 ALGORITHMES SCIENTIFIQUES :
+
+Température de couleur : 4 palettes réalistes selon degrés Kelvin
+Pseudo-random déterministe : Cohérence matériaux avec seed position
+Gradients thermiques : Calcul forces convection en 8 directions
+Carbonisation progressive : Révélation détails selon seuils de combustion
+
+🎬 EFFETS VISUELS CINÉMATIQUES :
+
+Scintillement multi-fréquence : 2 phases sinusoïdales combinées
+Distorsion thermique : Overlay avec gradient vertical et alpha
+Braises étincelantes : Pulsation temporelle + position pour variété
+Forme flammes déformée : Ellipses avec modulation width/height
+

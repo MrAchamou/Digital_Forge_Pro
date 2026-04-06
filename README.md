@@ -69,17 +69,29 @@ URL Google My Business
 
 ---
 
-## Bibliothèque d'Effets (50 effets)
+## Bibliothèque d'Effets Premium (62 effets réels)
+
+Tous les effets sont chargés au démarrage depuis le dossier `Premium_Effect-main/`.
+Chaque effet est une classe JavaScript complète héritant de `BaseEffect` avec son propre code d'animation.
 
 | Catégorie | Effets |
 |-----------|--------|
-| **Vivants** | HEARTBEAT, SOUL_AURA, CRYSTAL_BREATH, SUBTLE_BREATHE |
-| **Lumineux** | NEON_PULSE, GOLDEN_SHIMMER, EMBER_GLOW, SOLAR_FLARE, DIAMOND_FLASH |
-| **Cosmiques** | PLASMA_DRIFT, AURORA_FLOW, COSMIC_DUST, STAR_DRIFT, LUNAR_TIDE |
-| **Naturels** | SILK_WAVE, OCEAN_DEPTH, FOREST_MIST, INK_BLOOM, FROST_VEIL |
-| **Précieux** | PEARL_SHIMMER, RUBY_PULSE, SAPPHIRE_GLOW, EMERALD_BREATH, GOLD_WEAVE |
-| **Numériques** | DIGITAL_RAIN, DATA_STREAM, MATRIX_FALL, GLITCH_BLOOM, PIXEL_STORM |
-| **Minimalistes** | SOFT_GRADIENT, DEEP_GLOW, MINIMAL_PULSE, CLEAN_FADE, VELVET_FADE |
+| **Vivants** | HEARTBEAT, SOUL AURA, BREATHING, BREATHING OBJECT |
+| **Lumineux / Électrique** | NEON GLOW, HOLOGRAM, ELECTRIC FORM, ELECTRIC HOVER, ENERGY FLOW, ENERGY IONIZE, SPARKLE AURA |
+| **Cristal / Glace** | CRYSTAL GROW, CRYSTAL SHATTER, ICE FREEZE, PRISM SPLIT, RAINBOW SHIFT |
+| **Liquide / Vague** | LIQUID MORPH, LIQUID POUR, LIQUID STATE, WAVE DISSOLVE, WAVE DISTORTION, WAVE SURF |
+| **Morphing** | MORPH 3D, MÉTAMORPHOSES D'IMAGES, MIRROR REALITY, DIMENSION SHIFT |
+| **Particules / Cosmique** | PARTICLE BUILD, PARTICLE DISSOLVE, STAR DUST FORM, STAR EXPLOSION, STELLAR DRIFT, SMOKE DISPERSE |
+| **Digital / Quantique** | GLITCH SPAWN, REALITY GLITCH, QUANTUM PHASE, QUANTUM SPLIT, DNA BUILD, NEURAL PULSE, TYPEWRITER, SHADOW CLONE |
+| **Feu** | FIRE CONSUME, FIRE WRITE |
+| **Atmosphérique** | TORNADO ABSORB, TORNADO SPIN, TORNADO TWIST |
+| **Physique / Gravité** | MAGNETIC FIELD, MAGNETIC PULL, GRAVITY REVERSE, FLOAT DANCE, FLOAT PHYSICS, PENDULUM SWING, ORBIT DANCE, GYROSCOPE SPIN |
+| **Temporel** | ECHO MULTIPLE, ECHO TRAIL, TIME ECHO, TIME REWIND |
+| **Énergie** | PHASE THROUGH, PLASMA STATE |
+| **Transformation** | ROTATION 3D, FADE LAYERS |
+
+> **Chargement automatique** : Le serveur lit `Premium_Effect-main/*/Description.txt` et le fichier `.js` correspondant à chaque démarrage.
+> Les doublons sont détectés par `premiumId` unique — aucune duplication possible même après redémarrage.
 
 ---
 

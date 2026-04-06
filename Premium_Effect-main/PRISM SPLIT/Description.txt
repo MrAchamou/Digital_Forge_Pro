@@ -1,0 +1,57 @@
+## 🌈 EFFET 60 : PRISM SPLIT
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Prism_Split  
+**ID UNIQUE :** chromatic-spectral-decomposition-060  
+**NOM AFFICHAGE :** Décomposition Spectrale Prismatique  
+
+**DESCRIPTION :** Image se divise en ses composantes chromatiques pures comme un prisme optique. Séparation spectrale révélant la structure colorimétrique cachée, chaque couleur développe sa propre trajectoire, recomposition créant des interférences colorées nouvelles.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Décomposition révélant la "génétique chromatique" de l'image
+- Trajectoires indépendantes créant des danses colorées
+- Recomposition avec interférences créant des couleurs impossibles
+- Révélation de couleurs cachées invisibles dans l'image originale
+
+-------------------------------------------------------------------------
+
+✨ CARACTÉRISTIQUES HYPNOTIQUES IMPLÉMENTÉES :
+🔬 DÉCOMPOSITION SPECTRALE AUTHENTIQUE :
+
+7 canaux spectraux basés sur les longueurs d'ondes réelles
+Calcul d'affinité chromatique pour extraction précise
+Réfraction progressive selon les lois optiques
+
+🎭 ADDICTION PAR RÉVÉLATION :
+
+Génétique chromatique : Chaque pixel révèle sa composition spectrale cachée
+4 couleurs impossibles apparaissent progressivement (rose spectral, vert laser, bleu électrique, jaune plasma)
+70/30 d'imprévisibilité : Trajectoires calculées mais avec variations organiques
+
+🌊 DANSE COLORÉE INDÉPENDANTE :
+
+Chaque spectre suit sa propre trajectoire basée sur son indice de réfraction
+Rotations et oscillations indépendantes créant des chorégraphies colorées
+Modes de mélange cycliques (screen, multiply, overlay, color-dodge)
+
+💫 INTERFÉRENCES CRÉATIVES :
+
+Recomposition générant des couleurs impossibles par interférence
+Gradients radiaux dynamiques révélant les couleurs cachées
+Motifs d'onde sinusoïdaux créant des pulsations hypnotiques
+
+🎯 CYCLE D'ADDICTION 4 PHASES :
+
+Normal → Image standard (préparation)
+Décomposition → Séparation spectrale progressive
+Séparation → Danse indépendante des couleurs + révélation
+Recomposition → Fusion avec interférences + couleurs impossibles
+
+⚡ OPTIMISATIONS PERFORMANCE :
+
+Object pooling pour particules et canaux
+Canvas dédiés pour chaque spectre
+Calculs de trajectoire pré-générés
+Gestion mémoire avec destruction propre
+
+🎪 RÉSULTAT : Un prisme optique numérique révélant l'âme chromatique cachée de chaque image !

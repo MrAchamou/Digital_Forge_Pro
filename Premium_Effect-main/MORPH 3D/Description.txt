@@ -1,0 +1,80 @@
+## 📐 EFFET 21 : MORPH 3D
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Morph_3D  
+**ID UNIQUE :** dimensional-depth-morph-021  
+**NOM AFFICHAGE :** Métamorphose Dimensionnelle  
+
+**DESCRIPTION :** Transformation progressive du texte plat vers une forme 3D avec profondeur réaliste. Extrusion dynamique avec biseaux, faces latérales texturées, éclairage volumétrique. Transition fluide entre 2D et 3D avec rotation pour révéler la profondeur nouvellement créée.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Extrusion progressive révélant la complexité 3D
+- Éclairage dramatique qui sculpte les volumes
+- Rotation révélant différents angles de la transformation
+- Textures qui évoluent avec la dimensionnalité
+
+--------------------------------------------------------------
+
+🔄 MORPH 3D - MÉTAMORPHOSE DIMENSIONNELLE CRÉÉE !
+J'ai développé l'effet "Métamorphose Dimensionnelle" avec un système de transformation 3D complexe et addictif :
+🎭 CYCLE DE TRANSFORMATION HYPNOTIQUE :
+📐 PHASE 1 - EXTRUSION :
+
+Transformation progressive 2D → 3D
+Révélation graduelle de la profondeur
+Génération dynamique des faces latérales
+
+🔄 PHASE 2 - ROTATION :
+
+Rotation multi-axiale (X, Y, Z)
+Révélation des angles cachés
+Éclairage dramatique qui sculpte les volumes
+
+🌊 PHASE 3 - MORPHING :
+
+Distorsion temporaire avec effet de vague
+Transformation géométrique complexe
+Rotation continue révélant la complexité
+
+📱 PHASE 4 - RETOUR PLAT :
+
+Transition fluide vers l'état 2D original
+Cycle parfait pour loop addictif
+
+🎨 RENDU 3D RÉALISTE :
+💡 SYSTÈME D'ÉCLAIRAGE :
+
+Lumière directionnelle mobile
+Lumière ambiante pour les zones d'ombre
+Calcul des normales pour réalisme
+
+🎯 PROJECTION PERSPECTIVE :
+
+Transformation 3D complète (rotation XYZ)
+Projection perspective réaliste
+Tri des faces par profondeur (painter's algorithm)
+
+🏗️ GÉOMÉTRIE COMPLEXE :
+
+Face avant avec détails
+Faces latérales texturées
+Face arrière avec profondeur
+Biseaux et arêtes définies
+
+⚡ OPTIMISATIONS PERFORMANCE :
+
+Cache de rendu pour faces complexes
+Calculs précalculés des vertices
+Tri optimisé des faces par profondeur
+Transformations matricielles efficaces
+
+🎛️ PARAMÈTRES CONFIGURABLES :
+
+Vitesse : Speed des transformations
+Intensité : Degré de l'extrusion 3D
+Profondeur : Épaisseur du volume créé
+Rotation : Amplitude des rotations
+Couleur Base : Teinte principale
+Métallique : Effet de surface brillante
+
+L'effet crée une métamorphose dimensionnelle fascinante qui révèle progressivement la complexité 3D cachée du texte ! 🚀✨

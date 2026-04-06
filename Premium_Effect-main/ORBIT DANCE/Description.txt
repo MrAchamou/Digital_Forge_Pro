@@ -1,0 +1,63 @@
+## 🎭 EFFET 44 : ORBIT DANCE
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Orbit_Dance  
+**ID UNIQUE :** gravitational-orbital-mechanics-044  
+**NOM AFFICHAGE :** Mécanique Orbitale Gravitationnelle  
+
+**DESCRIPTION :** Orbite complexe autour de centres de masse invisibles avec mécanique céleste réaliste. Trajectoires elliptiques avec précession, effet de marée gravitationnelle déformant l'image, interactions à N-corps avec multiples attracteurs. Vitesse orbitale variable selon la distance.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Trajectoires elliptiques avec précession hypnotique
+- Déformations de marée révélant les forces gravitationnelles
+- Interactions multi-corps créant des orbites chaotiques
+- Vitesse variable créant des accélérations dramatiques
+
+----------------------------------------------------------------
+
+🎭 ORBIT DANCE CRÉÉ !
+✨ MÉCANIQUE ORBITALE HYPNOTIQUE
+🌌 PHYSIQUE GRAVITATIONNELLE RÉALISTE :
+
+Système N-corps : 3 centres de masse avec interactions complexes
+Intégration Verlet : Stabilité numérique pour orbites précises
+Éléments orbitaux : Semi-major axis, excentricité, inclinaison, précession
+Résonances orbitales : Perturbations 2:3, 1:2, 3:4 créant chaos contrôlé
+
+🎯 SPÉCIFICATIONS ADDICTION INTÉGRÉES
+🌊 TRAJECTOIRES ELLIPTIQUES AVEC PRÉCESSION :
+
+Orbites vraies suivant lois de Kepler
+Précession du périapside : Rotation lente de l'ellipse (hypnotique !)
+Vitesse variable : Accélération au périapside, ralentissement à l'apoapside
+Traînée orbitale : 80 points d'historique avec dégradé
+
+🌀 EFFETS DE MARÉE GRAVITATIONNELLE :
+
+Étirement radial : Effet "spaghetti" réaliste
+Cisaillement : Déformation selon gradient gravitationnel
+Renflement de marée : Breathing effect synchrone avec orbite
+Matrice de transformation : Déformations mathématiquement correctes
+
+⚡ INTERACTIONS MULTI-CORPS CHAOTIQUES :
+
+3 attracteurs avec masses et influences différentes
+Centres mobiles : Drift subtil créant imprévisibilité
+Champ de force visualisé : 400+ vecteurs gravitationnels
+Particules orbitales : 20 objets suivant leurs propres trajectoires
+
+🚀 DÉTAILS CINÉMATOGRAPHIQUES
+
+Anneaux d'accrétion pulsants autour des centres
+Effet Doppler visuel : Opacity modulée par vitesse orbitale
+Aura gravitationnelle : Glow inversement proportionnel à la distance
+Traînées particulaires : Chaque particule laisse sa trace
+
+🔬 PERFORMANCE OPTIMISÉE
+
+Object pooling : 20 particules réutilisées
+Régénération périodique du champ gravitationnel
+Intégration stable : Pas de divergence numérique
+Historique limité : Évite l'accumulation mémoire
+
+L'effet crée une danse orbitale mesmérisante avec physique authentique et chaos contrôlé ! 🌌

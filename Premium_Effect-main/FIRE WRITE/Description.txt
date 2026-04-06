@@ -1,0 +1,48 @@
+## 🔥 EFFET 6 : FIRE WRITE
+
+**CATÉGORIE :** TEXT  
+**EFFET DEMANDÉ :** Fire_Write  
+**ID UNIQUE :** flame-inscription-006  
+**NOM AFFICHAGE :** Écriture Flammes Vivantes  
+
+**DESCRIPTION :** Flammes réalistes "écrivent" le texte comme une main invisible. Combustion progressive avec particules de braises, gradient de chaleur (blanc → orange → rouge → noir). Ondulations naturelles du feu, crépitements simulés visuellement par micro-particules.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Flammes avec mouvement organique perpetuel
+- Braises qui s'élèvent et meurent lentement
+- Intensité du feu qui pulse comme une respiration
+- Traces de combustion qui persistent puis s'effacent
+
+-----------------------------------------------------------------
+
+🔥 FIRE WRITE EFFECT CRÉÉ !
+✨ CARACTÉRISTIQUES HYPNOTIQUES :
+🎯 ADDICTION MAXIMALE :
+
+Écriture progressive : Les flammes "écrivent" lettre par lettre
+Respiration organique : Intensité qui pulse comme un souffle vivant
+Ondulations perpétuelles : Mouvement naturel des flammes avec sin/cos
+Micro-détails addictifs : Braises scintillantes, traces de combustion
+
+🔥 RÉALISME CINÉMATOGRAPHIQUE :
+
+Gradient de température : Blanc → Jaune → Orange → Rouge → Noir
+Physique naturelle : Gravité inverse, ondulations, inertie
+Système de particules : 3 couches (traces, flammes, braises)
+Object pooling : Performance 60 FPS garantie
+
+⚡ PARAMÈTRES CONFIGURABLES :
+
+Vitesse : Rapidité d'écriture (0.1 → 3x)
+Intensité : Puissance du feu (0 → 100%)
+Couleur base : Teinte des flammes
+Densité : Nombre de particules
+Taille flammes : Ampleur de l'effet
+
+🎬 LOOP PARFAIT :
+
+Reset cyclique automatique sans à-coups
+Traces persistantes qui s'effacent progressivement
+Transition fluide entre les cycles
+
+L'effet est prêt ! Chaque utilisation créera une écriture de feu unique et hypnotique. 🚀✨

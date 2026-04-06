@@ -1,0 +1,89 @@
+💎 EFFET 33 : CRYSTAL SHATTER
+CATÉGORIE : IMAGE  
+EFFET DEMANDÉ : Crystal_Shatter  
+ID UNIQUE : crystalline-fracture-dynamics-033  
+NOM AFFICHAGE : Dynamiques de Fracture Cristalline  
+DESCRIPTION : Bris cristallin avec propagation de fissures réalistes. Lignes de tension qui se forment selon la structure de l'image, fractures qui suivent les contours naturels, éclats de cristal avec réflexions prismatiques. Physics de matériaux fragiles avec points de stress.
+SPÉCIFICATIONS ADDICTION :
+- Propagation de fissures suivant la logique structurelle
+- Éclats cristallins avec réflexions prismatiques hypnotiques
+- Points de stress qui révèlent la "géologie" de l'image
+- Fractures qui créent de nouveaux patterns géométriques
+
+------------------------------------------------------------------------------------
+
+✨ CARACTÉRISTIQUES ADDICTIVES INTÉGRÉES :
+🔬 PROPAGATION STRUCTURELLE :
+
+Réseau hexagonal : Structure cristalline réaliste avec connexions
+Points de stress : 8-20 points générés aléatoirement
+Propagation logique : Fissures suivent les lignes de faiblesse
+Attraction lattice : Fissures attirées vers les points de réseau
+
+💎 RÉFLEXIONS PRISMATIQUES :
+
+5 couleurs prismatiques : Rouge, vert, bleu, orange, cyan
+Indice de réfraction : Paramètre ajustable (1.5 par défaut)
+Éclats scintillants : 30% des fragments ont des effets sparkle
+Réfraction globale : Séparation chromatique de l'image entière
+
+🏗️ GÉOLOGIE DE L'IMAGE :
+
+Diagramme de Voronoi : Fragmentation naturelle en 15-40 zones
+Mapping de tension : Visualisation des contraintes internes
+Conservation énergétique : Transfert d'énergie entre phases
+Mémoire structurelle : Points gardent leurs propriétés cristallines
+
+🔳 PATTERNS GÉOMÉTRIQUES ÉMERGENTS :
+
+Fractures courbes naturelles : Déviation cristalline progressive
+Branchement conditionnel : 30% de chance de bifurcation
+Géométrie adaptative : 3-7 faces par éclat pour variété
+Symétries brisées : Asymétrie contrôlée pour réalisme
+
+🎭 CYCLE D'ADDICTION (5 PHASES) :
+
+INTACT (1.5s) : Cristal parfait avec reflets - anticipation
+TENSION (0.8s) : Points de stress visibles - montée dramatique
+FISSURATION (1.2s) : Propagation des cracks - satisfaction
+ÉCLATEMENT (1s) : Explosion d'éclats prismatiques - climax
+DISPERSION (1.5s) : Chute réaliste des fragments - résolution
+
+⚡ OPTIMISATIONS PERFORMANCE :
+
+Limites strictes : 50 fissures max, 200 éclats max
+Pooling intelligent : Réutilisation des objets fragment
+Propagation contrôlée : Vitesse adaptative selon performance
+Nettoyage automatique : Suppression des éclats invisibles
+
+🎨 EFFETS VISUELS CINÉMATOGRAPHIQUES :
+
+Physics réalistes : Gravité (0.0003), friction (0.98)
+Composite modes : Source-over, screen, multiply, overlay
+Éclairage volumétrique : Gradient radial pour lueur cristalline
+Profondeur de fissure : Effet noir + highlight blanc
+Scintillement dynamique : Sin/cos pour effets sparkle
+
+🧮 ALGORITHMES AVANCÉS :
+
+Voronoi simplifié : Fragmentation naturelle basée seeds
+Réseau hexagonal : Structure la plus stable dans la nature
+Propagation Dijkstra : Chemin optimal pour les fissures
+Conservation momentum : Physics réalistes pour éclats
+
+💫 MICRO-DÉTAILS ADDICTIFS :
+
+Variation de taille : Éclats de 2-10px avec shrinking progressif
+Rotation individuelle : Chaque fragment tourne à sa vitesse
+Couleurs prismatiques : Séparation spectrale comme un vrai cristal
+Imperfections contrôlées : 20% d'irrégularité dans les formes
+
+🎯 PARAMÈTRES CONFIGURABLES :
+
+Fragilité : Contrôle la facilité de fissuration (0.1-1.0)
+Réfraction : Intensité des effets prismatiques (0-1.0)
+Géométrie : Complexité des patterns de fracture (0-1.0)
+Vitesse : Temporisation globale de l'effet
+Intensité : Opacité générale des effets
+
+L'effet Crystal Shatter reproduit fidèlement la physique des matériaux fragiles avec des microdétails hypnotiques qui récompensent l'attention prolongée. La propagation structurelle suit les vraies lois de la cristallographie, créant une expérience scientifiquement plausible mais visuellement magique !

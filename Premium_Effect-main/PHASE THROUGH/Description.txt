@@ -1,0 +1,56 @@
+## 👻 EFFET 55 : PHASE THROUGH
+
+**CATÉGORIE :** IMAGE  
+**EFFET DEMANDÉ :** Phase_Through  
+**ID UNIQUE :** matter-phase-intangibility-055  
+**NOM AFFICHAGE :** Intangibilité Phasique Sélective  
+
+**DESCRIPTION :** Image traverse sélectivement autres objets virtuels en devenant intangible. Changement de phase de matière visible, interactions sélectives (traverse certains éléments, pas d'autres), ondulations d'intangibilité se propageant à travers l'image.
+
+**SPÉCIFICATIONS ADDICTION :**
+- Sélectivité d'intangibilité créant des logiques mystérieuses
+- Ondulations de phase révélant la structure moléculaire simulée
+- Interactions partielles créant des effets de semi-transparence
+- Moments de solidification/dissolution imprévisibles
+
+----------------------------------------------------------------------------------
+
+🧬 CARACTÉRISTIQUES HYPNOTIQUES :
+🔮 INTANGIBILITÉ SÉLECTIVE :
+
+Logique mystérieuse : Traverse certains objets (en pointillés), bloqué par d'autres (solides)
+Sélectivité dynamique : 40% des objets sont traversables, créant une logique imprévisible
+Interactions partielles : Semi-transparence progressive selon la proximité des objets
+
+🌊 ONDULATIONS DE PHASE :
+
+Structure moléculaire simulée : Grille de nœuds vibrants révélant la cohésion interne
+Liaisons inter-atomiques : Connexions dynamiques entre nœuds proches
+Propagation organique : Vagues de phase partant du centre et se propageant
+
+⚛️ TRANSITIONS IMPRÉVISIBLES :
+
+4 états de matière : Solide → Liquide → Gazeux → Plasma
+Changements spontanés : Toutes les 1.5-4.5 secondes
+Distorsion segmentée : L'image se déforme par sections selon l'état de phase
+
+🎨 DÉTAILS ADDICTION :
+✨ MICRO-ANIMATIONS :
+
+Vibrations moléculaires individuelles
+Particules de profondeur flottantes
+Zones d'interaction pulsantes (attraction/répulsion)
+
+🔄 LOOP PARFAIT :
+
+Grille moléculaire continue
+Vagues de phase recyclées via object pooling
+États de transition fluides sans à-coups
+
+🎯 RÉVÉLATION PROGRESSIVE :
+
+Structure interne révélée par les ondulations
+Connexions moléculaires apparaissant aléatoirement
+Zones d'interaction dévoilant leur influence
+
+L'effet crée une fascination scientifique en simulant des phénomènes quantiques visibles, rendant l'intangibilité mystérieuse mais logique ! 👻⚛️
