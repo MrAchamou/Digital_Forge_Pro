@@ -358,7 +358,7 @@ async function runBrain3Gemini(scenario: NarrativeScenario, brief: CreativeBrief
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-pro',
+    model: 'gemini-1.5-flash',
     generationConfig: { temperature: 0.4, maxOutputTokens: 2500 },
   });
 

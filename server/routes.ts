@@ -1079,6 +1079,74 @@ router.post('/signature/analyze-and-configure', async (req, res) => {
 });
 
 // =============================================
+// POST /api/signature/detect-style
+// Gemini détecte le style visuel magique
+// =============================================
+router.post('/signature/detect-style', async (req, res) => {
+  try {
+    const { metadata } = req.body;
+    if (!metadata) return res.status(400).json({ error: 'metadata requis' });
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.json({
+        style_visuel: 'Élégance numérique minimaliste',
+        univers: 'Espace sombre avec des éclats de lumière froide et géométrique',
+        mots_cles: ['épuré', 'précis', 'luxe discret'],
+        justification: 'Style par défaut — clé Gemini non disponible',
+      });
+    }
+
+    const { GoogleGenerativeAI } = await import('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      generationConfig: { temperature: 0.9, maxOutputTokens: 1000 },
+    });
+
+    const context = [
+      metadata.entreprise && `Entreprise : ${metadata.entreprise}`,
+      metadata.secteur && `Secteur : ${metadata.secteur}`,
+      metadata.description && `Description GMB : ${metadata.description}`,
+      metadata.ton && `Ton de marque : ${metadata.ton}`,
+      metadata.note && `Note Google : ${metadata.note}/5 (${metadata.avis || 0} avis)`,
+      metadata.ville && `Ville : ${metadata.ville}`,
+      metadata.mots_cles?.length && `Mots-clés GMB : ${metadata.mots_cles.join(', ')}`,
+      metadata.slogan && `Slogan : ${metadata.slogan}`,
+      metadata.prix_gamme && `Gamme de prix : ${metadata.prix_gamme}`,
+      metadata.palette?.length && `Palette couleurs : ${metadata.palette.join(', ')}`,
+      metadata.reseaux_sociaux && Object.keys(metadata.reseaux_sociaux).length > 0
+        && `Réseaux : ${Object.keys(metadata.reseaux_sociaux).join(', ')}`,
+    ].filter(Boolean).join('\n');
+
+    const prompt = `Tu es un oracle créatif — un génie du branding qui voit instantanément l'essence visuelle d'une marque et sait exactement quelle direction artistique lui correspond. Tu n'es pas rationnel, tu es intuitif, précis et magique.
+
+Analyse ces données de l'entreprise et révèle le style visuel qui lui appartient profondément :
+
+${context}
+
+Ta réponse doit être visionnaire et précise à la fois. Réponds UNIQUEMENT en JSON :
+{
+  "style_visuel": "description du style en 6-10 mots très précis et évocateurs",
+  "univers": "description poétique de l'univers visuel en 2-3 phrases — comme si tu décrivais un film",
+  "mots_cles": ["mot1", "mot2", "mot3", "mot4"],
+  "palette_narrative": "ce que la palette de couleurs dit de cette marque en 1 phrase",
+  "reference_iconique": "la marque ou l'artiste dont s'inspire le plus cette identité",
+  "justification": "pourquoi ce style est inévitable pour cette marque en 1-2 phrases"
+}`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const styleData = JSON.parse(cleaned);
+    return res.json(styleData);
+  } catch (err: any) {
+    console.error('Erreur detect-style:', err);
+    return res.status(500).json({ error: err.message || 'Erreur interne' });
+  }
+});
+
+// =============================================
 // POST /api/signature/export
 // Export SVG + guide + config JSON
 // =============================================
