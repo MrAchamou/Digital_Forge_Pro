@@ -88,6 +88,55 @@ function detectSector(category: string, description: string): string {
   return 'default';
 }
 
+// ── Résolution URL courte ────────────────────────────────────────────────────
+async function resolveShortUrl(url: string): Promise<string> {
+  const isShort = /maps\.app\.goo\.gl|goo\.gl\/maps/i.test(url);
+  if (!isShort) return url;
+
+  try {
+    log(`Résolution URL courte Google Maps: ${url}`, 'gmb-scraper');
+    const response = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'fr-FR,fr;q=0.9',
+      },
+      signal: AbortSignal.timeout(12000),
+    });
+    const resolved = response.url;
+    log(`URL résolue → ${resolved.slice(0, 120)}`, 'gmb-scraper');
+    return resolved;
+  } catch (err: any) {
+    log(`Impossible de résoudre URL courte: ${err.message}`, 'gmb-scraper');
+    return url;
+  }
+}
+
+// ── Extraction du nom de lieu depuis l'URL ────────────────────────────────────
+function extractPlaceNameFromUrl(url: string): string {
+  try {
+    const decoded = decodeURIComponent(url);
+
+    // Format standard: /maps/place/NOM+DU+LIEU/
+    const placeMatch = decoded.match(/\/maps\/place\/([^/@?]+)/);
+    if (placeMatch?.[1]) {
+      const name = placeMatch[1].replace(/\+/g, ' ').replace(/_/g, ' ').trim();
+      if (name.length > 2) return name;
+    }
+
+    // Format avec paramètre q=: /maps?q=NOM
+    const urlObj = new URL(url);
+    const q = urlObj.searchParams.get('q');
+    if (q && q.length > 2) return q.trim();
+
+    // Format avec ftid ou cid — on ne peut rien extraire, retourne vide
+    return '';
+  } catch {
+    return '';
+  }
+}
+
 async function fetchLogoUrl(website: string, entrepriseName: string): Promise<string> {
   if (!website) return '';
 
@@ -97,7 +146,6 @@ async function fetchLogoUrl(website: string, entrepriseName: string): Promise<st
       .replace(/^www\./, '')
       .split('/')[0];
 
-    // Essai 1 : Clearbit Logo API (haute qualité)
     const clearbitUrl = `https://logo.clearbit.com/${domain}`;
     const clearbitRes = await fetch(clearbitUrl, { signal: AbortSignal.timeout(4000) });
     if (clearbitRes.ok && clearbitRes.headers.get('content-type')?.startsWith('image/')) {
@@ -113,7 +161,6 @@ async function fetchLogoUrl(website: string, entrepriseName: string): Promise<st
       .replace(/^https?:\/\//, '')
       .replace(/^www\./, '')
       .split('/')[0];
-    // Essai 2 : Google Favicon haute résolution
     const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
     log(`Logo via Google Favicon: ${faviconUrl}`, 'gmb-scraper');
     return faviconUrl;
@@ -155,45 +202,61 @@ function extractSocialLinks(links: any[]): Record<string, string> {
 
 async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
   try {
-    const rawName = decodeURIComponent(gmbUrl)
-      .replace(/.*maps\/place\//, '')
-      .split('/')[0]
-      .replace(/\+/g, ' ')
-      .trim();
+    // ── Étape 1 : Résoudre l'URL courte si nécessaire ────────────────────────
+    const resolvedUrl = await resolveShortUrl(gmbUrl);
 
+    // ── Étape 2 : Extraire le nom du lieu depuis l'URL résolue ────────────────
+    let rawName = extractPlaceNameFromUrl(resolvedUrl);
+
+    if (!rawName) {
+      log(`Impossible d'extraire un nom depuis l'URL: ${resolvedUrl.slice(0, 100)}`, 'gmb-scraper');
+      return generateDemoData(gmbUrl);
+    }
+
+    log(`Nom extrait depuis URL: "${rawName}"`, 'gmb-scraper');
+
+    // ── Étape 3 : Requêtes Serper en parallèle ───────────────────────────────
     const [placesData, searchData] = await Promise.all([
       callSerper(rawName, { type: 'places', num: 5 }),
-      callSerper(`${rawName} site officiel contact email`, { type: 'search', num: 5 }),
+      callSerper(`${rawName} site officiel contact email téléphone`, { type: 'search', num: 5 }),
     ]);
 
     const place = placesData.places?.[0];
-    if (!place) return generateDemoData(gmbUrl);
+    if (!place) {
+      log(`Aucun résultat Serper Places pour "${rawName}"`, 'gmb-scraper');
+      return generateDemoData(gmbUrl);
+    }
 
     const category = place.category || place.type || '';
     const description = place.description || place.snippet || '';
     const sectorKey = detectSector(category, description);
     const website = place.website || place.url || '';
 
-    // Extraire email depuis les résultats de recherche
+    // ── Email depuis résultats web ───────────────────────────────────────────
     let email = '';
     const searchResults = searchData.organic || [];
     for (const result of searchResults) {
-      const emailMatch = (result.snippet || '').match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/);
-      if (emailMatch) { email = emailMatch[0]; break; }
+      const text = (result.snippet || '') + ' ' + (result.title || '');
+      const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/);
+      if (emailMatch && !emailMatch[0].includes('example') && !emailMatch[0].includes('sentry')) {
+        email = emailMatch[0];
+        break;
+      }
     }
 
-    // Extraire adresse composants
+    // ── Décomposition de l'adresse ───────────────────────────────────────────
     const addressFull = place.address || place.formattedAddress || '';
-    const adresseMatch = addressFull.match(/^(.+?),\s*(\d{5})\s+(.+?)(?:,\s*(.+))?$/);
+    // Format FR: "12 Rue de la Paix, 75001 Paris, France"
+    const adresseMatch = addressFull.match(/^(.+?),\s*(\d{4,5})\s+(.+?)(?:,\s*(.+))?$/);
     const adresse = adresseMatch?.[1] || addressFull;
     const code_postal = adresseMatch?.[2] || place.postalCode || '';
-    const ville = adresseMatch?.[3] || place.city || '';
+    const ville = adresseMatch?.[3]?.split(',')[0].trim() || place.city || '';
     const pays = adresseMatch?.[4] || place.country || 'France';
 
-    // Horaires
+    // ── Horaires ─────────────────────────────────────────────────────────────
     const horaires = parseHoraires(place.openingHours || place.hours);
 
-    // Photos GMB
+    // ── Photos GMB ───────────────────────────────────────────────────────────
     const photos: string[] = [];
     if (place.thumbnailUrl) photos.push(place.thumbnailUrl);
     if (Array.isArray(place.photos)) {
@@ -203,27 +266,30 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
       }
     }
 
-    // Coordonnées
+    // ── Coordonnées ──────────────────────────────────────────────────────────
     const coordonnees = place.latitude && place.longitude
       ? { lat: parseFloat(place.latitude), lng: parseFloat(place.longitude) }
       : null;
 
-    // Liens sociaux
+    // ── Réseaux sociaux ──────────────────────────────────────────────────────
     const reseaux_sociaux = extractSocialLinks([
       ...(place.socialLinks || []),
       ...(searchData.organic?.map((r: any) => r.link) || []),
     ]);
 
-    // Logo
+    // ── Logo ─────────────────────────────────────────────────────────────────
     const logo_url = await fetchLogoUrl(website, place.title || rawName);
 
-    // Mots clés depuis la description et catégorie
+    // ── Mots-clés ────────────────────────────────────────────────────────────
     const mots_cles = [
       ...category.split(/[,/]/).map((s: string) => s.trim()).filter(Boolean),
       ...(place.attributes || []).slice(0, 5),
     ].filter(Boolean).slice(0, 10);
 
-    log(`GMB scrapé complet: ${place.title} — ${mots_cles.length} mots-clés, logo: ${logo_url ? 'oui' : 'non'}`, 'gmb-scraper');
+    log(
+      `✅ GMB scrapé: "${place.title}" | ${category} | ${ville} | note:${place.rating} | logo:${logo_url ? 'oui' : 'non'} | email:${email || 'non'}`,
+      'gmb-scraper'
+    );
 
     return {
       nom: '',
@@ -260,11 +326,7 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
 }
 
 function generateDemoData(gmbUrl: string): GmbScrapedData {
-  const name = decodeURIComponent(gmbUrl)
-    .replace(/.*maps\/place\//, '')
-    .split('/')[0]
-    .replace(/\+/g, ' ')
-    .slice(0, 40) || 'Mon Entreprise';
+  const name = extractPlaceNameFromUrl(gmbUrl) || 'Mon Entreprise';
 
   return {
     nom: '',
@@ -297,6 +359,6 @@ function generateDemoData(gmbUrl: string): GmbScrapedData {
 }
 
 export async function scrapeGMB(gmbUrl: string): Promise<GmbScrapedData> {
-  log(`Scraping GMB complet: ${gmbUrl}`, 'gmb-scraper');
+  log(`Scraping GMB: ${gmbUrl}`, 'gmb-scraper');
   return scrapeWithSerper(gmbUrl);
 }

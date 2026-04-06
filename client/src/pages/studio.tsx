@@ -912,7 +912,7 @@ export default function Studio() {
             value={gmbUrl}
             onChange={e => setGmbUrl(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && gmbUrl && scrapeMutation.mutate(gmbUrl)}
-            placeholder="https://maps.google.com/maps/place/..."
+            placeholder="https://maps.app.goo.gl/... ou https://maps.google.com/maps/place/..."
             className="bg-white/5 border-white/20 text-white text-sm flex-1"
             data-testid="input-gmb-url"
           />
