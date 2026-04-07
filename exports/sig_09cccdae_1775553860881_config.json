@@ -1,0 +1,25 @@
+{
+  "brief": {
+    "style_visuel": "moderne",
+    "mots_cles": [
+      "tech"
+    ]
+  },
+  "scenario": {
+    "title": "Test"
+  },
+  "technique": {
+    "font": "Poppins",
+    "primaryColor": "#6366f1",
+    "effects": [
+      "NEON GLOW"
+    ]
+  },
+  "metadata": {
+    "entreprise": "Test Corp",
+    "secteur": "technologie",
+    "email": "test@test.com"
+  },
+  "generated_at": "2026-04-07T09:24:20.887Z",
+  "signature_id": "sig_09cccdae_1775553860881"
+}

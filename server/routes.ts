@@ -175,11 +175,12 @@ router.post('/generate', async (req, res) => {
 
     // Traitement NLP amélioré
     console.log(`🧠 [${requestId}] Processing prompt with enhanced NLP...`);
-    const concepts = await nlpProcessor.processPrompt(prompt, {
+    const nlpResult = await nlpProcessor.processPrompt(prompt, {
       enhancedMode: true,
       contextAware: true,
       requestId
     });
+    const concepts = Array.isArray(nlpResult) ? nlpResult : (nlpResult?.concepts || []);
 
     if (!concepts || concepts.length === 0) {
       throw new Error('NLP processing failed - no concepts extracted');
