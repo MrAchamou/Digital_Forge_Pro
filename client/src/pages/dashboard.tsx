@@ -66,8 +66,8 @@ const quickActions = [
   },
   {
     href: "/studio",
-    label: "Studio",
-    sublabel: "Design and preview effects",
+    label: "Signature Vivante",
+    sublabel: "Studio God Tier — 3 IA",
     icon: Sparkles,
     gradFrom: "#FFB800",
     gradTo: "#00D4FF",
