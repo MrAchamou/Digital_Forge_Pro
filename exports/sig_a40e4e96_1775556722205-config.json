@@ -1,0 +1,23 @@
+{
+  "signature_id": "sig_a40e4e96_1775556722205",
+  "generated_at": "2026-04-07T10:12:05.775Z",
+  "client": {
+    "nom": "Sophie Laurent",
+    "entreprise": "Lumière Studio",
+    "secteur": "Design & Création"
+  },
+  "creative_decisions": {
+    "brief_creatif": null,
+    "scenario_narratif": null,
+    "configuration_technique": null
+  },
+  "effects_used": [],
+  "cycle_total": 240,
+  "variations": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "version": "2.0"
+}

@@ -96,11 +96,11 @@ Genere un email de livraison en JSON valide uniquement :
 Client : ${nom}, ${entreprise}, ${secteur}. Effets : ${effetsStr}. Arc : ${arcNarratif}.
 Reponds UNIQUEMENT avec le JSON.`.trim(),
 
-    preview: `Tu es un developpeur frontend expert.
-Genere le contenu d'une page preview en JSON valide uniquement :
-{"titre_page":"string","headline":"string accrocheur","description":"string 1-2 phrases","section_effets":"string","texte_bouton_gmail":"string","texte_bouton_outlook":"string","texte_bouton_apple":"string","texte_bouton_download":"string","footer":"string"}
-Client : ${nom}, ${entreprise}. Effets : ${effetsStr}.
-Reponds UNIQUEMENT avec le JSON.`.trim(),
+    preview: `Tu es un copywriter premium specialise en email marketing de luxe.
+Genere le contenu d'une page preview PERSONNALISEE pour la signature email de "${nom}" chez "${entreprise}" (secteur: ${metadata.secteur}).
+JSON valide uniquement, TOUTES les valeurs doivent mentionner "${nom}" ou "${entreprise}" ou les deux :
+{"titre_page":"Signature Vivante de ${nom} — ${entreprise} | EffectForge AI","headline":"Phrase poetique et elegante de 6-10 mots qui parle directement de ${nom} ou de l'identite de ${entreprise}. Exemples : '${nom} — Une présence qui s'anime', '${entreprise} — L'élégance en mouvement'","description":"2 phrases qui parlent de la signature email de ${nom} chez ${entreprise} dans le secteur ${metadata.secteur}. Personnalise, chaleureux, premium.","section_effets":"Phrase sur les effets visuels qui incarnent l'univers de ${entreprise} ou de ${nom}","texte_bouton_gmail":"Installer dans Gmail","texte_bouton_outlook":"Installer dans Outlook","texte_bouton_apple":"Installer dans Apple Mail","texte_bouton_download":"Telecharger mon package complet","footer":"Signature de ${nom} — ${entreprise} · Creee par EffectForge AI"}
+Reponds UNIQUEMENT avec le JSON valide.`.trim(),
 
     readme: `Tu es un assistant chaleureux.
 Genere un texte de README en JSON valide uniquement :
@@ -197,15 +197,15 @@ export function getFallbackContent(
       ps:                   `Conseil pro : testez votre signature sur mobile.`,
     },
     previewPage: {
-      titre_page:            `Signature Vivante — ${nom} | ${entreprise}`,
-      headline:              `Votre signature email prend vie`,
-      description:           `Une signature exclusive en 4 variations qui raconte l'histoire de ${entreprise}.`,
-      section_effets:        `Effets utilises : ${effectsUsed.join(', ')}`,
+      titre_page:            `${nom} — Signature Vivante | ${entreprise} · EffectForge AI`,
+      headline:              `${nom} — Une identité qui s'anime`,
+      description:           `Une signature email exclusive pour ${entreprise}, conçue en 4 atmosphères visuelles qui incarnent votre univers créatif. Chaque message devient une expérience.`,
+      section_effets:        `4 variations vivantes qui racontent l'histoire de ${entreprise}`,
       texte_bouton_gmail:    'Installer dans Gmail',
       texte_bouton_outlook:  'Installer dans Outlook',
       texte_bouton_apple:    'Installer dans Apple Mail',
-      texte_bouton_download: 'Telecharger mon package complet',
-      footer:                'Signature creee par EffectForge AI',
+      texte_bouton_download: 'Télécharger mon package complet',
+      footer:                `Signature de ${nom} · ${entreprise} · Créée par EffectForge AI`,
     },
     readme: {
       contenu: `Bienvenue ${nom},\n\nVoici votre package de signature email premium cree par EffectForge AI.\n\nContenu du dossier :\n- signature.svg : Votre signature animee principale\n- signature-fallback.png : Fallback haute resolution\n- signature-outlook.htm : Version optimisee pour Outlook\n- signature-gmail.html : Version optimisee pour Gmail\n- instructions-gmail.pdf : Guide d'installation Gmail\n- instructions-outlook.pdf : Guide d'installation Outlook\n- instructions-apple-mail.pdf : Guide d'installation Apple Mail\n- config.json : Configuration complete\n\nBonne utilisation,\nL'equipe EffectForge AI`,

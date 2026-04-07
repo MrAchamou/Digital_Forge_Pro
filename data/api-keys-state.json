@@ -1,5 +1,5 @@
 {
-  "lastSaved": "2026-04-07T10:02:51.943Z",
+  "lastSaved": "2026-04-07T10:12:01.740Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
@@ -86,31 +86,31 @@
       "lastError": null
     },
     "cerebras_2": {
-      "usageToday": 0,
+      "usageToday": 6,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 0,
-      "avgResponseTime": 0,
-      "healthScore": 100,
-      "callsLastHour": 0,
+      "successCount": 6,
+      "avgResponseTime": 6092,
+      "healthScore": 80,
+      "callsLastHour": 6,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
-      "lastUsed": null,
+      "lastUsed": "2026-04-07T10:05:50.743Z",
       "lastError": null
     },
     "cerebras_3": {
-      "usageToday": 0,
+      "usageToday": 6,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 0,
-      "avgResponseTime": 0,
-      "healthScore": 100,
-      "callsLastHour": 0,
+      "successCount": 6,
+      "avgResponseTime": 9003,
+      "healthScore": 80,
+      "callsLastHour": 6,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
-      "lastUsed": null,
+      "lastUsed": "2026-04-07T10:06:10.676Z",
       "lastError": null
     },
     "cerebras_4": {

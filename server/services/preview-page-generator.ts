@@ -103,10 +103,30 @@ export async function generatePreviewPage(params: {
     min-height: 100vh;
     overflow-x: hidden;
   }
+  /* ── STARFIELD BACKGROUND ── */
+  #starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: ${accent};
+    opacity: 0;
+    animation: star-twinkle var(--dur, 4s) ease-in-out var(--delay, 0s) infinite;
+  }
+  @keyframes star-twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: var(--max-opacity, 0.4); transform: scale(1); }
+  }
+  body > *:not(#starfield) { position: relative; z-index: 1; }
   /* ── HERO ── */
   .hero {
     text-align: center;
-    padding: 80px 20px 60px;
+    padding: 90px 20px 70px;
     position: relative;
   }
   .hero::before {
@@ -114,37 +134,104 @@ export async function generatePreviewPage(params: {
     position: absolute;
     top: 0; left: 50%;
     transform: translateX(-50%);
-    width: 600px; height: 300px;
-    background: radial-gradient(ellipse at center, ${accent}22 0%, transparent 70%);
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse at center, ${accent}1a 0%, transparent 65%);
     pointer-events: none;
+    animation: hero-glow 8s ease-in-out infinite alternate;
+  }
+  @keyframes hero-glow {
+    0% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1.15); }
   }
   .badge {
-    display: inline-block;
-    font-size: 11px;
-    letter-spacing: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--accent);
-    border: 1px solid ${accent}44;
+    border: 1px solid ${accent}55;
     border-radius: 20px;
-    padding: 6px 16px;
-    margin-bottom: 24px;
+    padding: 7px 18px;
+    margin-bottom: 28px;
     animation: fadeInDown 0.6s ease;
+    background: ${accent}0a;
+  }
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: ${accent};
+    box-shadow: 0 0 8px ${accent};
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px ${accent}; }
+    50% { opacity: 0.5; box-shadow: 0 0 14px ${accent}; }
+  }
+  .hero-name {
+    font-size: clamp(14px, 3vw, 20px);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: ${accent};
+    font-family: Arial, sans-serif;
+    font-weight: 400;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.6s ease;
+    opacity: 0.85;
   }
   .hero h1 {
-    font-size: clamp(28px, 5vw, 52px);
+    font-size: clamp(32px, 5vw, 58px);
     font-weight: 400;
-    line-height: 1.2;
-    margin-bottom: 16px;
+    line-height: 1.15;
+    margin-bottom: 20px;
     animation: fadeInUp 0.8s ease;
+    background: linear-gradient(135deg, #ffffff 0%, ${accent} 60%, #ffffff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   .hero p {
     font-size: 16px;
-    color: rgba(232,232,255,0.6);
-    max-width: 500px;
+    color: rgba(232,232,255,0.55);
+    max-width: 520px;
     margin: 0 auto 48px;
-    line-height: 1.6;
+    line-height: 1.7;
     animation: fadeInUp 1s ease;
+    font-family: Arial, sans-serif;
   }
+  /* ── REPLAY BUTTON ── */
+  .replay-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid ${accent}66;
+    color: ${accent};
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 40px;
+    animation: fadeInUp 1.2s ease;
+  }
+  .replay-btn:hover {
+    background: ${accent}22;
+    border-color: ${accent};
+    box-shadow: 0 0 20px ${accent}44;
+    transform: translateY(-1px);
+  }
+  .replay-btn svg {
+    width: 14px; height: 14px;
+    fill: currentColor;
+    transition: transform 0.4s ease;
+  }
+  .replay-btn:hover svg { transform: rotate(360deg); }
   /* ── MOCK GMAIL ── */
   .gmail-mock {
     max-width: 700px;
@@ -364,11 +451,19 @@ export async function generatePreviewPage(params: {
 </head>
 <body>
 
+<!-- ── STARFIELD ── -->
+<div id="starfield"></div>
+
 <!-- ── HERO ── -->
 <section class="hero">
-  <div class="badge">EffectForge AI — God Tier Signature</div>
+  <div class="badge">EffectForge AI — Signature Vivante</div>
+  <div class="hero-name">${esc(nom)} · ${esc(entreprise)}</div>
   <h1>${pageContent.headline}</h1>
   <p>${pageContent.description}</p>
+  <button class="replay-btn" id="btn-replay-sig" data-testid="btn-replay-signature">
+    <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    Rejouer la signature
+  </button>
 
   <!-- Mock Gmail -->
   <div class="gmail-mock">
@@ -464,6 +559,33 @@ export async function generatePreviewPage(params: {
 </footer>
 
 <script>
+  // ── STARFIELD ──
+  (function() {
+    const sf = document.getElementById('starfield');
+    if (!sf) return;
+    const COUNT = 60;
+    for (let i = 0; i < COUNT; i++) {
+      const el = document.createElement('div');
+      el.className = 'star';
+      const size = 1 + Math.random() * 2;
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
+      const dur = (3 + Math.random() * 5).toFixed(2);
+      const delay = (Math.random() * 6).toFixed(2);
+      const opacity = (0.1 + Math.random() * 0.35).toFixed(2);
+      el.style.cssText = [
+        'width:' + size + 'px',
+        'height:' + size + 'px',
+        'left:' + x + '%',
+        'top:' + y + '%',
+        '--dur:' + dur + 's',
+        '--delay:' + delay + 's',
+        '--max-opacity:' + opacity,
+      ].join(';');
+      sf.appendChild(el);
+    }
+  })();
+
   // ══════════════════════════════════════════════════════════════════
   //  EFFECTFORGE — MOTEUR D'ANIMATION INTERACTIVE
   //  Cycle counter + Mouse tracking + Viewport restart + Sparkles
@@ -486,6 +608,33 @@ export async function generatePreviewPage(params: {
       const s = (varElapsed % 60).toString().padStart(2, '0');
       if (counterEl) counterEl.textContent = 'VARIATION ' + VARS[varIdx] + ' · ' + m + ':' + s;
     }, 1000);
+
+    // ── BOUTON REPLAY ────────────────────────────────────────────
+    const replayBtn = document.getElementById('btn-replay-sig');
+    if (replayBtn) {
+      replayBtn.addEventListener('click', function() {
+        const sig = document.querySelector('.gmail-sig-zone');
+        if (sig) restartSVGAnimations(sig);
+        // Reset elapsed time to 0 for a fresh cycle
+        elapsed = 0;
+        // Burst de sparkles
+        if (sig) {
+          const rect = sig.getBoundingClientRect();
+          for (let i = 0; i < 12; i++) {
+            setTimeout(function() {
+              const rx = rect.left + Math.random() * rect.width;
+              const ry = rect.top + Math.random() * rect.height;
+              spawnSparkle(rx, ry, '${accent}');
+            }, i * 60);
+          }
+        }
+        // Feedback visuel sur le bouton
+        replayBtn.textContent = '✨ Animation relancée !';
+        setTimeout(function() {
+          replayBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;vertical-align:middle;margin-right:8px"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>Rejouer la signature';
+        }, 2000);
+      });
+    }
 
     // ── 2. PARALLAX SOURIS — La signature réagit au mouvement ────
     // Utilise des CSS custom properties pour créer un micro-parallax
