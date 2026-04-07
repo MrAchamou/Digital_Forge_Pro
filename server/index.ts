@@ -153,16 +153,29 @@ app.use((req, res, next) => {
 
     // ─── Auto-détection des clés Replit (OpenAI / Anthropic) ───────────────
     import('./services/api-key-rotator').then(({ rotator }) => {
-      const openaiOk    = !!process.env.OPENAI_API_KEY?.startsWith('sk-');
-      const anthropicOk = !!process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-');
+      // Support intégrations Replit (AI_INTEGRATIONS_*) et clés directes
+      const openaiOk = !!(
+        process.env.AI_INTEGRATIONS_OPENAI_API_KEY ||
+        process.env.OPENAI_API_KEY?.startsWith('sk-')
+      );
+      const anthropicOk = !!(
+        process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY ||
+        process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-')
+      );
 
       if (openaiOk) {
-        console.log(`✅ OpenAI (GPT-4o) : clé Replit détectée et active — ...${process.env.OPENAI_API_KEY!.slice(-4)}`);
+        const keyHint = process.env.AI_INTEGRATIONS_OPENAI_API_KEY
+          ? '(Replit AI Integration)'
+          : `...${process.env.OPENAI_API_KEY!.slice(-4)}`;
+        console.log(`✅ OpenAI (GPT-4o) : clé détectée et active — ${keyHint}`);
       } else {
         console.warn('⚠️  OpenAI : clé non trouvée — vérifiez l\'intégration Replit');
       }
       if (anthropicOk) {
-        console.log(`✅ Anthropic (Claude) : clé Replit détectée et active — ...${process.env.ANTHROPIC_API_KEY!.slice(-4)}`);
+        const keyHint = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY
+          ? '(Replit AI Integration)'
+          : `...${process.env.ANTHROPIC_API_KEY!.slice(-4)}`;
+        console.log(`✅ Anthropic (Claude) : clé détectée et active — ${keyHint}`);
       } else {
         console.warn('⚠️  Anthropic : clé non trouvée — vérifiez l\'intégration Replit');
       }
