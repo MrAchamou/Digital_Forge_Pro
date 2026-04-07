@@ -1084,6 +1084,7 @@ export default function Studio() {
   const { toast } = useToast();
   const [gmbUrl, setGmbUrl] = useState('');
   const [form, setForm] = useState<FormData>(DEFAULT_FORM);
+  const [gmbFilledFields, setGmbFilledFields] = useState<Set<string>>(new Set());
   const [canvasPhase, setCanvasPhase] = useState(-1);
   const [svgContent, setSvgContent] = useState('');
   const [result, setResult] = useState<PipelineResult | null>(null);
@@ -1094,6 +1095,18 @@ export default function Studio() {
 
   const updateForm = (data: Partial<FormData>) => setForm(prev => ({ ...prev, ...data }));
   const setStep = (key: keyof PipelineState, s: StepStatus) => setPipeline(prev => ({ ...prev, [key]: s }));
+
+  // Classe CSS pour les inputs auto-remplis par GMB
+  const gmbCls = (field: string) =>
+    gmbFilledFields.has(field)
+      ? 'bg-green-500/8 border-green-500/40 text-white text-xs h-8 ring-1 ring-green-500/20'
+      : 'bg-white/5 border-white/10 text-white text-xs h-8';
+
+  // Badge "GMB" affiché dans le label si le champ a été auto-rempli
+  const GmbBadge = ({ field }: { field: string }) =>
+    gmbFilledFields.has(field)
+      ? <span className="ml-1 text-[9px] font-bold text-green-400 bg-green-500/15 px-1 py-0.5 rounded-sm leading-none">GMB</span>
+      : null;
 
   // ── Scraping GMB ───
   const scrapeMutation = useMutation({
@@ -1109,46 +1122,54 @@ export default function Studio() {
     onSuccess: (data) => {
       setStep('scraping', { status: 'done', data });
 
-      // Résumé des champs trouvés pour le toast
-      const found: string[] = [];
-      if (data.telephone)  found.push('📞 tél');
-      if (data.email)      found.push('✉ email');
-      if (data.site)       found.push('🌐 site');
-      if (data.logo_base64 || data.logo_url) found.push('🖼 logo');
-      if (Object.keys(data.reseaux_sociaux || {}).length) found.push(`🔗 ${Object.keys(data.reseaux_sociaux).join('/')}` );
+      // Champs remplis automatiquement (pour marquage visuel)
+      const filled = new Set<string>();
+      const mark = (key: string, val: any) => { if (val) filled.add(key); return val; };
 
       setForm(prev => ({
         ...prev,
-        entreprise:      data.entreprise      || prev.entreprise,
-        telephone:       data.telephone       || prev.telephone,
-        email:           data.email           || prev.email,
-        site:            data.site            || prev.site,
-        secteur:         data.secteur         || prev.secteur,
-        cta:             data.cta             || prev.cta,
-        palette:         data.palette?.length >= 3 ? data.palette : prev.palette,
-        ton:             data.ton             || prev.ton,
-        description:     data.description     || prev.description,
-        adresse:         data.adresse         || prev.adresse,
-        ville:           data.ville           || prev.ville,
-        pays:            data.pays            || prev.pays,
-        note:            data.note            || prev.note,
-        avis:            data.avis            || prev.avis,
-        slogan:          data.slogan          || prev.slogan,
-        mots_cles:       data.mots_cles?.length ? data.mots_cles : prev.mots_cles,
+        // Nom/titre réinitialisés pour que l'utilisateur les remplisse lui-même
+        nom:   '',
+        titre: '',
+        // Tous les champs GMB
+        entreprise:      mark('entreprise', data.entreprise)      || prev.entreprise,
+        telephone:       mark('telephone',  data.telephone)       || prev.telephone,
+        email:           mark('email',      data.email)           || prev.email,
+        site:            mark('site',       data.site)            || prev.site,
+        secteur:         mark('secteur',    data.secteur)         || prev.secteur,
+        cta:             mark('cta',        data.cta)             || prev.cta,
+        palette:         data.palette?.length >= 3 ? (mark('palette', true), data.palette) : prev.palette,
+        ton:             mark('ton',        data.ton)             || prev.ton,
+        description:     mark('description',data.description)     || prev.description,
+        adresse:         mark('adresse',    data.adresse)         || prev.adresse,
+        ville:           mark('ville',      data.ville)           || prev.ville,
+        pays:            mark('pays',       data.pays)            || prev.pays,
+        note:            data.note  || prev.note,
+        avis:            data.avis  || prev.avis,
+        slogan:          mark('slogan',     data.slogan)          || prev.slogan,
+        mots_cles:       data.mots_cles?.length ? (mark('mots_cles', true), data.mots_cles) : prev.mots_cles,
         reseaux_sociaux: Object.keys(data.reseaux_sociaux || {}).length
-                           ? data.reseaux_sociaux
+                           ? (mark('reseaux_sociaux', true), data.reseaux_sociaux)
                            : prev.reseaux_sociaux,
-        logo_url:    data.logo_base64 ? '' : (data.logo_url || prev.logo_url),
-        logo_base64: data.logo_base64 || prev.logo_base64,
+        logo_url:    data.logo_base64 ? (mark('logo', true), '') : (data.logo_url ? (mark('logo', true), data.logo_url) : prev.logo_url),
+        logo_base64: data.logo_base64 ? (mark('logo', true), data.logo_base64) : prev.logo_base64,
       }));
 
+      setGmbFilledFields(filled);
       setShowFullForm(true);
+
+      const found: string[] = [];
+      if (filled.has('telephone'))  found.push('📞 tél');
+      if (filled.has('email'))      found.push('✉ email');
+      if (filled.has('site'))       found.push('🌐 site');
+      if (filled.has('logo'))       found.push('🖼 logo');
+      if (filled.has('reseaux_sociaux')) found.push(`🔗 ${Object.keys(data.reseaux_sociaux).join('/')}`);
 
       const ratingStr = data.note ? ` · ★${data.note}${data.avis ? ` (${data.avis} avis)` : ''}` : '';
       const cityStr   = data.ville ? ` · ${data.ville}` : '';
       toast({
         title: `✅ ${data.entreprise} importé`,
-        description: `${ratingStr}${cityStr}${found.length ? `\n${found.join('  ')}` : ''}`,
+        description: `${ratingStr}${cityStr}${found.length ? ' — ' + found.join('  ') : ''}`,
       });
     },
     onError: (err: any) => {
@@ -1375,56 +1396,84 @@ export default function Studio() {
               </button>
             </div>
 
+            {/* Indicateur GMB */}
+            {gmbFilledFields.size > 0 && (
+              <div className="flex items-center gap-2 text-[10px] text-green-400/80 bg-green-500/8 border border-green-500/20 rounded-lg px-2.5 py-1.5">
+                <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
+                <span>{gmbFilledFields.size} champ{gmbFilledFields.size > 1 ? 's' : ''} auto-rempli{gmbFilledFields.size > 1 ? 's' : ''} par GMB — les champs verts sont importés. Saisissez votre <strong>Prénom Nom</strong> et <strong>Titre</strong>.</span>
+              </div>
+            )}
+
             {/* Section Identité */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1"><User className="w-3 h-3" /> Prénom Nom</Label>
+                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
+                  <User className="w-3 h-3" /> Prénom Nom
+                  {gmbFilledFields.size > 0 && <span className="ml-1 text-[9px] text-orange-400/70 bg-orange-500/10 px-1 py-0.5 rounded-sm">à remplir</span>}
+                </Label>
                 <Input value={form.nom} onChange={e => updateForm({ nom: e.target.value })}
+                  placeholder={gmbFilledFields.size > 0 ? 'Votre prénom et nom…' : ''}
                   className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-nom" />
               </div>
               <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1"><Briefcase className="w-3 h-3" /> Titre</Label>
+                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
+                  <Briefcase className="w-3 h-3" /> Titre / Poste
+                  {gmbFilledFields.size > 0 && <span className="ml-1 text-[9px] text-orange-400/70 bg-orange-500/10 px-1 py-0.5 rounded-sm">à remplir</span>}
+                </Label>
                 <Input value={form.titre} onChange={e => updateForm({ titre: e.target.value })}
+                  placeholder={gmbFilledFields.size > 0 ? 'Votre titre / poste…' : ''}
                   className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-titre" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1"><Building2 className="w-3 h-3" /> Entreprise</Label>
+                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
+                  <Building2 className="w-3 h-3" /> Entreprise<GmbBadge field="entreprise" />
+                </Label>
                 <Input value={form.entreprise} onChange={e => updateForm({ entreprise: e.target.value })}
-                  className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-entreprise" />
+                  className={gmbCls('entreprise')} data-testid="input-entreprise" />
               </div>
               <div>
-                <Label className="text-white/40 text-xs mb-1 block">Secteur</Label>
+                <Label className="text-white/40 text-xs mb-1 flex items-center">
+                  Secteur<GmbBadge field="secteur" />
+                </Label>
                 <Input value={form.secteur} onChange={e => updateForm({ secteur: e.target.value })}
-                  className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-secteur" />
+                  className={gmbCls('secteur')} data-testid="input-secteur" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1"><Mail className="w-3 h-3" /> Email</Label>
+                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
+                  <Mail className="w-3 h-3" /> Email<GmbBadge field="email" />
+                </Label>
                 <Input value={form.email} onChange={e => updateForm({ email: e.target.value })}
-                  className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-email" />
+                  className={gmbCls('email')} data-testid="input-email" />
               </div>
               <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1"><Phone className="w-3 h-3" /> Téléphone</Label>
+                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
+                  <Phone className="w-3 h-3" /> Téléphone<GmbBadge field="telephone" />
+                </Label>
                 <Input value={form.telephone} onChange={e => updateForm({ telephone: e.target.value })}
-                  className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-telephone" />
+                  className={gmbCls('telephone')} data-testid="input-telephone" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1"><Globe className="w-3 h-3" /> Site web</Label>
+                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
+                  <Globe className="w-3 h-3" /> Site web<GmbBadge field="site" />
+                </Label>
                 <Input value={form.site} onChange={e => updateForm({ site: e.target.value })}
-                  className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-site" />
+                  className={gmbCls('site')} data-testid="input-site" />
               </div>
               <div>
-                <Label className="text-white/40 text-xs mb-1 block">CTA (Bouton)</Label>
+                <Label className="text-white/40 text-xs mb-1 flex items-center">
+                  CTA (Bouton)<GmbBadge field="cta" />
+                </Label>
                 <Input value={form.cta} onChange={e => updateForm({ cta: e.target.value })}
-                  className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-cta" />
+                  className={gmbCls('cta')} data-testid="input-cta" />
               </div>
             </div>
 
@@ -1442,28 +1491,36 @@ export default function Studio() {
               <div className="space-y-3 pt-3 border-t border-white/10">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1"><MapPin className="w-3 h-3" /> Adresse</Label>
+                    <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
+                      <MapPin className="w-3 h-3" /> Adresse<GmbBadge field="adresse" />
+                    </Label>
                     <Input value={form.adresse} onChange={e => updateForm({ adresse: e.target.value })}
-                      className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-adresse" />
+                      className={gmbCls('adresse')} data-testid="input-adresse" />
                   </div>
                   <div>
-                    <Label className="text-white/40 text-xs mb-1 block">Ville</Label>
+                    <Label className="text-white/40 text-xs mb-1 flex items-center">
+                      Ville<GmbBadge field="ville" />
+                    </Label>
                     <Input value={form.ville} onChange={e => updateForm({ ville: e.target.value })}
-                      className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-ville" />
+                      className={gmbCls('ville')} data-testid="input-ville" />
                   </div>
                 </div>
 
                 <div>
-                  <Label className="text-white/40 text-xs mb-1 block">Slogan / Tagline</Label>
+                  <Label className="text-white/40 text-xs mb-1 flex items-center">
+                    Slogan / Tagline<GmbBadge field="slogan" />
+                  </Label>
                   <Input value={form.slogan} onChange={e => updateForm({ slogan: e.target.value })}
-                    placeholder="Le slogan de l'entreprise…" className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-slogan" />
+                    placeholder="Le slogan de l'entreprise…" className={gmbCls('slogan')} data-testid="input-slogan" />
                 </div>
 
                 <div>
-                  <Label className="text-white/40 text-xs mb-1 block">Description (GMB)</Label>
+                  <Label className="text-white/40 text-xs mb-1 flex items-center">
+                    Description<GmbBadge field="description" />
+                  </Label>
                   <Textarea value={form.description} onChange={e => updateForm({ description: e.target.value })}
                     rows={2} placeholder="Description Google My Business…"
-                    className="bg-white/5 border-white/10 text-white text-xs resize-none" data-testid="input-description" />
+                    className={`${gmbCls('description').replace('h-8', '')} resize-none`} data-testid="input-description" />
                 </div>
 
 
