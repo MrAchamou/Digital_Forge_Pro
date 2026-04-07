@@ -1,933 +1,75 @@
 import express from 'express';
 import cors from 'cors';
 import { storage } from './storage';
-import { nlpProcessor } from './ai-engine/nlp-processor';
-import { decisionEngine } from './core/decision-engine';
-import { jsGenerator } from './generator/js-generator';
-import { batchProcessor } from './parser/batch-processor';
-import { godMonitor } from './core/god-monitor';
-import { autonomousMonitor } from './core/autonomous-monitor';
-import { errorDetection } from './modules/error-detection.module';
-import { qualityAssurance } from './modules/quality-assurance.module';
 import { buildEffectPreviewHTML, saveEffectPreview, getEffectPreviewHTML } from './services/effect-preview-generator';
-import multer from 'multer';
-import fs from 'fs/promises';
+import { getAllTemplates, getSectorTemplate, type SectorId } from './templates/sector-templates';
+import { classifySector } from './services/sector-classifier';
+import fs from 'fs';
 import path from 'path';
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
 
-// === MIDDLEWARE GLOBAL DE MONITORING ===
-router.use(async (req, res, next) => {
-  const startTime = performance.now();
-  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+// === SANTÉ SYSTÈME ===
 
-  req.requestId = requestId;
-  req.startTime = startTime;
-
-  // Monitoring de la requête
-  godMonitor.trackRequest(requestId, {
-    method: req.method,
-    url: req.url,
-    userAgent: req.get('User-Agent'),
-    ip: req.ip,
-    timestamp: new Date()
-  });
-
-  next();
-});
-
-// === MIDDLEWARE DE FINALISATION ===
-router.use((req, res, next) => {
-  const originalSend = res.send;
-  res.send = function(data) {
-    const responseTime = performance.now() - req.startTime;
-
-    // Enregistrement des métriques
-    godMonitor.recordResponse(req.requestId, {
-      responseTime,
-      statusCode: res.statusCode,
-      contentLength: Buffer.byteLength(data || ''),
-      success: res.statusCode < 400
-    });
-
-    return originalSend.call(this, data);
-  };
-  next();
-});
-
-// === CORS AVANCÉ ===
-router.use(cors({
-  origin: (origin, callback) => {
-    // Auto-configuration CORS intelligente
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:5000',
-      'https://*.replit.dev',
-      'https://*.replit.co'
-    ];
-
-    if (!origin || allowedOrigins.some(pattern => 
-      pattern.includes('*') ? 
-        new RegExp(pattern.replace('*', '.*')).test(origin) : 
-        pattern === origin
-    )) {
-      callback(null, true);
-    } else {
-      godMonitor.logSecurityEvent('cors_blocked', { origin, timestamp: new Date() });
-      callback(null, false);
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID']
-}));
-
-// === ENDPOINTS DE SANTÉ DU SYSTÈME ===
-
-router.get('/health/god-status', async (req, res) => {
-  try {
-    const godStatus = godMonitor.getGodStatus();
-    const autonomousMetrics = autonomousMonitor.getCurrentMetrics();
-    const errorHealth = errorDetection.getSystemHealth();
-    const qualityMetrics = qualityAssurance.getSystemMetrics();
-
-    const completeStatus = {
-      godLevel: {
-        overallHealth: godStatus.overallHealth,
-        criticalIssues: godStatus.criticalIssues,
-        autoRepairsToday: godStatus.autoRepairsToday,
-        predictiveAccuracy: godStatus.predictiveAccuracy,
-        learningProgress: godStatus.learningProgress
-      },
-      autonomous: autonomousMetrics,
-      errorDetection: errorHealth,
-      quality: qualityMetrics,
-      systemVitals: {
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        cpu: process.cpuUsage(),
-        platform: process.platform,
-        nodeVersion: process.version
-      },
-      timestamp: new Date()
-    };
-
-    res.json(completeStatus);
-  } catch (error) {
-    console.error('Erreur health check:', error);
-    res.status(500).json({ error: 'Health check failed', details: error instanceof Error ? error.message : String(error) });
-  }
-});
-
-router.post('/health/force-optimization', async (req, res) => {
-  try {
-    autonomousMonitor.forceOptimizationCycle();
-    const predictiveAnalysis = await godMonitor.forcePredictiveAnalysis();
-
-    res.json({
-      success: true,
-      message: 'Optimisation forcée déclenchée',
-      predictiveAnalysis,
-      timestamp: new Date()
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Optimization failed', details: error instanceof Error ? error.message : String(error) });
-  }
-});
-
-router.get('/health/emergency-diagnostic', async (req, res) => {
-  try {
-    const emergencyReport = await godMonitor.performEmergencyDiagnostic();
-    res.json(emergencyReport);
-  } catch (error) {
-    res.status(500).json({ error: 'Emergency diagnostic failed', details: error instanceof Error ? error.message : String(error) });
-  }
-});
-
-// === ENDPOINT DE GÉNÉRATION D'EFFETS (AMÉLIORÉ) ===
-
-router.post('/generate', async (req, res) => {
-  const requestId = req.requestId;
-
-  try {
-    const { prompt, config = {} } = req.body;
-
-    if (!prompt || typeof prompt !== 'string') {
-      godMonitor.logError(requestId, 'Invalid prompt provided');
-      return res.status(400).json({ 
-        error: 'Invalid prompt', 
-        details: 'Prompt must be a non-empty string' 
-      });
-    }
-
-    // Détection d'erreurs préventive sur le prompt
-    const promptErrors = await errorDetection.detectErrors(prompt, { 
-      type: 'user_input',
-      requestId 
-    });
-
-    if (promptErrors.errors.length > 0) {
-      godMonitor.logWarning(requestId, `Prompt issues detected: ${promptErrors.errors.length}`);
-    }
-
-    // Traitement NLP amélioré
-    console.log(`🧠 [${requestId}] Processing prompt with enhanced NLP...`);
-    const nlpResult = await nlpProcessor.processPrompt(prompt, {
-      enhancedMode: true,
-      contextAware: true,
-      requestId
-    });
-    const concepts = Array.isArray(nlpResult) ? nlpResult : (nlpResult?.concepts || []);
-
-    if (!concepts || concepts.length === 0) {
-      throw new Error('NLP processing failed - no concepts extracted');
-    }
-
-    // Sélection de modules avec IA avancée
-    console.log(`🎯 [${requestId}] Selecting modules with advanced AI...`);
-    const selectedModules = await decisionEngine.selectModules(concepts, {
-      userIntent: prompt,
-      performanceRequirement: config.performance || 'high',
-      complexityBudget: config.complexity || 10,
-      platformConstraints: [],
-      previousChoices: []
-    });
-
-    if (selectedModules.length === 0) {
-      throw new Error('Module selection failed - no suitable modules found');
-    }
-
-    // Génération de code avec auto-amélioration
-    console.log(`⚡ [${requestId}] Generating code with auto-improvements...`);
-    const generatedCode = await jsGenerator.generateAdvancedCode(concepts, selectedModules, {
-      robustness: 'maximum',
-      optimization: 'aggressive',
-      errorHandling: 'comprehensive',
-      monitoring: 'real-time',
-      selfHealing: true,
-      requestId
-    });
-
-    // Assurance qualité automatique
-    console.log(`🔍 [${requestId}] Performing automated quality assurance...`);
-    const qualityReport = await qualityAssurance.performQualityAssurance(generatedCode, {
-      concepts,
-      selectedModules,
-      requestId,
-      strictMode: true
-    });
-
-    // Auto-amélioration du code si nécessaire
-    let finalCode = generatedCode;
-    if (qualityReport.overallScore < 85) {
-      console.log(`🔧 [${requestId}] Auto-improving code (score: ${qualityReport.overallScore})`);
-      finalCode = await jsGenerator.autoImproveCode(generatedCode, qualityReport);
-    }
-
-    // Enregistrement des métriques
-    godMonitor.recordGeneration(requestId, {
-      concepts: concepts.length,
-      modules: selectedModules.length,
-      qualityScore: qualityReport.overallScore,
-      codeLength: finalCode.length,
-      processingTime: performance.now() - req.startTime
-    });
-
-    // Génération de la page preview interactive
-    const previewId = `effect_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
-    let previewUrl: string | null = null;
-    try {
-      const previewHtml = buildEffectPreviewHTML({
-        previewId,
-        code: finalCode,
-        description: req.body.prompt || req.body.description || 'Effect',
-        concepts,
-        modules: selectedModules,
-        qualityScore: qualityReport.overallScore,
-        platform: req.body.platform || 'javascript',
-      });
-      await saveEffectPreview(previewId, previewHtml);
-      previewUrl = `/api/effect/preview/${previewId}`;
-    } catch (previewErr) {
-      console.warn('⚠️  Preview generation skipped:', previewErr);
-    }
-
-    const response = {
-      success: true,
-      code: finalCode,
-      concepts,
-      selectedModules,
-      previewId,
-      previewUrl,
-      qualityReport: {
-        overallScore: qualityReport.overallScore,
-        metrics: qualityReport.metrics,
-        recommendations: qualityReport.recommendations,
-        aiInsights: qualityReport.aiInsights
-      },
-      metadata: {
-        requestId,
-        processingTime: performance.now() - req.startTime,
-        timestamp: new Date(),
-        version: '2.0.0-GOD'
-      }
-    };
-
-    res.json(response);
-
-  } catch (error) {
-    console.error(`❌ [${requestId}] Generation error:`, error);
-
-    // Auto-réparation en cas d'erreur
-    try {
-      const autoRepairResult = await performAutoRepair(error, req.body, requestId);
-      if (autoRepairResult.success) {
-        return res.json(autoRepairResult);
-      }
-    } catch (repairError) {
-      console.error(`❌ [${requestId}] Auto-repair failed:`, repairError);
-    }
-
-    godMonitor.recordError(requestId, error as Error);
-
-    res.status(500).json({
-      error: 'Generation failed',
-      details: error instanceof Error ? error.message : String(error),
-      requestId,
-      autoRepairAttempted: true,
-      timestamp: new Date()
-    });
-  }
-});
-
-// === ENDPOINTS DE GESTION DES FICHIERS (AMÉLIORÉS) ===
-
-router.post('/upload', upload.array('files'), async (req, res) => {
-  const requestId = req.requestId;
-
-  try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'No files uploaded' });
-    }
-
-    const results = [];
-
-    for (const file of req.files) {
-      try {
-        // Validation et nettoyage sécurisé
-        const content = await fs.readFile(file.path, 'utf-8');
-
-        // Détection d'erreurs sur le fichier
-        const fileErrors = await errorDetection.detectErrors(content, {
-          type: 'uploaded_file',
-          fileName: file.originalname,
-          requestId
-        });
-
-        // Auto-correction si possible
-        let processedContent = content;
-        if (fileErrors.autoFixes && fileErrors.autoFixes.fixed.length > 0) {
-          processedContent = fileErrors.autoFixes.improvedCode;
-          console.log(`🔧 [${requestId}] Auto-corrected ${fileErrors.autoFixes.fixed.length} errors in ${file.originalname}`);
-        }
-
-        // Traitement par batch
-        const batchResult = await batchProcessor.processFile(processedContent, {
-          fileName: file.originalname,
-          enhanced: true,
-          autoCorrect: true,
-          requestId
-        });
-
-        results.push({
-          fileName: file.originalname,
-          success: true,
-          processed: batchResult.totalProcessed,
-          errors: fileErrors.errors.length,
-          autoFixed: fileErrors.autoFixes?.fixed?.length || 0,
-          qualityScore: batchResult.averageQuality || 0
-        });
-
-        // Nettoyage du fichier temporaire
-        await fs.unlink(file.path);
-
-      } catch (fileError) {
-        console.error(`Error processing file ${file.originalname}:`, fileError);
-        results.push({
-          fileName: file.originalname,
-          success: false,
-          error: fileError instanceof Error ? fileError.message : String(fileError)
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      results,
-      totalFiles: req.files.length,
-      successfulFiles: results.filter(r => r.success).length,
-      requestId,
-      timestamp: new Date()
-    });
-
-  } catch (error) {
-    console.error(`Upload processing error:`, error);
-    res.status(500).json({
-      error: 'Upload processing failed',
-      details: error instanceof Error ? error.message : String(error),
-      requestId
-    });
-  }
-});
-
-// === ENDPOINTS D'AUTO-RÉPARATION AVANCÉE ===
-
-router.post('/system/auto-repair', async (req, res) => {
-  const requestId = req.requestId;
-
-  try {
-    console.log(`🔧 [${requestId}] Démarrage auto-réparation système...`);
-
-    // Détection des problèmes système
-    const systemIssues = await detectSystemIssues();
-    console.log(`🔍 [${requestId}] ${systemIssues.length} problèmes détectés`);
-
-    if (systemIssues.length === 0) {
-      return res.json({
-        success: true,
-        message: 'Aucun problème détecté - système optimal',
-        systemHealth: 100,
-        timestamp: new Date()
-      });
-    }
-
-    // Réparation automatique
-    const repairActions = [];
-    for (const issue of systemIssues) {
-      try {
-        const repairResult = await executeAutoRepair(issue, requestId);
-        repairActions.push({
-          issue: issue.type,
-          action: repairResult.action,
-          success: repairResult.success,
-          details: repairResult.details
-        });
-
-        if (repairResult.success) {
-          console.log(`✅ [${requestId}] Réparé: ${issue.type}`);
-        } else {
-          console.log(`❌ [${requestId}] Échec réparation: ${issue.type}`);
-        }
-
-      } catch (repairError) {
-        console.error(`Erreur réparation ${issue.type}:`, repairError);
-        repairActions.push({
-          issue: issue.type,
-          action: 'failed',
-          success: false,
-          error: repairError instanceof Error ? repairError.message : String(repairError)
-        });
-      }
-    }
-
-    // Scan post-réparation
-    const postRepairScan = await errorDetection.scanProjectFiles();
-
-    res.json({
-      success: true,
-      repairActions,
-      systemStatus: 'auto-repair-completed',
-      postRepairScan: {
-        errorsFound: postRepairScan.errors.length,
-        autoFixed: postRepairScan.autoFixed
-      },
-      successfulRepairs: repairActions.filter(a => a.success).length,
-      timestamp: new Date(),
-      message: `${repairActions.filter(a => a.success).length} problèmes réparés automatiquement`
-    });
-
-  } catch (error) {
-    console.error(`❌ [${requestId}] Erreur auto-réparation:`, error);
-    res.status(500).json({
-      success: false,
-      error: "Échec de l'auto-réparation",
-      details: error instanceof Error ? error.message : String(error),
-      requestId,
-      timestamp: new Date()
-    });
-  }
-});
-
-router.post('/system/deep-scan', async (req, res) => {
-  const requestId = req.requestId;
-
-  try {
-    console.log(`🔍 [${requestId}] Démarrage scan profond...`);
-
-    // Scan complet des fichiers
-    const fileScanResults = await errorDetection.scanProjectFiles();
-
-    // Analyse de la qualité du système
-    const systemQuality = await qualityAssurance.performQualityAssurance('', {
-      type: 'system_analysis',
-      requestId
-    });
-
-    // Métriques de performance
-    const performanceMetrics = autonomousMonitor.getPerformanceReport();
-
-    // Statut GOD
-    const godStatus = godMonitor.getGodStatus();
-
-    const deepScanReport = {
-      fileScanning: {
-        totalErrors: fileScanResults.errors.length,
-        autoFixed: fileScanResults.autoFixed,
-        criticalIssues: fileScanResults.errors.filter(e => e.severity === 'critical').length
-      },
-      systemQuality: {
-        overallScore: systemQuality.overallScore,
-        metrics: systemQuality.metrics,
-        recommendations: systemQuality.recommendations
-      },
-      performance: performanceMetrics,
-      godStatus: {
-        health: godStatus.overallHealth,
-        aiEfficiency: godStatus.ai.confidenceLevel,
-        autoRepairs: godStatus.autoRepairsToday,
-        predictiveAccuracy: godStatus.predictiveAccuracy
-      },
-      recommendations: generateSystemRecommendations(fileScanResults, systemQuality, godStatus),
-      timestamp: new Date(),
-      requestId
-    };
-
-    res.json(deepScanReport);
-
-  } catch (error) {
-    console.error(`❌ [${requestId}] Erreur scan profond:`, error);
-    res.status(500).json({
-      error: 'Deep scan failed',
-      details: error instanceof Error ? error.message : String(error),
-      requestId
-    });
-  }
-});
-
-// === FONCTIONS UTILITAIRES ===
-
-async function detectSystemIssues() {
-  const issues = [];
-
-  try {
-    // Vérification mémoire
-    const memUsage = process.memoryUsage();
-    if (memUsage.heapUsed > memUsage.heapTotal * 0.9) {
-      issues.push({ 
-        type: 'memory_leak', 
-        severity: 'critical',
-        details: `Heap usage: ${Math.round(memUsage.heapUsed / memUsage.heapTotal * 100)}%`
-      });
-    }
-
-    // Vérification des modules critiques
-    const criticalModules = ['error-detection.module', 'quality-assurance.module', 'god-monitor'];
-    for (const moduleName of criticalModules) {
-      try {
-        if (moduleName === 'god-monitor') {
-          require('./core/god-monitor');
-        } else {
-          require(`./modules/${moduleName}`);
-        }
-      } catch (error) {
-        issues.push({
-          type: 'module_failure',
-          severity: 'critical',
-          module: moduleName,
-          details: error instanceof Error ? error.message : String(error)
-        });
-      }
-    }
-
-    // Vérification event loop lag
-    const lagStart = process.hrtime.bigint();
-    await new Promise(resolve => setImmediate(resolve));
-    const lag = Number(process.hrtime.bigint() - lagStart) / 1000000; // ms
-
-    if (lag > 100) {
-      issues.push({
-        type: 'event_loop_lag',
-        severity: 'high',
-        details: `Lag: ${lag.toFixed(2)}ms`
-      });
-    }
-
-    // Vérification espace disque
-    try {
-      const stats = await fs.stat('./');
-      // Simulation - dans un vrai environnement, on vérifierait l'espace disque
-      if (Math.random() < 0.1) { // 10% de chance de simuler un problème d'espace
-        issues.push({
-          type: 'disk_space_low',
-          severity: 'medium',
-          details: 'Available disk space below threshold'
-        });
-      }
-    } catch (error) {
-      issues.push({
-        type: 'filesystem_error',
-        severity: 'high',
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-
-  } catch (error) {
-    issues.push({
-      type: 'system_scan_error',
-      severity: 'critical',
-      details: error instanceof Error ? error.message : String(error)
-    });
-  }
-
-  return issues;
-}
-
-async function executeAutoRepair(issue: any, requestId: string) {
-  console.log(`🔧 [${requestId}] Réparation: ${issue.type}`);
-
-  switch (issue.type) {
-    case 'memory_leak':
-      if (global.gc) {
-        global.gc();
-        return { 
-          action: 'garbage_collection', 
-          success: true, 
-          details: 'Forced garbage collection executed' 
-        };
-      }
-      return { 
-        action: 'gc_unavailable', 
-        success: false, 
-        details: 'Garbage collection not available' 
-      };
-
-    case 'module_failure':
-      try {
-        // Tentative de rechargement du module
-        delete require.cache[require.resolve(`./modules/${issue.module}`)];
-        require(`./modules/${issue.module}`);
-        return { 
-          action: 'module_reload', 
-          success: true, 
-          details: `Module ${issue.module} reloaded successfully` 
-        };
-      } catch (reloadError) {
-        return { 
-          action: 'module_reload_failed', 
-          success: false, 
-          details: reloadError instanceof Error ? reloadError.message : String(reloadError) 
-        };
-      }
-
-    case 'event_loop_lag':
-      // Réduction de la charge en optimisant les tâches
-      process.nextTick(() => {
-        // Optimisation légère
-        setTimeout(() => {}, 0);
-      });
-      return { 
-        action: 'event_loop_optimization', 
-        success: true, 
-        details: 'Event loop optimization applied' 
-      };
-
-    case 'disk_space_low':
-      try {
-        // Nettoyage des fichiers temporaires
-        const tempDir = './temp';
-        try {
-          await fs.rmdir(tempDir, { recursive: true });
-          await fs.mkdir(tempDir, { recursive: true });
-        } catch (cleanupError) {
-          // Dossier temp n'existe peut-être pas
-        }
-        return { 
-          action: 'cleanup_temp', 
-          success: true, 
-          details: 'Temporary files cleaned' 
-        };
-      } catch (cleanupError) {
-        return { 
-          action: 'cleanup_failed', 
-          success: false, 
-          details: cleanupError instanceof Error ? cleanupError.message : String(cleanupError) 
-        };
-      }
-
-    default:
-      return { 
-        action: 'unknown_issue', 
-        success: false, 
-        details: `No repair strategy for ${issue.type}` 
-      };
-  }
-}
-
-async function performAutoRepair(error: any, requestBody: any, requestId: string) {
-  console.log(`🔧 [${requestId}] Tentative auto-réparation pour:`, error.message);
-
-  try {
-    // Stratégies de réparation basées sur le type d'erreur
-    if (error.message.includes('NLP processing failed')) {
-      // Réparation NLP
-      const fallbackConcepts = [
-        { name: 'effect', confidence: 0.8 },
-        { name: 'animation', confidence: 0.7 }
-      ];
-
-      const modules = await decisionEngine.selectModules(fallbackConcepts);
-      const code = await jsGenerator.generateAdvancedCode(fallbackConcepts, modules);
-
-      return {
-        success: true,
-        code,
-        repairStrategy: 'nlp_fallback',
-        concepts: fallbackConcepts,
-        selectedModules: modules,
-        message: 'Auto-réparation NLP réussie avec stratégie de fallback'
-      };
-    }
-
-    if (error.message.includes('Module selection failed')) {
-      // Réparation sélection de modules
-      const emergencyModules = [
-        { 
-          name: 'particles', 
-          confidence: 0.9, 
-          priority: 100, 
-          reasoning: ['Emergency fallback module'] 
-        }
-      ];
-
-      const code = await jsGenerator.generateAdvancedCode([], emergencyModules);
-
-      return {
-        success: true,
-        code,
-        repairStrategy: 'module_emergency_fallback',
-        selectedModules: emergencyModules,
-        message: 'Auto-réparation modules réussie avec module d\'urgence'
-      };
-    }
-
-    return { success: false, reason: 'No repair strategy available' };
-
-  } catch (repairError) {
-    console.error(`❌ [${requestId}] Auto-repair failed:`, repairError);
-    return { success: false, reason: repairError instanceof Error ? repairError.message : String(repairError) };
-  }
-}
-
-function generateSystemRecommendations(fileScan: any, quality: any, godStatus: any) {
-  const recommendations = [];
-
-  if (fileScan.errors.length > 10) {
-    recommendations.push({
-      type: 'critical',
-      title: 'Nombreuses erreurs détectées',
-      description: `${fileScan.errors.length} erreurs trouvées - scan et correction recommandés`,
-      action: 'run_auto_repair'
-    });
-  }
-
-  if (quality.overallScore < 80) {
-    recommendations.push({
-      type: 'warning',
-      title: 'Qualité système sous-optimale',
-      description: `Score: ${quality.overallScore}% - amélioration nécessaire`,
-      action: 'quality_optimization'
-    });
-  }
-
-  if (godStatus.overallHealth < 90) {
-    recommendations.push({
-      type: 'info',
-      title: 'Santé GOD sous-optimale',
-      description: `Santé: ${godStatus.overallHealth}% - monitoring renforcé recommandé`,
-      action: 'god_optimization'
-    });
-  }
-
-  if (recommendations.length === 0) {
-    recommendations.push({
-      type: 'success',
-      title: 'Système optimal',
-      description: 'Tous les indicateurs sont au vert - niveau GOD maintenu',
-      action: 'maintain_excellence'
-    });
-  }
-
-  return recommendations;
-}
-
-// === ENDPOINTS ADDITIONNELS ===
-
-router.get('/system/metrics', (req, res) => {
-  const metrics = {
-    god: godMonitor.getGodStatus(),
-    autonomous: autonomousMonitor.getCurrentMetrics(),
-    error: errorDetection.getSystemHealth(),
-    quality: qualityAssurance.getSystemMetrics(),
-    timestamp: new Date()
-  };
-  res.json(metrics);
-});
-
-router.post('/system/optimize', async (req, res) => {
-  try {
-    autonomousMonitor.forceOptimizationCycle();
-    await godMonitor.forcePredictiveAnalysis();
-
-    res.json({
-      success: true,
-      message: 'Optimisation système déclenchée',
-      timestamp: new Date()
-    });
-  } catch (error) {
-    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
-  }
-});
-
-// =============================================
-// ROUTES MANQUANTES — Diagnostic & Correction
-// =============================================
-
-// GET /api/system/health — Santé globale du système
-router.get('/system/health', (req, res) => {
-  const god = godMonitor.getGodStatus();
+router.get('/system/health', (_req, res) => {
   const uptimeSec = Math.floor(process.uptime());
-  const uptimeHours = (uptimeSec / 3600).toFixed(1);
+  const uptimeHours = (uptimeSec / 3600).toFixed(1) + 'h';
   const modules = {
-    particles:        { status: 'online',  performance: 100, uptime: uptimeHours + 'h', load: 8,  effectCount: 342 },
-    physics:          { status: 'online',  performance: 99,  uptime: uptimeHours + 'h', load: 6,  effectCount: 128 },
-    lighting:         { status: 'online',  performance: 99,  uptime: uptimeHours + 'h', load: 10, effectCount: 276 },
-    morphing:         { status: 'online',  performance: 99,  uptime: uptimeHours + 'h', load: 5,  effectCount: 89  },
-    errorDetection:   { status: 'online',  performance: 100, uptime: uptimeHours + 'h', load: 3,  effectCount: 0   },
-    qualityAssurance: { status: 'online',  performance: 99,  uptime: uptimeHours + 'h', load: 4,  effectCount: 0   },
+    particles:    { status: 'online', performance: 100, uptime: uptimeHours },
+    physics:      { status: 'online', performance: 99,  uptime: uptimeHours },
+    lighting:     { status: 'online', performance: 99,  uptime: uptimeHours },
+    morphing:     { status: 'online', performance: 99,  uptime: uptimeHours },
+    templates:    { status: 'online', performance: 100, uptime: uptimeHours },
+    classifier:   { status: 'online', performance: 100, uptime: uptimeHours },
   };
   const moduleAvg = Math.round(
     Object.values(modules).reduce((s, m) => s + m.performance, 0) / Object.keys(modules).length
   );
-  const overall = Math.max(god.overallHealth, moduleAvg);
   res.json({
-    overall,
+    overall: moduleAvg,
     modules,
     queue: { size: 0, processing: 0, failed: 0 },
     resources: {
-      cpu: (god.performance as any)?.cpuUsage ?? 8,
-      memory: (god.performance as any)?.memoryUsage ?? 28,
-      gpu: 6,
-      network: 2,
+      cpu: 8,
+      memory: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
       storage: 15,
     },
-    ai: { confidence: god.ai?.confidenceLevel ?? 0.97 },
-    predictiveAccuracy: god.predictiveAccuracy ?? 0.98,
+    uptime: uptimeSec,
+    timestamp: new Date(),
   });
 });
 
-// GET /api/library/real-time-stats — Statistiques temps réel
-router.get('/library/real-time-stats', async (req, res) => {
-  try {
-    const result = await storage.getEffects({ limit: 10000 });
-    const effects = result.effects;
-    const total = result.total;
-
-    const categories: Record<string, number> = {};
-    let totalDownloads = 0;
-    let totalRating = 0;
-    let ratedCount = 0;
-
-    effects.forEach(e => {
-      categories[e.category] = (categories[e.category] || 0) + 1;
-      totalDownloads += e.downloads || 0;
-      if (e.rating && e.rating > 0) { totalRating += e.rating; ratedCount++; }
-    });
-
-    res.json({
-      totalDescriptions: total,
-      effectsGenerated: total,
-      effectsRemaining: 0,
-      averageGenerationTime: 2.4,
-      successRate: 1.0,
-      categories,
-      expansionRate: 1.23,
-      qualityScore: ratedCount > 0 ? Math.round((totalRating / ratedCount) / 5 * 100) / 100 : 0.95,
-    });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
+router.get('/modules/status', (_req, res) => {
+  const uptimeHours = (process.uptime() / 3600).toFixed(1) + 'h';
+  const modules = [
+    { id: 'particles',   name: 'Particles System', status: 'online', performance: 100, uptime: uptimeHours, errors: 0 },
+    { id: 'physics',     name: 'Physics Engine',   status: 'online', performance: 99,  uptime: uptimeHours, errors: 0 },
+    { id: 'lighting',    name: 'Lighting Effects', status: 'online', performance: 99,  uptime: uptimeHours, errors: 0 },
+    { id: 'morphing',    name: 'Morphing System',  status: 'online', performance: 99,  uptime: uptimeHours, errors: 0 },
+    { id: 'templates',   name: 'Sector Templates', status: 'online', performance: 100, uptime: uptimeHours, errors: 0 },
+    { id: 'classifier',  name: 'AI Classifier',    status: 'online', performance: 100, uptime: uptimeHours, errors: 0 },
+  ];
+  res.json({
+    modules,
+    overall: 99,
+    timestamp: new Date(),
+  });
 });
 
-// GET /api/queue/jobs — Liste des jobs de la queue
-router.get('/queue/jobs', (req, res) => {
-  res.json([]);
-});
+// === BIBLIOTHÈQUE D'EFFETS ===
 
-// =============================================
-// POST /api/effects/generate — Création d'un job de génération
-// =============================================
-router.post('/effects/generate', async (req, res) => {
-  try {
-    const { jobQueue } = await import('./queue/job-queue');
-    const { description, platform = 'javascript', options = {} } = req.body;
-    if (!description || typeof description !== 'string') {
-      return res.status(400).json({ error: 'description is required' });
-    }
-    const estimatedTime = 30;
-    const job = await storage.createJob({
-      description,
-      platform,
-      options,
-      status: 'queued',
-      progress: 0,
-      estimatedTime,
-    } as any);
-    await jobQueue.addJob(job);
-    res.json({ success: true, jobId: job.id, estimatedTime });
-  } catch (err: any) {
-    console.error('Effects generate error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// =============================================
-// GET /api/effects/status/:jobId — Statut d'un job
-// =============================================
-router.get('/effects/status/:jobId', async (req, res) => {
-  try {
-    const job = await storage.getJob(req.params.jobId);
-    if (!job) return res.status(404).json({ error: 'Job introuvable' });
-    res.json(job);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/library/effects — Effets de la bibliothèque
 router.get('/library/effects', async (req, res) => {
   try {
-    const page = parseInt(String(req.query.page || '1'));
-    const limit = parseInt(String(req.query.limit || '12'));
-    const offset = (page - 1) * limit;
+    const page     = parseInt(String(req.query.page   || '1'));
+    const limit    = parseInt(String(req.query.limit  || '12'));
+    const offset   = (page - 1) * limit;
     const category = req.query.category as string | undefined;
-    const type = req.query.type as string | undefined;
-    const search = req.query.search as string | undefined;
+    const type     = req.query.type     as string | undefined;
+    const search   = req.query.search   as string | undefined;
     const platform = req.query.platform as string | undefined;
 
     const result = await storage.getEffects({ category, type, search, platform, limit, offset });
     const totalPages = Math.ceil(result.total / limit);
-
     res.json({
       effects: result.effects,
       pagination: { page, limit, total: result.total, pages: totalPages },
@@ -937,7 +79,6 @@ router.get('/library/effects', async (req, res) => {
   }
 });
 
-// GET /api/library/effects/:id/download — Téléchargement d'un effet
 router.get('/library/effects/:id/download', async (req, res) => {
   try {
     const effect = await storage.getEffect(req.params.id);
@@ -951,288 +92,146 @@ router.get('/library/effects/:id/download', async (req, res) => {
   }
 });
 
-// GET /api/modules/status — Statut des modules
-router.get('/modules/status', (req, res) => {
-  const god = godMonitor.getGodStatus();
-  const uptimeSec = Math.floor(process.uptime());
-  const uptimeHours = (uptimeSec / 3600).toFixed(1) + 'h';
-  const modules = [
-    { id: 'particles',         name: 'Particles System',    status: 'online', performance: 100, uptime: uptimeHours, errors: 0 },
-    { id: 'physics',           name: 'Physics Engine',      status: 'online', performance: 99,  uptime: uptimeHours, errors: 0 },
-    { id: 'lighting',          name: 'Lighting Effects',    status: 'online', performance: 99,  uptime: uptimeHours, errors: 0 },
-    { id: 'morphing',          name: 'Morphing System',     status: 'online', performance: 99,  uptime: uptimeHours, errors: 0 },
-    { id: 'error-detection',   name: 'Error Detection',     status: 'online', performance: 100, uptime: uptimeHours, errors: 0 },
-    { id: 'quality-assurance', name: 'Quality Assurance',   status: 'online', performance: 99,  uptime: uptimeHours, errors: 0 },
-    { id: 'neural-network',    name: 'Neural Network',      status: 'online', performance: Math.round((god.ai?.confidenceLevel ?? 0.97) * 100), uptime: uptimeHours, errors: 0 },
-    { id: 'self-healing',      name: 'Self-Healing Engine', status: 'online', performance: Math.round((god.selfHealing?.successRate ?? 0.99) * 100), uptime: uptimeHours, errors: 0 },
-  ];
-  const overall = Math.max(god.overallHealth, Math.round(modules.reduce((s, m) => s + m.performance, 0) / modules.length));
-  res.json({ modules, overall, timestamp: new Date() });
+router.get('/library/real-time-stats', async (_req, res) => {
+  try {
+    const result = await storage.getEffects({ limit: 10000 });
+    const effects = result.effects;
+    const categories: Record<string, number> = {};
+    effects.forEach(e => {
+      categories[e.category] = (categories[e.category] || 0) + 1;
+    });
+    res.json({
+      totalDescriptions: result.total,
+      effectsGenerated: result.total,
+      averageGenerationTime: 2.4,
+      successRate: 1.0,
+      categories,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// GET /api/ai/analyze — Analyse IA (React Query GET version)
-router.get('/ai/analyze', async (req, res) => {
+// === JOBS ===
+
+router.get('/queue/jobs', (_req, res) => {
+  res.json([]);
+});
+
+router.post('/effects/generate', async (req, res) => {
   try {
-    const description = String(req.query.description || '');
-    if (!description || description.length < 5) {
-      return res.json({ concepts: [], confidence: 0, modules: [], parameters: {}, complexity: 1, estimatedDuration: 0 });
+    const { jobQueue } = await import('./queue/job-queue');
+    const { description, platform = 'javascript', options = {} } = req.body;
+    if (!description || typeof description !== 'string') {
+      return res.status(400).json({ error: 'description is required' });
     }
-    const rawConcepts = await nlpProcessor.extractConcepts(description);
-    const concepts = Array.isArray(rawConcepts) ? rawConcepts.map((c: any) => c.name || c) : [];
-    res.json({
-      concepts,
-      confidence: 0.87,
-      modules: [],
-      parameters: {},
-      complexity: 5,
-      estimatedDuration: 3200,
-    });
+    const job = await storage.createJob({
+      description, platform, options,
+      status: 'queued', progress: 0, estimatedTime: 30,
+    } as any);
+    await jobQueue.addJob(job);
+    res.json({ success: true, jobId: job.id, estimatedTime: 30 });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST /api/ai/analyze — Analyse IA
-router.post('/ai/analyze', async (req, res) => {
+router.get('/effects/status/:jobId', async (req, res) => {
   try {
-    const { description } = req.body;
-    if (!description) return res.status(400).json({ error: 'Description requise' });
-    const rawConcepts = await nlpProcessor.extractConcepts(description);
-    const concepts = Array.isArray(rawConcepts) ? rawConcepts.map((c: any) => c.name || c) : [];
-    res.json({
-      concepts,
-      confidence: 0.87,
-      modules: [],
-      parameters: {},
-      complexity: 5,
-      estimatedDuration: 3200,
-    });
+    const job = await storage.getJob(req.params.jobId);
+    if (!job) return res.status(404).json({ error: 'Job introuvable' });
+    res.json(job);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST /api/modules/batch-generator/generate
-router.post('/modules/batch-generator/generate', async (req, res) => {
+router.get('/effect/preview/:id', (req, res) => {
   try {
-    const { type, category, count } = req.body;
-    res.json({
-      success: true,
-      generated: parseInt(count) || 10,
-      type, category,
-      message: `${count || 10} effets générés avec succès`,
-      timestamp: new Date(),
-    });
+    const html = getEffectPreviewHTML(req.params.id);
+    if (!html) return res.status(404).send('Preview introuvable');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.send(html);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST /api/modules/classification-storage/reorganize
-router.post('/modules/classification-storage/reorganize', async (req, res) => {
-  try {
-    res.json({ success: true, reorganized: 847, categories: 9, message: 'Bibliothèque réorganisée', timestamp: new Date() });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
+// === TEMPLATES DE SECTEUR ===
+
+router.get('/signature/templates', (_req, res) => {
+  const templates = getAllTemplates().map(t => ({
+    id: t.id,
+    label: t.label,
+    emoji: t.emoji,
+    description: t.description,
+    layout: t.layout,
+    effects: t.effects,
+    palette: t.palette,
+    tone: t.tone,
+    fieldCount: t.fields.length,
+  }));
+  res.json({ templates, total: templates.length });
 });
 
-// POST /api/modules/quality-assurance/batch-check
-router.post('/modules/quality-assurance/batch-check', async (req, res) => {
+router.get('/signature/templates/:sectorId', (req, res) => {
   try {
-    const qm = qualityAssurance.getSystemMetrics();
-    res.json({ success: true, checked: 847, passed: 819, failed: 28, averageScore: 0.89, metrics: qm, timestamp: new Date() });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/library/initialize
-router.post('/library/initialize', async (req, res) => {
-  try {
-    res.json({ success: true, message: 'Bibliothèque initialisée', total: 847, timestamp: new Date() });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/expansion/categories — catégories réelles de la bibliothèque
-router.get('/expansion/categories', async (req, res) => {
-  try {
-    const { effects } = await storage.getEffects({ limit: 500 });
-    const cats = [...new Set(effects.map(e => e.category))].sort();
-    res.json({ categories: cats });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/expansion/types — types réels de la bibliothèque
-router.get('/expansion/types', async (req, res) => {
-  try {
-    const { effects } = await storage.getEffects({ limit: 500 });
-    const types = [...new Set(effects.map(e => e.type))].sort();
-    res.json({ types });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/expansion/library-stats — stats réelles de la bibliothèque
-router.get('/expansion/library-stats', async (req, res) => {
-  try {
-    const { effects, total } = await storage.getEffects({ limit: 500 });
-    const categoriesDistribution: Record<string, number> = {};
-    const typesDistribution: Record<string, number> = {};
-    for (const e of effects) {
-      categoriesDistribution[e.category] = (categoriesDistribution[e.category] || 0) + 1;
-      typesDistribution[e.type] = (typesDistribution[e.type] || 0) + 1;
+    const validIds = ['artisanat','restauration','sante','immobilier','commerce','services_pro','tech','education','loisirs','transport'] as SectorId[];
+    const id = req.params.sectorId as SectorId;
+    if (!validIds.includes(id)) {
+      return res.status(400).json({ error: `Secteur invalide. Valeurs acceptées : ${validIds.join(', ')}` });
     }
-    res.json({ totalEffects: total, categoriesDistribution, typesDistribution });
+    const template = getSectorTemplate(id);
+    res.json(template);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/expansion/category-stats/:category — stats réelles par catégorie
-router.get('/expansion/category-stats/:category', async (req, res) => {
+router.post('/signature/classify-sector', async (req, res) => {
   try {
-    const { category } = req.params;
-    const { effects, total } = await storage.getEffects({ category, limit: 500 });
-    const totalAll = (await storage.getEffects({ limit: 500 })).total;
-    const avgComplexity = effects.length > 0
-      ? effects.reduce((sum, e) => sum + (e.complexity || 5), 0) / effects.length
-      : 0;
-    const allTags = effects.flatMap(e => (e.tags as string[]) || []);
-    const tagCounts: Record<string, number> = {};
-    for (const t of allTags) tagCounts[t] = (tagCounts[t] || 0) + 1;
-    const commonConcepts = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([t]) => t);
-    const share = total / Math.max(totalAll, 1);
-    const expansionPotential = share < 0.05 ? 'high' : share < 0.12 ? 'medium' : 'low';
-    res.json({ category, effectCount: total, averageComplexity: avgComplexity, expansionPotential, commonConcepts });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    const { metadata, gmb_data } = req.body;
+    const input = metadata || gmb_data;
+    if (!input) return res.status(400).json({ error: 'metadata ou gmb_data requis' });
 
-// POST /api/expansion/analyze-library — analyse réelle des lacunes
-router.post('/expansion/analyze-library', async (req, res) => {
-  try {
-    const { effects, total } = await storage.getEffects({ limit: 500 });
-    const catCount: Record<string, number> = {};
-    const typeCount: Record<string, number> = {};
-    for (const e of effects) {
-      catCount[e.category] = (catCount[e.category] || 0) + 1;
-      typeCount[e.type] = (typeCount[e.type] || 0) + 1;
-    }
-    const avgPerCat = total / Math.max(Object.keys(catCount).length, 1);
-    const gaps = Object.entries(catCount)
-      .filter(([, c]) => c < avgPerCat)
-      .sort((a, b) => a[1] - b[1])
-      .slice(0, 5)
-      .map(([cat, current]) => ({ category: cat, current, suggested: Math.ceil(avgPerCat) }));
-    const underrepTypes = Object.entries(typeCount).filter(([, c]) => c < 3).map(([t]) => t);
-    const opportunities = [
-      ...gaps.map(g => `Enrichir la catégorie ${g.category} (${g.current} effets → objectif ${g.suggested})`),
-      ...underrepTypes.map(t => `Explorer le type ${t} (peu représenté)`),
-    ].slice(0, 6);
+    const result = await classifySector(input);
+    const template = getSectorTemplate(result.sectorId);
+
     res.json({
-      success: true,
-      analysis: { totalEffects: total, categoriesDistribution: catCount, typesDistribution: typeCount },
-      gaps,
-      opportunities,
-      timestamp: new Date(),
+      ...result,
+      template: {
+        id: template.id,
+        label: template.label,
+        emoji: template.emoji,
+        layout: template.layout,
+        effects: template.effects,
+        palette: template.palette,
+        fields: template.fields,
+        tone: template.tone,
+      },
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST /api/expansion/expand — génération intelligente basée sur la vraie bibliothèque
-router.post('/expansion/expand', async (req, res) => {
-  try {
-    const { targetCategory, targetType, descriptionCount, creativeLevel, avoidDuplicates } = req.body;
-    const count = Math.min(parseInt(descriptionCount) || 5, 50);
-    const { effects } = await storage.getEffects({ category: targetCategory, limit: 500 });
-    const existingNames = new Set(effects.map(e => e.name.toLowerCase()));
-    const allTags = effects.flatMap(e => (e.tags as string[]) || []);
-    const tagCounts: Record<string, number> = {};
-    for (const t of allTags) tagCounts[t] = (tagCounts[t] || 0) + 1;
-    const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([t]) => t);
+// === GMB SCRAPING ===
 
-    const creativityMultiplier = { conservative: 0.7, moderate: 1.0, creative: 1.3, experimental: 1.6 }[creativeLevel as string] || 1.0;
-    const frenchPrefixes = ['Ultra', 'Hyper', 'Néo', 'Proto', 'Méta', 'Éco', 'Quantum', 'Plasma', 'Chrono', 'Hydro', 'Pyro', 'Cryo', 'Flux', 'Vortex'];
-    const frenchSuffixes = ['Dynamique', 'Stellaire', 'Organique', 'Fractale', 'Quantique', 'Cosmique', 'Cristalline', 'Vibrante', 'Pulsante', 'Lumineuse', 'Magnétique', 'Cinétique'];
-    const categoryLabel = targetCategory || 'GÉNÉRAL';
-
-    const generated = Array.from({ length: count }, (_, i) => {
-      const prefix = frenchPrefixes[Math.floor(Math.random() * frenchPrefixes.length)];
-      const suffix = frenchSuffixes[Math.floor(Math.random() * frenchSuffixes.length)];
-      const name = `${categoryLabel} ${prefix} ${suffix}`;
-      const isDuplicate = avoidDuplicates && existingNames.has(name.toLowerCase());
-      const confidence = Math.min(0.99, (0.82 + Math.random() * 0.15) * creativityMultiplier);
-      const uniquenessScore = Math.min(0.99, (0.75 + Math.random() * 0.20) * creativityMultiplier);
-      const sourceElements = topTags.slice(0, 3 + Math.floor(Math.random() * 3));
-      const description = `Effet ${categoryLabel.toLowerCase()} de type ${(targetType || 'animé').toLowerCase()} combinant ${sourceElements.join(', ')}. Niveau de complexité ${Math.round(creativityMultiplier * 7)}/10. Idéal pour signatures email professionnelles.`;
-      return { id: `exp_${Date.now()}_${i}`, name: isDuplicate ? `${name} v2` : name, description, confidence, uniquenessScore, sourceElements, category: targetCategory, type: targetType };
-    });
-
-    const duplicatesAvoided = avoidDuplicates ? generated.filter(g => g.name.endsWith('v2')).length : 0;
-    const avgConf = generated.reduce((s, g) => s + g.confidence, 0) / generated.length;
-    const avgUniq = generated.reduce((s, g) => s + g.uniquenessScore, 0) / generated.length;
-
-    const recommendations: string[] = [];
-    if (effects.length < 4) recommendations.push(`La catégorie ${targetCategory} est sous-développée — priorité d'expansion haute`);
-    if (creativeLevel === 'conservative') recommendations.push('Augmenter le niveau de créativité pour plus de diversité');
-    if (topTags.length > 5) recommendations.push(`Les tags ${topTags.slice(0, 3).join(', ')} sont très répandus — explorez de nouveaux concepts`);
-    recommendations.push(`Objectif : porter ${targetCategory} à ${Math.max(effects.length + count, 8)} effets pour équilibrer la bibliothèque`);
-
-    res.json({ success: true, generated, stats: { totalGenerated: count, averageUniqueness: avgUniq, averageConfidence: avgConf, duplicatesAvoided }, recommendations });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// =============================================
-// POST /api/signature/scrape-gmb
-// Scraping GMB via Serper API
-// =============================================
 router.post('/signature/scrape-gmb', async (req, res) => {
   try {
     const { gmb_url } = req.body;
     if (!gmb_url) return res.status(400).json({ error: 'gmb_url requis' });
-
     const { scrapeGMB } = await import('./services/gmb-scraper');
     const data = await scrapeGMB(gmb_url);
     return res.json(data);
   } catch (err: any) {
-    console.error('Erreur scrape-gmb:', err);
     return res.status(500).json({ error: err.message || 'Erreur interne' });
   }
 });
 
-// =============================================
-// POST /api/signature/analyze-and-configure
-// Pipeline 3 cerveaux IA
-// =============================================
-router.post('/signature/analyze-and-configure', async (req, res) => {
-  try {
-    const { signature_image_base64, metadata } = req.body;
-    if (!metadata) return res.status(400).json({ error: 'metadata requis' });
+// === STYLE VISUEL (Gemini) ===
 
-    const { runTripleAIPipeline } = await import('./services/triple-ai-director');
-    const result = await runTripleAIPipeline(signature_image_base64 || null, metadata);
-    return res.json(result);
-  } catch (err: any) {
-    console.error('Erreur analyze-and-configure:', err);
-    return res.status(500).json({ error: err.message || 'Erreur interne' });
-  }
-});
-
-// =============================================
-// POST /api/signature/detect-style
-// Gemini détecte le style visuel magique
-// =============================================
 router.post('/signature/detect-style', async (req, res) => {
   try {
     const { metadata } = req.body;
@@ -1240,112 +239,80 @@ router.post('/signature/detect-style', async (req, res) => {
 
     const context = [
       metadata.entreprise && `Entreprise : ${metadata.entreprise}`,
-      metadata.secteur && `Secteur : ${metadata.secteur}`,
+      metadata.secteur    && `Secteur : ${metadata.secteur}`,
       metadata.description && `Description GMB : ${metadata.description}`,
-      metadata.ton && `Ton de marque : ${metadata.ton}`,
-      metadata.note && `Note Google : ${metadata.note}/5 (${metadata.avis || 0} avis)`,
-      metadata.ville && `Ville : ${metadata.ville}`,
+      metadata.ton        && `Ton de marque : ${metadata.ton}`,
+      metadata.note       && `Note Google : ${metadata.note}/5 (${metadata.avis || 0} avis)`,
+      metadata.ville      && `Ville : ${metadata.ville}`,
       metadata.mots_cles?.length && `Mots-clés GMB : ${metadata.mots_cles.join(', ')}`,
-      metadata.slogan && `Slogan : ${metadata.slogan}`,
-      metadata.prix_gamme && `Gamme de prix : ${metadata.prix_gamme}`,
-      metadata.palette?.length && `Palette couleurs : ${metadata.palette.join(', ')}`,
-      metadata.reseaux_sociaux && Object.keys(metadata.reseaux_sociaux).length > 0
-        && `Réseaux : ${Object.keys(metadata.reseaux_sociaux).join(', ')}`,
+      metadata.slogan     && `Slogan : ${metadata.slogan}`,
+      metadata.palette?.length   && `Palette couleurs : ${metadata.palette.join(', ')}`,
     ].filter(Boolean).join('\n');
 
-    const prompt = `Tu es un oracle créatif — un génie du branding qui voit instantanément l'essence visuelle d'une marque et sait exactement quelle direction artistique lui correspond. Tu n'es pas rationnel, tu es intuitif, précis et magique.
-
-Analyse ces données de l'entreprise et révèle le style visuel qui lui appartient profondément :
+    const prompt = `Tu es un expert en identité visuelle. Analyse ces données d'entreprise et définis le style visuel qui lui correspond.
 
 ${context}
 
-Ta réponse doit être visionnaire et précise à la fois. Réponds UNIQUEMENT en JSON :
+Réponds UNIQUEMENT en JSON :
 {
-  "style_visuel": "description du style en 6-10 mots très précis et évocateurs",
-  "univers": "description poétique de l'univers visuel en 2-3 phrases — comme si tu décrivais un film",
+  "style_visuel": "description du style en 6-10 mots précis",
+  "univers": "description de l'univers visuel en 2-3 phrases",
   "mots_cles": ["mot1", "mot2", "mot3", "mot4"],
-  "palette_narrative": "ce que la palette de couleurs dit de cette marque en 1 phrase",
-  "reference_iconique": "la marque ou l'artiste dont s'inspire le plus cette identité",
-  "justification": "pourquoi ce style est inévitable pour cette marque en 1-2 phrases"
+  "palette_narrative": "ce que la palette dit de cette marque en 1 phrase",
+  "reference_iconique": "la marque dont s'inspire le plus cette identité",
+  "justification": "pourquoi ce style convient à cette marque en 1-2 phrases"
 }`;
 
     const { callGemini } = await import('./services/gemini-wrapper');
-    const text = await callGemini(prompt, { temperature: 0.9, maxTokens: 1000 });
+    const text = await callGemini(prompt, { temperature: 0.8, maxTokens: 800 });
     const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    const styleData = JSON.parse(cleaned);
-    return res.json(styleData);
+    return res.json(JSON.parse(cleaned));
+
   } catch (err: any) {
-    // ── Fallback sémantique : génère un style basé sur les métadonnées ──
-    // Activé quand tous les services IA sont indisponibles (pas de clés)
-    console.warn('detect-style: IA indisponible — fallback sémantique activé:', err.message);
+    console.warn('detect-style fallback activé:', err.message);
     const { metadata } = req.body || {};
     const secteur = (metadata?.secteur || '').toLowerCase();
-    const entreprise = metadata?.entreprise || '';
-
-    // Mapping secteur → style visuel prédéfini
     const STYLE_MAP: Record<string, any> = {
-      technologie: { style_visuel: 'Épuré futuriste avec accents lumineux', mots_cles: ['tech', 'précision', 'innovation', 'digital'], reference_iconique: 'Linear / Apple' },
-      santé: { style_visuel: 'Chaleureux et rassurant, blanc clinique', mots_cles: ['confiance', 'soin', 'précision', 'humain'], reference_iconique: 'Doctolib / Mayo Clinic' },
-      finance: { style_visuel: 'Sobre institutionnel avec lignes d\'autorité', mots_cles: ['fiabilité', 'prestige', 'structure', 'rigueur'], reference_iconique: 'Goldman Sachs / Amundi' },
-      luxe: { style_visuel: 'Minimalisme noir et or, élégance absolue', mots_cles: ['exclusivité', 'raffinement', 'heritage', 'désir'], reference_iconique: 'Hermès / Chanel' },
-      immobilier: { style_visuel: 'Architectural moderne, volumes et lumière', mots_cles: ['prestige', 'espace', 'qualité', 'vision'], reference_iconique: 'Barnes / Sotheby\'s Realty' },
-      design: { style_visuel: 'Créatif audacieux, couleurs et forme', mots_cles: ['créativité', 'audace', 'singularité', 'talent'], reference_iconique: 'IDEO / Pentagram' },
+      tech:       { style_visuel: 'Épuré futuriste avec accents lumineux', mots_cles: ['tech', 'précision', 'innovation', 'digital'] },
+      santé:      { style_visuel: 'Chaleureux et rassurant, blanc clinique', mots_cles: ['confiance', 'soin', 'précision', 'humain'] },
+      immobilier: { style_visuel: 'Architectural moderne, volumes et lumière', mots_cles: ['prestige', 'espace', 'qualité', 'vision'] },
+      restaurant: { style_visuel: 'Chaud et appétissant, terroir moderne', mots_cles: ['saveur', 'convivial', 'artisanal', 'goût'] },
     };
-
-    // Cherche un match partiel dans le secteur
-    let styleBase = { style_visuel: 'Professionnel moderne et dynamique', mots_cles: ['confiance', 'expertise', 'impact', 'qualité'], reference_iconique: 'Apple / Notion' };
+    let style = { style_visuel: 'Professionnel moderne et dynamique', mots_cles: ['confiance', 'expertise', 'impact', 'qualité'] };
     for (const [key, val] of Object.entries(STYLE_MAP)) {
-      if (secteur.includes(key)) { styleBase = val; break; }
+      if (secteur.includes(key)) { style = val; break; }
     }
-
     return res.json({
-      style_visuel: styleBase.style_visuel,
-      univers: `Un univers visuel qui reflète l'identité de ${entreprise || 'votre marque'} — ${styleBase.style_visuel.toLowerCase()}. Chaque animation est conçue pour transmettre la confiance et l'expertise de la marque en quelques secondes.`,
-      mots_cles: styleBase.mots_cles,
-      palette_narrative: 'Une palette soigneusement choisie pour véhiculer les valeurs profondes de la marque.',
-      reference_iconique: styleBase.reference_iconique,
-      justification: `Ce style correspond à l'essence de ${entreprise || 'votre entreprise'} dans le secteur ${metadata?.secteur || 'professionnel'}.`,
+      ...style,
+      univers: `Un univers visuel qui reflète l'identité de ${metadata?.entreprise || 'votre marque'}.`,
+      palette_narrative: 'Une palette soigneusement choisie pour véhiculer les valeurs de la marque.',
+      reference_iconique: 'Apple / Notion',
+      justification: `Ce style correspond au secteur ${metadata?.secteur || 'professionnel'}.`,
       _fallback: true,
     });
   }
 });
 
-// =============================================
-// POST /api/signature/deliver
-// Pipeline de livraison complète God Tier
-// =============================================
+// === LIVRAISON & EXPORT ===
+
 router.post('/signature/deliver', async (req, res) => {
   try {
     const { svg_content, client_email, metadata, creative_config } = req.body;
     if (!svg_content || !metadata) {
       return res.status(400).json({ error: 'svg_content et metadata requis' });
     }
-
-    const baseUrl = process.env.PREVIEW_BASE_URL ||
-      `${req.protocol}://${req.get('host')}`;
-
+    const baseUrl = process.env.PREVIEW_BASE_URL || `${req.protocol}://${req.get('host')}`;
     const { runDeliveryEngine } = await import('./services/delivery-engine');
     const result = await runDeliveryEngine(
-      {
-        svgContent: svg_content,
-        clientEmail: client_email,
-        metadata,
-        creativeConfig: creative_config || {},
-      },
+      { svgContent: svg_content, clientEmail: client_email, metadata, creativeConfig: creative_config || {} },
       baseUrl
     );
-
     return res.json(result);
   } catch (err: any) {
-    console.error('Erreur livraison:', err);
     return res.status(500).json({ error: err.message || 'Erreur interne' });
   }
 });
 
-// =============================================
-// GET /api/signature/preview/:id
-// Sert la page de prévisualisation HTML
-// =============================================
 router.get('/signature/preview/:id', async (req, res) => {
   try {
     const { getDeliveryFile } = await import('./services/delivery-engine');
@@ -1358,26 +325,6 @@ router.get('/signature/preview/:id', async (req, res) => {
   }
 });
 
-// =============================================
-// GET /api/effect/preview/:id
-// Sert la page de prévisualisation HTML d'un effet généré
-// =============================================
-router.get('/effect/preview/:id', async (req, res) => {
-  try {
-    const html = getEffectPreviewHTML(req.params.id);
-    if (!html) return res.status(404).send('Preview introuvable');
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-cache');
-    return res.send(html);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// =============================================
-// GET /api/signature/download/:id
-// Téléchargement du ZIP complet
-// =============================================
 router.get('/signature/download/:id', async (req, res) => {
   try {
     const { getDeliveryFile } = await import('./services/delivery-engine');
@@ -1391,20 +338,14 @@ router.get('/signature/download/:id', async (req, res) => {
   }
 });
 
-// =============================================
-// GET /api/signature/export-file/:id/:type
-// Téléchargement fichier individuel du package
-// =============================================
 router.get('/signature/export-file/:id/:type', async (req, res) => {
   try {
     const { id, type } = req.params;
     const validTypes = ['svg', 'outlook', 'gmail', 'pdf-gmail', 'pdf-outlook', 'pdf-apple', 'png', 'config'];
     if (!validTypes.includes(type)) return res.status(400).json({ error: 'type invalide' });
-
     const { getDeliveryFile } = await import('./services/delivery-engine');
     const file = await getDeliveryFile(id, type as any);
     if (!file) return res.status(404).json({ error: 'Fichier introuvable' });
-
     res.setHeader('Content-Type', file.contentType);
     res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
     return res.send(file.buffer);
@@ -1413,15 +354,10 @@ router.get('/signature/export-file/:id/:type', async (req, res) => {
   }
 });
 
-// =============================================
-// POST /api/signature/export
-// Export SVG + guide + config JSON
-// =============================================
 router.post('/signature/export', async (req, res) => {
   try {
     const { metadata, brief, scenario, config } = req.body;
     if (!metadata || !config) return res.status(400).json({ error: 'metadata et config requis' });
-
     const { buildDeliveryPackage } = await import('./services/signature-delivery');
     const pkg = await buildDeliveryPackage(metadata, brief, scenario, config);
     return res.json({
@@ -1432,24 +368,17 @@ router.post('/signature/export', async (req, res) => {
       svg_content: pkg.svg_content,
     });
   } catch (err: any) {
-    console.error('Erreur export:', err);
     return res.status(500).json({ error: err.message || 'Erreur interne' });
   }
 });
 
-// =============================================
-// GET /api/signature/export/:id/:type
-// Téléchargement des fichiers exportés
-// =============================================
 router.get('/signature/export/:id/:type', async (req, res) => {
   try {
     const { id, type } = req.params;
     if (!['svg', 'guide', 'config'].includes(type)) return res.status(400).json({ error: 'type invalide' });
-
     const { getExportFile } = await import('./services/signature-delivery');
     const file = await getExportFile(id, type as 'svg' | 'guide' | 'config');
     if (!file) return res.status(404).json({ error: 'Fichier introuvable' });
-
     res.setHeader('Content-Type', file.contentType);
     res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
     return res.send(file.content);
@@ -1458,463 +387,10 @@ router.get('/signature/export/:id/:type', async (req, res) => {
   }
 });
 
-// =============================================
-// GET /api/keys/status — Statut enrichi des clés
-// =============================================
-router.get('/keys/status', async (_req, res) => {
+router.get('/signature/latest-svg', (_req, res) => {
   try {
-    const { rotator } = await import('./services/api-key-rotator');
-    await rotator.init();
-    const status = rotator.getPoolStatus();
-
-    const now = new Date();
-    const daysInMonth = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 0).getDate();
-    const dayOfMonth  = now.getUTCDate();
-    const daysLeft    = daysInMonth - dayOfMonth;
-    const monthKey    = now.toISOString().slice(0, 7);
-    const serperMonthly = status.monthlyUsage[`serper_${monthKey}`] || 0;
-
-    // Clés Replit (OpenAI / Anthropic)
-    const openaiOk    = !!process.env.OPENAI_API_KEY?.startsWith('sk-');
-    const anthropicOk = !!process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-');
-
-    const serializedKeys = status.keys.map(k => ({
-      id:                   k.id,
-      service:              k.service,
-      label:                (k as any).label || k.id,
-      source:               (k as any).source || 'env',
-      status:               k.status,
-      usageToday:           k.usageToday,
-      dailyLimit:           k.dailyLimit,
-      successCount:         k.successCount,
-      avgResponseTime:      k.avgResponseTime,
-      healthScore:          Math.round((k as any).healthScore ?? 100),
-      velocity:             (k as any).velocity ?? 0,
-      minutesUntilExhausted: (k as any).minutesUntilExhausted ?? null,
-      cooldownUntil:        k.cooldownUntil?.toISOString() || null,
-      lastError:            k.lastError,
-    }));
-
-    return res.json({
-      keys: serializedKeys,
-      summary: status.summary,
-      serperMonthly,
-      serperMonthlyLimit: 2500,
-      daysLeft,
-      replit: {
-        openai:    { configured: openaiOk,    suffix: openaiOk    ? `...${process.env.OPENAI_API_KEY!.slice(-4)}`    : null },
-        anthropic: { configured: anthropicOk, suffix: anthropicOk ? `...${process.env.ANTHROPIC_API_KEY!.slice(-4)}` : null },
-      },
-    });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/keys/add — Ajout dynamique d'une clé (persiste en DB)
-router.post('/keys/add', async (req, res) => {
-  try {
-    const { service, key, label } = req.body as {
-      service: 'gemini' | 'cerebras' | 'serper';
-      key: string;
-      label?: string;
-    };
-    if (!service || !key) {
-      return res.status(400).json({ error: 'service et key sont requis' });
-    }
-    if (!['gemini', 'cerebras', 'serper'].includes(service)) {
-      return res.status(400).json({ error: 'service doit être gemini, cerebras ou serper' });
-    }
-    const { rotator } = await import('./services/api-key-rotator');
-    const newKey = await rotator.addKey(service, key, label);
-    return res.json({
-      success: true,
-      message: `Clé ${service} ajoutée et persistée en base de données`,
-      key: {
-        id:      newKey.id,
-        service: newKey.service,
-        label:   newKey.label,
-        source:  newKey.source,
-        status:  newKey.status,
-      },
-    });
-  } catch (err: any) {
-    return res.status(400).json({ error: err.message });
-  }
-});
-
-// DELETE /api/keys/:id — Suppression d'une clé
-router.delete('/keys/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { rotator } = await import('./services/api-key-rotator');
-    await rotator.removeKey(id);
-    return res.json({ success: true, message: `Clé ${id} retirée de la rotation` });
-  } catch (err: any) {
-    return res.status(400).json({ error: err.message });
-  }
-});
-
-// POST /api/keys/reset — Réinitialisation forcée
-router.post('/keys/reset', async (req, res) => {
-  try {
-    const { service } = req.body as { service?: 'gemini' | 'cerebras' | 'serper' };
-    const { rotator } = await import('./services/api-key-rotator');
-    await rotator.forceReset(service);
-    return res.json({ success: true, message: `Reset effectué pour: ${service || 'tous'}` });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/keys/test — Test de toutes les clés
-router.post('/keys/test', async (_req, res) => {
-  try {
-    const { rotator } = await import('./services/api-key-rotator');
-    const results = await rotator.testAllKeys();
-    return res.json({ results });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/keys/replit — État des clés Replit (OpenAI / Anthropic)
-router.get('/keys/replit', async (_req, res) => {
-  try {
-    // Supporte les intégrations Replit (AI_INTEGRATIONS_*) ET les clés classiques
-    const openaiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
-    const anthropicKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
-
-    const openaiOk    = !!(openaiKey?.length && openaiKey.length > 10);
-    const anthropicOk = !!(anthropicKey?.length && anthropicKey.length > 10);
-
-    // Source selon l'origine de la clé
-    const openaiSource = process.env.AI_INTEGRATIONS_OPENAI_API_KEY ? 'replit-ai-integration' : 'env-secret';
-    const anthropicSource = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY ? 'replit-ai-integration' : 'env-secret';
-
-    return res.json({
-      openai: {
-        configured: openaiOk,
-        model: 'gpt-4o',
-        suffix: openaiOk ? `...${openaiKey!.slice(-4)}` : null,
-        source: openaiSource,
-      },
-      anthropic: {
-        configured: anthropicOk,
-        model: 'claude-opus-4-5',
-        suffix: anthropicOk ? `...${anthropicKey!.slice(-4)}` : null,
-        source: anthropicSource,
-      },
-    });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// ─── Analytics P4 ────────────────────────────────────────────────────────────
-
-// GET /api/analytics/report — Rapport complet des métriques de génération
-router.get('/analytics/report', async (req, res) => {
-  try {
-    const { generateReport } = await import('./modules/analytics.module');
-    const days = parseInt(String(req.query.days ?? '30'), 10);
-    const report = generateReport(days);
-    return res.json(report);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/analytics/stats — Statistiques rapides pour le dashboard
-router.get('/analytics/stats', async (_req, res) => {
-  try {
-    const { getQuickStats } = await import('./modules/analytics.module');
-    const stats = getQuickStats();
-    return res.json(stats);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/analytics/export/csv — Export CSV des événements de génération
-router.get('/analytics/export/csv', async (req, res) => {
-  try {
-    const { exportCSVFromDB } = await import('./modules/analytics.module');
-    const days = parseInt(String(req.query.days ?? '30'), 10);
-    const csv  = await exportCSVFromDB(days);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="analytics_${days}j.csv"`);
-    return res.send(csv);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/analytics/export/json — Export JSON des événements
-router.get('/analytics/export/json', async (req, res) => {
-  try {
-    const { exportJSONFromDB } = await import('./modules/analytics.module');
-    const days = parseInt(String(req.query.days ?? '30'), 10);
-    const json = await exportJSONFromDB(days);
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename="analytics_${days}j.json"`);
-    return res.send(json);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/analytics/alerts — Alertes récentes
-router.get('/analytics/alerts', async (req, res) => {
-  try {
-    const { getRecentAlerts } = await import('./modules/analytics.module');
-    const limit = parseInt(String(req.query.limit ?? '20'), 10);
-    return res.json(getRecentAlerts(limit));
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// PATCH /api/analytics/thresholds — Configurer les seuils d'alerte
-router.patch('/analytics/thresholds', async (req, res) => {
-  try {
-    const { setAlertThresholds, getAlertThresholds } = await import('./modules/analytics.module');
-    setAlertThresholds(req.body);
-    return res.json({ success: true, thresholds: getAlertThresholds() });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/analytics/segmentation — Segmentation par variation et profil
-router.get('/analytics/segmentation', async (req, res) => {
-  try {
-    const { fetchEventsFromDB, getSegmentation } = await import('./modules/analytics.module');
-    const days   = parseInt(String(req.query.days ?? '30'), 10);
-    const events = await fetchEventsFromDB(days);
-    return res.json(getSegmentation(events));
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PREFERENCES ENGINE — P5, Module 16
-// ─────────────────────────────────────────────────────────────────────────────
-
-// GET /api/preferences — Récupérer les préférences de l'utilisateur
-router.get('/preferences', async (req, res) => {
-  try {
-    const { getOrCreatePreferences } = await import('./modules/user-preferences-engine.module');
-    const userId = String(req.query.user_id ?? 'default');
-    const prefs  = getOrCreatePreferences(userId);
-    return res.json(prefs);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/preferences/record — Enregistrer un choix (select/star/reject)
-router.post('/preferences/record', async (req, res) => {
-  try {
-    const { recordPreference } = await import('./modules/user-preferences-engine.module');
-    const userId = String(req.query.user_id ?? 'default');
-    const { effect_id, action, variation, secteur, intensity } = req.body;
-    if (!effect_id || !action) return res.status(400).json({ error: 'effect_id et action requis' });
-    const updated = recordPreference({
-      effect_id, action, variation: variation ?? 'A',
-      secteur: secteur ?? 'default',
-      intensity: Number(intensity ?? 0.5),
-      timestamp: Date.now(),
-    }, userId);
-    return res.json(updated);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE /api/preferences/reset — Réinitialiser les préférences
-router.delete('/preferences/reset', async (req, res) => {
-  try {
-    const { resetPreferences } = await import('./modules/user-preferences-engine.module');
-    const userId = String(req.query.user_id ?? 'default');
-    resetPreferences(userId);
-    return res.json({ success: true, message: `Préférences réinitialisées pour ${userId}` });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/preferences/weights — Poids pour le pipeline (usage interne + dev)
-router.get('/preferences/weights', async (req, res) => {
-  try {
-    const { computePreferenceWeights } = await import('./modules/user-preferences-engine.module');
-    const userId  = String(req.query.user_id ?? 'default');
-    const weights = computePreferenceWeights(userId);
-    return res.json(weights);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/preferences/recommendations — Recommandations proactives
-router.get('/preferences/recommendations', async (req, res) => {
-  try {
-    const { getProactiveRecommendations } = await import('./modules/user-preferences-engine.module');
-    const userId = String(req.query.user_id ?? 'default');
-    return res.json(getProactiveRecommendations(userId));
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/signatures/history — Historique des fingerprints visuels
-router.get('/signatures/history', async (req, res) => {
-  try {
-    const { getFingerprintHistory } = await import('./modules/visual-signature-engine.module');
-    const secteur = req.query.secteur ? String(req.query.secteur) : undefined;
-    const limit   = parseInt(String(req.query.limit ?? '50'), 10);
-    return res.json(await getFingerprintHistory(secteur, limit));
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PRESET MANAGER — P5, Module 17
-// ─────────────────────────────────────────────────────────────────────────────
-
-// GET /api/presets — Liste tous les presets
-router.get('/presets', async (_req, res) => {
-  try {
-    const { getAllPresets } = await import('./modules/preset-manager.module');
-    return res.json(await getAllPresets());
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/presets — Créer un preset
-router.post('/presets', async (req, res) => {
-  try {
-    const { createPreset } = await import('./modules/preset-manager.module');
-    const { name, description, secteur, configuration, tags, is_public, created_by } = req.body;
-    if (!name || !secteur || !configuration) {
-      return res.status(400).json({ error: 'name, secteur et configuration requis' });
-    }
-    const preset = await createPreset({ name, description, secteur, configuration, tags, is_public, created_by });
-    return res.status(201).json(preset);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/presets/smart/:secteur — Presets intelligents pour un secteur
-router.get('/presets/smart/:secteur', async (req, res) => {
-  try {
-    const { getSmartPresets } = await import('./modules/preset-manager.module');
-    return res.json(await getSmartPresets(req.params.secteur));
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/presets/public — Presets publics partagés
-router.get('/presets/public', async (_req, res) => {
-  try {
-    const { getPublicPresets } = await import('./modules/preset-manager.module');
-    return res.json(await getPublicPresets());
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/presets/sector/:secteur — Presets filtrés par secteur
-router.get('/presets/sector/:secteur', async (req, res) => {
-  try {
-    const { getPresetsBySector } = await import('./modules/preset-manager.module');
-    return res.json(await getPresetsBySector(req.params.secteur));
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/presets/:id/versions — Historique des versions
-router.get('/presets/:id/versions', async (req, res) => {
-  try {
-    const { getPresetVersionHistory } = await import('./modules/preset-manager.module');
-    return res.json(await getPresetVersionHistory(req.params.id));
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// PATCH /api/presets/:id — Mettre à jour un preset (avec versioning)
-router.patch('/presets/:id', async (req, res) => {
-  try {
-    const { updatePreset } = await import('./modules/preset-manager.module');
-    const updated = await updatePreset(req.params.id, req.body);
-    if (!updated) return res.status(404).json({ error: 'Preset introuvable ou preset smart non-modifiable' });
-    return res.json(updated);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/presets/:id/rollback/:versionId — Rollback vers une version précédente
-router.post('/presets/:id/rollback/:versionId', async (req, res) => {
-  try {
-    const { rollbackPreset } = await import('./modules/preset-manager.module');
-    const rolled = await rollbackPreset(req.params.id, req.params.versionId);
-    if (!rolled) return res.status(404).json({ error: 'Version introuvable' });
-    return res.json(rolled);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/presets/:id — Récupérer un preset par ID
-router.get('/presets/:id', async (req, res) => {
-  try {
-    const { getPresetById } = await import('./modules/preset-manager.module');
-    const preset = await getPresetById(req.params.id);
-    if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
-    return res.json(preset);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/presets/:id/use — Marquer un preset comme utilisé
-router.post('/presets/:id/use', async (req, res) => {
-  try {
-    const { usePreset } = await import('./modules/preset-manager.module');
-    const preset = await usePreset(req.params.id);
-    if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
-    return res.json(preset);
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE /api/presets/:id — Supprimer un preset
-router.delete('/presets/:id', async (req, res) => {
-  try {
-    const { deletePreset } = await import('./modules/preset-manager.module');
-    const deleted = await deletePreset(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Preset introuvable ou preset smart non-supprimable' });
-    return res.json({ success: true });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// ── SVG brut de la signature la plus récente / la plus grande ─────────────
-router.get('/signature/latest-svg', async (_req, res) => {
-  try {
-    const fs = await import('fs');
-    const path = await import('path');
     const exportsDir = path.join(process.cwd(), 'exports');
+    if (!fs.existsSync(exportsDir)) return res.status(404).json({ error: 'Aucun export disponible' });
     const files = fs.readdirSync(exportsDir)
       .filter((f: string) => f.endsWith('.svg'))
       .sort((a: string, b: string) => fs.statSync(path.join(exportsDir, b)).size - fs.statSync(path.join(exportsDir, a)).size);
@@ -1928,53 +404,19 @@ router.get('/signature/latest-svg', async (_req, res) => {
   }
 });
 
-// ── Route de test qualité SVG ──────────────────────────────────────────────
-router.get('/svg-quality-test/:filename?', async (req, res) => {
+router.get('/svg-quality-test/:filename?', (req, res) => {
   try {
-    const fs = await import('fs');
-    const path = await import('path');
     const exportsDir = path.join(process.cwd(), 'exports');
+    if (!fs.existsSync(exportsDir)) return res.status(404).send('Dossier exports introuvable');
     const files = fs.readdirSync(exportsDir).filter((f: string) => f.endsWith('.svg')).sort();
     const targetFile = req.params.filename
       ? files.find((f: string) => f.includes(req.params.filename!)) || files[files.length - 1]
       : files.sort((a: string, b: string) => fs.statSync(path.join(exportsDir, b)).size - fs.statSync(path.join(exportsDir, a)).size)[0];
     if (!targetFile) return res.status(404).send('Aucun SVG trouvé');
     const svgContent = fs.readFileSync(path.join(exportsDir, targetFile), 'utf8');
-    const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quality Check — ${targetFile}</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #050510; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 40px 20px; font-family: 'Inter', Arial, sans-serif; }
-.header { color: #a78bfa; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; text-align: center; opacity: 0.7; }
-.card { background: linear-gradient(135deg, #0d0d1f 0%, #111827 100%); border: 1px solid rgba(107,92,231,0.15); border-radius: 20px; padding: 32px; box-shadow: 0 0 80px rgba(107,92,231,0.15), 0 20px 60px rgba(0,0,0,0.5); max-width: 700px; width: 100%; }
-.label { color: #6b7280; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
-.sig-bg-white { background: #ffffff; border-radius: 8px; padding: 0; overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-.sig-bg-dark  { background: #1f2937; border-radius: 8px; padding: 0; overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-.sig-bg-white svg, .sig-bg-dark svg { display: block; width: 100%; height: auto; }
-.meta { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(107,92,231,0.1); }
-.meta-item { font-size: 11px; color: #9ca3af; }
-.meta-item span { color: #a78bfa; font-weight: 600; }
-</style>
-</head>
-<body>
-<div class="header">EffectForge AI — Contrôle Qualité Output</div>
-<div class="card">
-  <div class="label">Fond blanc (client email standard)</div>
-  <div class="sig-bg-white">${svgContent}</div>
-  <div class="label">Fond sombre (contexte dark-mode)</div>
-  <div class="sig-bg-dark">${svgContent}</div>
-  <div class="meta">
-    <div class="meta-item">Fichier: <span>${targetFile}</span></div>
-    <div class="meta-item">Taille: <span>${Math.round(svgContent.length / 1024)}KB</span></div>
-    <div class="meta-item">Généré: <span>${new Date().toLocaleString('fr-FR')}</span></div>
-  </div>
-</div>
-</body>
-</html>`;
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Quality Check — ${targetFile}</title>
+<style>* { box-sizing: border-box; margin: 0; padding: 0; } body { background: #050510; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; font-family: Arial, sans-serif; } .card { background: #0d0d1f; border: 1px solid rgba(107,92,231,0.15); border-radius: 20px; padding: 32px; max-width: 700px; width: 100%; } .label { color: #6b7280; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; } .sig-bg-white { background: #ffffff; border-radius: 8px; margin-bottom: 24px; } .sig-bg-dark { background: #1f2937; border-radius: 8px; margin-bottom: 24px; } .meta { color: #9ca3af; font-size: 11px; margin-top: 16px; }</style>
+</head><body><div class="card"><div class="label">Fond blanc</div><div class="sig-bg-white">${svgContent}</div><div class="label">Fond sombre</div><div class="sig-bg-dark">${svgContent}</div><div class="meta">Fichier: ${targetFile} — ${Math.round(svgContent.length / 1024)}KB — ${new Date().toLocaleString('fr-FR')}</div></div></body></html>`;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
     return res.send(html);
@@ -1983,9 +425,210 @@ body { background: #050510; display: flex; flex-direction: column; align-items: 
   }
 });
 
+// === CLÉS API ===
+
+router.get('/keys/status', async (_req, res) => {
+  try {
+    const { rotator } = await import('./services/api-key-rotator');
+    await rotator.init();
+    const status = rotator.getPoolStatus();
+    const now = new Date();
+    const daysLeft = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 0).getDate() - now.getUTCDate();
+    const openaiOk    = !!process.env.OPENAI_API_KEY?.startsWith('sk-');
+    const anthropicOk = !!process.env.ANTHROPIC_API_KEY?.startsWith('sk-ant-');
+    const serializedKeys = status.keys.map((k: any) => ({
+      id: k.id, service: k.service, label: k.label || k.id, source: k.source || 'env',
+      status: k.status, usageToday: k.usageToday, dailyLimit: k.dailyLimit,
+      successCount: k.successCount, avgResponseTime: k.avgResponseTime,
+      healthScore: Math.round(k.healthScore ?? 100), cooldownUntil: k.cooldownUntil?.toISOString() || null,
+    }));
+    return res.json({
+      keys: serializedKeys,
+      summary: status.summary,
+      daysLeft,
+      replit: {
+        openai:    { configured: openaiOk,    suffix: openaiOk    ? `...${process.env.OPENAI_API_KEY!.slice(-4)}`    : null },
+        anthropic: { configured: anthropicOk, suffix: anthropicOk ? `...${process.env.ANTHROPIC_API_KEY!.slice(-4)}` : null },
+      },
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/keys/add', async (req, res) => {
+  try {
+    const { service, key, label } = req.body;
+    if (!service || !key) return res.status(400).json({ error: 'service et key sont requis' });
+    if (!['gemini', 'cerebras', 'serper'].includes(service)) {
+      return res.status(400).json({ error: 'service doit être gemini, cerebras ou serper' });
+    }
+    const { rotator } = await import('./services/api-key-rotator');
+    const newKey = await rotator.addKey(service, key, label);
+    return res.json({ success: true, key: { id: newKey.id, service: newKey.service, label: newKey.label, status: newKey.status } });
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete('/keys/:id', async (req, res) => {
+  try {
+    const { rotator } = await import('./services/api-key-rotator');
+    await rotator.removeKey(req.params.id);
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+router.post('/keys/reset', async (req, res) => {
+  try {
+    const { service } = req.body;
+    const { rotator } = await import('./services/api-key-rotator');
+    await rotator.forceReset(service);
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/keys/test', async (_req, res) => {
+  try {
+    const { rotator } = await import('./services/api-key-rotator');
+    const results = await rotator.testAllKeys();
+    return res.json({ results });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/keys/replit', (_req, res) => {
+  const openaiKey   = process.env.AI_INTEGRATIONS_OPENAI_API_KEY   || process.env.OPENAI_API_KEY;
+  const anthropicKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
+  const openaiOk    = !!(openaiKey?.length   && openaiKey.length   > 10);
+  const anthropicOk = !!(anthropicKey?.length && anthropicKey.length > 10);
+  return res.json({
+    openai:    { configured: openaiOk,    model: 'gpt-4o',             suffix: openaiOk    ? `...${openaiKey!.slice(-4)}`    : null, source: process.env.AI_INTEGRATIONS_OPENAI_API_KEY    ? 'replit-ai-integration' : 'env-secret' },
+    anthropic: { configured: anthropicOk, model: 'claude-opus-4-5',    suffix: anthropicOk ? `...${anthropicKey!.slice(-4)}` : null, source: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY ? 'replit-ai-integration' : 'env-secret' },
+  });
+});
+
+// === PRESETS ===
+
+router.get('/presets', async (_req, res) => {
+  try {
+    const { getAllPresets } = await import('./modules/preset-manager.module');
+    return res.json(await getAllPresets());
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/presets', async (req, res) => {
+  try {
+    const { createPreset } = await import('./modules/preset-manager.module');
+    const { name, description, secteur, configuration, tags, is_public, created_by } = req.body;
+    if (!name || !secteur || !configuration) {
+      return res.status(400).json({ error: 'name, secteur et configuration requis' });
+    }
+    return res.status(201).json(await createPreset({ name, description, secteur, configuration, tags, is_public, created_by }));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/presets/smart/:secteur', async (req, res) => {
+  try {
+    const { getSmartPresets } = await import('./modules/preset-manager.module');
+    return res.json(await getSmartPresets(req.params.secteur));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/presets/public', async (_req, res) => {
+  try {
+    const { getPublicPresets } = await import('./modules/preset-manager.module');
+    return res.json(await getPublicPresets());
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/presets/sector/:secteur', async (req, res) => {
+  try {
+    const { getPresetsBySector } = await import('./modules/preset-manager.module');
+    return res.json(await getPresetsBySector(req.params.secteur));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/presets/:id/versions', async (req, res) => {
+  try {
+    const { getPresetVersionHistory } = await import('./modules/preset-manager.module');
+    return res.json(await getPresetVersionHistory(req.params.id));
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.patch('/presets/:id', async (req, res) => {
+  try {
+    const { updatePreset } = await import('./modules/preset-manager.module');
+    const updated = await updatePreset(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ error: 'Preset introuvable' });
+    return res.json(updated);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/presets/:id/rollback/:versionId', async (req, res) => {
+  try {
+    const { rollbackPreset } = await import('./modules/preset-manager.module');
+    const rolled = await rollbackPreset(req.params.id, req.params.versionId);
+    if (!rolled) return res.status(404).json({ error: 'Version introuvable' });
+    return res.json(rolled);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/presets/:id', async (req, res) => {
+  try {
+    const { getPresetById } = await import('./modules/preset-manager.module');
+    const preset = await getPresetById(req.params.id);
+    if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
+    return res.json(preset);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/presets/:id/use', async (req, res) => {
+  try {
+    const { usePreset } = await import('./modules/preset-manager.module');
+    const preset = await usePreset(req.params.id);
+    if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
+    return res.json(preset);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/presets/:id', async (req, res) => {
+  try {
+    const { deletePreset } = await import('./modules/preset-manager.module');
+    const deleted = await deletePreset(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Preset introuvable' });
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 export function registerRoutes(app: express.Application) {
   app.use(cors());
   app.use('/api', router);
 }
-
-export default router;

@@ -1,5 +1,4 @@
 import { log } from '../vite';
-import { callSerper } from './serper-wrapper';
 
 export interface GmbScrapedData {
   nom: string;
@@ -301,164 +300,54 @@ function parseHoraires(openingHours: any): string[] {
   return [];
 }
 
-// ── Scraping principal avec 3 requêtes Serper parallèles ─────────────────────
+// ── Scraping principal via extraction URL ────────────────────────────────────
 async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
   try {
     // 1. Résoudre l'URL courte
     const resolvedUrl = await resolveShortUrl(gmbUrl);
-    let rawName = extractPlaceNameFromUrl(resolvedUrl);
+    const rawName = extractPlaceNameFromUrl(resolvedUrl);
 
     if (!rawName) {
       log(`Impossible d'extraire un nom depuis: ${resolvedUrl.slice(0, 100)}`, 'gmb-scraper');
       return generateDemoData(gmbUrl);
     }
 
-    log(`Nom extrait: "${rawName}" — lancement de 3 requêtes Serper parallèles`, 'gmb-scraper');
+    log(`Nom extrait depuis l'URL: "${rawName}"`, 'gmb-scraper');
 
-    // 2. 3 requêtes Serper en parallèle
-    const [placesData, contactData, socialData] = await Promise.all([
-      // Places: données structurées GMB (nom, adresse, téléphone, note, horaires, site)
-      callSerper(rawName, { type: 'places', num: 5 }),
-
-      // Contact: email, téléphone, site depuis résultats web
-      callSerper(`"${rawName}" contact email téléphone adresse`, { type: 'search', num: 8 }),
-
-      // Social: réseaux sociaux + knowledge graph + logo
-      callSerper(`"${rawName}" site:facebook.com OR site:instagram.com OR site:linkedin.com OR site:twitter.com`, { type: 'search', num: 10 }),
-    ]);
-
-    const place = placesData.places?.[0];
-    if (!place) {
-      log(`Aucun résultat Places pour "${rawName}"`, 'gmb-scraper');
-      return generateDemoData(gmbUrl);
-    }
-
-    // ── Données de base depuis Places ──────────────────────────────────────
-    const category  = place.category || place.type || '';
-    const description = place.description || place.snippet || '';
-    const sectorKey = detectSector(category, description);
-    const website   = place.website || place.url || contactData?.knowledgeGraph?.website || '';
-
-    // ── Téléphone — Places en priorité, sinon extraction des snippets ──────
-    let telephone = place.phoneNumber || place.phone || '';
-    if (!telephone) {
-      const snippets = [
-        ...(contactData?.organic || []).map((r: any) => (r.snippet || '') + ' ' + (r.title || '')),
-        ...(contactData?.knowledgeGraph ? [JSON.stringify(contactData.knowledgeGraph)] : []),
-      ];
-      telephone = extractPhones(snippets);
-    }
-
-    // ── Email — extraction depuis résultats organiques ─────────────────────
-    let email = '';
-    const contactSnippets: string[] = [
-      ...(contactData?.organic || []).map((r: any) => (r.snippet || '') + ' ' + (r.link || '') + ' ' + (r.title || '')),
-      ...(contactData?.sitelinks || []).map((s: any) => s.link || ''),
-      description,
-    ];
-    email = extractEmails(contactSnippets);
-
-    // ── Adresse décomposée ─────────────────────────────────────────────────
-    const addressFull  = place.address || place.formattedAddress || '';
-    const adresseMatch = addressFull.match(/^(.+?),\s*(\d{4,5})\s+(.+?)(?:,\s*(.+))?$/);
-    const adresse      = adresseMatch?.[1] || addressFull;
-    const code_postal  = adresseMatch?.[2] || place.postalCode || '';
-    const ville        = adresseMatch?.[3]?.split(',')[0].trim() || place.city || '';
-    const pays         = adresseMatch?.[4] || place.country || 'France';
-
-    // ── Horaires ───────────────────────────────────────────────────────────
-    const horaires = parseHoraires(place.openingHours || place.hours);
-
-    // ── Photos GMB ─────────────────────────────────────────────────────────
-    const photos: string[] = [];
-    if (place.thumbnailUrl) photos.push(place.thumbnailUrl);
-    if (Array.isArray(place.photos)) {
-      for (const p of place.photos.slice(0, 5)) {
-        const url = typeof p === 'string' ? p : p?.url || p?.thumbnailUrl;
-        if (url) photos.push(url);
-      }
-    }
-
-    // ── Coordonnées ────────────────────────────────────────────────────────
-    const coordonnees = place.latitude && place.longitude
-      ? { lat: parseFloat(place.latitude), lng: parseFloat(place.longitude) }
-      : null;
-
-    // ── Réseaux sociaux — fusion de toutes les sources ─────────────────────
-    const allLinks: string[] = [
-      ...(place.socialLinks || []).map((l: any) => (typeof l === 'string' ? l : l?.url || '')),
-      ...(socialData?.organic || []).map((r: any) => r.link || ''),
-      ...(contactData?.organic || []).map((r: any) => r.link || ''),
-    ].filter(Boolean);
-
-    // Aussi extraire depuis knowledgeGraph si disponible
-    const kgText = contactData?.knowledgeGraph
-      ? JSON.stringify(contactData.knowledgeGraph)
-      : '';
-
-    const reseaux_sociaux = extractSocialLinks(allLinks, kgText);
-
-    // ── Logo — 4 fallbacks ─────────────────────────────────────────────────
-    const logo_url    = await fetchLogoUrl(website, contactData);
-    const logo_base64 = await fetchLogoBase64(logo_url);
-
-    // ── Mots-clés ──────────────────────────────────────────────────────────
-    const mots_cles = [
-      ...category.split(/[,\/]/).map((s: string) => s.trim()).filter(Boolean),
-      ...(place.attributes || []).slice(0, 5),
-    ].filter(Boolean).slice(0, 10);
-
-    // ── Description enrichie depuis knowledge graph ────────────────────────
-    const enrichedDesc = contactData?.knowledgeGraph?.description
-      || description
-      || `${place.title} — ${category}`;
-
-    // ── Slogan depuis knowledge graph ──────────────────────────────────────
-    const slogan = place.slogan || place.tagline || contactData?.knowledgeGraph?.title || '';
-
-    // ── CTA auto selon secteur ─────────────────────────────────────────────
-    const cta = SECTOR_CTA_MAP[sectorKey] || SECTOR_CTA_MAP.default;
-
-    log(
-      `✅ GMB: "${place.title}" | ${category} | ${ville} | ★${place.rating} | tél:${telephone ? 'oui' : 'non'} | email:${email ? 'oui' : 'non'} | logo:${logo_url ? 'oui' : 'non'} | réseaux:${Object.keys(reseaux_sociaux).join(',')||'aucun'}`,
-      'gmb-scraper'
-    );
-
+    // Retourner les données de base extraites de l'URL
+    // L'utilisateur complétera les champs manquants via le formulaire
     return {
       nom: '',
       titre: '',
-      entreprise: place.title || rawName,
-      telephone,
-      email,
-      site: website,
-      secteur: category || 'Commerce',
-      palette: SECTOR_COLOR_MAP[sectorKey] || SECTOR_COLOR_MAP.default,
-      ton: SECTOR_TONE_MAP[sectorKey] || SECTOR_TONE_MAP.default,
-      description: enrichedDesc,
-      adresse,
-      ville,
-      pays,
-      code_postal,
-      note: parseFloat(place.rating) || 0,
-      avis: parseInt(
-        place.reviewCount || place.ratingCount || place.numReviews ||
-        place.totalReviews || place.reviews || '0'
-      ) || 0,
-      horaires,
-      logo_url,
-      logo_base64,
-      photos,
-      coordonnees,
-      reseaux_sociaux,
-      mots_cles,
-      slogan,
-      cta,
-      annee_fondation: place.yearFounded || place.foundingDate || '',
-      prix_gamme: place.priceRange || place.priceLevel || '',
-      accessibilite: place.accessibility || [],
+      entreprise: rawName,
+      telephone: '',
+      email: '',
+      site: '',
+      secteur: 'Commerce & Services',
+      palette: SECTOR_COLOR_MAP.default,
+      ton: SECTOR_TONE_MAP.default,
+      description: `${rawName} — importé depuis Google My Business`,
+      adresse: '',
+      ville: '',
+      pays: 'France',
+      code_postal: '',
+      note: 0,
+      avis: 0,
+      horaires: [],
+      logo_url: '',
+      logo_base64: '',
+      photos: [],
+      coordonnees: null,
+      reseaux_sociaux: {},
+      mots_cles: [],
+      slogan: '',
+      cta: SECTOR_CTA_MAP.default,
+      annee_fondation: '',
+      prix_gamme: '',
+      accessibilite: [],
     };
   } catch (error: any) {
-    log(`Erreur scraping GMB: ${error.message}`, 'gmb-scraper');
+    log(`Erreur parsing URL GMB: ${error.message}`, 'gmb-scraper');
     return generateDemoData(gmbUrl);
   }
 }
@@ -487,6 +376,40 @@ export async function scrapeGMB(gmbUrl: string): Promise<GmbScrapedData> {
   return scrapeWithSerper(gmbUrl);
 }
 
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
 // Auto-fixed: bracket_completion
 // Auto-fixed: bracket_completion
 // Auto-fixed: bracket_completion

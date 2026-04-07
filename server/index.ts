@@ -1,14 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { setupVite, serveStatic, log } from "./vite";
 import { registerRoutes } from "./routes";
-import { DependencyChecker } from "./utils/dependency-checker";
-import { errorDetection } from './modules/error-detection.module';
 import { loadPremiumEffects } from './utils/premium-effects-loader';
 import { cleanOldExports } from './services/exports-cleaner';
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -28,11 +26,9 @@ app.use((req, res, next) => {
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-
       log(logLine);
     }
   });
@@ -46,114 +42,25 @@ app.use((req, res, next) => {
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
     res.status(status).json({ message });
     throw err;
   });
 
-  // Create the HTTP server
   const { createServer } = await import('http');
   const server = createServer(app);
 
-  // Importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (app.get("env") === "development") {
-    // Vérifier et corriger les dépendances automatiquement
-    log("Vérification des dépendances...");
-    const dependenciesOk = await DependencyChecker.autoFixDependencies();
-    if (!dependenciesOk) {
-      log("❌ Impossible de résoudre les problèmes de dépendances", "error");
-      process.exit(1);
-    }
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-
-  // Initialize GOD monitoring system
-  const { godMonitor } = await import('./core/god-monitor');
-  const { autonomousMonitor } = await import('./core/autonomous-monitor');
-  const { errorDetection } = await import('./modules/error-detection.module');
-  const { qualityAssurance } = await import('./modules/quality-assurance.module');
-
-  // Initialisation des systèmes globaux
-  (global as any).systemCache = new Map();
-  (global as any).activeSessions = 0;
-  (global as any).processedRequests = 0;
-  (global as any).systemMetrics = {
-    responseTime: 0,
-    errorCount: 0
-  };
-
-  // Surveillance des métriques de base
-  app.use((req, res, next) => {
-    const startTime = Date.now();
-    (global as any).activeSessions++;
-
-    res.on('finish', () => {
-      (global as any).activeSessions--;
-      (global as any).processedRequests++;
-      (global as any).systemMetrics.responseTime = Date.now() - startTime;
-    });
-
-    next();
-  });
-
-  // === ACTIVATION SYSTÈME GOD ===
-  console.log('🚀 Activation du système GOD...');
-
-  // Initialisation GOD Monitor
-  const godInitialized = godMonitor.initialize();
-  if (godInitialized) {
-    console.log('✅ GOD Monitor activé');
-  }
-
-  // Monitoring autonome (démarre automatiquement à l'initialisation)
-  console.log('🤖 Autonomous Monitor démarré');
-
-  // Activation détection d'erreurs continue
-  console.log('🔍 Activation détection d\'erreurs continue...');
-  try {
-    await errorDetection.startContinuousFileMonitoring();
-    console.log('✅ Surveillance continue des fichiers activée');
-  } catch (error) {
-    console.warn('⚠️ Surveillance fichiers partiellement activée:', error instanceof Error ? error.message : String(error));
-  }
-
-  // Scan initial du système
-  console.log('🔍 Scan initial du système...');
-  try {
-    const initialScan = await errorDetection.scanProjectFiles();
-    console.log(`📊 Scan initial: ${initialScan.errors.length} erreurs trouvées, ${initialScan.autoFixed} auto-corrigées`);
-  } catch (error) {
-    console.warn('⚠️ Scan initial échoué:', error instanceof Error ? error.message : String(error));
-  }
-
-  // Statut final
-  const godStatus = godMonitor.getGodStatus();
-  console.log('\n🎭 === EFFET GENERATOR SERVER - NIVEAU GOD ===');
-  console.log(`📊 Santé système: ${godStatus.overallHealth}%`);
-  console.log(`🧠 IA confidence: ${(godStatus.ai.confidenceLevel * 100).toFixed(1)}%`);
-  console.log(`🔮 Précision prédictive: ${(godStatus.predictiveAccuracy * 100).toFixed(1)}%`);
 
   server.listen(port, '0.0.0.0', () => {
     console.log(`🚀 Serveur démarré sur http://0.0.0.0:${port}`);
-    console.log(`🌐 API accessible sur: http://localhost:${port}`);
-    console.log(`🔗 WebSocket sur: ws://localhost:${port}`);
-    console.log(`📊 Dashboard disponible sur http://0.0.0.0:${port}/api/system/health`);
-    console.log('🎯 Système GOD entièrement opérationnel');
-    console.log('🔍 Auto-détection et correction des erreurs: ACTIVE');
 
-    // ─── Auto-détection des clés Replit (OpenAI / Anthropic) ───────────────
     import('./services/api-key-rotator').then(({ rotator }) => {
-      // Support intégrations Replit (AI_INTEGRATIONS_*) et clés directes
       const openaiOk = !!(
         process.env.AI_INTEGRATIONS_OPENAI_API_KEY ||
         process.env.OPENAI_API_KEY?.startsWith('sk-')
@@ -164,31 +71,23 @@ app.use((req, res, next) => {
       );
 
       if (openaiOk) {
-        const keyHint = process.env.AI_INTEGRATIONS_OPENAI_API_KEY
-          ? '(Replit AI Integration)'
-          : `...${process.env.OPENAI_API_KEY!.slice(-4)}`;
-        console.log(`✅ OpenAI (GPT-4o) : clé détectée et active — ${keyHint}`);
+        console.log('✅ OpenAI : clé détectée');
       } else {
         console.warn('⚠️  OpenAI : clé non trouvée — vérifiez l\'intégration Replit');
       }
       if (anthropicOk) {
-        const keyHint = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY
-          ? '(Replit AI Integration)'
-          : `...${process.env.ANTHROPIC_API_KEY!.slice(-4)}`;
-        console.log(`✅ Anthropic (Claude) : clé détectée et active — ${keyHint}`);
+        console.log('✅ Anthropic : clé détectée');
       } else {
         console.warn('⚠️  Anthropic : clé non trouvée — vérifiez l\'intégration Replit');
       }
 
-      // Initialisation du rotateur avec chargement DB
       rotator.init().then(() => {
-        console.log('🔑 Rotateur API v2.0 initialisé (PostgreSQL + circuit breaker + health scoring)');
+        console.log('🔑 Rotateur API initialisé');
       }).catch((e: Error) => {
         console.warn('⚠️  Rotateur API init partiel:', e.message);
       });
     }).catch(() => {});
 
-    // Nettoyage automatique exports > 7 jours au démarrage
     cleanOldExports(7).catch(err =>
       console.warn('⚠️ Nettoyage exports au démarrage échoué:', err.message)
     );
@@ -196,13 +95,10 @@ app.use((req, res, next) => {
     console.log('📦 Chargement des effets premium...');
     loadPremiumEffects().then(result => {
       if (result.loaded > 0) {
-        console.log(`✅ ${result.loaded} effets premium chargés dans la bibliothèque`);
+        console.log(`✅ ${result.loaded} effets premium chargés`);
       }
       if (result.skipped > 0) {
-        console.log(`⏭️  ${result.skipped} effets déjà présents (ignorés)`);
-      }
-      if (result.errors.length > 0) {
-        console.warn(`⚠️  ${result.errors.length} erreurs lors du chargement`);
+        console.log(`⏭️  ${result.skipped} effets déjà présents`);
       }
     }).catch(err => {
       console.warn('⚠️ Chargement des effets premium échoué:', err.message);
