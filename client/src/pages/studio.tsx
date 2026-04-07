@@ -4,7 +4,7 @@ import {
   Sparkles, Download, CheckCircle2, Circle, Loader2, Brain, Cpu, Zap, Bot,
   RefreshCw, Link2, Upload, ImageIcon, Wand2, Star, MapPin, Phone, Mail,
   Globe, Building2, User, Briefcase, ChevronDown, ChevronUp, Eye, EyeOff,
-  Package, Send, ExternalLink, Copy, Check,
+  Package, Send, ExternalLink, Copy, Check, Box,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +43,7 @@ interface FormData {
   secteur: string; cta: string; palette: string[];
   adresse: string; ville: string; pays: string;
   note: number; avis: number; description: string;
-  logo_url: string; logo_base64: string;
+  logo_url: string; logo_base64: string; logo3d: boolean;
   style_visuel: string; slogan: string;
   mots_cles: string[]; ton: string;
   reseaux_sociaux: Record<string, string>;
@@ -425,6 +425,36 @@ function LogoSection({ form, onUpdate }: { form: FormData; onUpdate: (data: Part
           </Button>
         </div>
       </div>
+
+      {/* Toggle Logo 3D */}
+      <button
+        type="button"
+        onClick={() => onUpdate({ logo3d: !form.logo3d })}
+        data-testid="toggle-logo3d"
+        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border transition-all text-xs ${
+          form.logo3d
+            ? 'border-violet-500/60 bg-violet-500/10 text-violet-300'
+            : 'border-white/10 bg-white/3 text-white/40 hover:border-white/20 hover:text-white/60'
+        }`}
+      >
+        <span className="flex items-center gap-2">
+          <Box className="w-3.5 h-3.5" />
+          <span className="font-medium">Pré-rendu Logo 3D</span>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+            form.logo3d ? 'bg-violet-500/30 text-violet-200' : 'bg-white/5 text-white/30'
+          }`}>
+            {form.logo3d ? 'ACTIF' : 'INACTIF'}
+          </span>
+        </span>
+        <span className={`text-[10px] leading-none ${form.logo3d ? 'text-violet-400' : 'text-white/20'}`}>
+          Extrusion · Éclairage · Profondeur
+        </span>
+      </button>
+      {form.logo3d && (
+        <p className="text-[10px] text-violet-300/60 pl-1">
+          Le logo sera extrudé en volume 3D SVG natif avant l'injection des effets d'animation.
+        </p>
+      )}
     </div>
   );
 }
@@ -724,7 +754,7 @@ const DEFAULT_FORM: FormData = {
   secteur: "Design & Créatif", cta: "Réserver un appel",
   palette: ["#0f0f0f", "#6366f1", "#e8e8ff"],
   adresse: "", ville: "Paris", pays: "France",
-  note: 0, avis: 0, description: "", logo_url: "", logo_base64: "",
+  note: 0, avis: 0, description: "", logo_url: "", logo_base64: "", logo3d: false,
   style_visuel: "", slogan: "", mots_cles: [], ton: "professionnel et moderne",
   reseaux_sociaux: {},
   client_email: "",
