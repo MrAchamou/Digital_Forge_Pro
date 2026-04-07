@@ -1,3 +1,4 @@
+
 <div align="center">
 
 # EffectForge AI — God Tier Studio
