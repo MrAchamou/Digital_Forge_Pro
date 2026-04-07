@@ -33,6 +33,7 @@ export interface GmbScrapedData {
 }
 
 const SECTOR_COLOR_MAP: Record<string, string[]> = {
+  artisan: ['#0a0e1a', '#1e88e5', '#e8f4ff'],
   restaurant: ['#1a0a00', '#c8601a', '#f5e6d3'],
   cafe: ['#2c1810', '#8b5e3c', '#f0e0c8'],
   hotel: ['#0a0a1a', '#b8960c', '#f5f0e8'],
@@ -52,6 +53,7 @@ const SECTOR_COLOR_MAP: Record<string, string[]> = {
 };
 
 const SECTOR_TONE_MAP: Record<string, string> = {
+  artisan: 'sérieux et réactif',
   restaurant: 'chaleureux et gourmand',
   cafe: 'convivial et artisanal',
   hotel: 'luxueux et élégant',
@@ -71,6 +73,7 @@ const SECTOR_TONE_MAP: Record<string, string> = {
 };
 
 const SECTOR_CTA_MAP: Record<string, string> = {
+  artisan: 'Demander un devis gratuit',
   restaurant: 'Réserver une table',
   cafe: 'Passer une commande',
   hotel: 'Vérifier les disponibilités',
@@ -91,6 +94,7 @@ const SECTOR_CTA_MAP: Record<string, string> = {
 
 function detectSector(category: string, description: string): string {
   const text = (category + ' ' + description).toLowerCase();
+  if (text.match(/plombier|plomberie|électricien|chauffagiste|maçon|carreleur|menuisier|serruri|peintre|couvreur|artisan|bricolage|rénovation|dépannage urgence/)) return 'artisan';
   if (text.match(/restaurant|pizza|burger|cuisine|traiteur|brasserie|bistro|crêpe/)) return 'restaurant';
   if (text.match(/café|coffee|bar|salon de thé|tea/)) return 'cafe';
   if (text.match(/hôtel|hotel|hébergement|chambre|résidence|auberge/)) return 'hotel';
@@ -153,12 +157,21 @@ function extractPlaceNameFromUrl(url: string): string {
 }
 
 // ── Extraction email depuis texte libre ──────────────────────────────────────
+const EMAIL_BLACKLIST_DOMAINS = [
+  'example', 'sentry', 'noreply', 'no-reply', 'test@', 'agence--web',
+  'agenceweb', 'webagency', 'seoweb', 'seoagence', 'marketing',
+  'wixsite', 'wordpress', 'jimdo', 'webflow', 'mailchimp',
+  'spamgourmet', 'mailnull', 'guerrillamail', 'yopmail',
+  'privacy@', 'webmaster@', 'admin@', 'info@apple', 'info@google',
+  'example.com', 'example.fr', 'exemple.fr',
+];
+
 function extractEmails(texts: string[]): string {
-  const forbidden = ['example', 'sentry', 'noreply', 'no-reply', 'support@sentry', 'test@'];
   for (const text of texts) {
     const matches = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-z]{2,6}/gi) || [];
     for (const m of matches) {
-      if (!forbidden.some(f => m.toLowerCase().includes(f))) return m.toLowerCase();
+      const lower = m.toLowerCase();
+      if (!EMAIL_BLACKLIST_DOMAINS.some(bad => lower.includes(bad))) return lower;
     }
   }
   return '';
@@ -427,7 +440,10 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
       pays,
       code_postal,
       note: parseFloat(place.rating) || 0,
-      avis: parseInt(place.reviewCount || place.reviews || '0') || 0,
+      avis: parseInt(
+        place.reviewCount || place.ratingCount || place.numReviews ||
+        place.totalReviews || place.reviews || '0'
+      ) || 0,
       horaires,
       logo_url,
       logo_base64,
@@ -470,3 +486,38 @@ export async function scrapeGMB(gmbUrl: string): Promise<GmbScrapedData> {
   log(`Scraping GMB: ${gmbUrl}`, 'gmb-scraper');
   return scrapeWithSerper(gmbUrl);
 }
+
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
