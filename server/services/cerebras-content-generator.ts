@@ -102,11 +102,21 @@ JSON valide uniquement, TOUTES les valeurs doivent mentionner "${nom}" ou "${ent
 {"titre_page":"Signature Vivante de ${nom} — ${entreprise} | EffectForge AI","headline":"Phrase poetique et elegante de 6-10 mots qui parle directement de ${nom} ou de l'identite de ${entreprise}. Exemples : '${nom} — Une présence qui s'anime', '${entreprise} — L'élégance en mouvement'","description":"2 phrases qui parlent de la signature email de ${nom} chez ${entreprise} dans le secteur ${metadata.secteur}. Personnalise, chaleureux, premium.","section_effets":"Phrase sur les effets visuels qui incarnent l'univers de ${entreprise} ou de ${nom}","texte_bouton_gmail":"Installer dans Gmail","texte_bouton_outlook":"Installer dans Outlook","texte_bouton_apple":"Installer dans Apple Mail","texte_bouton_download":"Telecharger mon package complet","footer":"Signature de ${nom} — ${entreprise} · Creee par EffectForge AI"}
 Reponds UNIQUEMENT avec le JSON valide.`.trim(),
 
-    readme: `Tu es un assistant chaleureux.
-Genere un texte de README en JSON valide uniquement :
-{"contenu":"8 a 10 lignes expliquant le package, les fichiers inclus, chaleureux"}
-Client : ${nom} de ${entreprise}.
-Fichiers : signature.svg, signature-fallback.png, signature-outlook.htm, signature-gmail.html, instructions-gmail.pdf, instructions-outlook.pdf, instructions-apple-mail.pdf, config.json.
+    readme: `Tu es un assistant chaleureux et professionnel.
+Genere un texte README premium en JSON valide uniquement :
+{"contenu":"string de 10 a 12 lignes (avec sauts de ligne \\n) expliquant le package de ${nom}, personnalise avec son nom et ${entreprise}, liste les fichiers et leur role, chaleureux et professionnel"}
+Client : ${nom} de ${entreprise}, secteur ${secteur}.
+Fichiers du package :
+- "PREVIEW — Ouvrez ce fichier.html" : page de previsualisation locale interactive (A OUVRIR EN PREMIER dans votre navigateur)
+- signature.svg : signature animee principale
+- signature-fallback.png : version statique haute resolution
+- signature-gmail.html : version optimisee Gmail
+- signature-outlook.htm : version optimisee Outlook
+- instructions-gmail.pdf : guide d'installation Gmail
+- instructions-outlook.pdf : guide d'installation Outlook
+- instructions-apple-mail.pdf : guide d'installation Apple Mail
+- palette-de-marque.html : charte colorimetrique de votre signature
+- config.json : configuration technique complete
 Reponds UNIQUEMENT avec le JSON.`.trim(),
   };
 
@@ -208,7 +218,7 @@ export function getFallbackContent(
       footer:                `Signature de ${nom} · ${entreprise} · Créée par EffectForge AI`,
     },
     readme: {
-      contenu: `Bienvenue ${nom},\n\nVoici votre package de signature email premium cree par EffectForge AI.\n\nContenu du dossier :\n- signature.svg : Votre signature animee principale\n- signature-fallback.png : Fallback haute resolution\n- signature-outlook.htm : Version optimisee pour Outlook\n- signature-gmail.html : Version optimisee pour Gmail\n- instructions-gmail.pdf : Guide d'installation Gmail\n- instructions-outlook.pdf : Guide d'installation Outlook\n- instructions-apple-mail.pdf : Guide d'installation Apple Mail\n- config.json : Configuration complete\n\nBonne utilisation,\nL'equipe EffectForge AI`,
+      contenu: `Bienvenue ${nom},\n\nVoici votre package de signature email premium cree par EffectForge AI pour ${entreprise}.\n\n→ COMMENCEZ ICI : Ouvrez "PREVIEW — Ouvrez ce fichier.html" dans votre navigateur pour voir votre signature animee en action !\n\nContenu du dossier :\n- "PREVIEW — Ouvrez ce fichier.html" : Page de previsualisation interactive — ouvrez-la EN PREMIER\n- signature.svg : Votre signature animee principale\n- signature-fallback.png : Version statique haute resolution (PNG)\n- signature-gmail.html : Version optimisee pour Gmail\n- signature-outlook.htm : Version optimisee pour Outlook\n- instructions-gmail.pdf : Guide d'installation Gmail (PDF)\n- instructions-outlook.pdf : Guide d'installation Outlook (PDF)\n- instructions-apple-mail.pdf : Guide d'installation Apple Mail (PDF)\n- palette-de-marque.html : Charte colorimetrique de votre signature\n- config.json : Configuration technique complete\n\nBonne utilisation, ${nom} !\nL'equipe EffectForge AI`,
     },
   };
 }

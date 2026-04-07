@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="600" height="180" viewBox="0 0 600 180"
+     role="img" aria-label="Email Signature">
+  <title>Email Signature</title>
+
+  <defs>
+    <!-- Dégradé de fond principal — profondeur premium -->
+    <linearGradient id="grad-bg-main" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0d08"/>
+      <stop offset="70%" stop-color="#0a0d08"/>
+      <stop offset="100%" stop-color="#0a0d08" stop-opacity="0.82"/>
+    </linearGradient>
+    <!-- Lumière directionnelle douce depuis le logo -->
+    <radialGradient id="grad-logo-spotlight" cx="76" cy="90" r="72" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#65a30d" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#0a0d08" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Halo angulaire depuis le coin supérieur droit (accent) -->
+    <radialGradient id="grad-corner-glow" cx="100%" cy="0%" r="60%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#65a30d" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0a0d08" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Gradients de base pour toutes les variations -->
+    <linearGradient id="grad-bg-a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0d08"/>
+      <stop offset="100%" stop-color="#65a30d" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="grad-bg-b" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#65a30d" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ecfccb" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="grad-shimmer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#65a30d" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#65a30d" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="grad-halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#65a30d" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="grad-sep-flow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#65a30d" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#65a30d" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#ecfccb" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#ecfccb" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="va-ene0-logo-halo-g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#65a30d" stop-opacity="0.24"/><stop offset="100%" stop-color="#65a30d" stop-opacity="0"/></radialGradient>
+<filter id="va-dim2-logo-glow"><feGaussianBlur stdDeviation="0.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="va-lum0-nom-shimmer" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="40%"  stop-color="#a1df49" stop-opacity="0.18000000000000002"/>
+          <stop offset="60%"  stop-color="#b5f35d" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="-2 0" to="2 0" dur="10.00s" repeatCount="indefinite"/>
+        </linearGradient>
+<linearGradient id="va-mou1-nom-wave" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="30%"  stop-color="#65a30d" stop-opacity="0.1"/>
+          <stop offset="50%"  stop-color="#8dcb35" stop-opacity="0.16000000000000003"/>
+          <stop offset="70%"  stop-color="#65a30d" stop-opacity="0.1"/>
+          <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="-2 0" to="2 0" dur="10.00s" repeatCount="indefinite"/>
+        </linearGradient>
+<radialGradient id="va-ecl1-sep-gold-pt" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f0d080" stop-opacity="0.1"/><stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/></radialGradient>
+<radialGradient id="va-amb0-fond-atm" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#65a30d" stop-opacity="0.020000000000000004"/><stop offset="100%" stop-color="#65a30d" stop-opacity="0"/></radialGradient>
+<linearGradient id="va-bri1-cta-sweep" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="50%"  stop-color="#b5f35d" stop-opacity="0.225"/>
+          <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="-2 -1" to="2 1" dur="10.00s" repeatCount="indefinite"/>
+        </linearGradient>
+<filter id="vb-ene0-logo-glow-elec"><feGaussianBlur stdDeviation="0.8999999999999999" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="vb-mat1-logo-iris" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#65a30d" stop-opacity="0.12"/><stop offset="25%" stop-color="#97d53f" stop-opacity="0.12"/><stop offset="50%" stop-color="#ff6b9d" stop-opacity="0.12"/><stop offset="75%" stop-color="#00d4ff" stop-opacity="0.12"/><stop offset="100%" stop-color="#b5f35d" stop-opacity="0.12"/>
+          <animateTransform attributeName="gradientTransform" type="rotate" from="0 76 154" to="360 76 154" dur="5.00s" repeatCount="indefinite"/>
+        </linearGradient>
+<filter id="vb-dim2-logo-f3d"><feDropShadow dx="1" dy="0" stdDeviation="2" flood-color="#65a30d" flood-opacity="0.12"/></filter>
+<filter id="vb-tra3-logo-morph-f"><feGaussianBlur stdDeviation="0.44999999999999996" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="vb-lum0-nom-scan" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="48%"  stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="50%"  stop-color="#b5f35d" stop-opacity="0.16000000000000003"/>
+          <stop offset="52%"  stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="0 -2" to="0 2" dur="7.94s" repeatCount="indefinite"/>
+        </linearGradient>
+<linearGradient id="vb-flu0-sep-flow" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="30%"  stop-color="#65a30d" stop-opacity="0.1"/>
+          <stop offset="50%"  stop-color="#8dcb35" stop-opacity="0.1"/>
+          <stop offset="70%"  stop-color="#65a30d" stop-opacity="0.1"/>
+          <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="0 -1" to="0 1" dur="3.01s" repeatCount="indefinite"/>
+        </linearGradient>
+<filter id="vb-ecl1-sep-glow"><feGaussianBlur stdDeviation="0.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<radialGradient id="vb-amb1-fond-atm" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#65a30d" stop-opacity="0.020000000000000004"/><stop offset="100%" stop-color="#65a30d" stop-opacity="0"/></radialGradient>
+<filter id="vb-bri0-cta-glow"><feGaussianBlur stdDeviation="0.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="vb-att1-cta-shadow"><feDropShadow dx="0" dy="0.5" stdDeviation="1" flood-color="#65a30d" flood-opacity="0.125"/></filter>
+<radialGradient id="vc-ene0-logo-aura1" cx="40%" cy="40%"><stop offset="0%" stop-color="#65a30d" stop-opacity="0.12"/><stop offset="100%" stop-color="#65a30d" stop-opacity="0"/></radialGradient>
+          <radialGradient id="vc-ene0-logo-aura2" cx="60%" cy="60%"><stop offset="0%" stop-color="#8dcb35" stop-opacity="0.09"/><stop offset="100%" stop-color="#65a30d" stop-opacity="0"/></radialGradient>
+<linearGradient id="vc-mat1-logo-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#8b6914" stop-opacity="0.15"/>
+          <stop offset="30%"  stop-color="#c9a84c" stop-opacity="0.24"/>
+          <stop offset="50%"  stop-color="#f0d080" stop-opacity="0.3"/>
+          <stop offset="70%"  stop-color="#c9a84c" stop-opacity="0.24"/>
+          <stop offset="100%" stop-color="#8b6914" stop-opacity="0.15"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="6.52s" repeatCount="indefinite"/>
+        </linearGradient>
+<filter id="vc-dim2-logo-gyro"><feDropShadow dx="2" dy="1" stdDeviation="2" flood-color="#65a30d" flood-opacity="0.105"/></filter>
+<filter id="vc-tra3-logo-morph-f"><feGaussianBlur stdDeviation="0.44999999999999996" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="vc-ecl1-sep-glow"><feGaussianBlur stdDeviation="0.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<radialGradient id="vc-amb0-fond-p1" cx="25%" cy="30%"><stop offset="0%" stop-color="#65a30d" stop-opacity="0.015"/><stop offset="100%" stop-color="#65a30d" stop-opacity="0"/></radialGradient>
+          <radialGradient id="vc-amb0-fond-p2" cx="75%" cy="70%"><stop offset="0%" stop-color="#8dcb35" stop-opacity="0.010000000000000002"/><stop offset="100%" stop-color="#65a30d" stop-opacity="0"/></radialGradient>
+<linearGradient id="vd-mat1-logo-metal" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="45%"  stop-color="#a1df49" stop-opacity="0.21"/>
+          <stop offset="55%"  stop-color="#b5f35d" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="1.71s" repeatCount="indefinite"/>
+        </linearGradient>
+        <filter id="vd-mat1-logo-metal-over" x="-10%" y="-10%" width="120%" height="120%">
+          <feFlood flood-color="#b5f35d" flood-opacity="0.09" result="shine"/>
+          <feBlend in="SourceGraphic" in2="shine" mode="screen"/>
+        </filter>
+<filter id="vd-dim2-logo-glow"><feGaussianBlur stdDeviation="0.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="vd-tra3-logo-cryst-f"><feGaussianBlur stdDeviation="0.3"/></filter>
+<filter id="vd-lum0-nom-neon"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="vd-flu0-sep-flow" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#65a30d" stop-opacity="0"/>
+          <stop offset="30%"  stop-color="#65a30d" stop-opacity="0.102741408"/>
+          <stop offset="50%"  stop-color="#8dcb35" stop-opacity="0.102741408"/>
+          <stop offset="70%"  stop-color="#65a30d" stop-opacity="0.102741408"/>
+          <stop offset="100%" stop-color="#65a30d" stop-opacity="0"/>
+          <animateTransform attributeName="gradientTransform" type="translate" from="0 -1" to="0 1" dur="1.15s" repeatCount="indefinite"/>
+        </linearGradient>
+<radialGradient id="vd-ecl1-sep-gold-pt" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f0d080" stop-opacity="0.1"/><stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/></radialGradient>
+<radialGradient id="vd-amb1-fond-atm" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#65a30d" stop-opacity="0.020000000000000004"/><stop offset="100%" stop-color="#65a30d" stop-opacity="0"/></radialGradient>
+<filter id="vd-bri0-cta-glow"><feGaussianBlur stdDeviation="0.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="vd-att1-cta-shadow"><feDropShadow dx="0" dy="0.5" stdDeviation="1" flood-color="#65a30d" flood-opacity="0.125"/></filter>
+
+    <style>
+      /* =============================================
+         EFFECTFORGE AI — Living Email Signature SVG
+         Cycle: 240s total | 4 Variations | Pure CSS
+         No JavaScript | Email-compatible
+         ============================================= */
+
+      /* Timing custom properties */
+      :root {
+        --cycle: 80s;
+        --fade-dur: 2s;
+        --mouse-x: 0.5;
+        --mouse-y: 0.5;
+        --energy: 1;
+      }
+
+      /* Smooth cross-fade transitions between variations — cubic-bezier */
+      .var-layer-enter { animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+      .var-layer-exit  { animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+      /* Micro-parallax réactif à la souris via CSS custom properties */
+      #layer-var-a, #layer-var-b, #layer-var-c, #layer-var-d {
+        transform-origin: center;
+        transition: filter 0.8s ease;
+      }
+
+/* === VARIATION A: Stable et Rassurant — Zone System === */
+@keyframes va-ene0-logo-halo {
+          0%,100% { r: 51.2; opacity: 0.15; }
+          50%      { r: 53.6; opacity: 0.3; }
+        }
+@keyframes va-dim2-logo-breathe-img {
+          0%,100% { transform: scale(1,1); }
+          50%      { transform: scale(1.018,1.012); }
+        }
+@keyframes va-tra3-logo-liquid {
+          0%,100% { rx: 54; ry: 22; }
+          25%      { rx: 58; ry: 20; }
+          50%      { rx: 52; ry: 26; }
+          75%      { rx: 56; ry: 24; }
+        }
+@keyframes va-contact-cascade {
+          0%   { transform: translateY(8px); opacity: 0; }
+          100% { transform: translateY(0);   opacity: 1; }
+        }
+@keyframes va-ryt0-sep-calm {
+          0%,100% { opacity: 0.04000000000000001; transform: scaleX(1); }
+          50%      { opacity: 0.1;     transform: scaleX(1.05); }
+        }
+@keyframes va-ecl1-sep-shine {
+          0%   { transform: translateY(148px); opacity: 0; }
+          10%  { opacity: 0.1; }
+          90%  { opacity: 0.1; }
+          100% { transform: translateY(0);       opacity: 0; }
+        }
+@keyframes va-amb0-fond-atm {
+          0%,100% { transform: scale(0.85); opacity: 0.03; }
+          50%      { transform: scale(1.1);  opacity: 0.05; }
+        }
+@keyframes va-str1-fond-star {
+          0%   { transform: translate(0,0); }
+          100% { transform: translate(1px,0px); }
+        }
+@keyframes va-inv0-cta-breath {
+          0%,100% { fill-opacity: 0.0375; }
+          50%      { fill-opacity: 0.0875; }
+        }
+/* === VARIATION B: Précis et Dynamique — Zone System === */
+@keyframes vb-ene0-logo-corona {
+          0%   { stroke-dashoffset: 0; opacity: 0.24; }
+          50%  { opacity: 0.3; }
+          100% { stroke-dashoffset: -16; opacity: 0.24; }
+        }
+@keyframes vb-mat1-logo-iris-pulse { 0%,100%{opacity:0.21} 50%{opacity:0.3} }
+@keyframes vb-dim2-logo-float3d {
+          0%,100% { transform: perspective(600px) rotateY(-2deg) translateZ(0px); }
+          50%      { transform: perspective(600px) rotateY(2deg) translateZ(4px); }
+        }
+@keyframes vb-tra3-logo-node-pulse {
+          0%,100% { opacity: 0.12; transform: scale(0.8); }
+          50%      { opacity: 0.3; transform: scale(1.2); }
+        }
+@keyframes vb-mou1-nom-float {
+          0%   { transform: translateY(0); }
+          100% { transform: translateY(-1px); }
+        }
+@keyframes vb-titre-fade {
+          0%,100% { opacity: 0.5727764783828232; }
+          50%      { opacity: 0.9272235216171768; }
+        }
+@keyframes vb-contact-cascade {
+          0%   { transform: translateY(8px); opacity: 0; }
+          100% { transform: translateY(0);   opacity: 1; }
+        }
+@keyframes vb-ecl1-sep-pulse {
+          0%,100% { opacity: 0.06; stroke-width: 2; }
+          50%      { opacity: 0.1;     stroke-width: 2.2; }
+        }
+@keyframes vb-amb1-fond-atm {
+          0%,100% { transform: scale(0.85); opacity: 0.03; }
+          50%      { transform: scale(1.1);  opacity: 0.05; }
+        }
+@keyframes vb-bri0-cta-border { from{stroke-dashoffset:0}to{stroke-dashoffset:-416} }
+@keyframes vb-att1-cta-pulse {
+          0%,100% { transform: scale(1);         filter: url(#vb-att1-cta-shadow); }
+          50%      { transform: scale(1.0075); filter: url(#vb-att1-cta-shadow); }
+        }
+/* === VARIATION C: Profond et Atmosphérique — Zone System === */
+@keyframes vc-ene0-logo-aura {
+          0%,100% { transform: scale(1) rotate(0deg); opacity: 0.18; }
+          33%      { transform: scale(1.03) rotate(3deg); }
+          66%      { transform: scale(1.015) rotate(-3deg); }
+        }
+@keyframes vc-dim2-logo-gyro-img {
+          0%   { transform: perspective(800px) rotateX(-1deg) rotateY(2deg); }
+          100% { transform: perspective(800px) rotateX(1deg) rotateY(-2deg); }
+        }
+@keyframes vc-tra3-logo-node-pulse {
+          0%,100% { opacity: 0.12; transform: scale(0.8); }
+          50%      { opacity: 0.3; transform: scale(1.2); }
+        }
+@keyframes vc-lum0-nom-breathe {
+          0%,100% { opacity: 1; }
+          50%      { opacity: 0.97; }
+        }
+@keyframes vc-titre-slide {
+          0%   { transform: translateX(-12px); opacity: 0; }
+          100% { transform: translateX(0);     opacity: 1; }
+        }
+@keyframes vc-contact-cascade {
+          0%   { transform: translateY(8px); opacity: 0; }
+          100% { transform: translateY(0);   opacity: 1; }
+        }
+@keyframes vc-flu0-sep-particle {
+          0%   { transform: translateY(0);      opacity: 0; }
+          10%  { opacity: 0.1; }
+          90%  { opacity: 0.1; }
+          100% { transform: translateY(148px); opacity: 0; }
+        }
+@keyframes vc-ecl1-sep-pulse {
+          0%,100% { opacity: 0.06; stroke-width: 2; }
+          50%      { opacity: 0.1;     stroke-width: 2.2; }
+        }
+@keyframes vc-amb0-fond-plasma {
+          0%,100% { transform: translate(0,0) scale(1); }
+          33%      { transform: translate(0.6000000000000001px,-0.4px) scale(1.1); }
+          66%      { transform: translate(-0.4px,0.5px) scale(0.95); }
+        }
+@keyframes vc-str1-fond-star {
+          0%   { transform: translate(0,0); }
+          100% { transform: translate(1px,0px); }
+        }
+/* === VARIATION D: Puissant et Mémorable — Zone System === */
+@keyframes vd-ene0-logo-orbit0 { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
+@keyframes vd-ene0-logo-orbit1 { from{transform:rotate(90deg)}to{transform:rotate(450deg)} }
+@keyframes vd-ene0-logo-orbit2 { from{transform:rotate(180deg)}to{transform:rotate(540deg)} }
+@keyframes vd-ene0-logo-orbit3 { from{transform:rotate(270deg)}to{transform:rotate(630deg)} }
+@keyframes vd-dim2-logo-breathe-img {
+          0%,100% { transform: scale(1,1); }
+          50%      { transform: scale(1.018,1.012); }
+        }
+@keyframes vd-tra3-logo-shard {
+          0%   { opacity: 0.09; transform: scale(0.8) rotate(-10deg); }
+          100% { opacity: 0.24; transform: scale(1.2) rotate(10deg); }
+        }
+@keyframes vd-lum0-nom-neon {
+          0%,100% { filter: drop-shadow(0 0 1px #65a30d) drop-shadow(0 0 2px #65a30d); }
+          50%      { filter: drop-shadow(0 0 2px #65a30d) drop-shadow(0 0 4px #65a30d); }
+        }
+@keyframes vd-titre-slide {
+          0%   { transform: translateX(-12px); opacity: 0; }
+          100% { transform: translateX(0);     opacity: 1; }
+        }
+@keyframes vd-contact-cascade {
+          0%   { transform: translateY(8px); opacity: 0; }
+          100% { transform: translateY(0);   opacity: 1; }
+        }
+@keyframes vd-ecl1-sep-shine {
+          0%   { transform: translateY(148px); opacity: 0; }
+          10%  { opacity: 0.1; }
+          90%  { opacity: 0.1; }
+          100% { transform: translateY(0);       opacity: 0; }
+        }
+@keyframes vd-amb1-fond-atm {
+          0%,100% { transform: scale(0.85); opacity: 0.03; }
+          50%      { transform: scale(1.1);  opacity: 0.05; }
+        }
+@keyframes vd-str2-fond-grid {
+          0%,100% { opacity: 0.03; }
+          50%      { opacity: 0.05; }
+        }
+@keyframes vd-bri0-cta-border { from{stroke-dashoffset:0}to{stroke-dashoffset:-416} }
+@keyframes vd-att1-cta-pulse {
+          0%,100% { transform: scale(1);         filter: url(#vd-att1-cta-shadow); }
+          50%      { transform: scale(1.0075); filter: url(#vd-att1-cta-shadow); }
+        }
+#company-logo-text { display: none; }
+
+      /* Variation layer visibility orchestration */
+      #layer-var-a, #layer-var-b, #layer-var-c, #layer-var-d {
+        opacity: 0;
+        will-change: opacity;
+      }
+
+      /* ================================================================
+         TIMING ORCHESTRATION — 80s cycle | CROSSFADE CONTINU (no gap)
+         Principe : chaque variation se CHEVAUCHE avec la suivante.
+         A s'éteint pendant que B s'allume → zéro zone morte.
+         Chaque variation visible ~20s | Transition crossfade 2s
+         ================================================================ */
+
+      /* Cycle 80s : A→B→C→D→A en boucle parfaite sans blanc */
+      #layer-var-a { animation: layer-fade-a 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-b { animation: layer-fade-b 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-c { animation: layer-fade-c 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-d { animation: layer-fade-d 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+
+      /* A : 0%→2.5% montée | 2.5%→22.5% présent | 22.5%→25% descente  */
+      @keyframes layer-fade-a {
+        0%      { opacity: 0; }
+        2.5%    { opacity: 1; }
+        22.5%   { opacity: 1; }
+        25%     { opacity: 0; }
+        98%     { opacity: 0; }
+        100%    { opacity: 0; }
+      }
+
+      /* B : 22.5%→25% montée (chevauche la descente de A) | 25%→47.5% présent | 47.5%→50% descente */
+      @keyframes layer-fade-b {
+        0%      { opacity: 0; }
+        22.5%   { opacity: 0; }
+        25%     { opacity: 1; }
+        47.5%   { opacity: 1; }
+        50%     { opacity: 0; }
+        100%    { opacity: 0; }
+      }
+
+      /* C : 47.5%→50% montée | 50%→72.5% présent | 72.5%→75% descente */
+      @keyframes layer-fade-c {
+        0%      { opacity: 0; }
+        47.5%   { opacity: 0; }
+        50%     { opacity: 1; }
+        72.5%   { opacity: 1; }
+        75%     { opacity: 0; }
+        100%    { opacity: 0; }
+      }
+
+      /* D : 72.5%→75% montée | 75%→97.5% présent | 97.5%→100% descente → retour à A */
+      @keyframes layer-fade-d {
+        0%      { opacity: 0; }
+        72.5%   { opacity: 0; }
+        75%     { opacity: 1; }
+        97.5%   { opacity: 1; }
+        100%    { opacity: 0; }
+      }
+
+      /* Couche de base — toujours visible, fond de scène permanent */
+      #layer-base { opacity: 1; }
+      #bg-base    { opacity: 1; }
+
+      /* Respiration légère sur le fond : la signature est vivante même au repos */
+      @keyframes sig-base-breathe {
+        0%, 100% { filter: brightness(1);   }
+        50%      { filter: brightness(1.04); }
+      }
+      #layer-base {
+        animation: sig-base-breathe 14s ease-in-out 0s infinite;
+      }
+
+      /* Internal variation animations timing */
+      #var-a, #var-a-halo, #var-a-shimmer, #var-a-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+      #var-b, #var-b-wave1, #var-b-wave2, #var-b-logo-glow, #var-b-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+      #var-c, #var-c-ring, #var-c-shimmer, #var-c-sep {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+      #var-d, #var-d-outer, #var-d-inner, #var-d-cta, #var-d-sep, #var-d-logo {
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+      }
+
+    </style>
+  </defs>
+
+  <!-- ===== LAYER 0: Background dégradé premium ===== -->
+  <rect id="bg-root" x="0" y="0" width="600" height="180" fill="url(#grad-bg-main)" rx="12"/>
+  <!-- Lumière douce autour du logo -->
+  <rect x="0" y="0" width="600" height="180" fill="url(#grad-logo-spotlight)" rx="12"/>
+  <!-- Halo accent depuis le coin -->
+  <rect x="0" y="0" width="600" height="180" fill="url(#grad-corner-glow)" rx="12"/>
+
+  <!-- ===== LAYER 1: Static Base — Always Visible ===== -->
+  <!-- Logo statique masqué par CSS ; chaque variation en fournit une copie animée -->
+  <g id="layer-base">
+    <g id="base-static">
+  <!-- Background base -->
+  <rect id="bg-base" x="0" y="0" width="600" height="180" fill="#0a0d08" rx="12"/>
+
+  <!-- Left column: photo + logo -->
+  <g id="left-col" transform="translate(16, 16)">
+    <defs>
+    <linearGradient id="photo3d-fill" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%"   stop-color="rgb(156,218,68)" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#65a30d"  stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ 3D Initials: shadow platform ══ -->
+  <ellipse cx="63" cy="118" rx="48" ry="6" fill="black" fill-opacity="0.25"/>
+  <!-- ══ Extrusion circles ══ -->
+  <circle cx="63" cy="63" r="53" fill="rgb(21,83,0)" fill-opacity="0.50"/>
+  <circle cx="62" cy="62" r="53" fill="rgb(21,83,0)" fill-opacity="0.28"/>
+  <!-- ══ Main face ══ -->
+  <circle cx="60" cy="60" r="52" fill="url(#photo3d-fill)" stroke="#65a30d" stroke-width="2.5" id="photo-ring"/>
+  <!-- ══ Initials ══ -->
+  <text x="60" y="67" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#ffffff">A</text>
+  <!-- ══ Specular arc ══ -->
+  <path d="M 22 28 A 42 42 0 0 1 98 28" stroke="white" stroke-width="2.5" fill="none" stroke-opacity="0.42" stroke-linecap="round"/>
+    <defs>
+    <filter id="logo3d-img-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feColorMatrix type="matrix" in="blur"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.65 0"/>
+    </filter>
+    <linearGradient id="logo3d-img-light" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.32"/>
+      <stop offset="50%"  stop-color="white" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="black" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ 3D Shadow clones (profondeur perspective) ══ -->
+  <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAt1BMVEX////+/v7+/v3tHCX+/vvtJCzzeH37+/uxsdRfYKz9/vru7/Sdn8pDRJ2nqNDsGiLo6PDuNDz09fdISZ+trdODhL1fXq3zUltgYan41dT2uLjb2+vNzeTj4uzyaW742dg6O5q3uNcxMpXtP0X1rbF/f7z67/D0gIWamsn5zM94eLf86Ombm8nsLDTyjpLvWV/4tLb1iYvya3HuSFDxX2nExd5OTqBtbbH0oaFparCNjsO7vNf0m6Da/ns5AAACC0lEQVQ4ja2Sa3OqMBCGs8niBoJEruKF02pFEa2eemmt9v//rrNgP3QGv3TmhGFC2Geyu++7QvyfBYQIIBGRX/kAGI3GJCe+Py183590whL+9JwnSJ77z7P+PNYPErz0nAVoPypnkRtRF1g6PWcFOpDVDFzZrQHWtucMQddBPJGuhC6wYCAkPZ/nJN1uXMgVA2qjq3QLjwCAoV05dqyDQUyYPQDo1S5CteMi3Sk9AOSTtaO9OjEQXPFnCoD2IP8qZ7lSoTEiKrCAn/H2AG/qSAulNiCkBHwA7NVBjqwdY/sL7r55/GEmLUGh3eHSUTtsbyC4LwTSQWvtRtkx0dGemhSSPESvNV5656iRVY6tDd+OjgpJVDdIzXtcRrM4TvEjjiu+AXdWKVZSORuR1l5t4m2mk48qnmTb6swAnNQdsGOR9qPauDipEw3VLedyGJAvyrIX1tqdSD/PtckwyhON9TQvCoNCcP2Hy/pyeVUHkVZVA5CbfKb9Qfae3bj1kVVrSUB7e4R0mrVAlrz3A8+9XqeyGQa1abpdWWeZFnluMhm5iZ7VmBNym9Dj/hpgwZalRTA3rjctEx3FhseHARrafSsoi31Ji8Hc9Ov4lmhZ3tyyDFDQafjVWkP74Zc/wNrk+ZVuZ3HelnnOQnGe+xg39xGwGV6rs/Canb2Q8A2wKPzcfeJdfHvWHeHfrn+nsCiobDnDYAAAAABJRU5ErkJggg==" x="14" y="124" width="100" height="36" preserveAspectRatio="xMidYMid meet" filter="url(#logo3d-img-shadow)" opacity="0.55"/>
+  <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAt1BMVEX////+/v7+/v3tHCX+/vvtJCzzeH37+/uxsdRfYKz9/vru7/Sdn8pDRJ2nqNDsGiLo6PDuNDz09fdISZ+trdODhL1fXq3zUltgYan41dT2uLjb2+vNzeTj4uzyaW742dg6O5q3uNcxMpXtP0X1rbF/f7z67/D0gIWamsn5zM94eLf86Ombm8nsLDTyjpLvWV/4tLb1iYvya3HuSFDxX2nExd5OTqBtbbH0oaFparCNjsO7vNf0m6Da/ns5AAACC0lEQVQ4ja2Sa3OqMBCGs8niBoJEruKF02pFEa2eemmt9v//rrNgP3QGv3TmhGFC2Geyu++7QvyfBYQIIBGRX/kAGI3GJCe+Py183590whL+9JwnSJ77z7P+PNYPErz0nAVoPypnkRtRF1g6PWcFOpDVDFzZrQHWtucMQddBPJGuhC6wYCAkPZ/nJN1uXMgVA2qjq3QLjwCAoV05dqyDQUyYPQDo1S5CteMi3Sk9AOSTtaO9OjEQXPFnCoD2IP8qZ7lSoTEiKrCAn/H2AG/qSAulNiCkBHwA7NVBjqwdY/sL7r55/GEmLUGh3eHSUTtsbyC4LwTSQWvtRtkx0dGemhSSPESvNV5656iRVY6tDd+OjgpJVDdIzXtcRrM4TvEjjiu+AXdWKVZSORuR1l5t4m2mk48qnmTb6swAnNQdsGOR9qPauDipEw3VLedyGJAvyrIX1tqdSD/PtckwyhON9TQvCoNCcP2Hy/pyeVUHkVZVA5CbfKb9Qfae3bj1kVVrSUB7e4R0mrVAlrz3A8+9XqeyGQa1abpdWWeZFnluMhm5iZ7VmBNym9Dj/hpgwZalRTA3rjctEx3FhseHARrafSsoi31Ji8Hc9Ov4lmhZ3tyyDFDQafjVWkP74Zc/wNrk+ZVuZ3HelnnOQnGe+xg39xGwGV6rs/Canb2Q8A2wKPzcfeJdfHvWHeHfrn+nsCiobDnDYAAAAABJRU5ErkJggg==" x="12" y="122" width="100" height="36" preserveAspectRatio="xMidYMid meet" filter="url(#logo3d-img-shadow)" opacity="0.35"/>
+  <!-- ══ Bevel rect derrière l'image ══ -->
+  <rect x="9" y="119" width="102" height="38" rx="4" fill="rgb(21,83,0)" opacity="0.6"/>
+  <!-- ══ Image principale (top face) ══ -->
+  <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAt1BMVEX////+/v7+/v3tHCX+/vvtJCzzeH37+/uxsdRfYKz9/vru7/Sdn8pDRJ2nqNDsGiLo6PDuNDz09fdISZ+trdODhL1fXq3zUltgYan41dT2uLjb2+vNzeTj4uzyaW742dg6O5q3uNcxMpXtP0X1rbF/f7z67/D0gIWamsn5zM94eLf86Ombm8nsLDTyjpLvWV/4tLb1iYvya3HuSFDxX2nExd5OTqBtbbH0oaFparCNjsO7vNf0m6Da/ns5AAACC0lEQVQ4ja2Sa3OqMBCGs8niBoJEruKF02pFEa2eemmt9v//rrNgP3QGv3TmhGFC2Geyu++7QvyfBYQIIBGRX/kAGI3GJCe+Py183590whL+9JwnSJ77z7P+PNYPErz0nAVoPypnkRtRF1g6PWcFOpDVDFzZrQHWtucMQddBPJGuhC6wYCAkPZ/nJN1uXMgVA2qjq3QLjwCAoV05dqyDQUyYPQDo1S5CteMi3Sk9AOSTtaO9OjEQXPFnCoD2IP8qZ7lSoTEiKrCAn/H2AG/qSAulNiCkBHwA7NVBjqwdY/sL7r55/GEmLUGh3eHSUTtsbyC4LwTSQWvtRtkx0dGemhSSPESvNV5656iRVY6tDd+OjgpJVDdIzXtcRrM4TvEjjiu+AXdWKVZSORuR1l5t4m2mk48qnmTb6swAnNQdsGOR9qPauDipEw3VLedyGJAvyrIX1tqdSD/PtckwyhON9TQvCoNCcP2Hy/pyeVUHkVZVA5CbfKb9Qfae3bj1kVVrSUB7e4R0mrVAlrz3A8+9XqeyGQa1abpdWWeZFnluMhm5iZ7VmBNym9Dj/hpgwZalRTA3rjctEx3FhseHARrafSsoi31Ji8Hc9Ov4lmhZ3tyyDFDQafjVWkP74Zc/wNrk+ZVuZ3HelnnOQnGe+xg39xGwGV6rs/Canb2Q8A2wKPzcfeJdfHvWHeHfrn+nsCiobDnDYAAAAABJRU5ErkJggg==" x="10" y="120" width="100" height="36" preserveAspectRatio="xMidYMid meet" id="company-logo"/>
+  <!-- ══ Lighting gradient overlay ══ -->
+  <rect x="10" y="120" width="100" height="38" rx="3" fill="url(#logo3d-img-light)" pointer-events="none"/>
+  <!-- ══ Top edge highlight ══ -->
+  <rect x="10" y="120" width="100" height="3" rx="2" fill="rgb(156,218,68)" fill-opacity="0.45" pointer-events="none"/>
+  </g>
+
+  <!-- Separator vertical -->
+  <g id="separator-v" transform="translate(170, 16)">
+    <defs>
+    <linearGradient id="sep-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#65a30d" stop-opacity="0.1"/>
+      <stop offset="30%" stop-color="#65a30d" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="rgb(141,203,53)" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="rgb(141,203,53)" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ 3D Separator: shadow depth ══ -->
+  <rect x="4" y="3" width="3" height="148" fill="black" fill-opacity="0.28" rx="1"/>
+  <rect x="3" y="2" width="3" height="148" fill="black" fill-opacity="0.16" rx="1"/>
+  <!-- ══ Main bar (wider) ══ -->
+  <rect id="sep-bar" x="0" y="0" width="4" height="148" fill="url(#sep-grad)" rx="1"/>
+  <!-- ══ Left edge specular highlight ══ -->
+  <rect x="0" y="6" width="1" height="136" fill="white" fill-opacity="0.42" rx="1"/>
+  </g>
+
+  <!-- Right column: info -->
+  <g id="right-col" transform="translate(186, 20)">
+    <defs>
+    <linearGradient id="name3d-shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+      <stop offset="40%"  stop-color="white" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ Name 3D: shadow extrusion ══ -->
+  <text x="3" y="25" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="0.5" fill="black" fill-opacity="0.16">André</text>
+  <text x="2" y="24" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="0.5" fill="black" fill-opacity="0.22">André</text>
+  <text x="1" y="23" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="0.5" fill="black" fill-opacity="0.32">André</text>
+  <!-- ══ Main text ══ -->
+  <text id="sig-name" x="0" y="22" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="0.5" fill="#ffffff">André</text>
+  <!-- ══ Specular shimmer ══ -->
+  <text x="0" y="22" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="0.5" fill="url(#name3d-shine)" pointer-events="none">André</text>
+    <!-- ══ Titre 3D: colored depth layers ══ -->
+  <text x="3" y="43" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" letter-spacing="1.5" fill="rgb(21,83,0)" fill-opacity="0.55">PLOMBIER</text>
+  <text x="2" y="42" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" letter-spacing="1.5" fill="rgb(21,83,0)" fill-opacity="0.40">PLOMBIER</text>
+  <text x="1" y="41" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" letter-spacing="1.5" fill="rgb(56,118,0)" fill-opacity="0.55">PLOMBIER</text>
+  <!-- ══ Main text ══ -->
+  <text id="sig-titre" x="0" y="40" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" letter-spacing="1.5" fill="#65a30d">PLOMBIER</text>
+    <!-- Company -->
+    <text id="sig-company" x="0" y="56" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.65)">Plombier André</text>
+
+    <!-- Separator horizontal thin -->
+    <line x1="0" y1="64" x2="380" y2="64" stroke="#65a30d" stroke-width="1" stroke-opacity="0.4"/>
+
+    <!-- Contact info -->
+    <g id="contact-block" transform="translate(0, 72)">
+      <!-- ══ Contact 3D row ══ -->
+  <rect x="-3" y="-12" width="242" height="15" rx="3" fill="rgb(11,73,0)" fill-opacity="0.40"/>
+  <rect x="-3" y="-12" width="242" height="2"  rx="1" fill="rgb(151,213,63)" fill-opacity="0.18"/>
+  <text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">✉  <tspan fill="#ffffff">saadoun.d@gmail.com</tspan></text>
+  <!-- ══ Contact 3D row ══ -->
+  <rect x="-3" y="6" width="242" height="15" rx="3" fill="rgb(11,73,0)" fill-opacity="0.40"/>
+  <rect x="-3" y="6" width="242" height="2"  rx="1" fill="rgb(151,213,63)" fill-opacity="0.18"/>
+  <text x="0" y="18" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">✆  <tspan fill="#ffffff">01 44 72 08 49</tspan></text>
+  <!-- ══ Contact 3D row ══ -->
+  <rect x="-3" y="24" width="242" height="15" rx="3" fill="rgb(11,73,0)" fill-opacity="0.40"/>
+  <rect x="-3" y="24" width="242" height="2"  rx="1" fill="rgb(151,213,63)" fill-opacity="0.18"/>
+  <text x="0" y="36" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.65)">⊕  <tspan fill="#65a30d">plombierparis15pascher.fr/</tspan></text>
+    </g>
+
+    <!-- Social icons -->
+    <g id="social-icons" transform="translate(0, 120)">
+      <g transform="translate(0, 0) scale(0.75)" id="icon-facebook">
+        <!-- ══ 3D Social icon extrusion ══ -->
+        <rect x="1"  y="3" width="20" height="20" rx="4" fill="rgb(21,83,0)" fill-opacity="0.55"/>
+        <rect x="0"  y="2" width="20" height="20" rx="4" fill="rgb(21,83,0)" fill-opacity="0.35"/>
+        <!-- ══ Main face ══ -->
+        <rect x="-2" y="-2" width="20" height="20" rx="4" fill="#65a30d" fill-opacity="0.22"/>
+        <!-- ══ Top highlight ══ -->
+        <rect x="-2" y="-2" width="20" height="3" rx="2" fill="rgb(156,218,68)" fill-opacity="0.48"/>
+        <!-- ══ Right bevel ══ -->
+        <rect x="16" y="-2" width="2" height="20" rx="1" fill="rgb(156,218,68)" fill-opacity="0.20"/>
+        <!-- ══ Icon path ══ -->
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#ffffff" fill-opacity="0.90"/>
+      </g>
+      <g transform="translate(26, 0) scale(0.75)" id="icon-instagram">
+        <!-- ══ 3D Social icon extrusion ══ -->
+        <rect x="1"  y="3" width="20" height="20" rx="4" fill="rgb(21,83,0)" fill-opacity="0.55"/>
+        <rect x="0"  y="2" width="20" height="20" rx="4" fill="rgb(21,83,0)" fill-opacity="0.35"/>
+        <!-- ══ Main face ══ -->
+        <rect x="-2" y="-2" width="20" height="20" rx="4" fill="#65a30d" fill-opacity="0.22"/>
+        <!-- ══ Top highlight ══ -->
+        <rect x="-2" y="-2" width="20" height="3" rx="2" fill="rgb(156,218,68)" fill-opacity="0.48"/>
+        <!-- ══ Right bevel ══ -->
+        <rect x="16" y="-2" width="2" height="20" rx="1" fill="rgb(156,218,68)" fill-opacity="0.20"/>
+        <!-- ══ Icon path ══ -->
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" fill="#ffffff" fill-opacity="0.90"/>
+      </g>
+    </g>
+
+    <!-- CTA -->
+    <g id="cta-block" transform="translate(220, 110)">
+      <defs>
+    <linearGradient id="cta3d-light" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="black" stop-opacity="0.12"/>
+    </linearGradient>
+    <linearGradient id="cta3d-shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+      <stop offset="50%"  stop-color="white" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ CTA 3D: extrusion layers ══ -->
+  <rect x="5" y="6" width="160" height="28" rx="14" fill="rgb(41,103,0)" fill-opacity="0.65"/>
+  <rect x="4" y="4" width="160" height="28" rx="14" fill="rgb(41,103,0)" fill-opacity="0.48"/>
+  <rect x="2" y="2" width="160" height="28" rx="14" fill="rgb(41,103,0)" fill-opacity="0.30"/>
+  <!-- ══ Main face ══ -->
+  <rect x="0" y="0" width="160" height="28" rx="14" fill="#65a30d" id="cta-btn"/>
+  <!-- ══ Lighting overlay ══ -->
+  <rect x="0" y="0" width="160" height="28" rx="14" fill="url(#cta3d-light)" pointer-events="none"/>
+  <!-- ══ Top edge highlight ══ -->
+  <rect x="5" y="1" width="150" height="3" rx="2" fill="rgb(156,218,68)" fill-opacity="0.55" pointer-events="none"/>
+  <!-- ══ Text ══ -->
+  <text x="80" y="18" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#ffffff" letter-spacing="0.5">DEMANDER UN DEVIS GR…</text>
+  <!-- ══ Text shimmer ══ -->
+  <text x="80" y="18" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="url(#cta3d-shine)" letter-spacing="0.5" pointer-events="none">DEMANDER UN DEVIS GR…</text>
+    </g>
+  </g>
+</g>
+  </g>
+
+  <!-- ===== LAYER 2: Variation A — Breathing Particles ===== -->
+  <g id="layer-var-a">
+    <g id="var-a"><circle id="va-ene0-logo-halopulse" cx="76" cy="154" r="50" fill="url(#va-ene0-logo-halo-g)" style="animation:va-ene0-logo-halo 2.19s ease-in-out 0.162s infinite;"/>
+        
+<g transform="translate(16,16)"><g id="va-dim2-logo-txt-anim" style="animation:va-dim2-logo-breathe-img 10.00s cubic-bezier(.4,0,.2,1) 0.46199999999999997s infinite; transform-box:fill-box; transform-origin:center; filter:url(#va-dim2-logo-glow); transform-box:fill-box; transform-origin:center;"><use href="#logo-bg"/><use href="#company-logo-text"/></g></g>
+        <circle id="va-dim2-logo-halo" cx="76" cy="154" r="59.8" fill="#65a30d" fill-opacity="0.036" style="animation:va-dim2-logo-breathe-img 10.00s cubic-bezier(.4,0,.2,1) 0.46199999999999997s infinite; transform-box:fill-box; transform-origin:center;"/>
+<ellipse cx="76" cy="154" rx="54" ry="22" fill="none" stroke="#65a30d" stroke-width="2" stroke-opacity="0.18" style="animation:va-tra3-logo-liquid 10.00s ease-in-out 0.612s infinite;"/>
+        
+<rect x="186" y="28" width="220" height="28" fill="url(#va-lum0-nom-shimmer)" rx="2"/>
+<rect x="186" y="50" width="220" height="4" fill="url(#va-mou1-nom-wave)" rx="2"/>
+<rect x="186" y="87" width="180" height="12" fill="#65a30d" fill-opacity="0.0144449953343824" rx="2" style="animation:va-contact-cascade 0.6s ease-out 1.594s 1 both;"/>
+          <rect x="186" y="102" width="160" height="12" fill="#65a30d" fill-opacity="0.0108337465007868" rx="2" style="animation:va-contact-cascade 0.6s ease-out 1.8940000000000001s 1 both;"/>
+          <rect x="186" y="117" width="170" height="12" fill="#65a30d" fill-opacity="0.0126393709175846" rx="2" style="animation:va-contact-cascade 0.6s ease-out 2.194s 1 both;"/>
+<rect x="170" y="16" width="2" height="148" fill="#65a30d" fill-opacity="1" rx="1" style="animation:va-ryt0-sep-calm 10.00s ease-in-out 0.485s infinite; transform-origin:171px 90px;"/>
+<rect x="170" y="16" width="3" height="148" fill="#c9a84c" fill-opacity="0.05" rx="1.5"/>
+          <ellipse cx="171.5" cy="16" rx="4" ry="6" fill="url(#va-ecl1-sep-gold-pt)" style="animation:va-ecl1-sep-shine 10.00s ease-in-out 0.635s infinite;"/>
+<ellipse cx="300" cy="90" rx="240" ry="81" fill="url(#va-amb0-fond-atm)" style="animation:va-amb0-fond-atm 10.00s ease-in-out 0s infinite; transform-origin:300px 90px;"/>
+<g id="va-str1-fond-stars"><circle cx="426" cy="128" r="1.6" fill="#65a30d" fill-opacity="0.03549240394822846" style="animation:va-str1-fond-star 10.00s linear 7.1s infinite;"/><circle cx="137" cy="129" r="1.2" fill="#65a30d" fill-opacity="0.04871341284087976" style="animation:va-str1-fond-star 10.00s linear 3.4s infinite;"/><circle cx="407" cy="97" r="1.9" fill="#65a30d" fill-opacity="0.010004029933611491" style="animation:va-str1-fond-star 10.00s linear 1.3s infinite;"/><circle cx="85" cy="3" r="1.8" fill="#65a30d" fill-opacity="0.04875234603591708" style="animation:va-str1-fond-star 10.00s linear 3.9s infinite;"/><circle cx="455" cy="15" r="0.5" fill="#65a30d" fill-opacity="0.03786266843080739" style="animation:va-str1-fond-star 10.00s linear 2.3s infinite;"/><circle cx="88" cy="2" r="1.5" fill="#65a30d" fill-opacity="0.04225090053707845" style="animation:va-str1-fond-star 10.00s linear 6.7s infinite;"/><circle cx="382" cy="138" r="0.7" fill="#65a30d" fill-opacity="0.04329935939454117" style="animation:va-str1-fond-star 10.00s linear 3.4s infinite;"/><circle cx="226" cy="48" r="1.1" fill="#65a30d" fill-opacity="0.02912331169090976" style="animation:va-str1-fond-star 10.00s linear 2.3s infinite;"/><circle cx="210" cy="3" r="1.3" fill="#65a30d" fill-opacity="0.00924262087828538" style="animation:va-str1-fond-star 10.00s linear 4.4s infinite;"/><circle cx="376" cy="4" r="1.9" fill="#65a30d" fill-opacity="0.03944455531509448" style="animation:va-str1-fond-star 10.00s linear 3.3s infinite;"/><circle cx="160" cy="97" r="1.6" fill="#65a30d" fill-opacity="0.004896724648278905" style="animation:va-str1-fond-star 10.00s linear 6.8s infinite;"/><circle cx="227" cy="129" r="1.0" fill="#65a30d" fill-opacity="0.013540999782526342" style="animation:va-str1-fond-star 10.00s linear 4.2s infinite;"/><circle cx="29" cy="7" r="0.8" fill="#65a30d" fill-opacity="0.033518413320462064" style="animation:va-str1-fond-star 10.00s linear 1.3s infinite;"/><circle cx="500" cy="156" r="1.7" fill="#65a30d" fill-opacity="0.0036778474352104243" style="animation:va-str1-fond-star 10.00s linear 5.1s infinite;"/><circle cx="371" cy="117" r="1.5" fill="#65a30d" fill-opacity="0.04392007855840348" style="animation:va-str1-fond-star 10.00s linear 8.9s infinite;"/><circle cx="568" cy="31" r="1.0" fill="#65a30d" fill-opacity="0.048341667467343544" style="animation:va-str1-fond-star 10.00s linear 8.5s infinite;"/><circle cx="81" cy="85" r="0.7" fill="#65a30d" fill-opacity="0.0012540602216176923" style="animation:va-str1-fond-star 10.00s linear 8.5s infinite;"/><circle cx="277" cy="139" r="1.6" fill="#65a30d" fill-opacity="0.006376614161899852" style="animation:va-str1-fond-star 10.00s linear 1.1s infinite;"/><circle cx="567" cy="113" r="1.9" fill="#65a30d" fill-opacity="0.038604831476175154" style="animation:va-str1-fond-star 10.00s linear 9.8s infinite;"/><circle cx="569" cy="30" r="1.2" fill="#65a30d" fill-opacity="0.022625363813858712" style="animation:va-str1-fond-star 10.00s linear 3.4s infinite;"/><circle cx="334" cy="79" r="1.0" fill="#65a30d" fill-opacity="0.027819268027997168" style="animation:va-str1-fond-star 10.00s linear 3.8s infinite;"/><circle cx="500" cy="166" r="1.8" fill="#65a30d" fill-opacity="0.024345354798062147" style="animation:va-str1-fond-star 10.00s linear 7.4s infinite;"/><circle cx="357" cy="143" r="1.2" fill="#65a30d" fill-opacity="0.03979791241472413" style="animation:va-str1-fond-star 10.00s linear 8.9s infinite;"/><circle cx="268" cy="164" r="0.7" fill="#65a30d" fill-opacity="0.010818996688067274" style="animation:va-str1-fond-star 10.00s linear 0.6s infinite;"/><circle cx="458" cy="24" r="1.4" fill="#65a30d" fill-opacity="0.024124951113481077" style="animation:va-str1-fond-star 10.00s linear 1.8s infinite;"/><circle cx="35" cy="134" r="1.1" fill="#65a30d" fill-opacity="0.029225239801417047" style="animation:va-str1-fond-star 10.00s linear 2.7s infinite;"/><circle cx="485" cy="70" r="0.9" fill="#65a30d" fill-opacity="0.0379642022515327" style="animation:va-str1-fond-star 10.00s linear 2.9s infinite;"/><circle cx="550" cy="4" r="1.8" fill="#65a30d" fill-opacity="0.002894153934516908" style="animation:va-str1-fond-star 10.00s linear 4.5s infinite;"/></g>
+<rect x="406" y="130" width="160" height="28" rx="14" fill="#65a30d" style="animation:va-inv0-cta-breath 10.00s ease-in-out 2.103s infinite;"/>
+<rect x="406" y="130" width="160" height="28" rx="14" fill="url(#va-bri1-cta-sweep)"/></g>
+  </g>
+
+  <!-- ===== LAYER 3: Variation B — Chromatic Wave ===== -->
+  <g id="layer-var-b">
+    <g id="var-b"><ellipse cx="76" cy="154" rx="59.8" ry="25.2" fill="none" stroke="#65a30d" stroke-width="2" stroke-dasharray="4 2" filter="url(#vb-ene0-logo-glow-elec)" style="animation:vb-ene0-logo-corona 2.98s linear 0.1s infinite;"/>
+        
+<rect x="24" y="134" width="104" height="40" fill="url(#vb-mat1-logo-iris)" rx="4" style="animation:vb-mat1-logo-iris-pulse 7.5s ease-in-out 0.25s infinite;"/>
+        
+<g transform="translate(16,16)"><g id="vb-dim2-logo-txt-anim" style="animation:vb-dim2-logo-float3d 8.00s ease-in-out 0.4s infinite; transform-box:fill-box; transform-origin:center; filter:url(#vb-dim2-logo-f3d); transform-box:fill-box; transform-origin:center;"><use href="#logo-bg"/><use href="#company-logo-text"/></g></g>
+        <ellipse id="vb-dim2-logo-shadow" cx="76" cy="178" rx="12" ry="1.7999999999999998" fill="#65a30d" fill-opacity="0.09" style="animation:vb-dim2-logo-float3d 8.00s ease-in-out 0.4s infinite; transform-box:fill-box; transform-origin:center;"/>
+
+<circle key="0" cx="93.4" cy="154.0" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 0.5499999999999999s infinite;"/>
+        <line x1="76" y1="154" x2="93.4" y2="154.0" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 0.5499999999999999s infinite;"/><circle key="1" cx="85.2" cy="169.8" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 0.95s infinite;"/>
+        <line x1="76" y1="154" x2="85.2" y2="169.8" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 0.95s infinite;"/><circle key="2" cx="66.4" cy="170.6" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 1.35s infinite;"/>
+        <line x1="76" y1="154" x2="66.4" y2="170.6" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 1.35s infinite;"/><circle key="3" cx="55.9" cy="154.0" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 1.75s infinite;"/>
+        <line x1="76" y1="154" x2="55.9" y2="154.0" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 1.75s infinite;"/><circle key="4" cx="65.5" cy="135.8" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 2.15s infinite;"/>
+        <line x1="76" y1="154" x2="65.5" y2="135.8" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 2.15s infinite;"/><circle key="5" cx="87.0" cy="135.0" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 2.55s infinite;"/>
+        <line x1="76" y1="154" x2="87.0" y2="135.0" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vb-tra3-logo-node-pulse 8.92s ease-in-out 2.55s infinite;"/>
+<rect x="186" y="28" width="220" height="28" fill="url(#vb-lum0-nom-scan)" rx="2"/>
+<rect x="186" y="28" width="220" height="28" fill="#65a30d" fill-opacity="0.010000000000000002" rx="2" style="animation:vb-mou1-nom-float 7.95s ease-in-out 0.35s infinite alternate;"/>
+<rect x="186" y="52" width="180" height="16" fill="#65a30d" fill-opacity="0.019056465132023786" rx="2" style="animation:vb-titre-fade 10.00s ease-in-out 0.5s infinite;"/>
+<rect x="186" y="87" width="180" height="12" fill="#65a30d" fill-opacity="0.012350825151975924" rx="2" style="animation:vb-contact-cascade 0.6s ease-out 1.1s 1 both;"/>
+          <rect x="186" y="102" width="160" height="12" fill="#65a30d" fill-opacity="0.009263118863981942" rx="2" style="animation:vb-contact-cascade 0.6s ease-out 1.4s 1 both;"/>
+          <rect x="186" y="117" width="170" height="12" fill="#65a30d" fill-opacity="0.010806972007978935" rx="2" style="animation:vb-contact-cascade 0.6s ease-out 1.7000000000000002s 1 both;"/>
+<rect x="170" y="16" width="3" height="148" fill="url(#vb-flu0-sep-flow)" rx="1.5"/>
+<rect x="170" y="16" width="3" height="148" fill="#65a30d" fill-opacity="0.1" filter="url(#vb-ecl1-sep-glow)" rx="1.5" style="animation:vb-ecl1-sep-pulse 2.01s ease-in-out 0.44999999999999996s infinite; transform-origin:171.5px 90px;"/>
+<ellipse cx="300" cy="90" rx="240" ry="81" fill="url(#vb-amb1-fond-atm)" style="animation:vb-amb1-fond-atm 10.00s ease-in-out 0.15s infinite; transform-origin:300px 90px;"/>
+<rect x="406" y="130" width="160" height="28" rx="14" fill="none" stroke="#65a30d" stroke-width="2" stroke-dasharray="8 4" filter="url(#vb-bri0-cta-glow)" stroke-opacity="0.25" style="animation:vb-bri0-cta-border 2.99s linear 1.3s infinite;"/>
+<rect x="406" y="130" width="160" height="28" rx="14" fill="#65a30d" fill-opacity="0.05" style="animation:vb-att1-cta-pulse 2.99s ease-in-out 1.45s infinite; transform-origin:486px 144px;"/></g>
+  </g>
+
+  <!-- ===== LAYER 4: Variation C — Generative Noise ===== -->
+  <g id="layer-var-c">
+    <g id="var-c"><circle cx="76" cy="154" r="64" fill="url(#vc-ene0-logo-aura1)" style="animation:vc-ene0-logo-aura 10.00s ease-in-out 0.1s infinite;transform-box:fill-box;transform-origin:76px 154px;"/>
+          <circle cx="76" cy="154" r="56" fill="url(#vc-ene0-logo-aura2)" style="animation:vc-ene0-logo-aura 13.0s ease-in-out 1.1s infinite alternate;transform-box:fill-box;transform-origin:76px 154px;"/>
+          
+<rect x="24" y="134" width="104" height="40" fill="url(#vc-mat1-logo-gold)" rx="3"/>
+        
+<g transform="translate(16,16)"><g id="vc-dim2-logo-txt-anim" style="animation:vc-dim2-logo-gyro-img 10.00s ease-in-out 0.4s infinite alternate; transform-box:fill-box; transform-origin:center; filter:url(#vc-dim2-logo-gyro); transform-box:fill-box; transform-origin:center;"><use href="#logo-bg"/><use href="#company-logo-text"/></g></g>
+        <ellipse id="vc-dim2-logo-tilt-shadow" cx="76" cy="177" rx="11.4" ry="1.5" fill="#65a30d" fill-opacity="0.075" style="animation:vc-dim2-logo-gyro-img 10.00s ease-in-out 0.4s infinite alternate; transform-box:fill-box; transform-origin:center;"/>
+
+<circle key="0" cx="93.4" cy="154.0" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 0.5499999999999999s infinite;"/>
+        <line x1="76" y1="154" x2="93.4" y2="154.0" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 0.5499999999999999s infinite;"/><circle key="1" cx="85.2" cy="169.8" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 0.95s infinite;"/>
+        <line x1="76" y1="154" x2="85.2" y2="169.8" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 0.95s infinite;"/><circle key="2" cx="66.4" cy="170.6" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 1.35s infinite;"/>
+        <line x1="76" y1="154" x2="66.4" y2="170.6" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 1.35s infinite;"/><circle key="3" cx="55.9" cy="154.0" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 1.75s infinite;"/>
+        <line x1="76" y1="154" x2="55.9" y2="154.0" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 1.75s infinite;"/><circle key="4" cx="65.5" cy="135.8" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 2.15s infinite;"/>
+        <line x1="76" y1="154" x2="65.5" y2="135.8" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 2.15s infinite;"/><circle key="5" cx="87.0" cy="135.0" r="0.44999999999999996" fill="#65a30d" fill-opacity="0.21" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 2.55s infinite;"/>
+        <line x1="76" y1="154" x2="87.0" y2="135.0" stroke="#65a30d" stroke-width="0.5" stroke-opacity="0.09" style="animation:vc-tra3-logo-node-pulse 10.00s ease-in-out 2.55s infinite;"/>
+<rect x="186" y="28" width="220" height="28" fill="#65a30d" fill-opacity="0.012" rx="2" style="animation:vc-lum0-nom-breathe 7.95s ease-in-out 0.157s infinite;"/>
+<rect x="186" y="52" width="180" height="16" fill="#65a30d" fill-opacity="0.02344648424318211" rx="2" style="animation:vc-titre-slide 0.8s ease-out 0.393s 1 both;"/>
+<rect x="186" y="87" width="180" height="12" fill="#65a30d" fill-opacity="0.008427503903216569" rx="2" style="animation:vc-contact-cascade 0.6s ease-out 0.929s 1 both;"/>
+          <rect x="186" y="102" width="160" height="12" fill="#65a30d" fill-opacity="0.006320627927412425" rx="2" style="animation:vc-contact-cascade 0.6s ease-out 1.229s 1 both;"/>
+          <rect x="186" y="117" width="170" height="12" fill="#65a30d" fill-opacity="0.007374065915314498" rx="2" style="animation:vc-contact-cascade 0.6s ease-out 1.529s 1 both;"/>
+<rect x="170" y="16" width="3" height="148" fill="#65a30d" fill-opacity="0.025" rx="1.5"/>
+          
+        <circle cx="171.5" cy="16" r="1.5" fill="#65a30d" fill-opacity="0.08000000000000002" style="animation:vc-flu0-sep-particle 5.09s linear 0.236s infinite;"/>
+        <circle cx="171.5" cy="16" r="1.8" fill="#65a30d" fill-opacity="0.08000000000000002" style="animation:vc-flu0-sep-particle 5.09s linear 1.5085s infinite;"/>
+        <circle cx="171.5" cy="16" r="2.1" fill="#65a30d" fill-opacity="0.08000000000000002" style="animation:vc-flu0-sep-particle 5.09s linear 2.7809999999999997s infinite;"/>
+        <circle cx="171.5" cy="16" r="2.4" fill="#65a30d" fill-opacity="0.08000000000000002" style="animation:vc-flu0-sep-particle 5.09s linear 4.0535s infinite;"/>
+<rect x="170" y="16" width="3" height="148" fill="#65a30d" fill-opacity="0.1" filter="url(#vc-ecl1-sep-glow)" rx="1.5" style="animation:vc-ecl1-sep-pulse 2.41s ease-in-out 0.386s infinite; transform-origin:171.5px 90px;"/>
+<ellipse cx="180" cy="72" rx="210" ry="90" fill="url(#vc-amb0-fond-p1)" style="animation:vc-amb0-fond-plasma 10.00s ease-in-out 0s infinite;"/>
+          <ellipse cx="420" cy="108" rx="180" ry="81" fill="url(#vc-amb0-fond-p2)" style="animation:vc-amb0-fond-plasma 12.0s ease-in-out 3s infinite alternate;"/>
+<g id="vc-str1-fond-stars"><circle cx="426" cy="128" r="1.6" fill="#65a30d" fill-opacity="0.03549240394822846" style="animation:vc-str1-fond-star 10.00s linear 7.1s infinite;"/><circle cx="137" cy="129" r="1.2" fill="#65a30d" fill-opacity="0.04871341284087976" style="animation:vc-str1-fond-star 10.00s linear 3.4s infinite;"/><circle cx="407" cy="97" r="1.9" fill="#65a30d" fill-opacity="0.010004029933611491" style="animation:vc-str1-fond-star 10.00s linear 1.3s infinite;"/><circle cx="85" cy="3" r="1.8" fill="#65a30d" fill-opacity="0.04875234603591708" style="animation:vc-str1-fond-star 10.00s linear 3.9s infinite;"/><circle cx="455" cy="15" r="0.5" fill="#65a30d" fill-opacity="0.03786266843080739" style="animation:vc-str1-fond-star 10.00s linear 2.3s infinite;"/><circle cx="88" cy="2" r="1.5" fill="#65a30d" fill-opacity="0.04225090053707845" style="animation:vc-str1-fond-star 10.00s linear 6.7s infinite;"/><circle cx="382" cy="138" r="0.7" fill="#65a30d" fill-opacity="0.04329935939454117" style="animation:vc-str1-fond-star 10.00s linear 3.4s infinite;"/><circle cx="226" cy="48" r="1.1" fill="#65a30d" fill-opacity="0.02912331169090976" style="animation:vc-str1-fond-star 10.00s linear 2.3s infinite;"/><circle cx="210" cy="3" r="1.3" fill="#65a30d" fill-opacity="0.00924262087828538" style="animation:vc-str1-fond-star 10.00s linear 4.4s infinite;"/><circle cx="376" cy="4" r="1.9" fill="#65a30d" fill-opacity="0.03944455531509448" style="animation:vc-str1-fond-star 10.00s linear 3.3s infinite;"/><circle cx="160" cy="97" r="1.6" fill="#65a30d" fill-opacity="0.004896724648278905" style="animation:vc-str1-fond-star 10.00s linear 6.8s infinite;"/><circle cx="227" cy="129" r="1.0" fill="#65a30d" fill-opacity="0.013540999782526342" style="animation:vc-str1-fond-star 10.00s linear 4.2s infinite;"/><circle cx="29" cy="7" r="0.8" fill="#65a30d" fill-opacity="0.033518413320462064" style="animation:vc-str1-fond-star 10.00s linear 1.3s infinite;"/><circle cx="500" cy="156" r="1.7" fill="#65a30d" fill-opacity="0.0036778474352104243" style="animation:vc-str1-fond-star 10.00s linear 5.1s infinite;"/><circle cx="371" cy="117" r="1.5" fill="#65a30d" fill-opacity="0.04392007855840348" style="animation:vc-str1-fond-star 10.00s linear 8.9s infinite;"/><circle cx="568" cy="31" r="1.0" fill="#65a30d" fill-opacity="0.048341667467343544" style="animation:vc-str1-fond-star 10.00s linear 8.5s infinite;"/><circle cx="81" cy="85" r="0.7" fill="#65a30d" fill-opacity="0.0012540602216176923" style="animation:vc-str1-fond-star 10.00s linear 8.5s infinite;"/><circle cx="277" cy="139" r="1.6" fill="#65a30d" fill-opacity="0.006376614161899852" style="animation:vc-str1-fond-star 10.00s linear 1.1s infinite;"/><circle cx="567" cy="113" r="1.9" fill="#65a30d" fill-opacity="0.038604831476175154" style="animation:vc-str1-fond-star 10.00s linear 9.8s infinite;"/><circle cx="569" cy="30" r="1.2" fill="#65a30d" fill-opacity="0.022625363813858712" style="animation:vc-str1-fond-star 10.00s linear 3.4s infinite;"/><circle cx="334" cy="79" r="1.0" fill="#65a30d" fill-opacity="0.027819268027997168" style="animation:vc-str1-fond-star 10.00s linear 3.8s infinite;"/><circle cx="500" cy="166" r="1.8" fill="#65a30d" fill-opacity="0.024345354798062147" style="animation:vc-str1-fond-star 10.00s linear 7.4s infinite;"/><circle cx="357" cy="143" r="1.2" fill="#65a30d" fill-opacity="0.03979791241472413" style="animation:vc-str1-fond-star 10.00s linear 8.9s infinite;"/><circle cx="268" cy="164" r="0.7" fill="#65a30d" fill-opacity="0.010818996688067274" style="animation:vc-str1-fond-star 10.00s linear 0.6s infinite;"/><circle cx="458" cy="24" r="1.4" fill="#65a30d" fill-opacity="0.024124951113481077" style="animation:vc-str1-fond-star 10.00s linear 1.8s infinite;"/><circle cx="35" cy="134" r="1.1" fill="#65a30d" fill-opacity="0.029225239801417047" style="animation:vc-str1-fond-star 10.00s linear 2.7s infinite;"/><circle cx="485" cy="70" r="0.9" fill="#65a30d" fill-opacity="0.0379642022515327" style="animation:vc-str1-fond-star 10.00s linear 2.9s infinite;"/><circle cx="550" cy="4" r="1.8" fill="#65a30d" fill-opacity="0.002894153934516908" style="animation:vc-str1-fond-star 10.00s linear 4.5s infinite;"/></g></g>
+  </g>
+
+  <!-- ===== LAYER 5: Variation D — Luminous Respiration ===== -->
+  <g id="layer-var-d">
+    <g id="var-d">
+        <ellipse id="vd-ene0-logo-orb0" cx="76" cy="154" rx="75.8" ry="29.8" fill="none" stroke="#65a30d" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 8" style="animation:vd-ene0-logo-orbit0 2.1s linear 0.1s infinite;transform-box:fill-box;transform-origin:76px 154px;"/>
+        <ellipse id="vd-ene0-logo-orb1" cx="76" cy="154" rx="78.2" ry="31" fill="none" stroke="#65a30d" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 8" style="animation:vd-ene0-logo-orbit1 2.5s linear 1.6s infinite;transform-box:fill-box;transform-origin:76px 154px;"/>
+        <ellipse id="vd-ene0-logo-orb2" cx="76" cy="154" rx="74" ry="29.2" fill="none" stroke="#65a30d" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 8" style="animation:vd-ene0-logo-orbit2 2.9s linear 3.1s infinite;transform-box:fill-box;transform-origin:76px 154px;"/>
+        <ellipse id="vd-ene0-logo-orb3" cx="76" cy="154" rx="77" ry="30.4" fill="none" stroke="#65a30d" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 8" style="animation:vd-ene0-logo-orbit3 3.3s linear 4.6s infinite;transform-box:fill-box;transform-origin:76px 154px;"/>
+<rect x="24" y="134" width="104" height="40" fill="url(#vd-mat1-logo-metal)" fill-opacity="1" rx="3"/>
+        <g transform="translate(16,16)"><g id="vd-mat1-logo-txt-anim" style=" filter:url(#vd-mat1-logo-metal-over); transform-box:fill-box; transform-origin:center;"><use href="#logo-bg"/><use href="#company-logo-text"/></g></g>
+<g transform="translate(16,16)"><g id="vd-dim2-logo-txt-anim" style="animation:vd-dim2-logo-breathe-img 2.34s cubic-bezier(.4,0,.2,1) 0.4s infinite; transform-box:fill-box; transform-origin:center; filter:url(#vd-dim2-logo-glow); transform-box:fill-box; transform-origin:center;"><use href="#logo-bg"/><use href="#company-logo-text"/></g></g>
+        <circle id="vd-dim2-logo-halo" cx="76" cy="154" r="59.8" fill="#65a30d" fill-opacity="0.036" style="animation:vd-dim2-logo-breathe-img 2.34s cubic-bezier(.4,0,.2,1) 0.4s infinite; transform-box:fill-box; transform-origin:center;"/>
+<polygon points="46,135.4 41.5,144.4 50.5,144.4" fill="#65a30d" fill-opacity="0.15" style="animation:vd-tra3-logo-shard 3.39s ease-in-out 0.5499999999999999s infinite alternate; filter:url(#vd-tra3-logo-cryst-f);"/><polygon points="114,141.8 110.25,149.3 117.75,149.3" fill="#65a30d" fill-opacity="0.15" style="animation:vd-tra3-logo-shard 3.39s ease-in-out 1.75s infinite alternate; filter:url(#vd-tra3-logo-cryst-f);"/><polygon points="66,164.4 63,170.4 69,170.4" fill="#65a30d" fill-opacity="0.15" style="animation:vd-tra3-logo-shard 3.39s ease-in-out 2.9499999999999997s infinite alternate; filter:url(#vd-tra3-logo-cryst-f);"/><polygon points="101,163.6 98.75,168.1 103.25,168.1" fill="#65a30d" fill-opacity="0.15" style="animation:vd-tra3-logo-shard 3.39s ease-in-out 1.35s infinite alternate; filter:url(#vd-tra3-logo-cryst-f);"/><polygon points="36,153.6 33,159.6 39,159.6" fill="#65a30d" fill-opacity="0.15" style="animation:vd-tra3-logo-shard 3.39s ease-in-out 2.35s infinite alternate; filter:url(#vd-tra3-logo-cryst-f);"/><polygon points="86,135.88 83.75,140.38 88.25,140.38" fill="#65a30d" fill-opacity="0.15" style="animation:vd-tra3-logo-shard 3.39s ease-in-out 3.55s infinite alternate; filter:url(#vd-tra3-logo-cryst-f);"/>
+
+<rect x="186" y="28" width="220" height="28" fill="none" rx="2" style="animation:vd-lum0-nom-neon 1.52s ease-in-out 0.124s infinite;"/>
+<rect x="186" y="52" width="180" height="16" fill="#65a30d" fill-opacity="0.0328686084622677" rx="2" style="animation:vd-titre-slide 0.8s ease-out 0.309s 1 both;"/>
+<rect x="186" y="87" width="180" height="12" fill="#65a30d" fill-opacity="0.025738401326755617" rx="2" style="animation:vd-contact-cascade 0.6s ease-out 0.794s 1 both;"/>
+          <rect x="186" y="102" width="160" height="12" fill="#65a30d" fill-opacity="0.019303800995066712" rx="2" style="animation:vd-contact-cascade 0.6s ease-out 1.0939999999999999s 1 both;"/>
+          <rect x="186" y="117" width="170" height="12" fill="#65a30d" fill-opacity="0.022521101160911168" rx="2" style="animation:vd-contact-cascade 0.6s ease-out 1.3940000000000001s 1 both;"/>
+<rect x="170" y="16" width="3" height="148" fill="url(#vd-flu0-sep-flow)" rx="1.5"/>
+<rect x="170" y="16" width="3" height="148" fill="#c9a84c" fill-opacity="0.05" rx="1.5"/>
+          <ellipse cx="171.5" cy="16" rx="4" ry="6" fill="url(#vd-ecl1-sep-gold-pt)" style="animation:vd-ecl1-sep-shine 2.39s ease-in-out 0.33499999999999996s infinite;"/>
+<ellipse cx="300" cy="90" rx="240" ry="81" fill="url(#vd-amb1-fond-atm)" style="animation:vd-amb1-fond-atm 9.59s ease-in-out 0.15s infinite; transform-origin:300px 90px;"/>
+<g style="animation:vd-str2-fond-grid 10.00s ease-in-out 0.3s infinite;"><line x1="30" y1="22" x2="120" y2="45" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="150" y1="22" x2="240" y2="45" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="270" y1="22" x2="360" y2="45" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="390" y1="22" x2="480" y2="45" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="510" y1="22" x2="600" y2="45" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="30" y1="67" x2="120" y2="90" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="150" y1="67" x2="240" y2="90" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="270" y1="67" x2="360" y2="90" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="390" y1="67" x2="480" y2="90" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="510" y1="67" x2="600" y2="90" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="30" y1="112" x2="120" y2="135" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="150" y1="112" x2="240" y2="135" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="270" y1="112" x2="360" y2="135" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="390" y1="112" x2="480" y2="135" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="510" y1="112" x2="600" y2="135" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="30" y1="157" x2="120" y2="180" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="150" y1="157" x2="240" y2="180" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="270" y1="157" x2="360" y2="180" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="390" y1="157" x2="480" y2="180" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/><line x1="510" y1="157" x2="600" y2="180" stroke="#65a30d" stroke-opacity="0.05" stroke-width="0.5"/></g>
+<rect x="406" y="130" width="160" height="28" rx="14" fill="none" stroke="#65a30d" stroke-width="2" stroke-dasharray="8 4" filter="url(#vd-bri0-cta-glow)" stroke-opacity="0.25" style="animation:vd-bri0-cta-border 1.16s linear 0.803s infinite;"/>
+<rect x="406" y="130" width="160" height="28" rx="14" fill="#65a30d" fill-opacity="0.05" style="animation:vd-att1-cta-pulse 1.28s ease-in-out 0.9530000000000001s infinite; transform-origin:486px 144px;"/></g>
+  </g>
+
+</svg>

@@ -1025,14 +1025,15 @@ function DeliverySection({
           </a>
 
           <a
-            href={deliveryResult.download_url}
+            href={`/api/signature/download/${deliveryResult.signature_id}`}
+            download
             className="block"
           >
             <Button
               className="w-full h-9 bg-green-600/20 border border-green-500/40 text-green-300 hover:bg-green-600/30 text-xs"
               data-testid="button-download-package"
             >
-              <Download className="w-3.5 h-3.5 mr-2" /> Télécharger le package complet
+              <Download className="w-3.5 h-3.5 mr-2" /> Télécharger le package complet (.zip)
             </Button>
           </a>
 

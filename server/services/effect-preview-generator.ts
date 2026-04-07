@@ -570,3 +570,11 @@ export function getEffectPreviewHTML(previewId: string): string | null {
 // Auto-fixed: bracket_completion
 // Auto-fixed: bracket_completion
 // Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
