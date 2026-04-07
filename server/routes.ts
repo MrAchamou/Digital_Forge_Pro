@@ -9,9 +9,6 @@ import { godMonitor } from './core/god-monitor';
 import { autonomousMonitor } from './core/autonomous-monitor';
 import { errorDetection } from './modules/error-detection.module';
 import { qualityAssurance } from './modules/quality-assurance.module';
-import { signatureBaseGenerator } from './generator/signature-base-generator';
-import { signatureVariationsGenerator } from './generator/signature-variations-generator';
-import { signatureSVGExporter } from './generator/signature-svg-exporter';
 import { buildEffectPreviewHTML, saveEffectPreview, getEffectPreviewHTML } from './services/effect-preview-generator';
 import multer from 'multer';
 import fs from 'fs/promises';
@@ -1118,33 +1115,6 @@ router.post('/expansion/expand', async (req, res) => {
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
-  }
-});
-
-// =============================================
-// POST /api/signature/generate
-// Génère une signature email vivante en SVG
-// =============================================
-router.post('/signature/generate', async (req, res) => {
-  try {
-    const { signature, style, zone_compositions } = req.body;
-
-    if (!signature || !style) {
-      return res.status(400).json({ error: 'Champs "signature" et "style" requis.' });
-    }
-
-    const baseResult = signatureBaseGenerator.generate(signature, style);
-    const variationsResult = signatureVariationsGenerator.generate(style, baseResult.palette, zone_compositions || undefined, baseResult.logo_url);
-    const exportResult = signatureSVGExporter.export(signature.nom || 'signature', baseResult, variationsResult);
-
-    return res.json({
-      svg_content: exportResult.svgContent,
-      filename: exportResult.filename,
-      metadata: exportResult.metadata,
-    });
-  } catch (err: any) {
-    console.error('Erreur génération signature:', err);
-    return res.status(500).json({ error: err.message || 'Erreur interne' });
   }
 });
 
