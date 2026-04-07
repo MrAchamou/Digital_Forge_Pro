@@ -164,7 +164,7 @@ export default function ExpansionPage() {
             <h1 className="text-4xl font-bold text-white">Module d'Expansion Intelligente</h1>
           </div>
           <p className="text-xl text-purple-200 max-w-3xl mx-auto">
-            Analysez votre bibliothèque de 2000 effets et générez automatiquement de nouveaux contenus uniques grâce à l'IA locale
+            Analysez votre bibliothèque d'effets premium et générez automatiquement de nouveaux contenus uniques grâce au pipeline Triple-IA
           </p>
         </div>
 

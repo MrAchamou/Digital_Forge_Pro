@@ -1056,48 +1056,91 @@ router.post('/library/initialize', async (req, res) => {
   }
 });
 
-// GET /api/expansion/categories
-router.get('/expansion/categories', (req, res) => {
-  res.json(['EXPLOSION', 'TRANSITION', 'ATMOSPHERIC', 'TRANSFORMATION', 'FIRE', 'DISTORTION', 'PARTICLES', 'LIGHTING', 'MORPHING', 'WATER', 'SMOKE', 'MAGIC', 'GLITCH', 'NEON']);
+// GET /api/expansion/categories — catégories réelles de la bibliothèque
+router.get('/expansion/categories', async (req, res) => {
+  try {
+    const { effects } = await storage.getEffects({ limit: 500 });
+    const cats = [...new Set(effects.map(e => e.category))].sort();
+    res.json({ categories: cats });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// GET /api/expansion/types
-router.get('/expansion/types', (req, res) => {
-  res.json(['particles', 'physics', 'lighting', 'morphing', 'shader', 'procedural', 'simulation', 'composite']);
+// GET /api/expansion/types — types réels de la bibliothèque
+router.get('/expansion/types', async (req, res) => {
+  try {
+    const { effects } = await storage.getEffects({ limit: 500 });
+    const types = [...new Set(effects.map(e => e.type))].sort();
+    res.json({ types });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// GET /api/expansion/library-stats
-router.get('/expansion/library-stats', (req, res) => {
-  res.json({
-    totalEffects: 847,
-    categoriesDistribution: { PARTICLES: 145, EXPLOSION: 124, LIGHTING: 112, TRANSITION: 98, ATMOSPHERIC: 87, MORPHING: 86, TRANSFORMATION: 76, FIRE: 65, DISTORTION: 54 },
-    typesDistribution: { particles: 220, physics: 180, lighting: 160, morphing: 140, shader: 80, procedural: 40, simulation: 20, composite: 7 },
-  });
+// GET /api/expansion/library-stats — stats réelles de la bibliothèque
+router.get('/expansion/library-stats', async (req, res) => {
+  try {
+    const { effects, total } = await storage.getEffects({ limit: 500 });
+    const categoriesDistribution: Record<string, number> = {};
+    const typesDistribution: Record<string, number> = {};
+    for (const e of effects) {
+      categoriesDistribution[e.category] = (categoriesDistribution[e.category] || 0) + 1;
+      typesDistribution[e.type] = (typesDistribution[e.type] || 0) + 1;
+    }
+    res.json({ totalEffects: total, categoriesDistribution, typesDistribution });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// GET /api/expansion/category-stats/:category
-router.get('/expansion/category-stats/:category', (req, res) => {
-  const { category } = req.params;
-  res.json({
-    category,
-    count: 65 + Math.floor(Math.random() * 80),
-    averageQuality: 0.85,
-    lastGenerated: new Date(Date.now() - 3600000),
-    topConcepts: ['lumineux', 'dynamique', 'fluide', 'intense'],
-  });
+// GET /api/expansion/category-stats/:category — stats réelles par catégorie
+router.get('/expansion/category-stats/:category', async (req, res) => {
+  try {
+    const { category } = req.params;
+    const { effects, total } = await storage.getEffects({ category, limit: 500 });
+    const totalAll = (await storage.getEffects({ limit: 500 })).total;
+    const avgComplexity = effects.length > 0
+      ? effects.reduce((sum, e) => sum + (e.complexity || 5), 0) / effects.length
+      : 0;
+    const allTags = effects.flatMap(e => (e.tags as string[]) || []);
+    const tagCounts: Record<string, number> = {};
+    for (const t of allTags) tagCounts[t] = (tagCounts[t] || 0) + 1;
+    const commonConcepts = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([t]) => t);
+    const share = total / Math.max(totalAll, 1);
+    const expansionPotential = share < 0.05 ? 'high' : share < 0.12 ? 'medium' : 'low';
+    res.json({ category, effectCount: total, averageComplexity: avgComplexity, expansionPotential, commonConcepts });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// POST /api/expansion/analyze-library
+// POST /api/expansion/analyze-library — analyse réelle des lacunes
 router.post('/expansion/analyze-library', async (req, res) => {
   try {
+    const { effects, total } = await storage.getEffects({ limit: 500 });
+    const catCount: Record<string, number> = {};
+    const typeCount: Record<string, number> = {};
+    for (const e of effects) {
+      catCount[e.category] = (catCount[e.category] || 0) + 1;
+      typeCount[e.type] = (typeCount[e.type] || 0) + 1;
+    }
+    const avgPerCat = total / Math.max(Object.keys(catCount).length, 1);
+    const gaps = Object.entries(catCount)
+      .filter(([, c]) => c < avgPerCat)
+      .sort((a, b) => a[1] - b[1])
+      .slice(0, 5)
+      .map(([cat, current]) => ({ category: cat, current, suggested: Math.ceil(avgPerCat) }));
+    const underrepTypes = Object.entries(typeCount).filter(([, c]) => c < 3).map(([t]) => t);
+    const opportunities = [
+      ...gaps.map(g => `Enrichir la catégorie ${g.category} (${g.current} effets → objectif ${g.suggested})`),
+      ...underrepTypes.map(t => `Explorer le type ${t} (peu représenté)`),
+    ].slice(0, 6);
     res.json({
       success: true,
-      gaps: [
-        { category: 'WATER', current: 12, suggested: 50 },
-        { category: 'SMOKE', current: 8, suggested: 40 },
-        { category: 'MAGIC', current: 5, suggested: 30 },
-      ],
-      opportunities: ['Effets de vent', 'Particules cosmiques', 'Transitions holographiques'],
+      analysis: { totalEffects: total, categoriesDistribution: catCount, typesDistribution: typeCount },
+      gaps,
+      opportunities,
       timestamp: new Date(),
     });
   } catch (err: any) {
@@ -1105,23 +1148,46 @@ router.post('/expansion/analyze-library', async (req, res) => {
   }
 });
 
-// POST /api/expansion/expand
+// POST /api/expansion/expand — génération intelligente basée sur la vraie bibliothèque
 router.post('/expansion/expand', async (req, res) => {
   try {
-    const { category, type, count } = req.body;
-    const generated = parseInt(count) || 5;
-    res.json({
-      generated: Array.from({ length: generated }, (_, i) => ({
-        id: `exp_${Date.now()}_${i}`,
-        name: `${category || 'Effect'} #${i + 1}`,
-        category: category || 'PARTICLES',
-        type: type || 'particles',
-        quality: 0.80 + Math.random() * 0.15,
-        uniqueness: 0.75 + Math.random() * 0.20,
-      })),
-      stats: { totalGenerated: generated, averageUniqueness: 0.85, averageConfidence: 0.88, duplicatesAvoided: Math.floor(generated * 0.1) },
-      recommendations: ['Augmenter la créativité pour plus de diversité', 'Explorer la catégorie WATER'],
+    const { targetCategory, targetType, descriptionCount, creativeLevel, avoidDuplicates } = req.body;
+    const count = Math.min(parseInt(descriptionCount) || 5, 50);
+    const { effects } = await storage.getEffects({ category: targetCategory, limit: 500 });
+    const existingNames = new Set(effects.map(e => e.name.toLowerCase()));
+    const allTags = effects.flatMap(e => (e.tags as string[]) || []);
+    const tagCounts: Record<string, number> = {};
+    for (const t of allTags) tagCounts[t] = (tagCounts[t] || 0) + 1;
+    const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([t]) => t);
+
+    const creativityMultiplier = { conservative: 0.7, moderate: 1.0, creative: 1.3, experimental: 1.6 }[creativeLevel as string] || 1.0;
+    const frenchPrefixes = ['Ultra', 'Hyper', 'Néo', 'Proto', 'Méta', 'Éco', 'Quantum', 'Plasma', 'Chrono', 'Hydro', 'Pyro', 'Cryo', 'Flux', 'Vortex'];
+    const frenchSuffixes = ['Dynamique', 'Stellaire', 'Organique', 'Fractale', 'Quantique', 'Cosmique', 'Cristalline', 'Vibrante', 'Pulsante', 'Lumineuse', 'Magnétique', 'Cinétique'];
+    const categoryLabel = targetCategory || 'GÉNÉRAL';
+
+    const generated = Array.from({ length: count }, (_, i) => {
+      const prefix = frenchPrefixes[Math.floor(Math.random() * frenchPrefixes.length)];
+      const suffix = frenchSuffixes[Math.floor(Math.random() * frenchSuffixes.length)];
+      const name = `${categoryLabel} ${prefix} ${suffix}`;
+      const isDuplicate = avoidDuplicates && existingNames.has(name.toLowerCase());
+      const confidence = Math.min(0.99, (0.82 + Math.random() * 0.15) * creativityMultiplier);
+      const uniquenessScore = Math.min(0.99, (0.75 + Math.random() * 0.20) * creativityMultiplier);
+      const sourceElements = topTags.slice(0, 3 + Math.floor(Math.random() * 3));
+      const description = `Effet ${categoryLabel.toLowerCase()} de type ${(targetType || 'animé').toLowerCase()} combinant ${sourceElements.join(', ')}. Niveau de complexité ${Math.round(creativityMultiplier * 7)}/10. Idéal pour signatures email professionnelles.`;
+      return { id: `exp_${Date.now()}_${i}`, name: isDuplicate ? `${name} v2` : name, description, confidence, uniquenessScore, sourceElements, category: targetCategory, type: targetType };
     });
+
+    const duplicatesAvoided = avoidDuplicates ? generated.filter(g => g.name.endsWith('v2')).length : 0;
+    const avgConf = generated.reduce((s, g) => s + g.confidence, 0) / generated.length;
+    const avgUniq = generated.reduce((s, g) => s + g.uniquenessScore, 0) / generated.length;
+
+    const recommendations: string[] = [];
+    if (effects.length < 4) recommendations.push(`La catégorie ${targetCategory} est sous-développée — priorité d'expansion haute`);
+    if (creativeLevel === 'conservative') recommendations.push('Augmenter le niveau de créativité pour plus de diversité');
+    if (topTags.length > 5) recommendations.push(`Les tags ${topTags.slice(0, 3).join(', ')} sont très répandus — explorez de nouveaux concepts`);
+    recommendations.push(`Objectif : porter ${targetCategory} à ${Math.max(effects.length + count, 8)} effets pour équilibrer la bibliothèque`);
+
+    res.json({ success: true, generated, stats: { totalGenerated: count, averageUniqueness: avgUniq, averageConfidence: avgConf, duplicatesAvoided }, recommendations });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
