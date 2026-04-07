@@ -32,7 +32,7 @@ export class SignatureSVGExporter {
       svgContent,
       filename,
       metadata: {
-        cycle_total: 240,
+        cycle_total: 80,
         variations_count: 4,
         dimensions: `${width}px x ${height}px`,
         compatible_clients: ['gmail', 'outlook', 'apple_mail'],
@@ -86,102 +86,90 @@ ${logoHideCSS}
       /* Variation layer visibility orchestration */
       #layer-var-a, #layer-var-b, #layer-var-c, #layer-var-d {
         opacity: 0;
+        will-change: opacity;
       }
 
-      /* === TIMING ORCHESTRATION (240s cycle) === */
+      /* ================================================================
+         TIMING ORCHESTRATION — 80s cycle | CROSSFADE CONTINU (no gap)
+         Principe : chaque variation se CHEVAUCHE avec la suivante.
+         A s'éteint pendant que B s'allume → zéro zone morte.
+         Chaque variation visible ~20s | Transition crossfade 2s
+         ================================================================ */
 
-      /* VAR A: appears at 0s, fades at 8s, gone by 10s */
-      #layer-var-a {
-        animation: layer-fade-a 240s ease-in-out 0s infinite;
-      }
-      /* VAR B: appears at 60s, fades at 70s */
-      #layer-var-b {
-        animation: layer-fade-b 240s ease-in-out 0s infinite;
-      }
-      /* VAR C: appears at 120s, fades at 130s */
-      #layer-var-c {
-        animation: layer-fade-c 240s ease-in-out 0s infinite;
-      }
-      /* VAR D: appears at 180s, fades at 190s */
-      #layer-var-d {
-        animation: layer-fade-d 240s ease-in-out 0s infinite;
-      }
+      /* Cycle 80s : A→B→C→D→A en boucle parfaite sans blanc */
+      #layer-var-a { animation: layer-fade-a 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-b { animation: layer-fade-b 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-c { animation: layer-fade-c 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-d { animation: layer-fade-d 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
 
+      /* A : 0%→2.5% montée | 2.5%→22.5% présent | 22.5%→25% descente  */
       @keyframes layer-fade-a {
-        0%       { opacity: 0; }
-        0.5%     { opacity: 0; }
-        2%       { opacity: 1; }
-        22%      { opacity: 1; }
-        24%      { opacity: 0; }
-        100%     { opacity: 0; }
+        0%      { opacity: 0; }
+        2.5%    { opacity: 1; }
+        22.5%   { opacity: 1; }
+        25%     { opacity: 0; }
+        98%     { opacity: 0; }
+        100%    { opacity: 0; }
       }
 
+      /* B : 22.5%→25% montée (chevauche la descente de A) | 25%→47.5% présent | 47.5%→50% descente */
       @keyframes layer-fade-b {
-        0%       { opacity: 0; }
-        24%      { opacity: 0; }
-        25.5%    { opacity: 1; }
-        48%      { opacity: 1; }
-        49.5%    { opacity: 0; }
-        100%     { opacity: 0; }
+        0%      { opacity: 0; }
+        22.5%   { opacity: 0; }
+        25%     { opacity: 1; }
+        47.5%   { opacity: 1; }
+        50%     { opacity: 0; }
+        100%    { opacity: 0; }
       }
 
+      /* C : 47.5%→50% montée | 50%→72.5% présent | 72.5%→75% descente */
       @keyframes layer-fade-c {
-        0%       { opacity: 0; }
-        49.5%    { opacity: 0; }
-        51%      { opacity: 1; }
-        73%      { opacity: 1; }
-        74.5%    { opacity: 0; }
-        100%     { opacity: 0; }
+        0%      { opacity: 0; }
+        47.5%   { opacity: 0; }
+        50%     { opacity: 1; }
+        72.5%   { opacity: 1; }
+        75%     { opacity: 0; }
+        100%    { opacity: 0; }
       }
 
+      /* D : 72.5%→75% montée | 75%→97.5% présent | 97.5%→100% descente → retour à A */
       @keyframes layer-fade-d {
-        0%       { opacity: 0; }
-        74.5%    { opacity: 0; }
-        76%      { opacity: 1; }
-        98%      { opacity: 1; }
-        99.5%    { opacity: 0; }
-        100%     { opacity: 0; }
+        0%      { opacity: 0; }
+        72.5%   { opacity: 0; }
+        75%     { opacity: 1; }
+        97.5%   { opacity: 1; }
+        100%    { opacity: 0; }
+      }
+
+      /* Couche de base — toujours visible, fond de scène permanent */
+      #layer-base { opacity: 1; }
+      #bg-base    { opacity: 1; }
+
+      /* Respiration légère sur le fond : la signature est vivante même au repos */
+      @keyframes sig-base-breathe {
+        0%, 100% { filter: brightness(1);   }
+        50%      { filter: brightness(1.04); }
+      }
+      #layer-base {
+        animation: sig-base-breathe 14s ease-in-out 0s infinite;
       }
 
       /* Internal variation animations timing */
-      /* VAR A internal elements (particles excluded — they have individual calc() durations) */
       #var-a, #var-a-halo, #var-a-shimmer, #var-a-sep {
         animation-duration: 10s;
         animation-iteration-count: infinite;
       }
-
-      /* VAR B internal elements */
       #var-b, #var-b-wave1, #var-b-wave2, #var-b-logo-glow, #var-b-sep {
         animation-duration: 10s;
         animation-iteration-count: infinite;
       }
-
-      /* VAR C internal elements (particles excluded — they have individual calc() durations) */
       #var-c, #var-c-ring, #var-c-shimmer, #var-c-sep {
         animation-duration: 10s;
         animation-iteration-count: infinite;
       }
-
-      /* VAR D internal elements */
       #var-d, #var-d-outer, #var-d-inner, #var-d-cta, #var-d-sep, #var-d-logo {
         animation-duration: 10s;
         animation-iteration-count: infinite;
-      }
-
-      /* Micro-variation on repetitions: subtle scale + hue shift */
-      #layer-var-a { animation-timing-function: ease-in-out; }
-      #layer-var-b { animation-timing-function: ease-in-out; }
-      #layer-var-c { animation-timing-function: ease-in-out; }
-      #layer-var-d { animation-timing-function: ease-in-out; }
-
-      /* Base layer always on top */
-      #layer-base {
-        opacity: 1;
-      }
-
-      /* Static background always visible */
-      #bg-base {
-        opacity: 1;
       }
 
     </style>
@@ -222,18 +210,22 @@ ${logoHideCSS}
   private buildTimingCSS(): string {
     return `      /* Timing custom properties */
       :root {
-        --cycle: 240s;
+        --cycle: 80s;
         --fade-dur: 2s;
+        --mouse-x: 0.5;
+        --mouse-y: 0.5;
+        --energy: 1;
       }`;
   }
 
   private buildTransitionCSS(): string {
-    return `      /* Smooth cross-fade transitions between variations */
-      .var-layer-enter {
-        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      .var-layer-exit {
-        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    return `      /* Smooth cross-fade transitions between variations — cubic-bezier */
+      .var-layer-enter { animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+      .var-layer-exit  { animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+      /* Micro-parallax réactif à la souris via CSS custom properties */
+      #layer-var-a, #layer-var-b, #layer-var-c, #layer-var-d {
+        transform-origin: center;
+        transition: filter 0.8s ease;
       }`;
   }
 }

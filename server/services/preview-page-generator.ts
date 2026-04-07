@@ -385,7 +385,13 @@ export async function generatePreviewPage(params: {
       <div class="gmail-sig-zone">
         ${svgContent}
       </div>
-      <div class="cycle-counter" id="cycle-counter">CYCLE A · 00:00</div>
+      <!-- Barre d'énergie du cycle + compteur -->
+      <div style="margin-top:10px;">
+        <div id="energy-bar" style="height:2px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+          <div id="energy-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,${accent}88,${accent});border-radius:2px;transition:width 0.5s ease;"></div>
+        </div>
+        <div class="cycle-counter" id="cycle-counter" style="margin-top:4px;">VARIATION A · 00:00</div>
+      </div>
     </div>
   </div>
 </section>
@@ -458,22 +464,200 @@ export async function generatePreviewPage(params: {
 </footer>
 
 <script>
-  // ── Cycle counter ──
+  // ══════════════════════════════════════════════════════════════════
+  //  EFFECTFORGE — MOTEUR D'ANIMATION INTERACTIVE
+  //  Cycle counter + Mouse tracking + Viewport restart + Sparkles
+  // ══════════════════════════════════════════════════════════════════
+
   (function() {
-    const variants = ['A', 'B', 'C', 'D'];
-    const cycleTotal = ${metadata.cycle_total || 240};
-    const varDur = cycleTotal / 4;
+
+    // ── 1. CYCLE COUNTER ─────────────────────────────────────────
+    const CYCLE = ${metadata.cycle_total || 80};
+    const VAR_DUR = CYCLE / 4;
+    const VARS = ['A', 'B', 'C', 'D'];
     let elapsed = 0;
-    const el = document.getElementById('cycle-counter');
-    if (!el) return;
-    setInterval(() => {
-      elapsed = (elapsed + 1) % cycleTotal;
-      const varIdx = Math.floor(elapsed / varDur);
-      const varElapsed = elapsed % varDur;
+    const counterEl = document.getElementById('cycle-counter');
+
+    setInterval(function() {
+      elapsed = (elapsed + 1) % CYCLE;
+      const varIdx = Math.floor(elapsed / VAR_DUR);
+      const varElapsed = elapsed % VAR_DUR;
       const m = Math.floor(varElapsed / 60).toString().padStart(2, '0');
       const s = (varElapsed % 60).toString().padStart(2, '0');
-      el.textContent = 'CYCLE ' + variants[varIdx] + ' · ' + m + ':' + s;
+      if (counterEl) counterEl.textContent = 'VARIATION ' + VARS[varIdx] + ' · ' + m + ':' + s;
     }, 1000);
+
+    // ── 2. PARALLAX SOURIS — La signature réagit au mouvement ────
+    // Utilise des CSS custom properties pour créer un micro-parallax
+    const sigZone = document.querySelector('.gmail-sig-zone');
+    const gmailMock = document.querySelector('.gmail-mock');
+
+    if (gmailMock) {
+      gmailMock.addEventListener('mousemove', function(e) {
+        const rect = gmailMock.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) / rect.width;
+        const my = (e.clientY - rect.top) / rect.height;
+
+        // Tilt subtle 3D sur le mock Gmail (1.5° max)
+        const tiltX = (my - 0.5) * -3;
+        const tiltY = (mx - 0.5) * 3;
+        gmailMock.style.transform = 'perspective(1200px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale(1.005)';
+        gmailMock.style.transition = 'transform 0.15s ease-out';
+
+        // Met à jour les variables CSS dans le SVG si accessible
+        const svgEl = gmailMock.querySelector('svg');
+        if (svgEl) {
+          svgEl.style.setProperty('--mouse-x', mx.toFixed(3));
+          svgEl.style.setProperty('--mouse-y', my.toFixed(3));
+        }
+
+        // Spawn sparkle à la position de la souris (throttlé à 120ms)
+        if (!gmailMock._lastSparkle || Date.now() - gmailMock._lastSparkle > 120) {
+          gmailMock._lastSparkle = Date.now();
+          spawnSparkle(e.clientX, e.clientY, '${accent}');
+        }
+      });
+
+      gmailMock.addEventListener('mouseleave', function() {
+        gmailMock.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)';
+        gmailMock.style.transition = 'transform 0.6s cubic-bezier(0.4,0,0.2,1)';
+      });
+    }
+
+    // ── 3. RESTART AU SURVOL — Force un "burst" d'énergie ────────
+    // Quand la souris entre sur la signature, toutes les animations
+    // internes sont relancées pour créer une sensation de réactivité
+    let restartTimeout = null;
+    if (sigZone) {
+      sigZone.addEventListener('mouseenter', function() {
+        if (restartTimeout) clearTimeout(restartTimeout);
+        restartTimeout = setTimeout(function() {
+          restartSVGAnimations(sigZone);
+        }, 80);
+      });
+    }
+
+    function restartSVGAnimations(container) {
+      const svgEl = container.querySelector('svg');
+      if (!svgEl) return;
+      // Technique : retirer et ré-ajouter la propriété animation-play-state
+      // pour forcer un restart des animations CSS
+      const animated = svgEl.querySelectorAll('[style*="animation"]');
+      animated.forEach(function(el) {
+        el.style.animationPlayState = 'paused';
+      });
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          animated.forEach(function(el) {
+            el.style.animationPlayState = 'running';
+          });
+        });
+      });
+    }
+
+    // ── 4. INTERSECTION OBSERVER — Restart en entrant dans le viewport ──
+    // Quand l'utilisateur scroll et arrive sur la signature :
+    // les animations se re-déclenchent avec plein d'énergie
+    if ('IntersectionObserver' in window && sigZone) {
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            // Un petit délai pour que la signature soit bien visible
+            setTimeout(function() {
+              restartSVGAnimations(entry.target);
+              // Effet de "réveil" sur le mock
+              if (gmailMock) {
+                gmailMock.style.transform = 'scale(1.01)';
+                setTimeout(function() {
+                  gmailMock.style.transform = 'scale(1)';
+                  gmailMock.style.transition = 'transform 0.8s cubic-bezier(0.34,1.56,0.64,1)';
+                }, 150);
+              }
+            }, 200);
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(sigZone);
+    }
+
+    // ── 5. PULSE PÉRIODIQUE — Renforce l'illusion de non-stop ────
+    // Toutes les 25s, un "souffle" subtil traverse la signature
+    // pour que l'utilisateur ait toujours l'impression qu'elle est vivante
+    let pulseCount = 0;
+    setInterval(function() {
+      pulseCount++;
+      if (!sigZone) return;
+      const svgEl = sigZone.querySelector('svg');
+      if (!svgEl) return;
+
+      // Souffle doux : brightness augmente brièvement
+      svgEl.style.filter = 'brightness(1.08) saturate(1.1)';
+      svgEl.style.transition = 'filter 1.2s ease';
+      setTimeout(function() {
+        svgEl.style.filter = 'brightness(1) saturate(1)';
+      }, 1200);
+
+      // Spawn plusieurs sparkles pour marquer le pulse
+      if (sigZone) {
+        const rect = sigZone.getBoundingClientRect();
+        for (let i = 0; i < 4; i++) {
+          setTimeout(function() {
+            const rx = rect.left + Math.random() * rect.width;
+            const ry = rect.top + Math.random() * rect.height;
+            spawnSparkle(rx, ry, '${accent}');
+          }, i * 150);
+        }
+      }
+    }, 25000);
+
+    // ── 6. EFFET SPARKLE — Particules visuelles sur interaction ──
+    function spawnSparkle(x, y, color) {
+      const spark = document.createElement('div');
+      const size = 3 + Math.random() * 4;
+      const vx = (Math.random() - 0.5) * 60;
+      const vy = -20 - Math.random() * 40;
+      spark.style.cssText = [
+        'position:fixed',
+        'pointer-events:none',
+        'border-radius:50%',
+        'z-index:9999',
+        'width:' + size + 'px',
+        'height:' + size + 'px',
+        'left:' + (x - size/2) + 'px',
+        'top:' + (y - size/2) + 'px',
+        'background:' + color,
+        'box-shadow:0 0 ' + (size*2) + 'px ' + color,
+        'transition:none',
+        'opacity:0.9',
+      ].join(';');
+      document.body.appendChild(spark);
+
+      let frame = 0;
+      const totalFrames = 30 + Math.floor(Math.random() * 20);
+      function tick() {
+        frame++;
+        const progress = frame / totalFrames;
+        const cy = y + vy * progress + 30 * progress * progress;
+        const cx = x + vx * progress;
+        spark.style.left = (cx - size/2) + 'px';
+        spark.style.top  = (cy - size/2) + 'px';
+        spark.style.opacity = (0.9 * (1 - progress)).toString();
+        if (frame < totalFrames) requestAnimationFrame(tick);
+        else spark.remove();
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // ── 7. INDICATEUR D'ÉNERGIE — Barre de vie visuelle ──────────
+    // Une fine barre en bas du mock montre le cycle actuel en temps réel
+    const energyBar = document.getElementById('energy-bar-fill');
+    if (energyBar) {
+      setInterval(function() {
+        const pct = ((elapsed / CYCLE) * 100).toFixed(1);
+        energyBar.style.width = pct + '%';
+      }, 500);
+    }
+
   })();
 
   // ── Copie 1-clic ──
@@ -481,25 +665,17 @@ export async function generatePreviewPage(params: {
     const b64 = btn.getAttribute('data-code');
     if (!b64) return;
     let decoded;
-    try {
-      decoded = decodeURIComponent(escape(atob(b64)));
-    } catch(e) {
-      decoded = atob(b64);
-    }
+    try { decoded = decodeURIComponent(escape(atob(b64))); }
+    catch(e) { decoded = atob(b64); }
     navigator.clipboard.writeText(decoded).then(function() {
       const orig = btn.innerHTML;
       btn.innerHTML = '✅ Copié !';
       btn.classList.add('copied');
-      setTimeout(function() {
-        btn.innerHTML = orig;
-        btn.classList.remove('copied');
-      }, 2000);
+      setTimeout(function() { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
     }).catch(function() {
-      // Fallback pour les navigateurs sans clipboard API
       const ta = document.createElement('textarea');
       ta.value = decoded;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
+      ta.style.cssText = 'position:fixed;opacity:0';
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');
@@ -507,10 +683,7 @@ export async function generatePreviewPage(params: {
       const orig = btn.innerHTML;
       btn.innerHTML = '✅ Copié !';
       btn.classList.add('copied');
-      setTimeout(function() {
-        btn.innerHTML = orig;
-        btn.classList.remove('copied');
-      }, 2000);
+      setTimeout(function() { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
     });
   }
 </script>
