@@ -57,25 +57,39 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
   const sp  = e.speed;
   const pfx = `${varId}-logo`;
 
-  // Si on a un logo URL, on crée une copie animée positionnée exactement par-dessus le logo statique
   const hasLogo = !!logoUrl;
+
+  // ── Helpers : élément logo animable (image OU groupe texte) ──────────────
+  // Pour les effets de TRANSFORMATION (3D, scale, gyro…) — avec style CSS d'animation
+  const animLogoEl = (animStyle: string, extraFilter = '') => {
+    if (hasLogo) {
+      return `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet" style="${animStyle}${extraFilter ? ` filter:url(#${extraFilter});` : ''}"/>`;
+    }
+    // Pas d'image : on anime le groupe logo-texte via <use> dans son espace local (translate 16,16)
+    return `<g transform="translate(16,16)"><g id="${pfx}-txt-anim" style="${animStyle}${extraFilter ? ` filter:url(#${extraFilter});` : ''} transform-box:fill-box; transform-origin:center;"><use href="#logo-bg"/><use href="#company-logo-text"/></g></g>`;
+  };
+
+  // Pour les effets DÉCORATIFS autour du logo (halo, orbite…) — logo statique en référence
+  const staticLogoEl = () => {
+    if (hasLogo) {
+      return `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>`;
+    }
+    return `<g transform="translate(16,16)"><use href="#logo-bg"/><use href="#company-logo-text"/></g>`;
+  };
 
   switch (e.effet_id) {
 
     case 'LOGO_3D_FLOAT': {
       const deg = Math.round(8 * i);
       const dur = d_fn(8, sp);
-      const animLogoEl = hasLogo
-        ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"
-            style="animation:${pfx}-float3d ${dur} ease-in-out ${delay}s infinite; transform-box:fill-box; transform-origin:center; filter:url(#${pfx}-f3d);"/>`
-        : '';
+      const animStyle = `animation:${pfx}-float3d ${dur} ease-in-out ${delay}s infinite; transform-box:fill-box; transform-origin:center;`;
       return {
         filterDefs: `<filter id="${pfx}-f3d"><feDropShadow dx="${deg/2}" dy="0" stdDeviation="${deg}" flood-color="${col}" flood-opacity="${i * 0.4}"/></filter>`,
         keyframes: `@keyframes ${pfx}-float3d {
           0%,100% { transform: perspective(600px) rotateY(-${deg}deg) translateZ(0px); }
           50%      { transform: perspective(600px) rotateY(${deg}deg) translateZ(${Math.round(12*i)}px); }
         }`,
-        elements: `${animLogoEl}
+        elements: `${animLogoEl(animStyle, `${pfx}-f3d`)}
         <ellipse id="${pfx}-shadow" cx="${LOGO_X + LOGO_W/2}" cy="${LOGO_Y + LOGO_H + 6}" rx="${40*i}" ry="${6*i}" fill="${col}" fill-opacity="${i*0.3}" style="animation:${pfx}-float3d ${dur} ease-in-out ${delay}s infinite; transform-box:fill-box; transform-origin:center;"/>`,
       };
     }
@@ -84,17 +98,14 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
       const dur = d_fn(6, sp);
       const sx  = 1 + 0.06 * i;
       const sy  = 1 + 0.04 * i;
-      const animLogoEl = hasLogo
-        ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"
-            style="animation:${pfx}-breathe-img ${dur} cubic-bezier(.4,0,.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center; filter:url(#${pfx}-glow);"/>`
-        : '';
+      const animStyle = `animation:${pfx}-breathe-img ${dur} cubic-bezier(.4,0,.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center;`;
       return {
         filterDefs: `<filter id="${pfx}-glow"><feGaussianBlur stdDeviation="${2*i}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
         keyframes: `@keyframes ${pfx}-breathe-img {
           0%,100% { transform: scale(1,1); }
           50%      { transform: scale(${sx.toFixed(3)},${sy.toFixed(3)}); }
         }`,
-        elements: `${animLogoEl}
+        elements: `${animLogoEl(animStyle, `${pfx}-glow`)}
         <circle id="${pfx}-halo" cx="${LOGO_X + LOGO_W/2}" cy="${LOGO_Y + LOGO_H/2}" r="${Math.max(LOGO_W, LOGO_H)/2 + 8 + 6*i}" fill="${col}" fill-opacity="${i*0.12}" style="animation:${pfx}-breathe-img ${dur} cubic-bezier(.4,0,.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center;"/>`,
       };
     }
@@ -103,17 +114,14 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
       const dur = d_fn(12, sp);
       const rx = Math.round(3 * i);
       const ry = Math.round(5 * i);
-      const animLogoEl = hasLogo
-        ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"
-            style="animation:${pfx}-gyro-img ${dur} ease-in-out ${delay}s infinite alternate; transform-box:fill-box; transform-origin:center; filter:url(#${pfx}-gyro);"/>`
-        : '';
+      const gyroStyle = `animation:${pfx}-gyro-img ${dur} ease-in-out ${delay}s infinite alternate; transform-box:fill-box; transform-origin:center;`;
       return {
         filterDefs: `<filter id="${pfx}-gyro"><feDropShadow dx="${ry}" dy="${rx}" stdDeviation="${ry}" flood-color="${col}" flood-opacity="${i*0.35}"/></filter>`,
         keyframes: `@keyframes ${pfx}-gyro-img {
           0%   { transform: perspective(800px) rotateX(-${rx}deg) rotateY(${ry}deg); }
           100% { transform: perspective(800px) rotateX(${rx}deg) rotateY(-${ry}deg); }
         }`,
-        elements: `${animLogoEl}
+        elements: `${animLogoEl(gyroStyle, `${pfx}-gyro`)}
         <ellipse id="${pfx}-tilt-shadow" cx="${LOGO_X + LOGO_W/2}" cy="${LOGO_Y + LOGO_H + 5}" rx="${38*i}" ry="${5*i}" fill="${col}" fill-opacity="${i*0.25}" style="animation:${pfx}-gyro-img ${dur} ease-in-out ${delay}s infinite alternate; transform-box:fill-box; transform-origin:center;"/>`,
       };
     }
@@ -188,8 +196,6 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
 
     case 'LOGO_METAL_BRUSH': {
       const dur = d_fn(4, sp);
-      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet" style="filter:url(#${pfx}-metal-over);"/>`
-        : '';
       return {
         filterDefs: `<linearGradient id="${pfx}-metal" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%"   stop-color="${col}" stop-opacity="0"/>
@@ -204,7 +210,7 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
         </filter>`,
         keyframes: '',
         elements: `<rect x="${LOGO_X-2}" y="${LOGO_Y-2}" width="${LOGO_W+4}" height="${LOGO_H+4}" fill="url(#${pfx}-metal)" fill-opacity="1" rx="3"/>
-        ${logoEl}`,
+        ${animLogoEl('', `${pfx}-metal-over`)}`,
       };
     }
 
