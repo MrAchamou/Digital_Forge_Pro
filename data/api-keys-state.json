@@ -1,5 +1,5 @@
 {
-  "lastSaved": "2026-04-07T10:29:01.702Z",
+  "lastSaved": "2026-04-07T10:31:02.054Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
@@ -142,17 +142,17 @@
       "lastError": null
     },
     "serper_1": {
-      "usageToday": 0,
+      "usageToday": 2,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 0,
-      "avgResponseTime": 0,
-      "healthScore": 100,
-      "callsLastHour": 0,
+      "successCount": 2,
+      "avgResponseTime": 1023,
+      "healthScore": 90,
+      "callsLastHour": 2,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
-      "lastUsed": null,
+      "lastUsed": "2026-04-07T10:30:55.826Z",
       "lastError": null
     },
     "serper_2": {
@@ -213,6 +213,7 @@
     }
   },
   "monthlyUsage": {
-    "cerebras_2026-04": 6
+    "cerebras_2026-04": 6,
+    "serper_2026-04": 4
   }
 }

@@ -67,6 +67,23 @@ export class SignatureSVGExporter {
   <title>Email Signature</title>
 
   <defs>
+    <!-- Dégradé de fond principal — profondeur premium -->
+    <linearGradient id="grad-bg-main" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${c0}"/>
+      <stop offset="70%" stop-color="${c0}"/>
+      <stop offset="100%" stop-color="${c0}" stop-opacity="0.82"/>
+    </linearGradient>
+    <!-- Lumière directionnelle douce depuis le logo -->
+    <radialGradient id="grad-logo-spotlight" cx="76" cy="90" r="72" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="${c1}" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="${c0}" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Halo angulaire depuis le coin supérieur droit (accent) -->
+    <radialGradient id="grad-corner-glow" cx="100%" cy="0%" r="60%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="${c1}" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="${c0}" stop-opacity="0"/>
+    </radialGradient>
+
     ${globalDefs}
 
     <style>
@@ -175,8 +192,12 @@ ${logoHideCSS}
     </style>
   </defs>
 
-  <!-- ===== LAYER 0: Static Background ===== -->
-  <rect id="bg-root" x="0" y="0" width="${width}" height="${height}" fill="${c0}" rx="12"/>
+  <!-- ===== LAYER 0: Background dégradé premium ===== -->
+  <rect id="bg-root" x="0" y="0" width="${width}" height="${height}" fill="url(#grad-bg-main)" rx="12"/>
+  <!-- Lumière douce autour du logo -->
+  <rect x="0" y="0" width="${width}" height="${height}" fill="url(#grad-logo-spotlight)" rx="12"/>
+  <!-- Halo accent depuis le coin -->
+  <rect x="0" y="0" width="${width}" height="${height}" fill="url(#grad-corner-glow)" rx="12"/>
 
   <!-- ===== LAYER 1: Static Base — Always Visible ===== -->
   <!-- Logo statique masqué par CSS ; chaque variation en fournit une copie animée -->

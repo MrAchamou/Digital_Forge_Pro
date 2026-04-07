@@ -429,12 +429,188 @@ function LogoSection({ form, onUpdate }: { form: FormData; onUpdate: (data: Part
   );
 }
 
+// ─── Palette Presets ─────────────────────────────────────────────────────────
+
+const GRADIENT_PRESETS = [
+  {
+    name: "Or Noir",      emoji: "✨",
+    colors: ["#0d0d1a", "#c9a84c", "#f0e6c8"],
+    grad: "linear-gradient(135deg, #0d0d1a 0%, #c9a84c 60%, #f0e6c8 100%)",
+  },
+  {
+    name: "Cyber Azure",  emoji: "⚡",
+    colors: ["#020b18", "#00d4ff", "#e0f7ff"],
+    grad: "linear-gradient(135deg, #020b18 0%, #00d4ff 55%, #e0f7ff 100%)",
+  },
+  {
+    name: "Luxe Rose",    emoji: "🌸",
+    colors: ["#130510", "#e879a0", "#fde8f0"],
+    grad: "linear-gradient(135deg, #130510 0%, #e879a0 55%, #fde8f0 100%)",
+  },
+  {
+    name: "Émeraude",     emoji: "💚",
+    colors: ["#061410", "#22c55e", "#d1fae5"],
+    grad: "linear-gradient(135deg, #061410 0%, #22c55e 55%, #d1fae5 100%)",
+  },
+  {
+    name: "Bordeaux",     emoji: "🍷",
+    colors: ["#130208", "#be185d", "#fce7f3"],
+    grad: "linear-gradient(135deg, #130208 0%, #be185d 55%, #fce7f3 100%)",
+  },
+  {
+    name: "Sunset Pro",   emoji: "🌅",
+    colors: ["#180800", "#f97316", "#fff0e0"],
+    grad: "linear-gradient(135deg, #180800 0%, #f97316 55%, #fff0e0 100%)",
+  },
+  {
+    name: "Violet Luxe",  emoji: "💜",
+    colors: ["#0c0818", "#7c3aed", "#ede9fe"],
+    grad: "linear-gradient(135deg, #0c0818 0%, #7c3aed 55%, #ede9fe 100%)",
+  },
+  {
+    name: "Titane",       emoji: "🔩",
+    colors: ["#0c0e12", "#94a3b8", "#f1f5f9"],
+    grad: "linear-gradient(135deg, #0c0e12 0%, #94a3b8 55%, #f1f5f9 100%)",
+  },
+  {
+    name: "Ivoire Luxe",  emoji: "🤍",
+    colors: ["#f5f0e8", "#c9a84c", "#1a1a2e"],
+    grad: "linear-gradient(135deg, #f5f0e8 0%, #c9a84c 50%, #1a1a2e 100%)",
+  },
+  {
+    name: "Onyx Blanc",   emoji: "🖤",
+    colors: ["#080808", "#e2e8f0", "#ffffff"],
+    grad: "linear-gradient(135deg, #080808 0%, #e2e8f0 55%, #ffffff 100%)",
+  },
+  {
+    name: "Indigo Nuit",  emoji: "🌌",
+    colors: ["#04050f", "#4f46e5", "#c7d2fe"],
+    grad: "linear-gradient(135deg, #04050f 0%, #4f46e5 55%, #c7d2fe 100%)",
+  },
+  {
+    name: "Ambre Forêt",  emoji: "🌿",
+    colors: ["#0a0d08", "#65a30d", "#ecfccb"],
+    grad: "linear-gradient(135deg, #0a0d08 0%, #65a30d 55%, #ecfccb 100%)",
+  },
+];
+
+// ─── Gradient Palette Section ─────────────────────────────────────────────────
+
+function GradientPaletteSection({ form, onUpdate }: { form: FormData; onUpdate: (d: Partial<FormData>) => void }) {
+  const [c0, c1, c2] = form.palette;
+  const activePalette = form.palette;
+
+  const isActive = (preset: typeof GRADIENT_PRESETS[0]) =>
+    preset.colors[0] === activePalette[0] && preset.colors[1] === activePalette[1];
+
+  const previewGrad = `linear-gradient(135deg, ${c0} 0%, ${c1} 55%, ${c2} 100%)`;
+
+  return (
+    <div className="space-y-3">
+      <Label className="text-white/40 text-xs uppercase tracking-wider flex items-center gap-1.5">
+        <span>🎨</span> Palette & Ambiance visuelle
+      </Label>
+
+      {/* Presets en grille */}
+      <div className="grid grid-cols-4 gap-1.5">
+        {GRADIENT_PRESETS.map((preset) => (
+          <button
+            key={preset.name}
+            data-testid={`btn-palette-preset-${preset.name.toLowerCase().replace(/\s+/g, '-')}`}
+            onClick={() => onUpdate({ palette: [...preset.colors] })}
+            title={preset.name}
+            className={`
+              relative group rounded-lg overflow-hidden border transition-all duration-200
+              ${isActive(preset)
+                ? "border-white/50 ring-1 ring-white/30 scale-[1.03]"
+                : "border-white/10 hover:border-white/30 hover:scale-[1.02]"}
+            `}
+          >
+            {/* Gradient preview */}
+            <div className="w-full h-10" style={{ background: preset.grad }} />
+            {/* Label */}
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-1 bg-gradient-to-t from-black/70 to-transparent">
+              <span className="text-[9px] text-white/90 font-medium leading-tight text-center px-0.5">{preset.name}</span>
+            </div>
+            {/* Checkmark si actif */}
+            {isActive(preset) && (
+              <div className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-white/90 flex items-center justify-center">
+                <svg viewBox="0 0 10 10" className="w-2 h-2"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Aperçu dégradé actuel */}
+      <div className="rounded-xl overflow-hidden border border-white/10" style={{ height: 36, background: previewGrad }}>
+        <div className="h-full flex items-center px-3 gap-2 bg-gradient-to-r from-black/40 to-transparent">
+          <span className="text-xs text-white/80 font-medium">Aperçu dégradé actuel</span>
+          <div className="flex gap-1 ml-auto">
+            {[c0, c1, c2].map((c, i) => (
+              <div key={i} className="w-4 h-4 rounded-full border border-white/30 shadow-inner" style={{ background: c }} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Couleurs personnalisées */}
+      <div>
+        <Label className="text-white/30 text-xs mb-2 block">Personnaliser les couleurs</Label>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { label: "Fond", idx: 0 },
+            { label: "Accent", idx: 1 },
+            { label: "Texte", idx: 2 },
+          ].map(({ label, idx }) => (
+            <div key={idx} className="space-y-1">
+              <span className="text-[10px] text-white/30 uppercase tracking-wider">{label}</span>
+              <div className="relative flex items-center gap-1">
+                <label className="relative cursor-pointer">
+                  <div
+                    className="w-7 h-7 rounded-lg border border-white/20 shadow-inner cursor-pointer"
+                    style={{ background: form.palette[idx] }}
+                  />
+                  <input
+                    type="color"
+                    value={form.palette[idx]}
+                    onChange={e => {
+                      const np = [...form.palette];
+                      np[idx] = e.target.value;
+                      onUpdate({ palette: np });
+                    }}
+                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                    data-testid={`input-color-picker-${idx}`}
+                  />
+                </label>
+                <input
+                  type="text"
+                  value={form.palette[idx]}
+                  onChange={e => {
+                    const np = [...form.palette];
+                    np[idx] = e.target.value;
+                    onUpdate({ palette: np });
+                  }}
+                  className="flex-1 bg-white/5 border border-white/10 text-white text-[10px] h-7 rounded-lg font-mono text-center px-1"
+                  data-testid={`input-palette-hex-${idx}`}
+                  maxLength={7}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Style Visuel avec IA ─────────────────────────────────────────────────────
 
 function StyleVisuelSection({ form, onUpdate }: { form: FormData; onUpdate: (data: Partial<FormData>) => void }) {
   const { toast } = useToast();
   const [styleResult, setStyleResult] = useState<StyleDetectResult | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [showPalette, setShowPalette] = useState(true);
 
   const detectStyleMutation = useMutation({
     mutationFn: async () => {
@@ -517,6 +693,25 @@ function StyleVisuelSection({ form, onUpdate }: { form: FormData; onUpdate: (dat
           )}
         </div>
       )}
+
+      {/* Séparateur + toggle palette */}
+      <div className="pt-1 border-t border-white/8">
+        <button
+          onClick={() => setShowPalette(!showPalette)}
+          className="w-full flex items-center justify-between text-white/30 hover:text-white/60 transition-colors py-0.5"
+          data-testid="button-toggle-palette"
+        >
+          <span className="text-xs uppercase tracking-wider flex items-center gap-1.5">
+            🎨 Palette & dégradés
+          </span>
+          {showPalette ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </button>
+        {showPalette && (
+          <div className="pt-2">
+            <GradientPaletteSection form={form} onUpdate={onUpdate} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1083,28 +1278,6 @@ export default function Studio() {
                     className="bg-white/5 border-white/10 text-white text-xs resize-none" data-testid="input-description" />
                 </div>
 
-                {/* Palette couleurs */}
-                <div>
-                  <Label className="text-white/40 text-xs mb-2 block">Palette couleurs</Label>
-                  <div className="flex gap-2">
-                    {form.palette.map((color, i) => (
-                      <div key={i} className="flex-1 space-y-1">
-                        <div className="w-full h-6 rounded-lg border border-white/20" style={{ background: color }} />
-                        <Input
-                          type="text"
-                          value={color}
-                          onChange={e => {
-                            const newPalette = [...form.palette];
-                            newPalette[i] = e.target.value;
-                            updateForm({ palette: newPalette });
-                          }}
-                          className="bg-white/5 border-white/10 text-white text-xs h-6 font-mono text-center"
-                          data-testid={`input-palette-${i}`}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
                 {/* Note GMB */}
                 {form.note > 0 && (
