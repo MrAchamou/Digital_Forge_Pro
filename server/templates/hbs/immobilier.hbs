@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root {
+    --sig-bg: {{palette.background}};
+    --sig-accent: {{palette.accent}};
+    --sig-text: {{palette.text}};
+    --sig-muted: {{palette.muted}};
+    --sig-border: {{palette.border}};
+  }
+  {{{animation.keyframes}}}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: transparent; font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+  .sig-wrap {
+    display: inline-flex;
+    background: var(--sig-bg);
+    border: 1px solid var(--sig-border);
+    border-radius: 8px;
+    width: {{layout.width}}px;
+    min-height: {{layout.height}}px;
+    overflow: hidden;
+  }
+  .sig-left {
+    width: 200px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px;
+    border-right: 1px solid var(--sig-border);
+    gap: 12px;
+  }
+  .sig-photo-wrap {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--sig-accent);
+    animation: {{animation.cssAnimation}};
+  }
+  .sig-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .sig-photo-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--sig-accent);
+    opacity: 0.2;
+    animation: {{animation.cssAnimation}};
+  }
+  .sig-logo img { height: 32px; width: auto; }
+  .sig-zone {
+    font-size: 11px;
+    color: var(--sig-muted);
+    text-align: center;
+    padding: 4px 10px;
+    border: 1px solid var(--sig-border);
+    border-radius: 20px;
+  }
+  .sig-right {
+    flex: 1;
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .sig-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--sig-text);
+  }
+  .sig-titre {
+    font-size: 12px;
+    color: var(--sig-accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+  .sig-agence {
+    font-size: 13px;
+    color: var(--sig-muted);
+    margin-top: 4px;
+  }
+  .sig-divider {
+    height: 1px;
+    background: linear-gradient(to right, var(--sig-accent), transparent);
+    margin: 12px 0;
+  }
+  .sig-contacts { display: flex; flex-direction: column; gap: 6px; }
+  .sig-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--sig-text);
+    text-decoration: none;
+  }
+  .sig-contact-row:hover { color: var(--sig-accent); }
+  .sig-contact-row.highlight {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--sig-accent);
+  }
+  .sig-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .sig-link {
+    font-size: 11px;
+    color: var(--sig-accent);
+    text-decoration: none;
+    border: 1px solid var(--sig-accent);
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .sig-link:hover { background: var(--sig-accent); color: var(--sig-bg); }
+</style>
+</head>
+<body>
+<div class="sig-wrap">
+  <div class="sig-left">
+    {{#if data.photo_url}}
+    <div class="sig-photo-wrap"><img src="{{data.photo_url}}" alt="{{data.nom}}"></div>
+    {{else}}
+    <div class="sig-photo-placeholder"></div>
+    {{/if}}
+    {{#if data.logo_url}}
+    <div class="sig-logo"><img src="{{data.logo_url}}" alt="logo"></div>
+    {{/if}}
+    {{#if data.zone}}
+    <div class="sig-zone">📍 {{data.zone}}</div>
+    {{/if}}
+  </div>
+  <div class="sig-right">
+    <div>
+      <div class="sig-name">{{data.nom}}</div>
+      <div class="sig-titre">{{data.titre}}</div>
+      {{#if data.agence}}<div class="sig-agence">{{data.agence}}</div>{{/if}}
+    </div>
+    <div class="sig-divider"></div>
+    <div class="sig-contacts">
+      {{#if data.telephone}}
+      <a href="tel:{{data.telephone}}" class="sig-contact-row highlight">
+        📞 {{data.telephone}}
+      </a>
+      {{/if}}
+      {{#if data.email}}
+      <a href="mailto:{{data.email}}" class="sig-contact-row">
+        ✉ {{data.email}}
+      </a>
+      {{/if}}
+    </div>
+    <div class="sig-links">
+      {{#if data.site}}<a href="{{data.site}}" class="sig-link">Annonces</a>{{/if}}
+      {{#if data.linkedin}}<a href="{{data.linkedin}}" class="sig-link">LinkedIn</a>{{/if}}
+    </div>
+  </div>
+</div>
+</body>
+</html>

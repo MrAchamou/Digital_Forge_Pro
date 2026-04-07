@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { storage } from './storage';
 import { buildEffectPreviewHTML, saveEffectPreview, getEffectPreviewHTML } from './services/effect-preview-generator';
-import { getAllTemplates, getSectorTemplate, type SectorId } from './templates/sector-templates';
+import { getAllSectorConfigs, getSectorConfig, renderSignature } from './services/signature-renderer';
 import { classifySector } from './services/sector-classifier';
 import fs from 'fs';
 import path from 'path';
@@ -158,32 +158,82 @@ router.get('/effect/preview/:id', (req, res) => {
   }
 });
 
-// === TEMPLATES DE SECTEUR ===
+// === TEMPLATES DE SECTEUR (JSON + Handlebars) ===
 
 router.get('/signature/templates', (_req, res) => {
-  const templates = getAllTemplates().map(t => ({
-    id: t.id,
-    label: t.label,
-    emoji: t.emoji,
-    description: t.description,
-    layout: t.layout,
-    effects: t.effects,
-    palette: t.palette,
-    tone: t.tone,
-    fieldCount: t.fields.length,
-  }));
-  res.json({ templates, total: templates.length });
+  try {
+    const configs = getAllSectorConfigs();
+    const templates = configs.map(t => ({
+      id: t.id,
+      label: t.label,
+      emoji: t.emoji,
+      description: t.description,
+      layout: t.layout,
+      effects: t.effects,
+      palette: t.palette,
+      animation: { name: t.animation.name, intensity: t.animation.intensity },
+      tone: t.tone,
+      cta: t.cta,
+      fieldCount: t.fields.length,
+    }));
+    res.json({ templates, total: templates.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 router.get('/signature/templates/:sectorId', (req, res) => {
   try {
-    const validIds = ['artisanat','restauration','sante','immobilier','commerce','services_pro','tech','education','loisirs','transport'] as SectorId[];
-    const id = req.params.sectorId as SectorId;
-    if (!validIds.includes(id)) {
-      return res.status(400).json({ error: `Secteur invalide. Valeurs acceptées : ${validIds.join(', ')}` });
-    }
-    const template = getSectorTemplate(id);
-    res.json(template);
+    const config = getSectorConfig(req.params.sectorId);
+    res.json(config);
+  } catch (err: any) {
+    res.status(404).json({ error: err.message });
+  }
+});
+
+router.post('/signature/render', (req, res) => {
+  try {
+    const { sectorId, data } = req.body;
+    if (!sectorId) return res.status(400).json({ error: 'sectorId requis' });
+    if (!data)     return res.status(400).json({ error: 'data requis' });
+
+    const html = renderSignature(sectorId, data);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/signature/preview-sector/:sectorId', (req, res) => {
+  try {
+    const { sectorId } = req.params;
+    const config = getSectorConfig(sectorId);
+
+    const demoData: Record<string, any> = {
+      nom: 'Jean Dupont',
+      titre: config.fields.find(f => f.key === 'titre')?.label || 'Professionnel',
+      entreprise: 'Mon Entreprise',
+      telephone: '06 12 34 56 78',
+      email: 'contact@monentreprise.fr',
+      site: 'https://monentreprise.fr',
+      adresse: '12 Rue de la Paix, Paris',
+      ville: 'Paris',
+      note: 4.8,
+      horaires: 'Lun-Ven 8h-18h',
+      zone: 'Île-de-France',
+      urgence: 'Urgences 24h/7j',
+      agence: 'Agence Centrale',
+      cabinet: 'Cabinet Dupont & Associés',
+      portfolio: 'https://portfolio.dev',
+      instagram: 'https://instagram.com/moncompte',
+      linkedin: 'https://linkedin.com/in/jeandupont',
+    };
+
+    const html = renderSignature(sectorId, demoData);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.send(html);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -196,19 +246,20 @@ router.post('/signature/classify-sector', async (req, res) => {
     if (!input) return res.status(400).json({ error: 'metadata ou gmb_data requis' });
 
     const result = await classifySector(input);
-    const template = getSectorTemplate(result.sectorId);
+    const config = getSectorConfig(result.sectorId);
 
     res.json({
       ...result,
       template: {
-        id: template.id,
-        label: template.label,
-        emoji: template.emoji,
-        layout: template.layout,
-        effects: template.effects,
-        palette: template.palette,
-        fields: template.fields,
-        tone: template.tone,
+        id: config.id,
+        label: config.label,
+        emoji: config.emoji,
+        layout: config.layout,
+        effects: config.effects,
+        palette: config.palette,
+        fields: config.fields,
+        tone: config.tone,
+        cta: config.cta,
       },
     });
   } catch (err: any) {

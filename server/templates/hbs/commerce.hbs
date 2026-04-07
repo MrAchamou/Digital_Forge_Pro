@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root {
+    --sig-bg: {{palette.background}};
+    --sig-accent: {{palette.accent}};
+    --sig-text: {{palette.text}};
+    --sig-muted: {{palette.muted}};
+    --sig-border: {{palette.border}};
+  }
+  {{{animation.keyframes}}}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: transparent; font-family: 'Segoe UI', Arial, sans-serif; }
+  .sig-wrap {
+    display: inline-block;
+    background: var(--sig-bg);
+    border: 1px solid var(--sig-border);
+    border-radius: 10px;
+    width: {{layout.width}}px;
+    overflow: hidden;
+    position: relative;
+  }
+  .sig-top-bar {
+    height: 4px;
+    background: linear-gradient(to right, var(--sig-accent), var(--sig-muted), var(--sig-accent));
+    background-size: 200% 100%;
+    animation: gradientShift 3s linear infinite;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  .sig-body {
+    padding: 18px 24px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .sig-logo-block {
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    border: 2px solid var(--sig-accent);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sig-accent);
+    background: linear-gradient(135deg, var(--sig-muted)22, var(--sig-accent)11);
+  }
+  .sig-logo-block img { width: 100%; height: 100%; object-fit: contain; }
+  .sig-logo-emoji { font-size: 32px; }
+  .sig-content { flex: 1; }
+  .sig-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--sig-text);
+    animation: {{animation.cssAnimation}};
+    display: block;
+  }
+  .sig-titre {
+    font-size: 13px;
+    color: var(--sig-accent);
+    font-style: italic;
+    margin-top: 2px;
+    display: block;
+  }
+  .sig-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 10px;
+  }
+  .sig-info {
+    font-size: 12px;
+    color: var(--sig-text);
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sig-info a { color: inherit; text-decoration: none; }
+  .sig-info a:hover { color: var(--sig-accent); }
+  .sig-bottom {
+    padding: 10px 24px 14px;
+    border-top: 1px solid var(--sig-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .sig-horaires {
+    font-size: 11px;
+    color: var(--sig-muted);
+  }
+  .sig-social { display: flex; gap: 8px; }
+  .sig-social a {
+    font-size: 11px;
+    color: var(--sig-accent);
+    text-decoration: none;
+    padding: 3px 8px;
+    border: 1px solid var(--sig-accent);
+    border-radius: 20px;
+  }
+  .sig-social a:hover { background: var(--sig-accent); color: var(--sig-bg); }
+</style>
+</head>
+<body>
+<div class="sig-wrap">
+  <div class="sig-top-bar"></div>
+  <div class="sig-body">
+    <div class="sig-logo-block">
+      {{#if data.logo_url}}
+      <img src="{{data.logo_url}}" alt="{{data.nom}}">
+      {{else}}
+      <span class="sig-logo-emoji">🛍️</span>
+      {{/if}}
+    </div>
+    <div class="sig-content">
+      <span class="sig-name">{{data.nom}}</span>
+      <span class="sig-titre">{{data.titre}}</span>
+      <div class="sig-info-row">
+        {{#if data.adresse}}<span class="sig-info">📍 {{data.adresse}}</span>{{/if}}
+        {{#if data.telephone}}<span class="sig-info">📞 <a href="tel:{{data.telephone}}">{{data.telephone}}</a></span>{{/if}}
+        {{#if data.site}}<span class="sig-info">🛒 <a href="{{data.site}}">Boutique en ligne</a></span>{{/if}}
+      </div>
+    </div>
+  </div>
+  <div class="sig-bottom">
+    {{#if data.horaires}}
+    <span class="sig-horaires">🕐 {{data.horaires}}</span>
+    {{/if}}
+    <div class="sig-social">
+      {{#if data.instagram}}<a href="{{data.instagram}}">📸 Instagram</a>{{/if}}
+      {{#if data.site}}<a href="{{data.site}}">🛒 Shop</a>{{/if}}
+    </div>
+  </div>
+</div>
+</body>
+</html>

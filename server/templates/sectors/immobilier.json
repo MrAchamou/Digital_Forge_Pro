@@ -1,0 +1,48 @@
+{
+  "id": "immobilier",
+  "label": "Immobilier",
+  "emoji": "🏠",
+  "description": "Agent immobilier, promoteur, architecte, syndic, gestionnaire de biens...",
+  "keywords": ["immobilier", "agent immobilier", "promoteur", "architecte", "syndic", "gestionnaire", "notaire", "diagnostiqueur", "home stager", "transaction", "location", "vente", "achat", "investissement", "patrimoine"],
+  "palette": {
+    "background": "#0f172a",
+    "accent": "#0ea5e9",
+    "text": "#f1f5f9",
+    "muted": "#64748b",
+    "border": "#0ea5e933"
+  },
+  "animation": {
+    "name": "hologramScan",
+    "intensity": "medium",
+    "keyframes": "@keyframes hologramScan { 0% { background-position: 0% 0%; opacity: 0.8; } 50% { background-position: 100% 100%; opacity: 1; } 100% { background-position: 0% 0%; opacity: 0.8; } } @keyframes shimmer { 0%, 100% { box-shadow: 0 0 8px #0ea5e944; } 50% { box-shadow: 0 0 20px #0ea5e9aa, 0 0 40px #0ea5e944; } }",
+    "selector": ".sig-photo-wrap",
+    "cssAnimation": "shimmer 3s ease-in-out infinite"
+  },
+  "layout": {
+    "format": "elegant-two-col",
+    "width": 680,
+    "height": 220,
+    "photoPosition": "left",
+    "logoSize": "medium",
+    "emphasis": "phone"
+  },
+  "effects": {
+    "primary": "HOLOGRAM",
+    "secondary": "CRYSTAL GROW",
+    "accent": "PRISM SPLIT",
+    "intensity": "medium",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom & Prénom", "required": true, "type": "text" },
+    { "key": "titre", "label": "Titre / Poste", "required": true, "type": "text" },
+    { "key": "agence", "label": "Agence / Cabinet", "required": true, "type": "text" },
+    { "key": "telephone", "label": "Téléphone direct", "required": true, "type": "phone" },
+    { "key": "zone", "label": "Zone couverte", "required": true, "type": "badge" },
+    { "key": "email", "label": "Email", "required": true, "type": "email" },
+    { "key": "site", "label": "Site / Annonces", "required": false, "type": "url" },
+    { "key": "linkedin", "label": "LinkedIn", "required": false, "type": "url" }
+  ],
+  "tone": "Prestige, confiance, expertise locale",
+  "cta": "Estimer mon bien"
+}

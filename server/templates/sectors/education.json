@@ -1,0 +1,48 @@
+{
+  "id": "education",
+  "label": "Éducation & Formation",
+  "emoji": "🎓",
+  "description": "École, coach, formateur, tuteur, auto-école, soutien scolaire...",
+  "keywords": ["école", "formation", "coach", "formateur", "tuteur", "auto-école", "soutien scolaire", "professeur", "enseignant", "université", "lycée", "collège", "cours", "apprentissage", "certification", "cpf", "stage", "alternance"],
+  "palette": {
+    "background": "#eff6ff",
+    "accent": "#3b82f6",
+    "text": "#1e3a5f",
+    "muted": "#93c5fd",
+    "border": "#3b82f633"
+  },
+  "animation": {
+    "name": "typingCursor",
+    "intensity": "medium",
+    "keyframes": "@keyframes typingCursor { 0%, 100% { border-right-color: #3b82f6; } 50% { border-right-color: transparent; } }",
+    "selector": ".sig-titre",
+    "cssAnimation": "typingCursor 1s step-end infinite"
+  },
+  "layout": {
+    "format": "structured-light",
+    "width": 600,
+    "height": 200,
+    "photoPosition": "left",
+    "logoSize": "medium",
+    "emphasis": "subjects"
+  },
+  "effects": {
+    "primary": "TYPEWRITER",
+    "secondary": "DNA BUILD",
+    "accent": "PARTICLE BUILD",
+    "intensity": "medium",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom & Prénom", "required": true, "type": "text" },
+    { "key": "titre", "label": "Matières / Spécialités", "required": true, "type": "text" },
+    { "key": "etablissement", "label": "Établissement / Structure", "required": false, "type": "text" },
+    { "key": "niveaux", "label": "Niveaux enseignés", "required": false, "type": "badge" },
+    { "key": "telephone", "label": "Contact", "required": true, "type": "phone" },
+    { "key": "email", "label": "Email", "required": true, "type": "email" },
+    { "key": "certifications", "label": "Certifications", "required": false, "type": "badge" },
+    { "key": "site", "label": "Site / Plateforme", "required": false, "type": "url" }
+  ],
+  "tone": "Clair, bienveillant, progressif",
+  "cta": "Prendre un cours"
+}

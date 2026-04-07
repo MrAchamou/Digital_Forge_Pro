@@ -1,0 +1,48 @@
+{
+  "id": "tech",
+  "label": "Tech & Digital",
+  "emoji": "💻",
+  "description": "Développeur, agence web, startup, infographiste, community manager...",
+  "keywords": ["développeur", "dev", "agence web", "startup", "infographiste", "community manager", "designer", "ux", "ui", "data", "ia", "intelligence artificielle", "cybersécurité", "cloud", "it", "informatique", "digital", "tech", "software", "seo", "marketing digital"],
+  "palette": {
+    "background": "#030712",
+    "accent": "#06b6d4",
+    "text": "#e2e8f0",
+    "muted": "#475569",
+    "border": "#06b6d433"
+  },
+  "animation": {
+    "name": "glitchEffect",
+    "intensity": "medium",
+    "keyframes": "@keyframes glitchEffect { 0%, 95%, 100% { text-shadow: none; transform: none; } 96% { text-shadow: 2px 0 #ef4444, -2px 0 #06b6d4; transform: translateX(2px); } 97% { text-shadow: -2px 0 #ef4444, 2px 0 #06b6d4; transform: translateX(-2px); } 98% { text-shadow: 1px 0 #06b6d4; transform: translateX(0); } }",
+    "selector": ".sig-name",
+    "cssAnimation": "glitchEffect 4s steps(1) infinite"
+  },
+  "layout": {
+    "format": "minimal-dark",
+    "width": 640,
+    "height": 195,
+    "photoPosition": "none",
+    "logoSize": "small",
+    "emphasis": "portfolio"
+  },
+  "effects": {
+    "primary": "GLITCH SPAWN",
+    "secondary": "QUANTUM PHASE",
+    "accent": "REALITY GLITCH",
+    "intensity": "medium",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom / Pseudo", "required": true, "type": "text" },
+    { "key": "titre", "label": "Titre / Stack", "required": true, "type": "text" },
+    { "key": "entreprise", "label": "Entreprise / Freelance", "required": false, "type": "text" },
+    { "key": "email", "label": "Email", "required": true, "type": "email" },
+    { "key": "portfolio", "label": "Portfolio / GitHub", "required": true, "type": "url" },
+    { "key": "linkedin", "label": "LinkedIn", "required": false, "type": "url" },
+    { "key": "site", "label": "Site Web", "required": false, "type": "url" },
+    { "key": "competences", "label": "Compétences clés", "required": false, "type": "badge" }
+  ],
+  "tone": "Futuriste, précis, innovant",
+  "cta": "Voir mon portfolio"
+}

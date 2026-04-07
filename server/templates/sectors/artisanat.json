@@ -1,0 +1,48 @@
+{
+  "id": "artisanat",
+  "label": "Artisanat & Travaux",
+  "emoji": "🔧",
+  "description": "Plombier, électricien, mécanicien, menuisier, peintre, maçon, serrurier...",
+  "keywords": ["plombier", "électricien", "mécanicien", "menuisier", "peintre", "maçon", "serrurier", "chauffagiste", "carreleur", "vitrier", "couvreur", "artisan", "travaux", "btp", "construction", "dépannage", "rénovation"],
+  "palette": {
+    "background": "#0d1117",
+    "accent": "#f59e0b",
+    "text": "#f1f5f9",
+    "muted": "#94a3b8",
+    "border": "#f59e0b33"
+  },
+  "animation": {
+    "name": "electricPulse",
+    "intensity": "high",
+    "keyframes": "@keyframes electricPulse { 0%, 100% { text-shadow: 0 0 6px #f59e0b, 0 0 12px #f59e0b; } 50% { text-shadow: 0 0 18px #f59e0b, 0 0 36px #fbbf24, 0 0 54px #f59e0b; } }",
+    "selector": ".sig-name",
+    "cssAnimation": "electricPulse 2s ease-in-out infinite"
+  },
+  "layout": {
+    "format": "compact-horizontal",
+    "width": 600,
+    "height": 180,
+    "photoPosition": "left",
+    "logoSize": "medium",
+    "emphasis": "phone"
+  },
+  "effects": {
+    "primary": "ELECTRIC HOVER",
+    "secondary": "MAGNETIC PULL",
+    "accent": "NEON GLOW",
+    "intensity": "high",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom & Prénom", "required": true, "type": "text" },
+    { "key": "titre", "label": "Métier", "required": true, "type": "text" },
+    { "key": "telephone", "label": "Téléphone", "required": true, "type": "phone" },
+    { "key": "zone", "label": "Zone d'intervention", "required": true, "type": "badge" },
+    { "key": "urgence", "label": "Disponibilité Urgence", "required": false, "type": "badge" },
+    { "key": "siret", "label": "SIRET / Certification", "required": false, "type": "text" },
+    { "key": "email", "label": "Email", "required": false, "type": "email" },
+    { "key": "site", "label": "Site Web", "required": false, "type": "url" }
+  ],
+  "tone": "Sérieux, réactif, disponible",
+  "cta": "Appelez maintenant"
+}

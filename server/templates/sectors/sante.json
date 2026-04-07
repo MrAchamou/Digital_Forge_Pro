@@ -1,0 +1,48 @@
+{
+  "id": "sante",
+  "label": "Santé & Bien-être",
+  "emoji": "💆",
+  "description": "Médecin, dentiste, kiné, coiffeur, esthéticienne, naturopathe, spa...",
+  "keywords": ["médecin", "docteur", "dentiste", "kiné", "kinésithérapeute", "coiffeur", "esthéticienne", "naturopathe", "spa", "ostéopathe", "psychologue", "diététicien", "pharmacien", "infirmier", "sage-femme", "opticien", "santé", "bien-être", "beauté"],
+  "palette": {
+    "background": "#f0fdf4",
+    "accent": "#059669",
+    "text": "#064e3b",
+    "muted": "#6ee7b7",
+    "border": "#05966933"
+  },
+  "animation": {
+    "name": "breathe",
+    "intensity": "low",
+    "keyframes": "@keyframes breathe { 0%, 100% { opacity: 1; transform: scaleY(1); } 50% { opacity: 0.7; transform: scaleY(0.97); } }",
+    "selector": ".sig-accent-bar",
+    "cssAnimation": "breathe 4s ease-in-out infinite"
+  },
+  "layout": {
+    "format": "airy",
+    "width": 600,
+    "height": 200,
+    "photoPosition": "left",
+    "logoSize": "medium",
+    "emphasis": "booking"
+  },
+  "effects": {
+    "primary": "BREATHING",
+    "secondary": "WAVE DISSOLVE",
+    "accent": "NEURAL PULSE",
+    "intensity": "low",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Dr / Praticien", "required": true, "type": "text" },
+    { "key": "titre", "label": "Spécialité", "required": true, "type": "text" },
+    { "key": "diplome", "label": "Diplôme / Certification", "required": false, "type": "badge" },
+    { "key": "telephone", "label": "Prise de RDV", "required": true, "type": "phone" },
+    { "key": "adresse", "label": "Cabinet / Adresse", "required": true, "type": "text" },
+    { "key": "assurance", "label": "Conventionné / Mutuelle", "required": false, "type": "badge" },
+    { "key": "email", "label": "Email", "required": false, "type": "email" },
+    { "key": "site", "label": "Site / Doctolib", "required": false, "type": "url" }
+  ],
+  "tone": "Rassurant, professionnel, bienveillant",
+  "cta": "Prendre rendez-vous"
+}

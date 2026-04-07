@@ -1,0 +1,48 @@
+{
+  "id": "services_pro",
+  "label": "Services Professionnels",
+  "emoji": "⚖️",
+  "description": "Avocat, comptable, notaire, consultant, RH, assurance, banque...",
+  "keywords": ["avocat", "comptable", "notaire", "consultant", "rh", "ressources humaines", "assurance", "banque", "expert-comptable", "commissaire", "auditeur", "conseiller", "cabinet", "juridique", "finance", "fiscaliste", "juriste"],
+  "palette": {
+    "background": "#1e1b4b",
+    "accent": "#6366f1",
+    "text": "#e0e7ff",
+    "muted": "#818cf8",
+    "border": "#6366f133"
+  },
+  "animation": {
+    "name": "subtleFade",
+    "intensity": "low",
+    "keyframes": "@keyframes subtleFade { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }",
+    "selector": ".sig-accent-line",
+    "cssAnimation": "subtleFade 5s ease-in-out infinite"
+  },
+  "layout": {
+    "format": "sober-vertical",
+    "width": 580,
+    "height": 210,
+    "photoPosition": "left",
+    "logoSize": "small",
+    "emphasis": "credentials"
+  },
+  "effects": {
+    "primary": "FADE LAYERS",
+    "secondary": "TIME ECHO",
+    "accent": "DIMENSION SHIFT",
+    "intensity": "low",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom & Prénom", "required": true, "type": "text" },
+    { "key": "titre", "label": "Titre / Fonction", "required": true, "type": "text" },
+    { "key": "cabinet", "label": "Cabinet / Entreprise", "required": true, "type": "text" },
+    { "key": "ordre", "label": "N° Ordre / Barreau", "required": false, "type": "badge" },
+    { "key": "email", "label": "Email professionnel", "required": true, "type": "email" },
+    { "key": "telephone", "label": "Téléphone", "required": true, "type": "phone" },
+    { "key": "site", "label": "Site Web", "required": false, "type": "url" },
+    { "key": "linkedin", "label": "LinkedIn", "required": false, "type": "url" }
+  ],
+  "tone": "Sobre, formel, autorité",
+  "cta": "Consulter nos services"
+}

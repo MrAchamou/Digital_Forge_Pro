@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root {
+    --sig-bg: {{palette.background}};
+    --sig-accent: {{palette.accent}};
+    --sig-text: {{palette.text}};
+    --sig-muted: {{palette.muted}};
+    --sig-border: {{palette.border}};
+  }
+  {{{animation.keyframes}}}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: transparent; font-family: 'Times New Roman', Georgia, serif; }
+  .sig-wrap {
+    display: inline-flex;
+    background: var(--sig-bg);
+    border-left: 3px solid var(--sig-accent);
+    width: {{layout.width}}px;
+    min-height: {{layout.height}}px;
+    overflow: hidden;
+  }
+  .sig-photo-col {
+    width: 80px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 20px;
+  }
+  .sig-photo-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--sig-border);
+  }
+  .sig-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .sig-photo-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 3px;
+    background: var(--sig-accent);
+    opacity: 0.15;
+  }
+  .sig-body {
+    flex: 1;
+    padding: 20px 22px 20px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sig-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sig-text);
+    letter-spacing: 0.02em;
+  }
+  .sig-titre {
+    font-size: 12px;
+    color: var(--sig-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 600;
+  }
+  .sig-cabinet {
+    font-size: 13px;
+    color: var(--sig-muted);
+    font-style: italic;
+  }
+  .sig-accent-line {
+    height: 1px;
+    background: var(--sig-accent);
+    opacity: 0.4;
+    animation: {{animation.cssAnimation}};
+  }
+  .sig-contacts { display: flex; flex-direction: column; gap: 5px; }
+  .sig-contact-item {
+    font-size: 12px;
+    color: var(--sig-text);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sig-contact-item:hover { color: var(--sig-accent); }
+  .sig-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sig-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border: 1px solid var(--sig-border);
+    color: var(--sig-muted);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    letter-spacing: 0.04em;
+  }
+  .sig-logo-col {
+    width: 70px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px 16px 0 0;
+  }
+  .sig-logo-col img { width: 50px; height: auto; }
+  .sig-links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .sig-link {
+    font-size: 11px;
+    color: var(--sig-accent);
+    text-decoration: none;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .sig-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="sig-wrap">
+  <div class="sig-photo-col">
+    {{#if data.photo_url}}
+    <div class="sig-photo-wrap"><img src="{{data.photo_url}}" alt="{{data.nom}}"></div>
+    {{else}}
+    <div class="sig-photo-placeholder"></div>
+    {{/if}}
+  </div>
+  <div class="sig-body">
+    <div>
+      <div class="sig-name">{{data.nom}}</div>
+      <div class="sig-titre">{{data.titre}}</div>
+      {{#if data.cabinet}}<div class="sig-cabinet">{{data.cabinet}}</div>{{/if}}
+    </div>
+    <div class="sig-accent-line"></div>
+    <div class="sig-contacts">
+      {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item">✉ {{data.email}}</a>{{/if}}
+      {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item">☎ {{data.telephone}}</a>{{/if}}
+    </div>
+    <div class="sig-badges">
+      {{#if data.ordre}}<span class="sig-badge">N° {{data.ordre}}</span>{{/if}}
+    </div>
+    <div class="sig-links">
+      {{#if data.site}}<a href="{{data.site}}" class="sig-link">Site web</a>{{/if}}
+      {{#if data.linkedin}}<a href="{{data.linkedin}}" class="sig-link">LinkedIn</a>{{/if}}
+    </div>
+  </div>
+  {{#if data.logo_url}}
+  <div class="sig-logo-col"><img src="{{data.logo_url}}" alt="logo"></div>
+  {{/if}}
+</div>
+</body>
+</html>

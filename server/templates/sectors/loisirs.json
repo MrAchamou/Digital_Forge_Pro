@@ -1,0 +1,47 @@
+{
+  "id": "loisirs",
+  "label": "Loisirs & Tourisme",
+  "emoji": "🏨",
+  "description": "Hôtel, agence voyage, salle de sport, photographe, événementiel...",
+  "keywords": ["hôtel", "agence voyage", "tourisme", "salle de sport", "fitness", "photographe", "vidéaste", "événementiel", "dj", "animateur", "loisirs", "spa", "resort", "camping", "gîte", "chambre hôtes", "location vacances", "activités"],
+  "palette": {
+    "background": "#020617",
+    "accent": "#8b5cf6",
+    "text": "#f1f5f9",
+    "muted": "#6d28d9",
+    "border": "#8b5cf633"
+  },
+  "animation": {
+    "name": "stellarDrift",
+    "intensity": "high",
+    "keyframes": "@keyframes stellarDrift { 0% { text-shadow: 0 0 10px #8b5cf6; } 33% { text-shadow: 2px -2px 20px #a78bfa, 0 0 40px #8b5cf666; } 66% { text-shadow: -2px 2px 20px #7c3aed, 0 0 30px #8b5cf666; } 100% { text-shadow: 0 0 10px #8b5cf6; } }",
+    "selector": ".sig-name",
+    "cssAnimation": "stellarDrift 5s ease-in-out infinite"
+  },
+  "layout": {
+    "format": "immersive-wide",
+    "width": 700,
+    "height": 230,
+    "photoPosition": "top",
+    "logoSize": "large",
+    "emphasis": "rating"
+  },
+  "effects": {
+    "primary": "STELLAR DRIFT",
+    "secondary": "FLOAT DANCE",
+    "accent": "ORBIT DANCE",
+    "intensity": "high",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom / Établissement", "required": true, "type": "text" },
+    { "key": "titre", "label": "Type d'activité", "required": true, "type": "text" },
+    { "key": "adresse", "label": "Lieu / Adresse", "required": true, "type": "text" },
+    { "key": "note", "label": "Note Google / TripAdvisor", "required": false, "type": "rating" },
+    { "key": "telephone", "label": "Réservation", "required": true, "type": "phone" },
+    { "key": "site", "label": "Site / Réservation en ligne", "required": false, "type": "url" },
+    { "key": "instagram", "label": "Instagram", "required": false, "type": "url" }
+  ],
+  "tone": "Cinématique, immersif, inspirant",
+  "cta": "Réserver maintenant"
+}

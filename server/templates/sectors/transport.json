@@ -1,0 +1,48 @@
+{
+  "id": "transport",
+  "label": "Transport & Logistique",
+  "emoji": "🚚",
+  "description": "Taxi, VTC, déménageur, livreur, transporteur, ambulancier...",
+  "keywords": ["taxi", "vtc", "uber", "chauffeur", "déménageur", "déménagement", "livreur", "livraison", "transporteur", "ambulancier", "ambulance", "coursier", "messagerie", "fret", "logistique", "camion", "bus", "navette", "transfer"],
+  "palette": {
+    "background": "#0c0a09",
+    "accent": "#ef4444",
+    "text": "#fafaf9",
+    "muted": "#78716c",
+    "border": "#ef444433"
+  },
+  "animation": {
+    "name": "speedPulse",
+    "intensity": "high",
+    "keyframes": "@keyframes speedPulse { 0%, 100% { transform: translateX(0); box-shadow: -4px 0 0 #ef4444; } 50% { transform: translateX(3px); box-shadow: -8px 0 0 #ef4444, -16px 0 0 #ef444444; } }",
+    "selector": ".sig-cta",
+    "cssAnimation": "speedPulse 1.5s ease-in-out infinite"
+  },
+  "layout": {
+    "format": "functional-direct",
+    "width": 580,
+    "height": 175,
+    "photoPosition": "none",
+    "logoSize": "medium",
+    "emphasis": "phone"
+  },
+  "effects": {
+    "primary": "TORNADO SPIN",
+    "secondary": "WAVE SURF",
+    "accent": "GYROSCOPE SPIN",
+    "intensity": "high",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom / Entreprise", "required": true, "type": "text" },
+    { "key": "titre", "label": "Type de service", "required": true, "type": "text" },
+    { "key": "telephone", "label": "Téléphone / Réservation", "required": true, "type": "phone" },
+    { "key": "zone", "label": "Zone couverte", "required": true, "type": "badge" },
+    { "key": "disponibilite", "label": "Disponibilité", "required": false, "type": "badge" },
+    { "key": "vehicule", "label": "Type de véhicule", "required": false, "type": "badge" },
+    { "key": "email", "label": "Email / Devis", "required": false, "type": "email" },
+    { "key": "site", "label": "Site Web", "required": false, "type": "url" }
+  ],
+  "tone": "Rapide, direct, disponible",
+  "cta": "Appeler maintenant"
+}

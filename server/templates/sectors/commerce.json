@@ -1,0 +1,47 @@
+{
+  "id": "commerce",
+  "label": "Commerce & Retail",
+  "emoji": "🛍️",
+  "description": "Boutique mode, pharmacie, librairie, fleuriste, animalerie, bijouterie...",
+  "keywords": ["boutique", "magasin", "commerce", "retail", "mode", "vêtements", "pharmacie", "librairie", "fleuriste", "animalerie", "bijouterie", "maroquinerie", "chaussures", "lingerie", "optique", "décoration", "mobilier"],
+  "palette": {
+    "background": "#0a0a0a",
+    "accent": "#ec4899",
+    "text": "#fdf4ff",
+    "muted": "#a21caf",
+    "border": "#ec489933"
+  },
+  "animation": {
+    "name": "sparkleAura",
+    "intensity": "high",
+    "keyframes": "@keyframes sparkleAura { 0%, 100% { text-shadow: 0 0 10px #ec4899, 0 0 20px #ec489966; letter-spacing: 0.02em; } 50% { text-shadow: 0 0 20px #ec4899, 0 0 40px #f472b6, 0 0 60px #ec489966; letter-spacing: 0.05em; } }",
+    "selector": ".sig-name",
+    "cssAnimation": "sparkleAura 2.5s ease-in-out infinite"
+  },
+  "layout": {
+    "format": "colorful",
+    "width": 600,
+    "height": 190,
+    "photoPosition": "none",
+    "logoSize": "large",
+    "emphasis": "address"
+  },
+  "effects": {
+    "primary": "SPARKLE AURA",
+    "secondary": "NEON GLOW",
+    "accent": "STAR DUST FORM",
+    "intensity": "high",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom de la boutique", "required": true, "type": "text" },
+    { "key": "titre", "label": "Slogan / Spécialité", "required": true, "type": "text" },
+    { "key": "adresse", "label": "Adresse", "required": true, "type": "text" },
+    { "key": "horaires", "label": "Horaires", "required": true, "type": "hours" },
+    { "key": "telephone", "label": "Téléphone", "required": false, "type": "phone" },
+    { "key": "instagram", "label": "Instagram", "required": false, "type": "url" },
+    { "key": "site", "label": "Boutique en ligne", "required": false, "type": "url" }
+  ],
+  "tone": "Dynamique, accrocheur, tendance",
+  "cta": "Découvrir la collection"
+}

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root {
+    --sig-bg: {{palette.background}};
+    --sig-accent: {{palette.accent}};
+    --sig-text: {{palette.text}};
+    --sig-muted: {{palette.muted}};
+    --sig-border: {{palette.border}};
+  }
+  {{{animation.keyframes}}}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: transparent; font-family: 'Arial Black', 'Segoe UI', Arial, sans-serif; }
+  .sig-wrap {
+    display: inline-block;
+    background: var(--sig-bg);
+    width: {{layout.width}}px;
+    overflow: hidden;
+    border-radius: 4px;
+    position: relative;
+    border-top: 3px solid var(--sig-accent);
+  }
+  .sig-body {
+    padding: 14px 20px 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .sig-logo-block {
+    flex-shrink: 0;
+    text-align: center;
+  }
+  .sig-logo-block img { height: 44px; width: auto; }
+  .sig-logo-emoji { font-size: 36px; }
+  .sig-main { flex: 1; }
+  .sig-name {
+    font-size: 19px;
+    font-weight: 900;
+    color: var(--sig-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .sig-titre {
+    font-size: 12px;
+    color: var(--sig-muted);
+    margin-top: 2px;
+  }
+  .sig-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .sig-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    background: var(--sig-accent);
+    color: var(--sig-bg);
+    font-weight: 700;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .sig-badge.dark {
+    background: transparent;
+    border: 1px solid var(--sig-muted);
+    color: var(--sig-muted);
+  }
+  .sig-cta-col {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .sig-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--sig-accent);
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 18px;
+    font-size: 16px;
+    font-weight: 900;
+    border-radius: 3px;
+    animation: {{animation.cssAnimation}};
+    white-space: nowrap;
+  }
+  .sig-contact-small {
+    font-size: 11px;
+    color: var(--sig-muted);
+    text-decoration: none;
+  }
+  .sig-contact-small:hover { color: var(--sig-accent); }
+  .sig-bottom {
+    padding: 8px 20px;
+    border-top: 1px solid var(--sig-border);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .sig-info {
+    font-size: 11px;
+    color: var(--sig-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+  }
+  .sig-info:hover { color: var(--sig-accent); }
+</style>
+</head>
+<body>
+<div class="sig-wrap">
+  <div class="sig-body">
+    <div class="sig-logo-block">
+      {{#if data.logo_url}}
+      <img src="{{data.logo_url}}" alt="{{data.nom}}">
+      {{else}}
+      <span class="sig-logo-emoji">🚚</span>
+      {{/if}}
+    </div>
+    <div class="sig-main">
+      <div class="sig-name">{{data.nom}}</div>
+      <div class="sig-titre">{{data.titre}}</div>
+      <div class="sig-badges">
+        {{#if data.zone}}<span class="sig-badge">{{data.zone}}</span>{{/if}}
+        {{#if data.disponibilite}}<span class="sig-badge">{{data.disponibilite}}</span>{{/if}}
+        {{#if data.vehicule}}<span class="sig-badge dark">{{data.vehicule}}</span>{{/if}}
+      </div>
+    </div>
+    {{#if data.telephone}}
+    <div class="sig-cta-col">
+      <a href="tel:{{data.telephone}}" class="sig-cta">
+        📞 {{data.telephone}}
+      </a>
+      {{#if data.email}}
+      <a href="mailto:{{data.email}}" class="sig-contact-small">{{data.email}}</a>
+      {{/if}}
+    </div>
+    {{/if}}
+  </div>
+  {{#if data.site}}
+  <div class="sig-bottom">
+    <a href="{{data.site}}" class="sig-info">🌐 {{data.site}}</a>
+  </div>
+  {{/if}}
+</div>
+</body>
+</html>

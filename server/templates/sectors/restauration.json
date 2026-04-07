@@ -1,0 +1,48 @@
+{
+  "id": "restauration",
+  "label": "Restauration & Alimentation",
+  "emoji": "🍽️",
+  "description": "Restaurant, café, boulangerie, traiteur, food truck, épicerie fine...",
+  "keywords": ["restaurant", "café", "boulangerie", "traiteur", "food truck", "épicerie", "pizzeria", "brasserie", "bar", "bistrot", "pâtisserie", "chocolatier", "glacier", "snack", "sandwicherie", "restauration"],
+  "palette": {
+    "background": "#1a0a00",
+    "accent": "#d97706",
+    "text": "#fef3c7",
+    "muted": "#92400e",
+    "border": "#d9770633"
+  },
+  "animation": {
+    "name": "flameFlicker",
+    "intensity": "medium",
+    "keyframes": "@keyframes flameFlicker { 0%, 100% { color: #d97706; text-shadow: 0 0 8px #d97706; } 33% { color: #f59e0b; text-shadow: 0 0 16px #f59e0b, 0 2px 4px #92400e; } 66% { color: #ef4444; text-shadow: 0 0 12px #ef4444; } }",
+    "selector": ".sig-name",
+    "cssAnimation": "flameFlicker 3s ease-in-out infinite"
+  },
+  "layout": {
+    "format": "centered",
+    "width": 620,
+    "height": 220,
+    "photoPosition": "top",
+    "logoSize": "large",
+    "emphasis": "address"
+  },
+  "effects": {
+    "primary": "FIRE WRITE",
+    "secondary": "LIQUID MORPH",
+    "accent": "SOUL AURA",
+    "intensity": "medium",
+    "locked": true
+  },
+  "fields": [
+    { "key": "nom", "label": "Nom de l'établissement", "required": true, "type": "text" },
+    { "key": "titre", "label": "Type de cuisine / Spécialité", "required": true, "type": "text" },
+    { "key": "adresse", "label": "Adresse", "required": true, "type": "text" },
+    { "key": "telephone", "label": "Réservation", "required": true, "type": "phone" },
+    { "key": "horaires", "label": "Horaires d'ouverture", "required": true, "type": "hours" },
+    { "key": "note", "label": "Note Google", "required": false, "type": "rating" },
+    { "key": "site", "label": "Menu en ligne / Site", "required": false, "type": "url" },
+    { "key": "instagram", "label": "Instagram", "required": false, "type": "url" }
+  ],
+  "tone": "Chaleureux, gourmand, accueillant",
+  "cta": "Réservez une table"
+}
