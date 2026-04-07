@@ -404,6 +404,19 @@ export default function Preview() {
     setSourceSvg(svg);
   }, []);
 
+  // ── Charger un exemple de démo depuis l'API ───────────────────────────────
+  const loadDemoSvg = useCallback(async () => {
+    try {
+      const res = await fetch('/api/signature/latest-svg');
+      if (!res.ok) return;
+      const svgText = await res.text();
+      setSourceSvg(svgText);
+      localStorage.setItem('reality_preview_svg', svgText);
+    } catch {
+      /* silently ignore */
+    }
+  }, []);
+
   // ── Calculer le SVG processé ──────────────────────────────────────────────
   const processedSvg = (() => {
     if (!sourceSvg) return '';
@@ -648,14 +661,32 @@ export default function Preview() {
       </div>
 
       {!hasSvg ? (
-        <div className="flex flex-col items-center justify-center flex-1 space-y-4">
+        <div className="flex flex-col items-center justify-center flex-1 space-y-6">
           <div className="w-20 h-20 rounded-full bg-white/3 border border-white/10 flex items-center justify-center">
             <Eye className="w-8 h-8 text-white/15" />
           </div>
-          <p className="text-white/30 text-center text-sm max-w-xs">
-            Aucune signature dans le Reality Studio.<br />
-            <Link href="/studio"><span className="text-forge-cyan underline cursor-pointer">Générez-en une depuis le Studio →</span></Link>
-          </p>
+          <div className="text-center space-y-3 max-w-xs">
+            <p className="text-white/30 text-sm">
+              Aucune signature dans le Reality Studio.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Link href="/studio">
+                <Button size="sm" className="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white text-xs" data-testid="btn-go-studio">
+                  <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                  Générer depuis le Studio
+                </Button>
+              </Link>
+              <Button
+                size="sm"
+                onClick={loadDemoSvg}
+                className="w-full bg-white/8 hover:bg-white/15 border border-white/15 hover:border-white/30 text-white/60 hover:text-white text-xs"
+                data-testid="btn-load-demo"
+              >
+                <Eye className="w-3.5 h-3.5 mr-1.5" />
+                Voir un exemple de signature
+              </Button>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="flex flex-1 overflow-hidden">
@@ -904,6 +935,42 @@ export default function Preview() {
   );
 }
 
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
+// Auto-fixed: bracket_completion
 // Auto-fixed: bracket_completion
 // Auto-fixed: bracket_completion
 // Auto-fixed: bracket_completion

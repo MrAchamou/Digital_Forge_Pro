@@ -1909,6 +1909,80 @@ router.delete('/presets/:id', async (req, res) => {
   }
 });
 
+// ── SVG brut de la signature la plus récente / la plus grande ─────────────
+router.get('/signature/latest-svg', async (_req, res) => {
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const exportsDir = path.join(process.cwd(), 'exports');
+    const files = fs.readdirSync(exportsDir)
+      .filter((f: string) => f.endsWith('.svg'))
+      .sort((a: string, b: string) => fs.statSync(path.join(exportsDir, b)).size - fs.statSync(path.join(exportsDir, a)).size);
+    if (files.length === 0) return res.status(404).json({ error: 'Aucun SVG disponible' });
+    const svgContent = fs.readFileSync(path.join(exportsDir, files[0]), 'utf8');
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', 'no-cache');
+    return res.send(svgContent);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Route de test qualité SVG ──────────────────────────────────────────────
+router.get('/svg-quality-test/:filename?', async (req, res) => {
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const exportsDir = path.join(process.cwd(), 'exports');
+    const files = fs.readdirSync(exportsDir).filter((f: string) => f.endsWith('.svg')).sort();
+    const targetFile = req.params.filename
+      ? files.find((f: string) => f.includes(req.params.filename!)) || files[files.length - 1]
+      : files.sort((a: string, b: string) => fs.statSync(path.join(exportsDir, b)).size - fs.statSync(path.join(exportsDir, a)).size)[0];
+    if (!targetFile) return res.status(404).send('Aucun SVG trouvé');
+    const svgContent = fs.readFileSync(path.join(exportsDir, targetFile), 'utf8');
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quality Check — ${targetFile}</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050510; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 40px 20px; font-family: 'Inter', Arial, sans-serif; }
+.header { color: #a78bfa; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; text-align: center; opacity: 0.7; }
+.card { background: linear-gradient(135deg, #0d0d1f 0%, #111827 100%); border: 1px solid rgba(107,92,231,0.15); border-radius: 20px; padding: 32px; box-shadow: 0 0 80px rgba(107,92,231,0.15), 0 20px 60px rgba(0,0,0,0.5); max-width: 700px; width: 100%; }
+.label { color: #6b7280; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+.sig-bg-white { background: #ffffff; border-radius: 8px; padding: 0; overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.sig-bg-dark  { background: #1f2937; border-radius: 8px; padding: 0; overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.sig-bg-white svg, .sig-bg-dark svg { display: block; width: 100%; height: auto; }
+.meta { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(107,92,231,0.1); }
+.meta-item { font-size: 11px; color: #9ca3af; }
+.meta-item span { color: #a78bfa; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="header">EffectForge AI — Contrôle Qualité Output</div>
+<div class="card">
+  <div class="label">Fond blanc (client email standard)</div>
+  <div class="sig-bg-white">${svgContent}</div>
+  <div class="label">Fond sombre (contexte dark-mode)</div>
+  <div class="sig-bg-dark">${svgContent}</div>
+  <div class="meta">
+    <div class="meta-item">Fichier: <span>${targetFile}</span></div>
+    <div class="meta-item">Taille: <span>${Math.round(svgContent.length / 1024)}KB</span></div>
+    <div class="meta-item">Généré: <span>${new Date().toLocaleString('fr-FR')}</span></div>
+  </div>
+</div>
+</body>
+</html>`;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    return res.send(html);
+  } catch (err: any) {
+    return res.status(500).send(err.message);
+  }
+});
+
 export function registerRoutes(app: express.Application) {
   app.use(cors());
   app.use('/api', router);
