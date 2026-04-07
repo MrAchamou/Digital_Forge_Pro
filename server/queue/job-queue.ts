@@ -1,5 +1,6 @@
 import { storage } from "../storage";
 import { orchestrator } from "../core/orchestrator";
+import { buildEffectPreviewHTML, saveEffectPreview, ensurePreviewDir } from "../services/effect-preview-generator";
 import type { Job } from "@shared/schema";
 
 interface JobProcessor {
@@ -84,11 +85,31 @@ class JobQueue implements JobProcessor {
 
       const actualTime = Math.round((Date.now() - startTime) / 1000);
 
+      // Génération de la page preview HTML interactive
+      let previewUrl: string | null = null;
+      try {
+        ensurePreviewDir();
+        const previewId = `effect_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        const previewHtml = buildEffectPreviewHTML({
+          previewId,
+          code: result.code || '',
+          description: job.description,
+          concepts: result.metadata?.concepts || [],
+          modules: result.metadata?.modules || [],
+          qualityScore: result.metadata?.qualityScore ?? result.qualityReport?.overallScore ?? 80,
+          platform: job.platform || 'javascript',
+        });
+        await saveEffectPreview(previewId, previewHtml);
+        previewUrl = `/api/effect/preview/${previewId}`;
+      } catch (previewErr) {
+        console.warn('⚠️  Preview generation skipped:', previewErr);
+      }
+
       // Mark job as completed
       await storage.updateJob(job.id, {
         status: 'completed',
         progress: 100,
-        result: result,
+        result: { ...result, previewUrl },
         actualTime: actualTime
       });
 
