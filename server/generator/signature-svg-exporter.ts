@@ -56,6 +56,9 @@ export class SignatureSVGExporter {
     const timing = this.buildTimingCSS();
     const transitionCSS = this.buildTransitionCSS();
     const allVariantCSS = variations.map(v => v.cssAnimations).join('\n');
+    const logoHideCSS = logoUrl
+      ? `#company-logo-text { display: none; }` // masque le texte si vrai logo
+      : '';
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"

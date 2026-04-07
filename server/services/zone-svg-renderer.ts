@@ -755,6 +755,23 @@ function renderContactEffect(d_fn: Function, e: ZoneEffectDecision, varId: strin
       };
     }
 
+    case 'CONTACT_HIGHLIGHT_HOVER': {
+      // Surbrillance douce qui parcourt chaque ligne de contact
+      const dur = d_fn(8, sp);
+      const lineHighlights = [78, 94, 110].map((y, idx) =>
+        `<rect x="190" y="${y}" width="190" height="11" fill="${col}" fill-opacity="${i*0.12}" rx="3"
+          style="animation:${pfx}-hl ${dur} ease-in-out ${delay + idx * 1.5}s infinite;"/>`
+      ).join('');
+      return {
+        filterDefs: '',
+        keyframes: `@keyframes ${pfx}-hl {
+          0%,100% { fill-opacity: ${i*0.06}; transform: scaleX(0.95); }
+          50%      { fill-opacity: ${i*0.18}; transform: scaleX(1); }
+        }`,
+        elements: lineHighlights,
+      };
+    }
+
     default: return empty();
   }
 }
@@ -855,15 +872,22 @@ function mergeEffects(effects: SVGEffectCode[]): SVGEffectCode {
 }
 
 // Ordre de rendu des catégories pour chaque zone (du fond vers le premier plan)
-// 🌀 Chaos Organisé : supporte jusqu'à 4 couches simultanées par zone
+// Chaque zone a ses catégories sémantiques propres — rendu couche la plus profonde en premier.
 const LAYER_RENDER_ORDER: Record<string, string[]> = {
-  logo:       ['energie', 'matiere', 'dimension', 'transformation'],  // aura → matière → 3D → morph
+  // Logo : aura énergétique → matière physique → effet 3D → transformation finale
+  logo:       ['energie', 'matiere', 'dimension', 'transformation'],
+  // Nom : lumière ambiante → mouvement continu
   nom:        ['lumiere', 'mouvement'],
-  separateur: ['tertiary', 'secondary', 'primary'],  // fond d'abord, puis couches successives
-  fond:       ['tertiary', 'secondary', 'primary'],
-  cta:        ['tertiary', 'secondary', 'primary'],
-  titre:      ['secondary', 'primary'],
-  contact:    ['secondary', 'primary'],
+  // Titre : rythme de fond continu → texture colorée → animation d'apparition (au premier plan)
+  titre:      ['rythme', 'texture', 'apparition'],
+  // Contact : ligne de scan en fond → pulsation des icônes → entrée en cascade (au premier plan)
+  contact:    ['scan', 'emphasis', 'entree'],
+  // Séparateur : respiration de base → flux d'énergie → éclat électrique (le plus visible)
+  separateur: ['rythme', 'flux', 'eclat'],
+  // Fond : couche épurée → ambiance atmosphérique → structure géométrique (au premier plan)
+  fond:       ['epure', 'ambiance', 'structure'],
+  // CTA : invitation douce → brillance/shimmer → attraction magnétique (le plus saillant)
+  cta:        ['invitation', 'brillance', 'attraction'],
 };
 
 function renderZoneWithLayers(

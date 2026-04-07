@@ -6,14 +6,68 @@ import type { ZoneSelection, CategoryCandidates, EffetCandidat } from './zone-ef
 //
 // Principe : au lieu d'un seul effet par zone, on empile
 // le TOP-1 de CHAQUE catégorie simultanément.
-// Logo = 4 couches. Nom = 2. Sep/Fond/CTA = 3.
-// Résultat : effets spectaculaires "waooow" garantis.
+// Logo = 4 couches sémantiques. Nom = 2. Toutes les autres
+// zones = 3 couches sémantiques (chacune avec son rôle visuel).
 // ═══════════════════════════════════════════════════════
+
+// ── Catégories sémantiques par zone ─────────────────────────
 
 const LOGO_CATEGORY_ORDER   = ['energie', 'matiere', 'dimension', 'transformation'] as const;
 const NOM_CATEGORY_ORDER    = ['lumiere', 'mouvement'] as const;
-const FLAT_CATEGORY_ORDER   = ['primary', 'secondary', 'tertiary'] as const;
 
+// Titre : comment le texte apparaît → sa couleur/style → son rythme continu
+const TITRE_CATEGORY_ORDER  = ['apparition', 'texture', 'rythme'] as const;
+
+// Contact : animation d'entrée → emphase sur les icônes → ligne de scan
+const CONTACT_CATEGORY_ORDER = ['entree', 'emphasis', 'scan'] as const;
+
+// Séparateur : rythme de base → flux d'énergie → éclat électrique/doré
+const SEP_CATEGORY_ORDER = ['rythme', 'flux', 'eclat'] as const;
+
+// Fond : couche épurée de base → ambiance atmosphérique → structure géométrique
+const FOND_CATEGORY_ORDER = ['epure', 'ambiance', 'structure'] as const;
+
+// CTA : invitation douce → brillance/electricity → attraction magnétique
+const CTA_CATEGORY_ORDER = ['invitation', 'brillance', 'attraction'] as const;
+
+// ── Mapping effet_id → catégorie sémantique ────────────────
+
+const TITRE_FUSION_MAP: Record<string, string[]> = {
+  apparition: ['TITRE_SLIDE_IN', 'TITRE_FADE_PRESENCE'],
+  texture:    ['TITRE_COLOR_SHIFT'],
+  rythme:     ['TITRE_LETTER_SPACING_BREATHE'],
+};
+
+const CONTACT_FUSION_MAP: Record<string, string[]> = {
+  entree:   ['CONTACT_CASCADE_APPEAR'],
+  emphasis: ['CONTACT_ICON_PULSE', 'CONTACT_HIGHLIGHT_HOVER'],
+  scan:     ['CONTACT_SCAN_LINE'],
+};
+
+const SEP_FUSION_MAP: Record<string, string[]> = {
+  rythme: ['SEP_BREATHING_CALM'],
+  flux:   ['SEP_ENERGY_FLOW', 'SEP_PARTICLE_STREAM'],
+  eclat:  ['SEP_ELECTRIC_PULSE', 'SEP_GOLD_SHINE'],
+};
+
+const FOND_FUSION_MAP: Record<string, string[]> = {
+  epure:     ['FOND_MINIMAL_NOISE', 'FOND_CLEAN_DARK'],
+  ambiance:  ['FOND_ATMOSPHERIC_BREATH', 'FOND_PLASMA_FIELD'],
+  structure: ['FOND_NEURAL_GRID', 'FOND_STELLAR_DRIFT'],
+};
+
+const CTA_FUSION_MAP: Record<string, string[]> = {
+  invitation: ['CTA_BREATH_INVITATION', 'CTA_STATIC_PRESENCE'],
+  brillance:  ['CTA_SHIMMER_SWEEP', 'CTA_ELECTRIC_BORDER'],
+  attraction: ['CTA_GRAVITY_PULSE', 'CTA_PARTICLE_ATTRACT'],
+};
+
+// ─────────────────────────────────────────────────────
+// pickCatLayers
+// Sélectionne le meilleur candidat par catégorie sémantique
+// (utilisé pour Logo et Nom dont les catégories viennent
+//  déjà de zone-effect-selector via CategoryCandidates).
+// ─────────────────────────────────────────────────────
 function pickCatLayers(
   cats: CategoryCandidates,
   categoryOrder: readonly string[],
@@ -28,7 +82,6 @@ function pickCatLayers(
     const top = candidates[0];
     if (!top || top.score < 0.05) continue;
 
-    // Chaque couche suivante est légèrement moins intense (hiérarchie visuelle)
     const intensityMult = 1 - idx * 0.12;
     layers.push({
       effet_id:  top.id,
@@ -52,29 +105,53 @@ function pickCatLayers(
   return { primary, layers };
 }
 
-function pickFlatLayers(
+// ─────────────────────────────────────────────────────
+// pickSemanticFusionLayers
+// Pour une zone avec une liste plate de candidats scorés,
+// classe chacun dans sa catégorie sémantique (via fusionMap)
+// et prend le meilleur par catégorie.
+// Résultat : 3 couches aux rôles visuels distincts.
+// ─────────────────────────────────────────────────────
+function pickSemanticFusionLayers(
   candidates: EffetCandidat[],
-  maxLayers: number,
+  fusionMap: Record<string, string[]>,
+  categoryOrder: readonly string[],
   primaryColor: string,
+  fallbackId: string,
   speed: 'slow' | 'medium' | 'fast' = 'medium',
 ): { primary: ZoneEffectDecision; layers: EffectLayer[] } {
-  const top = candidates.slice(0, maxLayers);
-  const layers: EffectLayer[] = top.map((c, idx) => ({
-    effet_id:  c.id,
-    category:  FLAT_CATEGORY_ORDER[idx] || `extra${idx}`,
-    intensity: parseFloat((c.intensite_recommandee * (1 - idx * 0.2)).toFixed(3)),
-    speed,
-    color:     primaryColor,
-    raison:    `Chaos flat ${idx + 1}: ${c.nom}`,
-  }));
+  const layers: EffectLayer[] = [];
 
-  const first = candidates[0];
+  for (let idx = 0; idx < categoryOrder.length; idx++) {
+    const catName = categoryOrder[idx];
+    const allowedIds = new Set(fusionMap[catName] || []);
+
+    // Trouver le meilleur candidat de cette catégorie sémantique
+    const best = candidates
+      .filter(c => allowedIds.has(c.id))
+      .sort((a, b) => b.score - a.score)[0];
+
+    if (!best) continue;
+
+    // Hiérarchie visuelle : couches plus profondes légèrement atténuées
+    const intensityMult = 1 - idx * 0.15;
+    layers.push({
+      effet_id:  best.id,
+      category:  catName,
+      intensity: parseFloat((best.intensite_recommandee * intensityMult).toFixed(3)),
+      speed,
+      color:     primaryColor,
+      raison:    `Fusion sémantique ${catName}: ${best.nom}`,
+    });
+  }
+
+  const first = layers[0];
   const primary: ZoneEffectDecision = {
-    effet_id:  first?.id || 'SEP_BREATHING_CALM',
-    intensity: first?.intensite_recommandee || 0.25,
+    effet_id:  first?.effet_id || fallbackId,
+    intensity: first?.intensity || 0.25,
     speed,
     color:     primaryColor,
-    raison:    'Chaos primary',
+    raison:    'Fusion primary layer',
   };
 
   return { primary, layers };
@@ -84,7 +161,7 @@ function pickFlatLayers(
 // buildChaosComposition
 // Construit une ZoneComposition MAXIMUM-COUCHES à partir
 // des candidats déjà scorés par le sélecteur.
-// Utilisé comme fallback enrichi si Gemini échoue.
+// Chaque zone reçoit ses catégories sémantiques propres.
 // ─────────────────────────────────────────────────────
 export function buildChaosComposition(
   selection: ZoneSelection,
@@ -101,18 +178,29 @@ export function buildChaosComposition(
 
   const { primary: logoPrimary, layers: logoLayers }     = pickCatLayers(logoCats,  LOGO_CATEGORY_ORDER, primaryColor, speed);
   const { primary: nomPrimary,  layers: nomLayers  }     = pickCatLayers(nomCats,   NOM_CATEGORY_ORDER,  primaryColor, speed);
-  const { primary: sepPrimary,  layers: sepLayers  }     = pickFlatLayers(sepArr,     3, primaryColor, speed);
-  const { primary: fondPrimary, layers: fondLayers }     = pickFlatLayers(fondArr,    3, primaryColor, speed);
-  const { primary: ctaPrimary,  layers: ctaLayers  }     = pickFlatLayers(ctaArr,     3, primaryColor, speed);
-  const { primary: titrePrimary, layers: titreLayers }   = pickFlatLayers(titreArr,   2, primaryColor, speed);
-  const { primary: contactPrimary, layers: contactLayers } = pickFlatLayers(contactArr, 2, primaryColor, speed);
+
+  const { primary: titrePrimary,   layers: titreLayers   } = pickSemanticFusionLayers(
+    titreArr, TITRE_FUSION_MAP, TITRE_CATEGORY_ORDER, primaryColor, 'TITRE_FADE_PRESENCE', speed,
+  );
+  const { primary: contactPrimary, layers: contactLayers } = pickSemanticFusionLayers(
+    contactArr, CONTACT_FUSION_MAP, CONTACT_CATEGORY_ORDER, primaryColor, 'CONTACT_CASCADE_APPEAR', speed,
+  );
+  const { primary: sepPrimary,  layers: sepLayers  } = pickSemanticFusionLayers(
+    sepArr, SEP_FUSION_MAP, SEP_CATEGORY_ORDER, primaryColor, 'SEP_BREATHING_CALM', speed,
+  );
+  const { primary: fondPrimary, layers: fondLayers } = pickSemanticFusionLayers(
+    fondArr, FOND_FUSION_MAP, FOND_CATEGORY_ORDER, primaryColor, 'FOND_ATMOSPHERIC_BREATH', speed,
+  );
+  const { primary: ctaPrimary,  layers: ctaLayers  } = pickSemanticFusionLayers(
+    ctaArr, CTA_FUSION_MAP, CTA_CATEGORY_ORDER, primaryColor, 'CTA_BREATH_INVITATION', speed,
+  );
 
   return {
-    logo:       { ...logoPrimary, layers: logoLayers },
-    nom:        { ...nomPrimary,  layers: nomLayers  },
-    separateur: { ...sepPrimary,  layers: sepLayers  },
-    fond:       { ...fondPrimary, layers: fondLayers },
-    cta:        { ...ctaPrimary,  layers: ctaLayers  },
+    logo:       { ...logoPrimary,    layers: logoLayers    },
+    nom:        { ...nomPrimary,     layers: nomLayers     },
+    separateur: { ...sepPrimary,     layers: sepLayers     },
+    fond:       { ...fondPrimary,    layers: fondLayers    },
+    cta:        { ...ctaPrimary,     layers: ctaLayers     },
     titre:      { ...titrePrimary,   layers: titreLayers   },
     contact:    { ...contactPrimary, layers: contactLayers },
   };
@@ -120,9 +208,9 @@ export function buildChaosComposition(
 
 // ─────────────────────────────────────────────────────
 // enrichWithChaos
-// Enrichit une composition existante (post-Gemini) avec
-// des couches manquantes depuis le sélecteur.
-// Garantit que TOUTES les catégories sont représentées.
+// Enrichit une composition existante (post-IA) avec des
+// couches sémantiques manquantes. Garantit que TOUTES
+// les catégories sont représentées pour chaque zone.
 // ─────────────────────────────────────────────────────
 export function enrichWithChaos(
   composition: ZoneComposition,
@@ -151,7 +239,7 @@ export function enrichWithChaos(
   }
   result.logo.layers = logoLayers;
 
-  // ── Nom : forcer lumiere + mouvement ─────────────
+  // ── Nom : forcer lumiere + mouvement ──────────────
   const nomCats         = selection.nom as CategoryCandidates;
   const existingNomCats = new Set((result.nom.layers || []).map((l: EffectLayer) => l.category));
   const nomLayers       = [...(result.nom.layers || [])] as EffectLayer[];
@@ -171,39 +259,48 @@ export function enrichWithChaos(
   }
   result.nom.layers = nomLayers;
 
-  // ── Zones plates : ajouter couche secondary si absente ──
-  const addSecondaryLayer = (
+  // ── Enrichissement sémantique des zones plates ────
+  const enrichSemantic = (
     zone: ZoneEffectDecision,
     candidates: EffetCandidat[],
+    fusionMap: Record<string, string[]>,
+    categoryOrder: readonly string[],
     fallbackColor: string,
-    targetLayers = 2,
   ): ZoneEffectDecision => {
     const currentLayers = (zone.layers || []) as EffectLayer[];
-    if (currentLayers.length >= targetLayers) return zone;
-    const usedIds = new Set(currentLayers.map(l => l.effet_id));
-    const extra = candidates.filter(c => !usedIds.has(c.id));
+    const existingCats  = new Set(currentLayers.map(l => l.category));
+    const existingIds   = new Set(currentLayers.map(l => l.effet_id));
+    const newLayers     = [...currentLayers];
 
-    const newLayers = [...currentLayers];
-    for (let i = 0; i < Math.min(targetLayers - currentLayers.length, extra.length); i++) {
-      const c = extra[i];
+    for (const catName of categoryOrder) {
+      if (existingCats.has(catName)) continue;
+
+      const allowedIds = new Set(fusionMap[catName] || []);
+      const best = candidates
+        .filter(c => allowedIds.has(c.id) && !existingIds.has(c.id))
+        .sort((a, b) => b.score - a.score)[0];
+
+      if (!best) continue;
+
       newLayers.push({
-        effet_id:  c.id,
-        category:  FLAT_CATEGORY_ORDER[currentLayers.length + i] || `extra${i}`,
-        intensity: parseFloat((c.intensite_recommandee * (0.6 - i * 0.15)).toFixed(3)),
+        effet_id:  best.id,
+        category:  catName,
+        intensity: parseFloat((best.intensite_recommandee * 0.6).toFixed(3)),
         speed:     zone.speed || 'medium',
         color:     zone.color || fallbackColor,
-        raison:    `Auto-chaos extra couche`,
+        raison:    `Auto-chaos ${catName}`,
       });
+      existingIds.add(best.id);
     }
 
     return { ...zone, layers: newLayers };
   };
 
-  result.separateur = addSecondaryLayer(result.separateur, selection.separateur as EffetCandidat[], primaryColor, 2);
-  result.fond       = addSecondaryLayer(result.fond,       selection.fond       as EffetCandidat[], primaryColor, 2);
-  result.cta        = addSecondaryLayer(result.cta,        selection.cta        as EffetCandidat[], primaryColor, 2);
-  result.titre      = addSecondaryLayer(result.titre,      selection.titre      as EffetCandidat[], primaryColor, 2);
-  result.contact    = addSecondaryLayer(result.contact,    selection.contact    as EffetCandidat[], primaryColor, 2);
+  result.titre   = enrichSemantic(result.titre,   selection.titre   as EffetCandidat[], TITRE_FUSION_MAP,   TITRE_CATEGORY_ORDER,   primaryColor);
+  result.contact = enrichSemantic(result.contact, selection.contact as EffetCandidat[], CONTACT_FUSION_MAP, CONTACT_CATEGORY_ORDER, primaryColor);
+  result.separateur = enrichSemantic(result.separateur, selection.separateur as EffetCandidat[], SEP_FUSION_MAP,   SEP_CATEGORY_ORDER,  primaryColor);
+  result.fond       = enrichSemantic(result.fond,       selection.fond        as EffetCandidat[], FOND_FUSION_MAP,  FOND_CATEGORY_ORDER, primaryColor);
+  result.cta        = enrichSemantic(result.cta,        selection.cta         as EffetCandidat[], CTA_FUSION_MAP,   CTA_CATEGORY_ORDER,  primaryColor);
 
   return result;
 }

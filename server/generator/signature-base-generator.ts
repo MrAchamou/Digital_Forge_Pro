@@ -175,8 +175,9 @@ export class SignatureBaseGenerator {
   <rect id="sep-bar" x="0" y="0" width="2" height="148" fill="url(#sep-grad)" rx="1"/>`;
   }
 
-  private buildSocialIcons(reseaux: string[], accent: string, textColor: string): string {
-    const icons = reseaux.filter(r => SOCIAL_ICONS[r.toLowerCase()]);
+  private buildSocialIcons(reseaux: string[] | undefined, accent: string, textColor: string): string {
+    if (!reseaux || !Array.isArray(reseaux)) return '';
+    const icons = reseaux.filter(r => SOCIAL_ICONS[r?.toLowerCase?.() || '']);
     if (icons.length === 0) return '';
     return icons.map((r, i) => {
       const path = SOCIAL_ICONS[r.toLowerCase()];
