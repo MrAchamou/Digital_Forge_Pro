@@ -1,10 +1,10 @@
 {
-  "lastSaved": "2026-04-07T10:32:39.328Z",
+  "lastSaved": "2026-04-07T10:48:23.261Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:33:25.735Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 2,
       "errorCount": 2,
       "successCount": 0,
@@ -17,8 +17,8 @@
     },
     "gemini_2": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:33:25.832Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 2,
       "errorCount": 2,
       "successCount": 0,
@@ -31,8 +31,8 @@
     },
     "gemini_3": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:33:25.955Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 2,
       "errorCount": 2,
       "successCount": 0,
@@ -45,8 +45,8 @@
     },
     "gemini_4": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:33:26.051Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 2,
       "errorCount": 2,
       "successCount": 0,
@@ -59,8 +59,8 @@
     },
     "gemini_5": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:33:26.186Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 2,
       "errorCount": 2,
       "successCount": 0,
@@ -73,8 +73,8 @@
     },
     "cerebras_1": {
       "usageToday": 1,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:33:12.748Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 1,
       "errorCount": 1,
       "successCount": 1,
@@ -83,12 +83,12 @@
       "callsLastHour": 1,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-07T09:37:50.123Z",
-      "lastError": "429: {\"message\":\"We're experiencing high traffic right now! Please try again soon.\",\"type\":\"too_many_requests_error\",\"param\":\"queue\",\"code\":\"queue_exceeded\"}"
+      "lastError": null
     },
     "cerebras_2": {
       "usageToday": 6,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:33:12.885Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 1,
       "errorCount": 1,
       "successCount": 6,
@@ -97,12 +97,12 @@
       "callsLastHour": 6,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-07T10:05:50.743Z",
-      "lastError": "429: {\"message\":\"We're experiencing high traffic right now! Please try again soon.\",\"type\":\"too_many_requests_error\",\"param\":\"queue\",\"code\":\"queue_exceeded\"}"
+      "lastError": null
     },
     "cerebras_3": {
       "usageToday": 6,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:33:12.969Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 1,
       "errorCount": 1,
       "successCount": 6,
@@ -111,7 +111,7 @@
       "callsLastHour": 6,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-07T10:06:10.676Z",
-      "lastError": "429: {\"message\":\"We're experiencing high traffic right now! Please try again soon.\",\"type\":\"too_many_requests_error\",\"param\":\"queue\",\"code\":\"queue_exceeded\"}"
+      "lastError": null
     },
     "cerebras_4": {
       "usageToday": 7,
@@ -129,8 +129,8 @@
     },
     "cerebras_5": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-07T10:34:26.557Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 2,
       "errorCount": 2,
       "successCount": 0,
@@ -139,7 +139,7 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": null,
-      "lastError": "429: {\"message\":\"We're experiencing high traffic right now! Please try again soon.\",\"type\":\"too_many_requests_error\",\"param\":\"queue\",\"code\":\"queue_exceeded\"}"
+      "lastError": null
     },
     "serper_1": {
       "usageToday": 2,

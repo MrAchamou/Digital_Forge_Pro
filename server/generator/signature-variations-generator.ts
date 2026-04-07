@@ -236,13 +236,13 @@ export class SignatureVariationsGenerator {
       #var-b-wave1 { animation: wave-b 10s ease-in-out 0s infinite; }
       #var-b-wave2 { animation: wave-b2 10s ease-in-out 0s infinite; }
       #var-b-logo-glow { animation: hue-logo-b 10s ease-in-out 0s infinite; }
-      #var-b-sep { animation: sep-pulse-b 10s ease-in-out 0s infinite; transform-origin: 172px 90px; }`;
+      #var-b-sep { animation: sep-pulse-b 10s ease-in-out 0s infinite; transform-origin: 170px 90px; }`;
 
     const svg = `<g id="var-b">
       <rect x="0" y="0" width="600" height="180" fill="${c1}" fill-opacity="0.05" rx="12"/>
       <rect id="var-b-wave1" x="-600" y="0" width="600" height="180" fill="url(#grad-bg-b)" rx="12"/>
       <rect id="var-b-wave2" x="0" y="0" width="600" height="180" fill="${c2}" fill-opacity="0.08" rx="12"/>
-      <ellipse id="var-b-logo-glow" cx="70" cy="135" rx="55" ry="18" fill="${c1}" fill-opacity="0.2"/>
+      <ellipse id="var-b-logo-glow" cx="76" cy="154" rx="55" ry="18" fill="${c1}" fill-opacity="0.2"/>
       <rect id="var-b-sep" x="170" y="16" width="4" height="148" fill="${c1}" fill-opacity="0.5" rx="2"/>
     </g>`;
 
@@ -293,7 +293,7 @@ export class SignatureVariationsGenerator {
       <g id="var-c-particles">${particles}</g>
       <circle id="var-c-ring" cx="76" cy="76" r="52" fill="none" stroke="${c2}" stroke-width="2" stroke-dasharray="8 4"/>
       <rect id="var-c-shimmer" x="186" y="34" width="280" height="14" fill="url(#grad-shimmer)" rx="2"/>
-      <rect id="var-c-sep" x="172" y="16" width="2" height="148" fill="${c2}" fill-opacity="0.4" rx="1"/>
+      <rect id="var-c-sep" x="170" y="16" width="2" height="148" fill="${c2}" fill-opacity="0.4" rx="1"/>
     </g>`;
 
     return { id: 'var-c', label: 'Generative Noise', cssAnimations: css, svgElements: svg };
@@ -344,14 +344,14 @@ export class SignatureVariationsGenerator {
       #var-d-inner { animation: resp-inner-d 10s ease-in-out 0s infinite; }
       #var-d-cta { animation: cta-glow-d 10s ease-in-out 0s infinite; }
       #var-d-sep { animation: sep-resp-d 10s ease-in-out 0s infinite; }
-      #var-d-logo { animation: logo-rotate-d 10s ease-in-out 0s infinite; transform-origin: 76px 135px; }`;
+      #var-d-logo { animation: logo-rotate-d 10s ease-in-out 0s infinite; transform-origin: 76px 154px; }`;
 
     const svg = `<g id="var-d">
       <rect x="0" y="0" width="600" height="180" fill="${c1}" fill-opacity="0.06" rx="12"/>
       <circle id="var-d-outer" cx="76" cy="76" r="58" fill="url(#grad-halo)" stroke="${c1}" stroke-width="1"/>
       <circle id="var-d-inner" cx="76" cy="76" r="52" fill="url(#grad-halo)"/>
-      <ellipse id="var-d-logo" cx="76" cy="135" rx="50" ry="15" fill="${c1}" fill-opacity="0.15"/>
-      <rect id="var-d-cta" x="406" y="110" width="160" height="28" rx="14" fill="${c1}" fill-opacity="0.4"/>
+      <ellipse id="var-d-logo" cx="76" cy="154" rx="50" ry="15" fill="${c1}" fill-opacity="0.15"/>
+      <rect id="var-d-cta" x="406" y="130" width="160" height="28" rx="14" fill="${c1}" fill-opacity="0.4"/>
       <rect id="var-d-sep" x="170" y="16" width="4" height="148" fill="url(#grad-sep-flow)" rx="2"/>
     </g>`;
 

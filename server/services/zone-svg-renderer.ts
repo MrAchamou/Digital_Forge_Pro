@@ -363,7 +363,7 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
 // ZONE NOM
 // ════════════════════════════════════════════
 
-function renderNomEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, delay: number, nomX = 195, nomY = 30, nomW = 220): SVGEffectCode {
+function renderNomEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, delay: number, nomX = 186, nomY = 30, nomW = 220): SVGEffectCode {
   const col = e.color;
   const i   = e.intensity;
   const sp  = e.speed;
@@ -470,7 +470,7 @@ function renderTitreEffect(d_fn: Function, e: ZoneEffectDecision, varId: string,
   const i   = e.intensity;
   const sp  = e.speed;
   const pfx = `${varId}-titre`;
-  const tx  = 195, ty = 58;
+  const tx  = 186, ty = 54;
 
   switch (e.effet_id) {
 
@@ -535,7 +535,7 @@ function renderSeparateurEffect(d_fn: Function, e: ZoneEffectDecision, varId: st
   const i   = e.intensity;
   const sp  = e.speed;
   const pfx = `${varId}-sep`;
-  const sx = 172, sy = 16, sh = 148;
+  const sx = 170, sy = 16, sh = 148;
 
   switch (e.effet_id) {
 
@@ -721,9 +721,9 @@ function renderContactEffect(d_fn: Function, e: ZoneEffectDecision, varId: strin
           0%   { transform: translateY(8px); opacity: 0; }
           100% { transform: translateY(0);   opacity: 1; }
         }`,
-        elements: `<rect x="195" y="78" width="180" height="12" fill="${col}" fill-opacity="${i*0.08}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.3}s 1 both;"/>
-          <rect x="195" y="94" width="160" height="12" fill="${col}" fill-opacity="${i*0.06}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.6}s 1 both;"/>
-          <rect x="195" y="110" width="170" height="12" fill="${col}" fill-opacity="${i*0.07}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.9}s 1 both;"/>`,
+        elements: `<rect x="186" y="87" width="180" height="12" fill="${col}" fill-opacity="${i*0.08}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.3}s 1 both;"/>
+          <rect x="186" y="102" width="160" height="12" fill="${col}" fill-opacity="${i*0.06}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.6}s 1 both;"/>
+          <rect x="186" y="117" width="170" height="12" fill="${col}" fill-opacity="${i*0.07}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.9}s 1 both;"/>`,
       };
     }
 
@@ -735,9 +735,9 @@ function renderContactEffect(d_fn: Function, e: ZoneEffectDecision, varId: strin
           0%,100% { transform: scale(1);    opacity: 0.7; }
           50%      { transform: scale(${1+0.15*i}); opacity: 1; }
         }`,
-        elements: `<circle cx="193" cy="83"  r="5" fill="${col}" fill-opacity="${i*0.4}" style="animation:${pfx}-icon ${dur} ease-in-out ${delay}s infinite; transform-origin:193px 83px;"/>
-          <circle cx="193" cy="99"  r="5" fill="${col}" fill-opacity="${i*0.4}" style="animation:${pfx}-icon ${dur} ease-in-out ${delay+1}s infinite; transform-origin:193px 99px;"/>
-          <circle cx="193" cy="115" r="5" fill="${col}" fill-opacity="${i*0.4}" style="animation:${pfx}-icon ${dur} ease-in-out ${delay+2}s infinite; transform-origin:193px 115px;"/>`,
+        elements: `<circle cx="186" cy="92"  r="5" fill="${col}" fill-opacity="${i*0.4}" style="animation:${pfx}-icon ${dur} ease-in-out ${delay}s infinite; transform-origin:186px 92px;"/>
+          <circle cx="186" cy="107" r="5" fill="${col}" fill-opacity="${i*0.4}" style="animation:${pfx}-icon ${dur} ease-in-out ${delay+1}s infinite; transform-origin:186px 107px;"/>
+          <circle cx="186" cy="122" r="5" fill="${col}" fill-opacity="${i*0.4}" style="animation:${pfx}-icon ${dur} ease-in-out ${delay+2}s infinite; transform-origin:186px 122px;"/>`,
       };
     }
 
@@ -751,15 +751,15 @@ function renderContactEffect(d_fn: Function, e: ZoneEffectDecision, varId: strin
           <animateTransform attributeName="gradientTransform" type="translate" from="0 -1" to="0 1" dur="${dur}" repeatCount="indefinite"/>
         </linearGradient>`,
         keyframes: '',
-        elements: `<rect x="185" y="75" width="200" height="60" fill="url(#${pfx}-scan-g)" rx="4"/>`,
+        elements: `<rect x="185" y="86" width="200" height="46" fill="url(#${pfx}-scan-g)" rx="4"/>`,
       };
     }
 
     case 'CONTACT_HIGHLIGHT_HOVER': {
       // Surbrillance douce qui parcourt chaque ligne de contact
       const dur = d_fn(8, sp);
-      const lineHighlights = [78, 94, 110].map((y, idx) =>
-        `<rect x="190" y="${y}" width="190" height="11" fill="${col}" fill-opacity="${i*0.12}" rx="3"
+      const lineHighlights = [87, 102, 117].map((y, idx) =>
+        `<rect x="186" y="${y}" width="190" height="11" fill="${col}" fill-opacity="${i*0.12}" rx="3"
           style="animation:${pfx}-hl ${dur} ease-in-out ${delay + idx * 1.5}s infinite;"/>`
       ).join('');
       return {
@@ -785,7 +785,7 @@ function renderCtaEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, d
   const i   = e.intensity;
   const sp  = e.speed;
   const pfx = `${varId}-cta`;
-  const cx = 486, cy = 124, cw = 160, ch = 28, cr = 14;
+  const cx = 486, cy = 144, cw = 160, ch = 28, cr = 14;
 
   switch (e.effet_id) {
 
