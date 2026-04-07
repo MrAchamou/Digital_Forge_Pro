@@ -4,7 +4,8 @@ import {
   Sparkles, Download, CheckCircle2, Circle, Loader2, Brain, Cpu, Zap, Bot,
   RefreshCw, Link2, Upload, ImageIcon, Wand2, Star, MapPin, Phone, Mail,
   Globe, Building2, User, Briefcase, ChevronDown, ChevronUp, Eye, EyeOff,
-  Package, Send, ExternalLink, Copy, Check, Box,
+  Package, Send, ExternalLink, Copy, Check, Box, AlignCenter, Type, Tag,
+  Share2, SeparatorVertical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,16 @@ interface DeliveryResult {
   steps: DeliveryStepStatus[];
 }
 
+interface Sections3D {
+  photo?: boolean;
+  separator?: boolean;
+  nom?: boolean;
+  titre?: boolean;
+  contact?: boolean;
+  social?: boolean;
+  cta?: boolean;
+}
+
 interface FormData {
   nom: string; titre: string; entreprise: string;
   telephone: string; email: string; site: string;
@@ -44,6 +55,7 @@ interface FormData {
   adresse: string; ville: string; pays: string;
   note: number; avis: number; description: string;
   logo_url: string; logo_base64: string; logo3d: boolean;
+  sections3d: Sections3D;
   style_visuel: string; slogan: string;
   mots_cles: string[]; ton: string;
   reseaux_sociaux: Record<string, string>;
@@ -459,6 +471,84 @@ function LogoSection({ form, onUpdate }: { form: FormData; onUpdate: (data: Part
   );
 }
 
+// ─── Sections 3D Panel ────────────────────────────────────────────────────────
+
+const SECTION_DEFS: { key: keyof Sections3D; label: string; sub: string; Icon: any }[] = [
+  { key: 'photo',     label: 'Photo',     sub: 'Halo · Profondeur · Arc',    Icon: User           },
+  { key: 'separator', label: 'Séparateur', sub: 'Extrusion · Bevel',         Icon: SeparatorVertical },
+  { key: 'nom',       label: 'Nom',       sub: 'Ombre · Shimmer',            Icon: Type           },
+  { key: 'titre',     label: 'Titre',     sub: 'Couches colorées',           Icon: Tag            },
+  { key: 'contact',   label: 'Contact',   sub: 'Pill surélevé · Highlight',  Icon: Mail           },
+  { key: 'social',    label: 'Icônes',    sub: 'Boutons extrudés',           Icon: Share2         },
+  { key: 'cta',       label: 'CTA',       sub: 'Bouton 3D · Bevel · Glow',   Icon: Zap            },
+];
+
+function Sections3DPanel({ form, onUpdate }: { form: FormData; onUpdate: (data: Partial<FormData>) => void }) {
+  const s3d = form.sections3d || {};
+  const activeCount = SECTION_DEFS.filter(d => s3d[d.key]).length;
+
+  const toggle = (key: keyof Sections3D) => {
+    onUpdate({ sections3d: { ...s3d, [key]: !s3d[key] } });
+  };
+
+  const toggleAll = () => {
+    if (activeCount === SECTION_DEFS.length) {
+      onUpdate({ sections3d: {} });
+    } else {
+      const all: Sections3D = {};
+      SECTION_DEFS.forEach(d => { all[d.key] = true; });
+      onUpdate({ sections3d: all });
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-white/40 text-xs uppercase tracking-wider flex items-center gap-1.5">
+          <Box className="w-3 h-3" /> Pré-rendu 3D par section
+        </Label>
+        <button
+          type="button"
+          onClick={toggleAll}
+          data-testid="toggle-sections3d-all"
+          className="text-[10px] px-2 py-0.5 rounded-full border border-violet-500/40 text-violet-400 hover:bg-violet-500/10 transition-colors"
+        >
+          {activeCount === SECTION_DEFS.length ? 'Tout désactiver' : 'Tout activer'}
+        </button>
+      </div>
+      <div className="grid grid-cols-2 gap-1.5">
+        {SECTION_DEFS.map(({ key, label, sub, Icon }) => {
+          const active = !!s3d[key];
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => toggle(key)}
+              data-testid={`toggle-section3d-${key}`}
+              className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border transition-all text-left ${
+                active
+                  ? 'border-violet-500/60 bg-violet-500/10 text-violet-300'
+                  : 'border-white/8 bg-white/3 text-white/35 hover:border-white/20 hover:text-white/55'
+              }`}
+            >
+              <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${active ? 'text-violet-400' : 'text-white/25'}`} />
+              <span className="min-w-0">
+                <span className="block text-[11px] font-medium leading-tight">{label}</span>
+                <span className={`block text-[9px] leading-tight truncate ${active ? 'text-violet-400/70' : 'text-white/20'}`}>{sub}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      {activeCount > 0 && (
+        <p className="text-[10px] text-violet-300/55 pl-0.5">
+          {activeCount} section{activeCount > 1 ? 's' : ''} en mode volume 3D SVG natif.
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ─── Palette Presets ─────────────────────────────────────────────────────────
 
 const GRADIENT_PRESETS = [
@@ -755,6 +845,7 @@ const DEFAULT_FORM: FormData = {
   palette: ["#0f0f0f", "#6366f1", "#e8e8ff"],
   adresse: "", ville: "Paris", pays: "France",
   note: 0, avis: 0, description: "", logo_url: "", logo_base64: "", logo3d: false,
+  sections3d: {},
   style_visuel: "", slogan: "", mots_cles: [], ton: "professionnel et moderne",
   reseaux_sociaux: {},
   client_email: "",
@@ -1275,6 +1366,9 @@ export default function Studio() {
 
             {/* Logo */}
             <LogoSection form={form} onUpdate={updateForm} />
+
+            {/* Pré-rendu 3D par section */}
+            <Sections3DPanel form={form} onUpdate={updateForm} />
 
             {/* Style visuel + IA */}
             <StyleVisuelSection form={form} onUpdate={updateForm} />

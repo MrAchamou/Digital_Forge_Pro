@@ -1,3 +1,13 @@
+export interface Sections3D {
+  photo?: boolean;
+  separator?: boolean;
+  nom?: boolean;
+  titre?: boolean;
+  contact?: boolean;
+  social?: boolean;
+  cta?: boolean;
+}
+
 export interface SignatureData {
   nom: string;
   titre: string;
@@ -10,6 +20,7 @@ export interface SignatureData {
   logo_url?: string;
   photo_url?: string;
   logo3d?: boolean;
+  sections3d?: Sections3D;
 }
 
 export interface StyleData {
@@ -81,17 +92,17 @@ export class SignatureBaseGenerator {
   }
 
   private buildBaseSVG(sig: SignatureData, style: StyleData, colors: any): string {
-    const { colorBg, colorAccent, colorText, colorSecondary, textOnBg, textMuted } = colors;
+    const s3d = sig.sections3d || {};
+    const { colorBg, colorAccent, colorSecondary, textOnBg, textMuted } = colors;
 
-    const socialIconsXML = this.buildSocialIcons(sig.reseaux, colorAccent, textOnBg);
-    const separatorXML = this.buildSeparator(colorAccent, colorSecondary);
-    const photoXML = this.buildPhotoOrPlaceholder(sig.photo_url, sig.nom, colorAccent, textOnBg);
-    const logoXML = this.buildLogoOrText(sig.logo_url, sig.entreprise, colorAccent, textOnBg, sig.logo3d);
-    const ctaXML = this.buildCTA(sig.cta, colorAccent, textOnBg);
-
-    const emailText = sig.email ? this.escapeXml(sig.email) : '';
-    const phoneText = sig.telephone ? this.escapeXml(sig.telephone) : '';
-    const siteText = sig.site ? this.escapeXml(sig.site.replace(/^https?:\/\//, '')) : '';
+    const photoXML    = this.buildPhotoOrPlaceholder(sig.photo_url, sig.nom, colorAccent, textOnBg, s3d.photo);
+    const logoXML     = this.buildLogoOrText(sig.logo_url, sig.entreprise, colorAccent, textOnBg, sig.logo3d);
+    const separatorXML= this.buildSeparator(colorAccent, colorSecondary, s3d.separator);
+    const nameXML     = this.buildNameText(sig.nom, textOnBg, s3d.nom);
+    const titreXML    = this.buildTitreText(sig.titre, colorAccent, s3d.titre);
+    const contactXML  = this.buildContactBlock(sig.email, sig.telephone, sig.site, textOnBg, textMuted, colorAccent, s3d.contact);
+    const socialXML   = this.buildSocialIcons(sig.reseaux, colorAccent, textOnBg, s3d.social);
+    const ctaXML      = this.buildCTA(sig.cta, colorAccent, textOnBg, s3d.cta);
 
     return `<g id="base-static">
   <!-- Background base -->
@@ -110,12 +121,8 @@ export class SignatureBaseGenerator {
 
   <!-- Right column: info -->
   <g id="right-col" transform="translate(186, 20)">
-    <!-- Name -->
-    <text id="sig-name" x="0" y="22" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" fill="${textOnBg}" letter-spacing="0.5">${this.escapeXml(sig.nom)}</text>
-
-    <!-- Title -->
-    <text id="sig-titre" x="0" y="40" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" fill="${colorAccent}" letter-spacing="1.5" text-transform="uppercase">${this.escapeXml(sig.titre.toUpperCase())}</text>
-
+    ${nameXML}
+    ${titreXML}
     <!-- Company -->
     <text id="sig-company" x="0" y="56" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="${textMuted}">${this.escapeXml(sig.entreprise)}</text>
 
@@ -124,14 +131,12 @@ export class SignatureBaseGenerator {
 
     <!-- Contact info -->
     <g id="contact-block" transform="translate(0, 72)">
-      ${emailText ? `<text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">✉  <tspan fill="${textOnBg}">${emailText}</tspan></text>` : ''}
-      ${phoneText ? `<text x="0" y="15" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">✆  <tspan fill="${textOnBg}">${phoneText}</tspan></text>` : ''}
-      ${siteText ? `<text x="0" y="30" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">⊕  <tspan fill="${colorAccent}">${siteText}</tspan></text>` : ''}
+      ${contactXML}
     </g>
 
     <!-- Social icons -->
     <g id="social-icons" transform="translate(0, 120)">
-      ${socialIconsXML}
+      ${socialXML}
     </g>
 
     <!-- CTA -->
@@ -142,18 +147,68 @@ export class SignatureBaseGenerator {
 </g>`;
   }
 
-  private buildPhotoOrPlaceholder(photoUrl: string | undefined, nom: string, accent: string, textColor: string): string {
+  // ── PHOTO ────────────────────────────────────────────────────────────────────
+
+  private buildPhotoOrPlaceholder(photoUrl: string | undefined, nom: string, accent: string, textColor: string, is3d?: boolean): string {
     const initials = nom.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    if (photoUrl) {
-      return `<clipPath id="photo-clip">
+    const dark   = this.lightenHex(accent, -80);
+    const bright = this.lightenHex(accent, 55);
+
+    if (!is3d) {
+      if (photoUrl) {
+        return `<clipPath id="photo-clip">
     <circle cx="60" cy="60" r="52"/>
   </clipPath>
   <image href="${this.escapeXml(photoUrl)}" x="8" y="8" width="104" height="104" clip-path="url(#photo-clip)" preserveAspectRatio="xMidYMid slice"/>
   <circle cx="60" cy="60" r="52" fill="none" stroke="${accent}" stroke-width="2" id="photo-ring"/>`;
-    }
-    return `<circle cx="60" cy="60" r="52" fill="${accent}" fill-opacity="0.15" stroke="${accent}" stroke-width="2" id="photo-ring"/>
+      }
+      return `<circle cx="60" cy="60" r="52" fill="${accent}" fill-opacity="0.15" stroke="${accent}" stroke-width="2" id="photo-ring"/>
   <text x="60" y="67" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="${textColor}">${initials}</text>`;
+    }
+
+    if (photoUrl) {
+      return `<defs>
+    <clipPath id="photo-clip"><circle cx="60" cy="60" r="52"/></clipPath>
+    <filter id="photo3d-drop" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feColorMatrix type="matrix" in="blur" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0"/>
+    </filter>
+  </defs>
+  <!-- ══ 3D Photo: shadow platform ══ -->
+  <ellipse cx="64" cy="120" rx="50" ry="7" fill="black" fill-opacity="0.32" filter="url(#photo3d-drop)"/>
+  <!-- ══ Extrusion rings ══ -->
+  <circle cx="63" cy="63" r="53" fill="${dark}" fill-opacity="0.45"/>
+  <circle cx="61" cy="61" r="53" fill="${dark}" fill-opacity="0.25"/>
+  <!-- ══ Photo ══ -->
+  <image href="${this.escapeXml(photoUrl)}" x="8" y="8" width="104" height="104" clip-path="url(#photo-clip)" preserveAspectRatio="xMidYMid slice"/>
+  <!-- ══ Accent ring ══ -->
+  <circle cx="60" cy="60" r="52" fill="none" stroke="${accent}" stroke-width="3" id="photo-ring"/>
+  <!-- ══ Inner glow ring ══ -->
+  <circle cx="60" cy="60" r="49" fill="none" stroke="${bright}" stroke-width="1" stroke-opacity="0.35"/>
+  <!-- ══ Specular arc (top highlight) ══ -->
+  <path d="M 22 26 A 44 44 0 0 1 98 26" stroke="white" stroke-width="2.5" fill="none" stroke-opacity="0.38" stroke-linecap="round"/>`;
+    }
+
+    return `<defs>
+    <linearGradient id="photo3d-fill" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%"   stop-color="${bright}" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="${accent}"  stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ 3D Initials: shadow platform ══ -->
+  <ellipse cx="63" cy="118" rx="48" ry="6" fill="black" fill-opacity="0.25"/>
+  <!-- ══ Extrusion circles ══ -->
+  <circle cx="63" cy="63" r="53" fill="${dark}" fill-opacity="0.50"/>
+  <circle cx="62" cy="62" r="53" fill="${dark}" fill-opacity="0.28"/>
+  <!-- ══ Main face ══ -->
+  <circle cx="60" cy="60" r="52" fill="url(#photo3d-fill)" stroke="${accent}" stroke-width="2.5" id="photo-ring"/>
+  <!-- ══ Initials ══ -->
+  <text x="60" y="67" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="${textColor}">${initials}</text>
+  <!-- ══ Specular arc ══ -->
+  <path d="M 22 28 A 42 42 0 0 1 98 28" stroke="white" stroke-width="2.5" fill="none" stroke-opacity="0.42" stroke-linecap="round"/>`;
   }
+
+  // ── LOGO ─────────────────────────────────────────────────────────────────────
 
   private buildLogoOrText(logoUrl: string | undefined, company: string, accent: string, textColor: string, logo3d?: boolean): string {
     if (logo3d) {
@@ -243,38 +298,194 @@ export class SignatureBaseGenerator {
   <rect x="10" y="120" width="100" height="3" rx="2" fill="${bright}" fill-opacity="0.45" pointer-events="none"/>`;
   }
 
-  private buildSeparator(colorAccent: string, colorSecondary: string): string {
-    return `<defs>
+  // ── SEPARATOR ────────────────────────────────────────────────────────────────
+
+  private buildSeparator(colorAccent: string, colorSecondary: string, is3d?: boolean): string {
+    const defs = `<defs>
     <linearGradient id="sep-grad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${colorAccent}" stop-opacity="0.1"/>
       <stop offset="30%" stop-color="${colorAccent}" stop-opacity="0.8"/>
       <stop offset="70%" stop-color="${colorSecondary}" stop-opacity="0.8"/>
       <stop offset="100%" stop-color="${colorSecondary}" stop-opacity="0.1"/>
     </linearGradient>
-  </defs>
+  </defs>`;
+    if (!is3d) {
+      return `${defs}
   <rect id="sep-bar" x="0" y="0" width="2" height="148" fill="url(#sep-grad)" rx="1"/>`;
+    }
+    return `${defs}
+  <!-- ══ 3D Separator: shadow depth ══ -->
+  <rect x="4" y="3" width="3" height="148" fill="black" fill-opacity="0.28" rx="1"/>
+  <rect x="3" y="2" width="3" height="148" fill="black" fill-opacity="0.16" rx="1"/>
+  <!-- ══ Main bar (wider) ══ -->
+  <rect id="sep-bar" x="0" y="0" width="4" height="148" fill="url(#sep-grad)" rx="1"/>
+  <!-- ══ Left edge specular highlight ══ -->
+  <rect x="0" y="6" width="1" height="136" fill="white" fill-opacity="0.42" rx="1"/>`;
   }
 
-  private buildSocialIcons(reseaux: string[] | undefined, accent: string, textColor: string): string {
+  // ── NAME ─────────────────────────────────────────────────────────────────────
+
+  private buildNameText(nom: string, textColor: string, is3d?: boolean): string {
+    const name = this.escapeXml(nom);
+    const fa = `font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="0.5"`;
+    if (!is3d) {
+      return `<text id="sig-name" x="0" y="22" ${fa} fill="${textColor}">${name}</text>`;
+    }
+    const layers = [
+      { dx: 3, dy: 3, op: '0.16' },
+      { dx: 2, dy: 2, op: '0.22' },
+      { dx: 1, dy: 1, op: '0.32' },
+    ];
+    const shadows = layers.map(l =>
+      `<text x="${l.dx}" y="${22 + l.dy}" ${fa} fill="black" fill-opacity="${l.op}">${name}</text>`
+    ).join('\n  ');
+    return `<defs>
+    <linearGradient id="name3d-shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+      <stop offset="40%"  stop-color="white" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ Name 3D: shadow extrusion ══ -->
+  ${shadows}
+  <!-- ══ Main text ══ -->
+  <text id="sig-name" x="0" y="22" ${fa} fill="${textColor}">${name}</text>
+  <!-- ══ Specular shimmer ══ -->
+  <text x="0" y="22" ${fa} fill="url(#name3d-shine)" pointer-events="none">${name}</text>`;
+  }
+
+  // ── TITRE ────────────────────────────────────────────────────────────────────
+
+  private buildTitreText(titre: string, accent: string, is3d?: boolean): string {
+    const t = this.escapeXml(titre.toUpperCase());
+    const fa = `font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" letter-spacing="1.5"`;
+    if (!is3d) {
+      return `<text id="sig-titre" x="0" y="40" ${fa} fill="${accent}">${t}</text>`;
+    }
+    const d1 = this.lightenHex(accent, -80);
+    const d2 = this.lightenHex(accent, -45);
+    return `<!-- ══ Titre 3D: colored depth layers ══ -->
+  <text x="3" y="43" ${fa} fill="${d1}" fill-opacity="0.55">${t}</text>
+  <text x="2" y="42" ${fa} fill="${d1}" fill-opacity="0.40">${t}</text>
+  <text x="1" y="41" ${fa} fill="${d2}" fill-opacity="0.55">${t}</text>
+  <!-- ══ Main text ══ -->
+  <text id="sig-titre" x="0" y="40" ${fa} fill="${accent}">${t}</text>`;
+  }
+
+  // ── CONTACT ──────────────────────────────────────────────────────────────────
+
+  private buildContactBlock(email: string, telephone: string, site: string, textOnBg: string, textMuted: string, accent: string, is3d?: boolean): string {
+    const emailText = email ? this.escapeXml(email) : '';
+    const phoneText = telephone ? this.escapeXml(telephone) : '';
+    const siteText  = site ? this.escapeXml(site.replace(/^https?:\/\//, '')) : '';
+
+    if (!is3d) {
+      return [
+        emailText ? `<text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">✉  <tspan fill="${textOnBg}">${emailText}</tspan></text>` : '',
+        phoneText ? `<text x="0" y="15" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">✆  <tspan fill="${textOnBg}">${phoneText}</tspan></text>` : '',
+        siteText  ? `<text x="0" y="30" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">⊕  <tspan fill="${accent}">${siteText}</tspan></text>` : '',
+      ].join('\n  ');
+    }
+
+    const dark   = this.lightenHex(accent, -90);
+    const bright = this.lightenHex(accent, 50);
+    const items = [
+      { y: 0,  icon: '✉', text: emailText, color: textOnBg },
+      { y: 18, icon: '✆', text: phoneText, color: textOnBg },
+      { y: 36, icon: '⊕', text: siteText,  color: accent  },
+    ].filter(item => item.text);
+
+    return items.map(item => `<!-- ══ Contact 3D row ══ -->
+  <rect x="-3" y="${item.y - 12}" width="242" height="15" rx="3" fill="${dark}" fill-opacity="0.40"/>
+  <rect x="-3" y="${item.y - 12}" width="242" height="2"  rx="1" fill="${bright}" fill-opacity="0.18"/>
+  <text x="0" y="${item.y}" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">${item.icon}  <tspan fill="${item.color}">${item.text}</tspan></text>`
+    ).join('\n  ');
+  }
+
+  // ── SOCIAL ICONS ─────────────────────────────────────────────────────────────
+
+  private buildSocialIcons(reseaux: string[] | undefined, accent: string, textColor: string, is3d?: boolean): string {
     if (!reseaux || !Array.isArray(reseaux)) return '';
     const icons = reseaux.filter(r => SOCIAL_ICONS[r?.toLowerCase?.() || '']);
     if (icons.length === 0) return '';
+
+    if (!is3d) {
+      return icons.map((r, i) => {
+        const path = SOCIAL_ICONS[r.toLowerCase()];
+        const x = i * 26;
+        return `<g transform="translate(${x}, 0) scale(0.75)" id="icon-${r}">
+        <rect x="-2" y="-2" width="20" height="20" rx="4" fill="${accent}" fill-opacity="0.15"/>
+        <path d="${path}" fill="${textColor}" fill-opacity="0.85"/>
+      </g>`;
+      }).join('\n      ');
+    }
+
+    const dark   = this.lightenHex(accent, -80);
+    const bright = this.lightenHex(accent, 55);
     return icons.map((r, i) => {
       const path = SOCIAL_ICONS[r.toLowerCase()];
       const x = i * 26;
       return `<g transform="translate(${x}, 0) scale(0.75)" id="icon-${r}">
-        <rect x="-2" y="-2" width="20" height="20" rx="4" fill="${accent}" fill-opacity="0.15"/>
-        <path d="${path}" fill="${textColor}" fill-opacity="0.85"/>
+        <!-- ══ 3D Social icon extrusion ══ -->
+        <rect x="1"  y="3" width="20" height="20" rx="4" fill="${dark}" fill-opacity="0.55"/>
+        <rect x="0"  y="2" width="20" height="20" rx="4" fill="${dark}" fill-opacity="0.35"/>
+        <!-- ══ Main face ══ -->
+        <rect x="-2" y="-2" width="20" height="20" rx="4" fill="${accent}" fill-opacity="0.22"/>
+        <!-- ══ Top highlight ══ -->
+        <rect x="-2" y="-2" width="20" height="3" rx="2" fill="${bright}" fill-opacity="0.48"/>
+        <!-- ══ Right bevel ══ -->
+        <rect x="16" y="-2" width="2" height="20" rx="1" fill="${bright}" fill-opacity="0.20"/>
+        <!-- ══ Icon path ══ -->
+        <path d="${path}" fill="${textColor}" fill-opacity="0.90"/>
       </g>`;
     }).join('\n      ');
   }
 
-  private buildCTA(cta: string, accent: string, textColor: string): string {
+  // ── CTA ──────────────────────────────────────────────────────────────────────
+
+  private buildCTA(cta: string, accent: string, textColor: string, is3d?: boolean): string {
     if (!cta) return '';
     const label = cta.length > 20 ? cta.slice(0, 20) + '…' : cta;
     const width = Math.min(160, label.length * 7 + 24);
-    return `<rect x="0" y="0" width="${width}" height="28" rx="14" fill="${accent}" id="cta-btn"/>
+    const dark   = this.lightenHex(accent, -60);
+    const bright = this.lightenHex(accent, 55);
+
+    if (!is3d) {
+      return `<rect x="0" y="0" width="${width}" height="28" rx="14" fill="${accent}" id="cta-btn"/>
     <text x="${width / 2}" y="18" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="${textColor}" letter-spacing="0.5">${this.escapeXml(label.toUpperCase())}</text>`;
+    }
+
+    return `<defs>
+    <linearGradient id="cta3d-light" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="black" stop-opacity="0.12"/>
+    </linearGradient>
+    <linearGradient id="cta3d-shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+      <stop offset="50%"  stop-color="white" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ CTA 3D: extrusion layers ══ -->
+  <rect x="5" y="6" width="${width}" height="28" rx="14" fill="${dark}" fill-opacity="0.65"/>
+  <rect x="4" y="4" width="${width}" height="28" rx="14" fill="${dark}" fill-opacity="0.48"/>
+  <rect x="2" y="2" width="${width}" height="28" rx="14" fill="${dark}" fill-opacity="0.30"/>
+  <!-- ══ Main face ══ -->
+  <rect x="0" y="0" width="${width}" height="28" rx="14" fill="${accent}" id="cta-btn"/>
+  <!-- ══ Lighting overlay ══ -->
+  <rect x="0" y="0" width="${width}" height="28" rx="14" fill="url(#cta3d-light)" pointer-events="none"/>
+  <!-- ══ Top edge highlight ══ -->
+  <rect x="5" y="1" width="${width - 10}" height="3" rx="2" fill="${bright}" fill-opacity="0.55" pointer-events="none"/>
+  <!-- ══ Text ══ -->
+  <text x="${width / 2}" y="18" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="${textColor}" letter-spacing="0.5">${this.escapeXml(label.toUpperCase())}</text>
+  <!-- ══ Text shimmer ══ -->
+  <text x="${width / 2}" y="18" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="url(#cta3d-shine)" letter-spacing="0.5" pointer-events="none">${this.escapeXml(label.toUpperCase())}</text>`;
+  }
+
+  // ── UTILS ────────────────────────────────────────────────────────────────────
+
+  private buildSocialIconsLegacy(reseaux: string[] | undefined, accent: string, textColor: string): string {
+    return this.buildSocialIcons(reseaux, accent, textColor, false);
   }
 
   private escapeXml(str: string): string {
