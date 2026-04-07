@@ -1108,30 +1108,48 @@ export default function Studio() {
     onMutate: () => setStep('scraping', { status: 'running' }),
     onSuccess: (data) => {
       setStep('scraping', { status: 'done', data });
-      // Remplissage automatique complet du formulaire
+
+      // Résumé des champs trouvés pour le toast
+      const found: string[] = [];
+      if (data.telephone)  found.push('📞 tél');
+      if (data.email)      found.push('✉ email');
+      if (data.site)       found.push('🌐 site');
+      if (data.logo_base64 || data.logo_url) found.push('🖼 logo');
+      if (Object.keys(data.reseaux_sociaux || {}).length) found.push(`🔗 ${Object.keys(data.reseaux_sociaux).join('/')}` );
+
       setForm(prev => ({
         ...prev,
-        entreprise: data.entreprise || prev.entreprise,
-        telephone: data.telephone || prev.telephone,
-        email: data.email || prev.email,
-        site: data.site || prev.site,
-        secteur: data.secteur || prev.secteur,
-        palette: data.palette?.length >= 3 ? data.palette : prev.palette,
-        ton: data.ton || prev.ton,
-        description: data.description || prev.description,
-        adresse: data.adresse || prev.adresse,
-        ville: data.ville || prev.ville,
-        pays: data.pays || prev.pays,
-        note: data.note || prev.note,
-        avis: data.avis || prev.avis,
-        logo_url: data.logo_base64 ? '' : (data.logo_url || prev.logo_url),
+        entreprise:      data.entreprise      || prev.entreprise,
+        telephone:       data.telephone       || prev.telephone,
+        email:           data.email           || prev.email,
+        site:            data.site            || prev.site,
+        secteur:         data.secteur         || prev.secteur,
+        cta:             data.cta             || prev.cta,
+        palette:         data.palette?.length >= 3 ? data.palette : prev.palette,
+        ton:             data.ton             || prev.ton,
+        description:     data.description     || prev.description,
+        adresse:         data.adresse         || prev.adresse,
+        ville:           data.ville           || prev.ville,
+        pays:            data.pays            || prev.pays,
+        note:            data.note            || prev.note,
+        avis:            data.avis            || prev.avis,
+        slogan:          data.slogan          || prev.slogan,
+        mots_cles:       data.mots_cles?.length ? data.mots_cles : prev.mots_cles,
+        reseaux_sociaux: Object.keys(data.reseaux_sociaux || {}).length
+                           ? data.reseaux_sociaux
+                           : prev.reseaux_sociaux,
+        logo_url:    data.logo_base64 ? '' : (data.logo_url || prev.logo_url),
         logo_base64: data.logo_base64 || prev.logo_base64,
-        slogan: data.slogan || prev.slogan,
-        mots_cles: data.mots_cles || prev.mots_cles,
-        reseaux_sociaux: data.reseaux_sociaux || prev.reseaux_sociaux,
       }));
+
       setShowFullForm(true);
-      toast({ title: "✅ GMB importé", description: `${data.entreprise}${data.note ? ` · ${data.note}★` : ''}${data.ville ? ` · ${data.ville}` : ''}` });
+
+      const ratingStr = data.note ? ` · ★${data.note}${data.avis ? ` (${data.avis} avis)` : ''}` : '';
+      const cityStr   = data.ville ? ` · ${data.ville}` : '';
+      toast({
+        title: `✅ ${data.entreprise} importé`,
+        description: `${ratingStr}${cityStr}${found.length ? `\n${found.join('  ')}` : ''}`,
+      });
     },
     onError: (err: any) => {
       setStep('scraping', { status: 'error' });
@@ -1244,24 +1262,70 @@ export default function Studio() {
         </div>
 
         {/* Résumé GMB importé */}
-        {gmbDone && pipeline.scraping.data && (
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
-            {pipeline.scraping.data.logo_url || pipeline.scraping.data.logo_base64 ? (
-              <img src={pipeline.scraping.data.logo_base64 || pipeline.scraping.data.logo_url} alt="logo" className="w-7 h-7 rounded-lg object-contain bg-white/5 border border-white/10" />
-            ) : null}
-            <span className="text-green-400 font-semibold">{pipeline.scraping.data.entreprise}</span>
-            {pipeline.scraping.data.secteur && <span className="text-white/40">{pipeline.scraping.data.secteur}</span>}
-            {pipeline.scraping.data.ville && (
-              <span className="text-white/40 flex items-center gap-1"><MapPin className="w-3 h-3" />{pipeline.scraping.data.ville}</span>
-            )}
-            {pipeline.scraping.data.note > 0 && (
-              <span className="text-amber-400 flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400" />{pipeline.scraping.data.note} ({pipeline.scraping.data.avis} avis)</span>
-            )}
-            {pipeline.scraping.data.telephone && (
-              <span className="text-white/40 flex items-center gap-1"><Phone className="w-3 h-3" />{pipeline.scraping.data.telephone}</span>
-            )}
-          </div>
-        )}
+        {gmbDone && pipeline.scraping.data && (() => {
+          const d = pipeline.scraping.data;
+          const socialCount = Object.keys(d.reseaux_sociaux || {}).length;
+          return (
+            <div className="mt-3 rounded-xl border border-green-500/20 bg-green-500/5 p-3 space-y-2" data-testid="gmb-import-summary">
+              {/* Ligne 1 : logo + nom + secteur + ville + note */}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                {(d.logo_base64 || d.logo_url) && (
+                  <img
+                    src={d.logo_base64 || d.logo_url}
+                    alt="logo"
+                    className="w-8 h-8 rounded-lg object-contain bg-white/5 border border-white/10 flex-shrink-0"
+                    data-testid="gmb-logo-preview"
+                  />
+                )}
+                <span className="text-green-400 font-semibold" data-testid="gmb-entreprise">{d.entreprise}</span>
+                {d.secteur && <span className="text-white/35 bg-white/5 px-2 py-0.5 rounded-full">{d.secteur}</span>}
+                {d.ville && <span className="text-white/40 flex items-center gap-1"><MapPin className="w-3 h-3" />{d.ville}</span>}
+                {d.note > 0 && (
+                  <span className="text-amber-400 flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-amber-400" />{d.note}
+                    {d.avis > 0 && <span className="text-white/30">({d.avis} avis)</span>}
+                  </span>
+                )}
+              </div>
+              {/* Ligne 2 : contact */}
+              <div className="flex flex-wrap gap-3 text-[11px] text-white/40">
+                {d.telephone && (
+                  <span className="flex items-center gap-1" data-testid="gmb-telephone">
+                    <Phone className="w-3 h-3 text-forge-cyan/60" />{d.telephone}
+                  </span>
+                )}
+                {d.email && (
+                  <span className="flex items-center gap-1" data-testid="gmb-email">
+                    <Mail className="w-3 h-3 text-forge-cyan/60" />{d.email}
+                  </span>
+                )}
+                {d.site && (
+                  <span className="flex items-center gap-1 truncate max-w-[160px]" data-testid="gmb-site">
+                    <Globe className="w-3 h-3 text-forge-cyan/60 flex-shrink-0" />{d.site.replace(/^https?:\/\//, '')}
+                  </span>
+                )}
+              </div>
+              {/* Ligne 3 : réseaux + champs auto */}
+              <div className="flex flex-wrap gap-2 text-[10px]">
+                {socialCount > 0 && (
+                  <span className="bg-violet-500/10 border border-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">
+                    🔗 {Object.keys(d.reseaux_sociaux).join(' · ')}
+                  </span>
+                )}
+                {d.cta && (
+                  <span className="bg-white/5 border border-white/10 text-white/40 px-2 py-0.5 rounded-full">
+                    CTA : {d.cta}
+                  </span>
+                )}
+                {!(d.logo_base64 || d.logo_url) && (
+                  <span className="bg-orange-500/10 border border-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">
+                    ⚠ Logo non trouvé
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* 3 zones principales */}
