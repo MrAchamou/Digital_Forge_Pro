@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { log } from '../vite';
 
 const MAX_RETRIES = 5;
-const CEREBRAS_MODEL = 'llama3.3-70b';
+const CEREBRAS_MODEL = 'qwen-3-235b-a22b-instruct-2507';
 
 export async function callCerebras(
   prompt: string,
