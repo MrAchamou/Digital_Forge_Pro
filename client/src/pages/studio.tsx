@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import {
   Sparkles, Download, CheckCircle2, Circle, Loader2, Brain, Cpu, Zap, Bot,
   RefreshCw, Link2, Upload, ImageIcon, Wand2, Star, MapPin, Phone, Mail,
@@ -1082,6 +1083,7 @@ const idle: StepStatus = { status: 'idle' };
 
 export default function Studio() {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   const [gmbUrl, setGmbUrl] = useState('');
   const [form, setForm] = useState<FormData>(DEFAULT_FORM);
   const [gmbFilledFields, setGmbFilledFields] = useState<Set<string>>(new Set());
@@ -1238,6 +1240,20 @@ export default function Studio() {
     const a = document.createElement('a');
     a.href = url; a.download = `signature_god_tier_${result?.signature_id || 'export'}.svg`; a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const openRealityPreview = () => {
+    if (!svgContent) return;
+    localStorage.setItem('reality_preview_svg', svgContent);
+    localStorage.setItem('reality_preview_meta', JSON.stringify({
+      nom: form.nom,
+      titre: form.titre,
+      entreprise: form.entreprise,
+      signature_id: result?.signature_id || '',
+      email: form.email,
+      telephone: form.telephone,
+    }));
+    navigate('/preview');
   };
 
   const isRunning = pipelineMutation.isPending;
@@ -1549,12 +1565,20 @@ export default function Studio() {
 
           {/* SVG Preview */}
           {svgContent && (
-            <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
-              <div className="flex items-center justify-between mb-3">
+            <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
                 <h3 className="text-xs font-semibold text-green-400 uppercase tracking-widest">SVG God Tier Final</h3>
                 <span className="text-xs text-white/40 font-mono">{result?.signature_id}</span>
               </div>
               <div className="rounded-lg overflow-hidden border border-white/10" dangerouslySetInnerHTML={{ __html: svgContent }} />
+              <Button
+                onClick={openRealityPreview}
+                className="w-full h-10 bg-gradient-to-r from-forge-cyan/20 to-violet-600/20 border border-forge-cyan/50 text-forge-cyan hover:bg-forge-cyan/30 hover:border-forge-cyan/80 text-sm font-semibold rounded-xl transition-all"
+                data-testid="button-open-reality-preview"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Visualiser dans Reality Preview — Ajustements &amp; Validation
+              </Button>
             </div>
           )}
 
@@ -1599,6 +1623,11 @@ export default function Studio() {
           {result && (
             <div className="rounded-xl border border-white/10 bg-white/3 p-4 space-y-3">
               <h4 className="text-xs font-semibold text-white/50 uppercase tracking-widest">Exports</h4>
+              <Button onClick={openRealityPreview}
+                className="w-full h-9 bg-gradient-to-r from-forge-cyan/20 to-violet-600/20 border border-forge-cyan/50 text-forge-cyan hover:bg-forge-cyan/30 text-xs font-semibold"
+                data-testid="button-reality-preview-panel">
+                <Eye className="w-3.5 h-3.5 mr-2" /> Reality Preview &amp; Ajustements
+              </Button>
               <Button onClick={downloadSVG}
                 className="w-full h-9 bg-violet-600/30 border border-violet-500/50 text-violet-300 hover:bg-violet-600/40 text-xs"
                 data-testid="button-download-svg">
