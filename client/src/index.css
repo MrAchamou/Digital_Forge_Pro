@@ -295,7 +295,8 @@
     padding: 24px;
     position: relative;
     overflow: hidden;
-    transition: all 0.25s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    animation: ambient-border-pulse 5s ease-in-out infinite;
   }
 
   .stat-card::after {
@@ -396,4 +397,140 @@
   .glow-text {
     text-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
   }
+}
+
+/* ═══════════════════════════════════════════════════
+   AMBIENT CONTINUOUS ANIMATIONS — EffectForge AI
+   ═══════════════════════════════════════════════════ */
+
+@keyframes ambient-border-pulse {
+  0%, 100% {
+    border-color: rgba(0, 212, 255, 0.06);
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
+  }
+  50% {
+    border-color: rgba(0, 212, 255, 0.18);
+    box-shadow: 0 0 16px 0 rgba(0, 212, 255, 0.06);
+  }
+}
+
+@keyframes ambient-glow-breathe {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.04); }
+}
+
+@keyframes gradient-x-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes forge-scan-vertical {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes neon-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.6; }
+  94% { opacity: 1; }
+  96% { opacity: 0.7; }
+  97% { opacity: 1; }
+}
+
+@keyframes data-stream {
+  0% { transform: translateY(-100%); opacity: 0; }
+  5% { opacity: 0.6; }
+  95% { opacity: 0.6; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes stat-counter-tick {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes icon-orbit {
+  from { transform: rotate(0deg) translateX(22px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(22px) rotate(-360deg); }
+}
+
+.animate-ambient-border {
+  animation: ambient-border-pulse 4s ease-in-out infinite;
+}
+
+.animate-glow-breathe {
+  animation: ambient-glow-breathe 3s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-x-shift 6s ease infinite;
+}
+
+.animate-neon-flicker {
+  animation: neon-flicker 8s linear infinite;
+}
+
+.animate-stat-tick {
+  animation: stat-counter-tick 2s ease-in-out infinite;
+}
+
+/* Card ambient breathing border */
+.forge-card-ambient {
+  background: hsl(var(--forge-dark));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  animation: ambient-border-pulse 5s ease-in-out infinite;
+}
+
+.forge-card-ambient:hover {
+  border-color: rgba(0, 212, 255, 0.25) !important;
+  box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1), 0 0 0 1px rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
+  animation: none;
+}
+
+/* Animated gradient text */
+.text-gradient-animate {
+  background: linear-gradient(135deg, #00d4ff, #8b5cf6, #ff006e, #00d4ff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-x-shift 5s ease infinite;
+}
+
+/* Pulsing dot indicator */
+.pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00d4ff;
+  animation: ambient-glow-breathe 2s ease-in-out infinite;
+  box-shadow: 0 0 6px #00d4ff, 0 0 12px rgba(0, 212, 255, 0.4);
+}
+
+/* God mode status line */
+.god-mode-bar {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0, 212, 255, 0.15) 20%,
+    rgba(139, 92, 246, 0.2) 50%,
+    rgba(0, 212, 255, 0.15) 80%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: gradient-x-shift 3s ease infinite;
+}
+
+/* Live metric number */
+.metric-live {
+  animation: stat-counter-tick 3s ease-in-out infinite;
+  display: inline-block;
 }

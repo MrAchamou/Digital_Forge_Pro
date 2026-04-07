@@ -260,6 +260,101 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
       };
     }
 
+    case 'LOGO_NEURAL_MORPH': {
+      const dur = d_fn(9, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const R = Math.max(LOGO_W, LOGO_H) / 2;
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet" style="filter:url(#${pfx}-morph-f);"/>` : '';
+      const nodes = Array.from({ length: 6 }, (_, k) => ({
+        angle: k * 60,
+        r: (R + 8 + k * 3) * i,
+        delay: k * 0.4,
+      }));
+      const nodeEls = nodes.map((n, k) => {
+        const nx = CX + Math.cos((n.angle * Math.PI) / 180) * n.r;
+        const ny = CY + Math.sin((n.angle * Math.PI) / 180) * n.r;
+        return `<circle key="${k}" cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="${1.5*i}" fill="${col}" fill-opacity="${i*0.7}" style="animation:${pfx}-node-pulse ${dur} ease-in-out ${delay + n.delay}s infinite;"/>
+        <line x1="${CX}" y1="${CY}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${col}" stroke-width="0.5" stroke-opacity="${i*0.3}" style="animation:${pfx}-node-pulse ${dur} ease-in-out ${delay + n.delay}s infinite;"/>`;
+      }).join('');
+      return {
+        filterDefs: `<filter id="${pfx}-morph-f"><feGaussianBlur stdDeviation="${1.5*i}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
+        keyframes: `@keyframes ${pfx}-node-pulse {
+          0%,100% { opacity: ${i*0.4}; transform: scale(0.8); }
+          50%      { opacity: ${i}; transform: scale(1.2); }
+        }`,
+        elements: `${logoEl}\n${nodeEls}`,
+      };
+    }
+
+    case 'LOGO_PRISM_REFRACT': {
+      const dur = d_fn(7, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
+      const prismColors = ['#ff006e', '#ffbe0b', '#06d6a0', '#00d4ff', '#8338ec'];
+      const prismEls = prismColors.map((c, k) => {
+        const angle = k * 72;
+        const r = (LOGO_W / 2 + 6 + k * 3) * i;
+        return `<ellipse cx="${CX}" cy="${CY}" rx="${r}" ry="${r*0.4}" fill="none" stroke="${c}" stroke-width="1" stroke-opacity="${i * 0.5}" style="animation:${pfx}-prism${k} ${(parseFloat(dur) + k * 0.6).toFixed(1)}s linear ${delay + k * 0.3}s infinite; transform-origin:${CX}px ${CY}px; transform:rotate(${angle}deg);"/>`;
+      }).join('');
+      const prismKeyframes = prismColors.map((_, k) =>
+        `@keyframes ${pfx}-prism${k} { from{transform:rotate(${k*72}deg)} to{transform:rotate(${k*72+360}deg)} }`
+      ).join('\n');
+      return {
+        filterDefs: '',
+        keyframes: prismKeyframes,
+        elements: `${prismEls}\n${logoEl}`,
+      };
+    }
+
+    case 'LOGO_NEON_OUTLINE': {
+      const dur = d_fn(3.5, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const dash = Math.round(10 * i);
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
+      return {
+        filterDefs: `<filter id="${pfx}-neon-f"><feGaussianBlur stdDeviation="${3*i}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
+        keyframes: `@keyframes ${pfx}-neon-trace {
+          0%   { stroke-dashoffset: 0; opacity: ${i*0.9}; }
+          50%  { opacity: ${i}; }
+          100% { stroke-dashoffset: ${-dash * 6}; opacity: ${i*0.9}; }
+        }
+        @keyframes ${pfx}-neon-glow {
+          0%,100% { filter: drop-shadow(0 0 ${2*i}px ${col}); }
+          50%      { filter: drop-shadow(0 0 ${6*i}px ${col}) drop-shadow(0 0 ${12*i}px ${col}); }
+        }`,
+        elements: `<rect x="${LOGO_X-3}" y="${LOGO_Y-3}" width="${LOGO_W+6}" height="${LOGO_H+6}" rx="4" fill="none"
+          stroke="${col}" stroke-width="${1.5*i}" stroke-dasharray="${dash} ${dash/2}"
+          filter="url(#${pfx}-neon-f)"
+          style="animation:${pfx}-neon-trace ${dur} linear ${delay}s infinite, ${pfx}-neon-glow ${(parseFloat(dur)*2).toFixed(1)}s ease-in-out ${delay}s infinite;"/>
+        ${logoEl}`,
+      };
+    }
+
+    case 'LOGO_CRYSTAL_FRAGMENT': {
+      const dur = d_fn(8, sp);
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
+      const shards = [
+        { x: CX-LOGO_W*0.3, y: CY-LOGO_H*0.35, r: 3, d: 0 },
+        { x: CX+LOGO_W*0.38, y: CY-LOGO_H*0.2, r: 2.5, d: 1.2 },
+        { x: CX-LOGO_W*0.1, y: CY+LOGO_H*0.4, r: 2, d: 2.4 },
+        { x: CX+LOGO_W*0.25, y: CY+LOGO_H*0.35, r: 1.5, d: 0.8 },
+        { x: CX-LOGO_W*0.4, y: CY+LOGO_H*0.1, r: 2, d: 1.8 },
+        { x: CX+LOGO_W*0.1, y: CY-LOGO_H*0.42, r: 1.5, d: 3.0 },
+      ];
+      const shardEls = shards.map((s, k) =>
+        `<polygon points="${s.x},${s.y-s.r*2} ${s.x-s.r*1.5},${s.y+s.r} ${s.x+s.r*1.5},${s.y+s.r}" fill="${col}" fill-opacity="${i*0.5}" style="animation:${pfx}-shard ${dur} ease-in-out ${delay + s.d}s infinite alternate; filter:url(#${pfx}-cryst-f);"/>`
+      ).join('');
+      return {
+        filterDefs: `<filter id="${pfx}-cryst-f"><feGaussianBlur stdDeviation="${1*i}"/></filter>`,
+        keyframes: `@keyframes ${pfx}-shard {
+          0%   { opacity: ${i*0.3}; transform: scale(0.8) rotate(-10deg); }
+          100% { opacity: ${i*0.8}; transform: scale(1.2) rotate(10deg); }
+        }`,
+        elements: `${shardEls}\n${logoEl}`,
+      };
+    }
+
     default: return empty();
   }
 }

@@ -26,7 +26,7 @@ function pickCatLayers(
     const catName = categoryOrder[idx];
     const candidates = (cats[catName] || []) as EffetCandidat[];
     const top = candidates[0];
-    if (!top || top.score < 0.15) continue;
+    if (!top || top.score < 0.05) continue;
 
     // Chaque couche suivante est légèrement moins intense (hiérarchie visuelle)
     const intensityMult = 1 - idx * 0.12;
@@ -139,7 +139,7 @@ export function enrichWithChaos(
   for (const catName of LOGO_CATEGORY_ORDER) {
     if (existingLogoCats.has(catName)) continue;
     const top = ((logoCats[catName] || []) as EffetCandidat[])[0];
-    if (!top || top.score < 0.2) continue;
+    if (!top || top.score < 0.05) continue;
     logoLayers.push({
       effet_id:  top.id,
       category:  catName,
@@ -159,7 +159,7 @@ export function enrichWithChaos(
   for (const catName of NOM_CATEGORY_ORDER) {
     if (existingNomCats.has(catName)) continue;
     const top = ((nomCats[catName] || []) as EffetCandidat[])[0];
-    if (!top || top.score < 0.2) continue;
+    if (!top || top.score < 0.05) continue;
     nomLayers.push({
       effet_id:  top.id,
       category:  catName,

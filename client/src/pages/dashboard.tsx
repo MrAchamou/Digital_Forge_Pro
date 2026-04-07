@@ -131,11 +131,17 @@ export default function Dashboard() {
             className="text-4xl md:text-5xl font-black leading-tight mb-3"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
-            <span style={{
-              background: "linear-gradient(135deg, #ffffff 0%, #00D4FF 40%, #7C3AED 80%, #FF006E 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>
+            <span
+              className="text-gradient-animate"
+              style={{
+                background: "linear-gradient(135deg, #ffffff 0%, #00D4FF 30%, #7C3AED 60%, #FF006E 85%, #00D4FF 100%)",
+                backgroundSize: "300% 300%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                animation: "gradient-x-shift 4s ease infinite",
+              }}
+            >
               NEXUS COMMAND
             </span>
           </h1>
@@ -181,10 +187,14 @@ export default function Dashboard() {
             color: "#FFB800",
             sub: "GOD tier rating",
           },
-        ].map((stat) => {
+        ].map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="stat-card group">
+            <div
+              key={stat.label}
+              className="stat-card group"
+              style={{ animationDelay: `${idx * 1.2}s` }}
+            >
               <div
                 className="absolute top-0 right-0 w-20 h-20 rounded-full blur-2xl pointer-events-none opacity-40"
                 style={{ background: stat.color, transform: "translate(40%, -40%)" }}
@@ -199,7 +209,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                <span
+                  className="text-3xl font-black text-white metric-live"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif", animationDelay: `${idx * 0.8}s` }}
+                >
                   {stat.value}
                 </span>
                 <span className="text-sm text-white/30">{stat.unit}</span>
