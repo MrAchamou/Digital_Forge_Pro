@@ -12,6 +12,7 @@ import { qualityAssurance } from './modules/quality-assurance.module';
 import { signatureBaseGenerator } from './generator/signature-base-generator';
 import { signatureVariationsGenerator } from './generator/signature-variations-generator';
 import { signatureSVGExporter } from './generator/signature-svg-exporter';
+import { buildEffectPreviewHTML, saveEffectPreview, getEffectPreviewHTML } from './services/effect-preview-generator';
 import multer from 'multer';
 import fs from 'fs/promises';
 import path from 'path';
@@ -236,11 +237,32 @@ router.post('/generate', async (req, res) => {
       processingTime: performance.now() - req.startTime
     });
 
+    // Génération de la page preview interactive
+    const previewId = `effect_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    let previewUrl: string | null = null;
+    try {
+      const previewHtml = buildEffectPreviewHTML({
+        previewId,
+        code: finalCode,
+        description: req.body.prompt || req.body.description || 'Effect',
+        concepts,
+        modules: selectedModules,
+        qualityScore: qualityReport.overallScore,
+        platform: req.body.platform || 'javascript',
+      });
+      await saveEffectPreview(previewId, previewHtml);
+      previewUrl = `/api/effect/preview/${previewId}`;
+    } catch (previewErr) {
+      console.warn('⚠️  Preview generation skipped:', previewErr);
+    }
+
     const response = {
       success: true,
       code: finalCode,
       concepts,
       selectedModules,
+      previewId,
+      previewUrl,
       qualityReport: {
         overallScore: qualityReport.overallScore,
         metrics: qualityReport.metrics,
@@ -848,6 +870,46 @@ router.get('/queue/jobs', (req, res) => {
   res.json([]);
 });
 
+// =============================================
+// POST /api/effects/generate — Création d'un job de génération
+// =============================================
+router.post('/effects/generate', async (req, res) => {
+  try {
+    const { jobQueue } = await import('./queue/job-queue');
+    const { description, platform = 'javascript', options = {} } = req.body;
+    if (!description || typeof description !== 'string') {
+      return res.status(400).json({ error: 'description is required' });
+    }
+    const estimatedTime = 30;
+    const job = await storage.createJob({
+      description,
+      platform,
+      options,
+      status: 'queued',
+      progress: 0,
+      estimatedTime,
+    } as any);
+    await jobQueue.addJob(job);
+    res.json({ success: true, jobId: job.id, estimatedTime });
+  } catch (err: any) {
+    console.error('Effects generate error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// =============================================
+// GET /api/effects/status/:jobId — Statut d'un job
+// =============================================
+router.get('/effects/status/:jobId', async (req, res) => {
+  try {
+    const job = await storage.getJob(req.params.jobId);
+    if (!job) return res.status(404).json({ error: 'Job introuvable' });
+    res.json(job);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/library/effects — Effets de la bibliothèque
 router.get('/library/effects', async (req, res) => {
   try {
@@ -1246,6 +1308,22 @@ router.get('/signature/preview/:id', async (req, res) => {
     if (!file) return res.status(404).json({ error: 'Preview introuvable' });
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.send(file.buffer);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// =============================================
+// GET /api/effect/preview/:id
+// Sert la page de prévisualisation HTML d'un effet généré
+// =============================================
+router.get('/effect/preview/:id', async (req, res) => {
+  try {
+    const html = getEffectPreviewHTML(req.params.id);
+    if (!html) return res.status(404).send('Preview introuvable');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    return res.send(html);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }

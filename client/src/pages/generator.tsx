@@ -32,7 +32,11 @@ import {
   Wand2,
   Code,
   Copy,
-  Loader2
+  Loader2,
+  RefreshCw,
+  ExternalLink,
+  Share2,
+  Play
 } from "lucide-react";
 import type { EffectAnalysis } from "@shared/schema";
 import { useEffectGenerator } from "@/hooks/use-effect-generator";
@@ -78,6 +82,7 @@ export default function Generator() {
   const [realTimeAnalysis, setRealTimeAnalysis] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [currentPhase, setCurrentPhase] = useState("");
+  const [previewIframeKey, setPreviewIframeKey] = useState(0);
   const [aiThinking, setAiThinking] = useState([]);
 
   const { generateEffect, isGenerating, currentJob } = useEffectGenerator();
@@ -137,6 +142,15 @@ export default function Generator() {
         title: "Code Copied",
         description: "Code copied to clipboard",
       });
+    }
+  };
+
+  const handleSharePreview = async () => {
+    const previewUrl = (currentJob?.result as any)?.previewUrl as string | undefined;
+    if (previewUrl) {
+      const fullUrl = `${window.location.origin}${previewUrl}`;
+      await navigator.clipboard.writeText(fullUrl);
+      toast({ title: "Lien copié !", description: "L'URL de prévisualisation est dans votre presse-papiers." });
     }
   };
 
@@ -466,6 +480,73 @@ export default function Generator() {
         </TabsContent>
       </Tabs>
 
+      {/* Live Preview */}
+      {currentJob?.status === 'completed' && !!(currentJob.result as any)?.previewUrl && (
+        <Card className="glass-morphism border-forge-gold/40 bg-transparent overflow-hidden">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <CardTitle className="text-xl font-semibold text-forge-gold flex items-center gap-2">
+                <Play className="w-5 h-5" />
+                Aperçu Live
+              </CardTitle>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={() => setPreviewIframeKey(k => k + 1)}
+                  variant="outline"
+                  size="sm"
+                  className="border-forge-gold text-forge-gold hover:bg-forge-gold/10"
+                  data-testid="button-replay-preview"
+                >
+                  <RefreshCw className="w-4 h-4 mr-1" />
+                  Rejouer
+                </Button>
+                <Button
+                  onClick={handleSharePreview}
+                  variant="outline"
+                  size="sm"
+                  className="border-forge-cyan text-forge-cyan hover:bg-forge-cyan/10"
+                  data-testid="button-share-preview"
+                >
+                  <Share2 className="w-4 h-4 mr-1" />
+                  Partager
+                </Button>
+                <Button
+                  onClick={() => {
+                    const url = (currentJob.result as any)?.previewUrl;
+                    if (url) window.open(url, '_blank');
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-forge-electric text-forge-electric hover:bg-forge-electric/10"
+                  data-testid="button-open-preview"
+                >
+                  <ExternalLink className="w-4 h-4 mr-1" />
+                  Ouvrir
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="relative w-full" style={{ height: '520px' }}>
+              <iframe
+                key={previewIframeKey}
+                src={(currentJob.result as any)?.previewUrl}
+                className="w-full h-full border-0"
+                title="Effect Preview"
+                data-testid="iframe-effect-preview"
+                allow="autoplay"
+              />
+            </div>
+            <div className="px-4 py-3 border-t border-forge-gold/20 flex items-center justify-between text-sm text-gray-400">
+              <span>Cliquez dans la prévisualisation pour déclencher l'effet</span>
+              <span className="text-forge-gold font-medium">
+                Score : {(currentJob.result as any)?.qualityReport?.overallScore ?? '—'}%
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Generated Code */}
       {currentJob?.status === 'completed' && !!currentJob.result && (
         <Card className="glass-morphism border-forge-purple/30 bg-transparent">
@@ -473,7 +554,7 @@ export default function Generator() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-semibold text-forge-cyan flex items-center gap-2">
                 <Code className="w-6 h-6" />
-                Generated Code
+                Code Généré
               </CardTitle>
               <div className="flex space-x-2">
                 <Button 
@@ -484,7 +565,7 @@ export default function Generator() {
                   data-testid="button-copy-code"
                 >
                   <Copy className="w-4 h-4 mr-1" />
-                  Copy
+                  Copier
                 </Button>
                 <Button 
                   onClick={handleDownload}
@@ -494,7 +575,7 @@ export default function Generator() {
                   data-testid="button-download-code"
                 >
                   <Download className="w-4 h-4 mr-1" />
-                  Download
+                  Télécharger
                 </Button>
               </div>
             </div>
