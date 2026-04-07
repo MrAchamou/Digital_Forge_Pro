@@ -5,7 +5,9 @@
     "logo": {
       "description": "Pièce maîtresse 3D — présence physique maximale",
       "max_effets_simultanes": 3,
-      "obligatoire": ["dimension"],
+      "obligatoire": [
+        "dimension"
+      ],
       "categories": {
         "dimension": {
           "description": "La forme dans l'espace 3D",
@@ -17,9 +19,17 @@
               "css_technique": "rotateY",
               "duree_cycle": "8s ease-in-out infinite",
               "description": "Rotation Y douce donnant profondeur réelle",
-              "intensite": { "min": 0.2, "max": 0.6, "defaut": 0.4 },
-              "compatible_secteurs": ["tous"],
-              "incompatible_avec": ["LOGO_GYRO_TILT"]
+              "intensite": {
+                "min": 0.2,
+                "max": 0.6,
+                "defaut": 0.4
+              },
+              "compatible_secteurs": [
+                "tous"
+              ],
+              "incompatible_avec": [
+                "LOGO_GYRO_TILT"
+              ]
             },
             {
               "id": "LOGO_VOLUME_BREATHE",
@@ -27,8 +37,14 @@
               "css_technique": "scale_asymetrique",
               "duree_cycle": "6s cubic-bezier(0.4,0,0.2,1) infinite",
               "description": "Gonflement organique 3D — le logo respire de l'intérieur",
-              "intensite": { "min": 0.1, "max": 0.4, "defaut": 0.25 },
-              "compatible_secteurs": ["tous"],
+              "intensite": {
+                "min": 0.1,
+                "max": 0.4,
+                "defaut": 0.25
+              },
+              "compatible_secteurs": [
+                "tous"
+              ],
               "incompatible_avec": []
             },
             {
@@ -37,9 +53,19 @@
               "css_technique": "rotateX_rotateY",
               "duree_cycle": "12s ease-in-out infinite alternate",
               "description": "Inclinaison gyroscopique — flottement dans l'espace",
-              "intensite": { "min": 0.2, "max": 0.5, "defaut": 0.3 },
-              "compatible_secteurs": ["tech", "créatif", "innovation"],
-              "incompatible_avec": ["LOGO_3D_FLOAT"]
+              "intensite": {
+                "min": 0.2,
+                "max": 0.5,
+                "defaut": 0.3
+              },
+              "compatible_secteurs": [
+                "tech",
+                "créatif",
+                "innovation"
+              ],
+              "incompatible_avec": [
+                "LOGO_3D_FLOAT"
+              ]
             }
           ]
         },
@@ -52,37 +78,91 @@
               "nom": "Métal Brossé",
               "css_technique": "gradient_metalique",
               "description": "Reflet lumineux sur surface métallique brossée",
-              "intensite": { "min": 0.3, "max": 0.8, "defaut": 0.5 },
-              "compatible_secteurs": ["finance", "tech", "industrie", "juridique"],
-              "incompatible_avec": ["LOGO_GLASS_IRIS", "LOGO_GOLD_POLISH", "LOGO_MATTE_FLAT"]
+              "intensite": {
+                "min": 0.3,
+                "max": 0.8,
+                "defaut": 0.5
+              },
+              "compatible_secteurs": [
+                "finance",
+                "tech",
+                "industrie",
+                "juridique"
+              ],
+              "incompatible_avec": [
+                "LOGO_GLASS_IRIS",
+                "LOGO_GOLD_POLISH",
+                "LOGO_MATTE_FLAT"
+              ]
             },
             {
               "id": "LOGO_GLASS_IRIS",
               "nom": "Verre Irisé",
               "css_technique": "gradient_iridescent",
               "description": "Reflets chromatiques changeants sur surface transparente",
-              "intensite": { "min": 0.2, "max": 0.7, "defaut": 0.4 },
-              "compatible_secteurs": ["créatif", "luxe", "beauté", "art"],
-              "incompatible_avec": ["LOGO_METAL_BRUSH", "LOGO_MATTE_FLAT"]
+              "intensite": {
+                "min": 0.2,
+                "max": 0.7,
+                "defaut": 0.4
+              },
+              "compatible_secteurs": [
+                "créatif",
+                "luxe",
+                "beauté",
+                "art"
+              ],
+              "incompatible_avec": [
+                "LOGO_METAL_BRUSH",
+                "LOGO_MATTE_FLAT"
+              ]
             },
             {
               "id": "LOGO_GOLD_POLISH",
               "nom": "Or Poli",
               "css_technique": "gradient_or",
               "description": "Brillance dorée avec reflet chaud en déplacement lent",
-              "couleurs_fixes": ["#c9a84c", "#f0d080", "#8b6914"],
-              "intensite": { "min": 0.4, "max": 0.9, "defaut": 0.6 },
-              "compatible_secteurs": ["luxe", "juridique", "finance", "prestige"],
-              "incompatible_avec": ["LOGO_METAL_BRUSH", "LOGO_MATTE_FLAT", "LOGO_GLASS_IRIS"]
+              "couleurs_fixes": [
+                "#c9a84c",
+                "#f0d080",
+                "#8b6914"
+              ],
+              "intensite": {
+                "min": 0.4,
+                "max": 0.9,
+                "defaut": 0.6
+              },
+              "compatible_secteurs": [
+                "luxe",
+                "juridique",
+                "finance",
+                "prestige"
+              ],
+              "incompatible_avec": [
+                "LOGO_METAL_BRUSH",
+                "LOGO_MATTE_FLAT",
+                "LOGO_GLASS_IRIS"
+              ]
             },
             {
               "id": "LOGO_MATTE_FLAT",
               "nom": "Mat Vivant",
               "css_technique": "noise_texture",
               "description": "Surface mate avec micro-vibration organique subtile",
-              "intensite": { "min": 0.1, "max": 0.3, "defaut": 0.15 },
-              "compatible_secteurs": ["minimaliste", "design", "mode"],
-              "incompatible_avec": ["LOGO_GOLD_POLISH", "LOGO_GLASS_IRIS", "LOGO_METAL_BRUSH"]
+              "intensite": {
+                "min": 0.1,
+                "max": 0.3,
+                "defaut": 0.15
+              },
+              "compatible_secteurs": [
+                "minimaliste",
+                "design",
+                "mode"
+              ],
+              "incompatible_avec": [
+                "LOGO_GOLD_POLISH",
+                "LOGO_GLASS_IRIS",
+                "LOGO_METAL_BRUSH"
+              ]
             }
           ]
         },
@@ -96,9 +176,17 @@
               "css_technique": "radialGradient_pulsant",
               "description": "Lumière émise au rythme d'un cœur lent et certain",
               "duree_cycle": "0.83s ease-in-out infinite",
-              "intensite": { "min": 0.1, "max": 0.5, "defaut": 0.3 },
-              "compatible_secteurs": ["tous"],
-              "incompatible_avec": ["LOGO_ELECTRIC_CORONA"]
+              "intensite": {
+                "min": 0.1,
+                "max": 0.5,
+                "defaut": 0.3
+              },
+              "compatible_secteurs": [
+                "tous"
+              ],
+              "incompatible_avec": [
+                "LOGO_ELECTRIC_CORONA"
+              ]
             },
             {
               "id": "LOGO_ORBITAL_PARTICLES",
@@ -106,27 +194,62 @@
               "css_technique": "orbit_elliptique",
               "description": "3 à 5 micro-particules orbitant à distances différentes",
               "nombre_particules": 4,
-              "intensite": { "min": 0.2, "max": 0.6, "defaut": 0.4 },
-              "compatible_secteurs": ["tech", "science", "innovation", "créatif"],
-              "incompatible_avec": ["LOGO_SOUL_AURA"]
+              "intensite": {
+                "min": 0.2,
+                "max": 0.6,
+                "defaut": 0.4
+              },
+              "compatible_secteurs": [
+                "tech",
+                "science",
+                "innovation",
+                "créatif"
+              ],
+              "incompatible_avec": [
+                "LOGO_SOUL_AURA"
+              ]
             },
             {
               "id": "LOGO_SOUL_AURA",
               "nom": "Aura d'Âme",
               "css_technique": "radialGradients_rotation",
               "description": "Énergie organique douce émanant de toute la forme",
-              "intensite": { "min": 0.1, "max": 0.4, "defaut": 0.2 },
-              "compatible_secteurs": ["art", "bien-être", "créatif", "spirituel"],
-              "incompatible_avec": ["LOGO_ORBITAL_PARTICLES", "LOGO_ELECTRIC_CORONA"]
+              "intensite": {
+                "min": 0.1,
+                "max": 0.4,
+                "defaut": 0.2
+              },
+              "compatible_secteurs": [
+                "art",
+                "bien-être",
+                "créatif",
+                "spirituel"
+              ],
+              "incompatible_avec": [
+                "LOGO_ORBITAL_PARTICLES",
+                "LOGO_ELECTRIC_CORONA"
+              ]
             },
             {
               "id": "LOGO_ELECTRIC_CORONA",
               "nom": "Couronne Électrique",
               "css_technique": "stroke_dasharray_glow",
               "description": "Couronne d'énergie électrique contenue autour du logo",
-              "intensite": { "min": 0.2, "max": 0.7, "defaut": 0.4 },
-              "compatible_secteurs": ["tech", "énergie", "innovation", "gaming"],
-              "incompatible_avec": ["LOGO_SOUL_AURA", "LOGO_HALO_PULSE"]
+              "intensite": {
+                "min": 0.2,
+                "max": 0.7,
+                "defaut": 0.4
+              },
+              "compatible_secteurs": [
+                "tech",
+                "énergie",
+                "innovation",
+                "gaming"
+              ],
+              "incompatible_avec": [
+                "LOGO_SOUL_AURA",
+                "LOGO_HALO_PULSE"
+              ]
             }
           ]
         },
@@ -140,9 +263,20 @@
               "css_technique": "clip_path_fragments",
               "description": "Micro-éclatement imperceptible puis reconstruction lente",
               "duree_cycle": "24s ease-in-out",
-              "intensite": { "min": 0.1, "max": 0.4, "defaut": 0.2 },
-              "compatible_secteurs": ["créatif", "tech", "innovation", "art"],
-              "incompatible_avec": ["LOGO_ORBITAL_PARTICLES"]
+              "intensite": {
+                "min": 0.1,
+                "max": 0.4,
+                "defaut": 0.2
+              },
+              "compatible_secteurs": [
+                "créatif",
+                "tech",
+                "innovation",
+                "art"
+              ],
+              "incompatible_avec": [
+                "LOGO_ORBITAL_PARTICLES"
+              ]
             },
             {
               "id": "LOGO_LIQUID_EDGE",
@@ -150,9 +284,20 @@
               "css_technique": "border_radius_asymetrique",
               "description": "Les contours ondulent comme une surface liquide calme",
               "duree_cycle": "10s ease-in-out infinite",
-              "intensite": { "min": 0.1, "max": 0.3, "defaut": 0.15 },
-              "compatible_secteurs": ["beauté", "art", "créatif", "bien-être"],
-              "incompatible_avec": ["LOGO_CRYSTAL_FRAGMENT"]
+              "intensite": {
+                "min": 0.1,
+                "max": 0.3,
+                "defaut": 0.15
+              },
+              "compatible_secteurs": [
+                "beauté",
+                "art",
+                "créatif",
+                "bien-être"
+              ],
+              "incompatible_avec": [
+                "LOGO_CRYSTAL_FRAGMENT"
+              ]
             },
             {
               "id": "LOGO_NEURAL_MORPH",
@@ -160,15 +305,25 @@
               "css_technique": "path_morph",
               "description": "La forme évolue imperceptiblement entre micro-états",
               "duree_cycle": "20s ease-in-out infinite",
-              "intensite": { "min": 0.05, "max": 0.2, "defaut": 0.1 },
-              "compatible_secteurs": ["tech", "IA", "innovation", "science"],
-              "incompatible_avec": ["LOGO_LIQUID_EDGE"]
+              "intensite": {
+                "min": 0.05,
+                "max": 0.2,
+                "defaut": 0.1
+              },
+              "compatible_secteurs": [
+                "tech",
+                "IA",
+                "innovation",
+                "science"
+              ],
+              "incompatible_avec": [
+                "LOGO_LIQUID_EDGE"
+              ]
             }
           ]
         }
       }
     },
-
     "nom": {
       "description": "Identité typographique — lisibilité absolue",
       "max_effets_simultanes": 2,
@@ -183,9 +338,20 @@
               "css_technique": "linearGradient_traversant",
               "description": "Reflet lumineux qui traverse le nom lentement",
               "duree_cycle": "6s ease-in-out infinite",
-              "intensite": { "min": 0.2, "max": 0.6, "defaut": 0.4 },
-              "compatible_secteurs": ["luxe", "prestige", "juridique", "finance"],
-              "incompatible_avec": ["NOM_NEON_GLOW"]
+              "intensite": {
+                "min": 0.2,
+                "max": 0.6,
+                "defaut": 0.4
+              },
+              "compatible_secteurs": [
+                "luxe",
+                "prestige",
+                "juridique",
+                "finance"
+              ],
+              "incompatible_avec": [
+                "NOM_NEON_GLOW"
+              ]
             },
             {
               "id": "NOM_NEON_GLOW",
@@ -193,9 +359,21 @@
               "css_technique": "text_shadow_pulse",
               "description": "Lueur néon qui pulse doucement autour des lettres",
               "duree_cycle": "4s ease-in-out infinite",
-              "intensite": { "min": 0.2, "max": 0.7, "defaut": 0.4 },
-              "compatible_secteurs": ["tech", "gaming", "créatif", "digital"],
-              "incompatible_avec": ["NOM_SHIMMER_GOLD", "NOM_CLEAN_BREATHE"]
+              "intensite": {
+                "min": 0.2,
+                "max": 0.7,
+                "defaut": 0.4
+              },
+              "compatible_secteurs": [
+                "tech",
+                "gaming",
+                "créatif",
+                "digital"
+              ],
+              "incompatible_avec": [
+                "NOM_SHIMMER_GOLD",
+                "NOM_CLEAN_BREATHE"
+              ]
             },
             {
               "id": "NOM_HOLOGRAM_SCAN",
@@ -203,9 +381,20 @@
               "css_technique": "gradient_scan_vertical",
               "description": "Ligne de scan holographique traversant le nom",
               "duree_cycle": "8s linear infinite",
-              "intensite": { "min": 0.1, "max": 0.4, "defaut": 0.25 },
-              "compatible_secteurs": ["tech", "IA", "futuriste", "digital"],
-              "incompatible_avec": ["NOM_SHIMMER_GOLD"]
+              "intensite": {
+                "min": 0.1,
+                "max": 0.4,
+                "defaut": 0.25
+              },
+              "compatible_secteurs": [
+                "tech",
+                "IA",
+                "futuriste",
+                "digital"
+              ],
+              "incompatible_avec": [
+                "NOM_SHIMMER_GOLD"
+              ]
             },
             {
               "id": "NOM_CLEAN_BREATHE",
@@ -213,9 +402,19 @@
               "css_technique": "opacity_cycle",
               "description": "Le nom respire — présence constante légèrement vivante",
               "duree_cycle": "10s ease-in-out infinite",
-              "intensite": { "min": 0.05, "max": 0.2, "defaut": 0.1 },
-              "compatible_secteurs": ["minimaliste", "médical", "institutionnel"],
-              "incompatible_avec": ["NOM_NEON_GLOW"]
+              "intensite": {
+                "min": 0.05,
+                "max": 0.2,
+                "defaut": 0.1
+              },
+              "compatible_secteurs": [
+                "minimaliste",
+                "médical",
+                "institutionnel"
+              ],
+              "incompatible_avec": [
+                "NOM_NEON_GLOW"
+              ]
             }
           ]
         },
@@ -228,8 +427,16 @@
               "css_technique": "translateY_apesanteur",
               "description": "Le nom flotte imperceptiblement — apesanteur",
               "duree_cycle": "8s ease-in-out infinite alternate",
-              "intensite": { "min": 0.1, "max": 0.3, "defaut": 0.15 },
-              "compatible_secteurs": ["créatif", "luxe", "art"],
+              "intensite": {
+                "min": 0.1,
+                "max": 0.3,
+                "defaut": 0.15
+              },
+              "compatible_secteurs": [
+                "créatif",
+                "luxe",
+                "art"
+              ],
               "incompatible_avec": []
             },
             {
@@ -238,111 +445,213 @@
               "css_technique": "lettre_translateY_cascade",
               "description": "Les lettres ondulent comme une vague très lente",
               "duree_cycle": "6s ease-in-out infinite",
-              "intensite": { "min": 0.1, "max": 0.3, "defaut": 0.15 },
-              "compatible_secteurs": ["créatif", "art", "mode", "beauté"],
-              "incompatible_avec": ["NOM_FLOAT_SUBTLE"]
+              "intensite": {
+                "min": 0.1,
+                "max": 0.3,
+                "defaut": 0.15
+              },
+              "compatible_secteurs": [
+                "créatif",
+                "art",
+                "mode",
+                "beauté"
+              ],
+              "incompatible_avec": [
+                "NOM_FLOAT_SUBTLE"
+              ]
             }
           ]
         }
       }
     },
-
     "titre": {
-      "description": "Positionnement subtil — discret mais présent",
-      "max_effets_simultanes": 1,
-      "regles": "Un seul effet maximum. Toujours moins intense que le nom.",
-      "effets": [
-        {
-          "id": "TITRE_SLIDE_IN",
-          "nom": "Slide Élégant",
-          "css_technique": "translateX_opacity_entree",
-          "description": "Le titre glisse depuis la gauche au chargement",
-          "mode": "one_shot",
-          "intensite": { "min": 0.5, "max": 1.0, "defaut": 0.8 },
-          "compatible_secteurs": ["tous"],
-          "incompatible_avec": ["TITRE_LETTER_SPACING_BREATHE"]
+      "description": "Positionnement subtil — discret mais présent, 3 couches simultanées",
+      "max_effets_simultanes": 3,
+      "obligatoire": true,
+      "categories": {
+        "apparition": {
+          "description": "Animation d'entrée — le titre se révèle",
+          "choisir": 1,
+          "effets": [
+            {
+              "id": "TITRE_SLIDE_IN",
+              "nom": "Slide Élégant",
+              "css_technique": "translateX_opacity_entree",
+              "description": "Le titre glisse depuis la gauche au chargement",
+              "mode": "one_shot",
+              "intensite": {
+                "min": 0.5,
+                "max": 1,
+                "defaut": 0.8
+              },
+              "compatible_secteurs": [
+                "tous"
+              ],
+              "incompatible_avec": []
+            },
+            {
+              "id": "TITRE_FADE_PRESENCE",
+              "nom": "Présence Fantôme",
+              "css_technique": "opacity_fantome",
+              "description": "Le titre apparaît et disparaît comme une présence",
+              "duree_cycle": "14s ease-in-out infinite",
+              "intensite": {
+                "min": 0.1,
+                "max": 0.4,
+                "defaut": 0.25
+              },
+              "compatible_secteurs": [
+                "minimaliste",
+                "institutionnel"
+              ],
+              "incompatible_avec": []
+            }
+          ]
         },
-        {
-          "id": "TITRE_LETTER_SPACING_BREATHE",
-          "nom": "Espacement Respirant",
-          "css_technique": "letter_spacing_cycle",
-          "description": "Les lettres s'écartent et se rapprochent imperceptiblement",
-          "duree_cycle": "12s ease-in-out infinite",
-          "intensite": { "min": 0.1, "max": 0.4, "defaut": 0.2 },
-          "compatible_secteurs": ["luxe", "prestige", "mode"],
-          "incompatible_avec": ["TITRE_SLIDE_IN"]
+        "texture": {
+          "description": "Texture colorée — habillage chromatique continu",
+          "choisir": 1,
+          "effets": [
+            {
+              "id": "TITRE_COLOR_SHIFT",
+              "nom": "Dérive Chromatique",
+              "css_technique": "color_animation",
+              "description": "La couleur du titre dérive très lentement",
+              "duree_cycle": "16s ease-in-out infinite",
+              "intensite": {
+                "min": 0.1,
+                "max": 0.3,
+                "defaut": 0.2
+              },
+              "compatible_secteurs": [
+                "créatif",
+                "art",
+                "digital",
+                "tous"
+              ],
+              "incompatible_avec": []
+            }
+          ]
         },
-        {
-          "id": "TITRE_COLOR_SHIFT",
-          "nom": "Dérive Chromatique",
-          "css_technique": "color_animation",
-          "description": "La couleur du titre dérive très lentement",
-          "duree_cycle": "16s ease-in-out infinite",
-          "intensite": { "min": 0.1, "max": 0.3, "defaut": 0.2 },
-          "compatible_secteurs": ["créatif", "art", "digital"],
-          "incompatible_avec": []
-        },
-        {
-          "id": "TITRE_FADE_PRESENCE",
-          "nom": "Présence Fantôme",
-          "css_technique": "opacity_fantome",
-          "description": "Le titre apparaît et disparaît comme une présence",
-          "duree_cycle": "14s ease-in-out infinite",
-          "intensite": { "min": 0.1, "max": 0.4, "defaut": 0.25 },
-          "compatible_secteurs": ["minimaliste", "institutionnel"],
-          "incompatible_avec": []
+        "rythme": {
+          "description": "Rythme de fond — respiration imperceptible continue",
+          "choisir": 1,
+          "effets": [
+            {
+              "id": "TITRE_LETTER_SPACING_BREATHE",
+              "nom": "Espacement Respirant",
+              "css_technique": "letter_spacing_cycle",
+              "description": "Les lettres s'écartent et se rapprochent imperceptiblement",
+              "duree_cycle": "12s ease-in-out infinite",
+              "intensite": {
+                "min": 0.1,
+                "max": 0.4,
+                "defaut": 0.2
+              },
+              "compatible_secteurs": [
+                "luxe",
+                "prestige",
+                "mode",
+                "tous"
+              ],
+              "incompatible_avec": []
+            }
+          ]
         }
-      ]
+      }
     },
-
     "contact": {
-      "description": "Information vivante — lisibilité non négociable",
-      "max_effets_simultanes": 1,
-      "regles": "Jamais d'animation qui gêne la lecture d'une adresse email ou d'un numéro.",
-      "effets": [
-        {
-          "id": "CONTACT_CASCADE_APPEAR",
-          "nom": "Apparition en Cascade",
-          "css_technique": "animation_delay_cascade",
-          "description": "Chaque ligne contact apparaît avec un délai",
-          "mode": "one_shot",
-          "intensite": { "min": 0.5, "max": 1.0, "defaut": 0.8 },
-          "compatible_secteurs": ["tous"],
-          "incompatible_avec": ["CONTACT_SCAN_LINE"]
+      "description": "Information vivante — lisibilité non négociable, 3 couches simultanées",
+      "max_effets_simultanes": 3,
+      "obligatoire": true,
+      "categories": {
+        "entree": {
+          "description": "Animation d'entrée — les infos se révèlent progressivement",
+          "choisir": 1,
+          "effets": [
+            {
+              "id": "CONTACT_CASCADE_APPEAR",
+              "nom": "Apparition en Cascade",
+              "css_technique": "animation_delay_cascade",
+              "description": "Chaque ligne contact apparaît avec un délai",
+              "mode": "one_shot",
+              "intensite": {
+                "min": 0.5,
+                "max": 1,
+                "defaut": 0.8
+              },
+              "compatible_secteurs": [
+                "tous"
+              ],
+              "incompatible_avec": []
+            }
+          ]
         },
-        {
-          "id": "CONTACT_SCAN_LINE",
-          "nom": "Ligne de Scan",
-          "css_technique": "scan_vertical_lumineux",
-          "description": "Un scan lumineux parcourt les infos contact",
-          "duree_cycle": "20s linear infinite",
-          "intensite": { "min": 0.1, "max": 0.3, "defaut": 0.15 },
-          "compatible_secteurs": ["tech", "digital", "futuriste"],
-          "incompatible_avec": ["CONTACT_CASCADE_APPEAR"]
+        "emphasis": {
+          "description": "Emphase — animation discrète qui maintient l'attention",
+          "choisir": 1,
+          "effets": [
+            {
+              "id": "CONTACT_ICON_PULSE",
+              "nom": "Pulse des Icônes",
+              "css_technique": "scale_icones_stagger",
+              "description": "Les icônes email/tel/web pulsent légèrement",
+              "duree_cycle": "4s ease-in-out infinite staggered",
+              "intensite": {
+                "min": 0.1,
+                "max": 0.3,
+                "defaut": 0.15
+              },
+              "compatible_secteurs": [
+                "tous"
+              ],
+              "incompatible_avec": []
+            },
+            {
+              "id": "CONTACT_HIGHLIGHT_HOVER",
+              "nom": "Surbrillance Active",
+              "css_technique": "background_transition",
+              "description": "Chaque ligne s'illumine au passage — interactivité CSS pure",
+              "mode": "hover_css",
+              "intensite": {
+                "min": 0.1,
+                "max": 0.5,
+                "defaut": 0.2
+              },
+              "compatible_secteurs": [
+                "tous"
+              ],
+              "incompatible_avec": []
+            }
+          ]
         },
-        {
-          "id": "CONTACT_ICON_PULSE",
-          "nom": "Pulse des Icônes",
-          "css_technique": "scale_icones_stagger",
-          "description": "Les icônes email/tel/web pulsent légèrement",
-          "duree_cycle": "4s ease-in-out infinite staggered",
-          "intensite": { "min": 0.1, "max": 0.3, "defaut": 0.15 },
-          "compatible_secteurs": ["tous"],
-          "incompatible_avec": []
-        },
-        {
-          "id": "CONTACT_HIGHLIGHT_HOVER",
-          "nom": "Surbrillance Active",
-          "css_technique": "background_transition",
-          "description": "Chaque ligne s'illumine au passage — interactivité CSS pure",
-          "mode": "hover_css",
-          "intensite": { "min": 0.1, "max": 0.5, "defaut": 0.2 },
-          "compatible_secteurs": ["tous"],
-          "incompatible_avec": []
+        "scan": {
+          "description": "Scan de fond — parcours lumineux très discret",
+          "choisir": 1,
+          "effets": [
+            {
+              "id": "CONTACT_SCAN_LINE",
+              "nom": "Ligne de Scan",
+              "css_technique": "scan_vertical_lumineux",
+              "description": "Un scan lumineux parcourt les infos contact",
+              "duree_cycle": "20s linear infinite",
+              "intensite": {
+                "min": 0.1,
+                "max": 0.3,
+                "defaut": 0.15
+              },
+              "compatible_secteurs": [
+                "tech",
+                "digital",
+                "futuriste",
+                "tous"
+              ],
+              "incompatible_avec": []
+            }
+          ]
         }
-      ]
+      }
     },
-
     "separateur": {
       "description": "Colonne vertébrale énergétique de la signature",
       "max_effets_simultanes": 2,
@@ -353,9 +662,17 @@
           "css_technique": "gradient_flow_vertical",
           "description": "Énergie qui coule du haut vers le bas en continu",
           "duree_cycle": "3s linear infinite",
-          "intensite": { "min": 0.2, "max": 0.8, "defaut": 0.5 },
-          "compatible_secteurs": ["tous"],
-          "incompatible_avec": ["SEP_BREATHING_CALM"]
+          "intensite": {
+            "min": 0.2,
+            "max": 0.8,
+            "defaut": 0.5
+          },
+          "compatible_secteurs": [
+            "tous"
+          ],
+          "incompatible_avec": [
+            "SEP_BREATHING_CALM"
+          ]
         },
         {
           "id": "SEP_ELECTRIC_PULSE",
@@ -363,9 +680,20 @@
           "css_technique": "width_opacity_glow",
           "description": "La ligne pulse comme un courant électrique contenu",
           "duree_cycle": "2s ease-in-out infinite",
-          "intensite": { "min": 0.2, "max": 0.7, "defaut": 0.4 },
-          "compatible_secteurs": ["tech", "énergie", "finance", "digital"],
-          "incompatible_avec": ["SEP_BREATHING_CALM"]
+          "intensite": {
+            "min": 0.2,
+            "max": 0.7,
+            "defaut": 0.4
+          },
+          "compatible_secteurs": [
+            "tech",
+            "énergie",
+            "finance",
+            "digital"
+          ],
+          "incompatible_avec": [
+            "SEP_BREATHING_CALM"
+          ]
         },
         {
           "id": "SEP_BREATHING_CALM",
@@ -373,9 +701,21 @@
           "css_technique": "opacity_width_lent",
           "description": "Le séparateur respire — présence organique douce",
           "duree_cycle": "8s ease-in-out infinite",
-          "intensite": { "min": 0.1, "max": 0.5, "defaut": 0.3 },
-          "compatible_secteurs": ["art", "bien-être", "créatif", "médical"],
-          "incompatible_avec": ["SEP_ELECTRIC_PULSE", "SEP_ENERGY_FLOW"]
+          "intensite": {
+            "min": 0.1,
+            "max": 0.5,
+            "defaut": 0.3
+          },
+          "compatible_secteurs": [
+            "art",
+            "bien-être",
+            "créatif",
+            "médical"
+          ],
+          "incompatible_avec": [
+            "SEP_ELECTRIC_PULSE",
+            "SEP_ENERGY_FLOW"
+          ]
         },
         {
           "id": "SEP_PARTICLE_STREAM",
@@ -384,9 +724,19 @@
           "description": "Particules remontant le long du séparateur",
           "nombre": 4,
           "duree_cycle": "4s linear infinite staggered",
-          "intensite": { "min": 0.2, "max": 0.6, "defaut": 0.35 },
-          "compatible_secteurs": ["tech", "science", "innovation"],
-          "incompatible_avec": ["SEP_BREATHING_CALM"]
+          "intensite": {
+            "min": 0.2,
+            "max": 0.6,
+            "defaut": 0.35
+          },
+          "compatible_secteurs": [
+            "tech",
+            "science",
+            "innovation"
+          ],
+          "incompatible_avec": [
+            "SEP_BREATHING_CALM"
+          ]
         },
         {
           "id": "SEP_GOLD_SHINE",
@@ -394,13 +744,22 @@
           "css_technique": "point_brillant_montant",
           "description": "Un éclat doré glisse lentement du bas vers le haut",
           "duree_cycle": "6s ease-in-out infinite",
-          "intensite": { "min": 0.2, "max": 0.6, "defaut": 0.4 },
-          "compatible_secteurs": ["luxe", "prestige", "juridique"],
-          "incompatible_avec": ["SEP_PARTICLE_STREAM"]
+          "intensite": {
+            "min": 0.2,
+            "max": 0.6,
+            "defaut": 0.4
+          },
+          "compatible_secteurs": [
+            "luxe",
+            "prestige",
+            "juridique"
+          ],
+          "incompatible_avec": [
+            "SEP_PARTICLE_STREAM"
+          ]
         }
       ]
     },
-
     "fond": {
       "description": "Univers atmosphérique — ressenti sans être vu",
       "max_effets_simultanes": 2,
@@ -414,9 +773,18 @@
           "nombre_points": 28,
           "intensite_max": 0.25,
           "duree_cycle": "30s linear infinite",
-          "intensite": { "min": 0.05, "max": 0.25, "defaut": 0.15 },
-          "compatible_secteurs": ["tous"],
-          "incompatible_avec": ["FOND_CLEAN_DARK", "FOND_MINIMAL_NOISE"]
+          "intensite": {
+            "min": 0.05,
+            "max": 0.25,
+            "defaut": 0.15
+          },
+          "compatible_secteurs": [
+            "tous"
+          ],
+          "incompatible_avec": [
+            "FOND_CLEAN_DARK",
+            "FOND_MINIMAL_NOISE"
+          ]
         },
         {
           "id": "FOND_ATMOSPHERIC_BREATH",
@@ -425,8 +793,14 @@
           "description": "L'atmosphère du fond respire — vague de lumière centrale",
           "intensite_max": 0.2,
           "duree_cycle": "16s ease-in-out infinite",
-          "intensite": { "min": 0.05, "max": 0.2, "defaut": 0.12 },
-          "compatible_secteurs": ["tous"],
+          "intensite": {
+            "min": 0.05,
+            "max": 0.2,
+            "defaut": 0.12
+          },
+          "compatible_secteurs": [
+            "tous"
+          ],
           "incompatible_avec": []
         },
         {
@@ -436,9 +810,22 @@
           "description": "Champ de plasma coloré en mouvement très lent",
           "intensite_max": 0.15,
           "duree_cycle": "24s ease-in-out infinite",
-          "intensite": { "min": 0.05, "max": 0.15, "defaut": 0.1 },
-          "compatible_secteurs": ["tech", "créatif", "art", "digital"],
-          "incompatible_avec": ["FOND_CLEAN_DARK", "FOND_MINIMAL_NOISE", "FOND_NEURAL_GRID"]
+          "intensite": {
+            "min": 0.05,
+            "max": 0.15,
+            "defaut": 0.1
+          },
+          "compatible_secteurs": [
+            "tech",
+            "créatif",
+            "art",
+            "digital"
+          ],
+          "incompatible_avec": [
+            "FOND_CLEAN_DARK",
+            "FOND_MINIMAL_NOISE",
+            "FOND_NEURAL_GRID"
+          ]
         },
         {
           "id": "FOND_NEURAL_GRID",
@@ -447,9 +834,20 @@
           "description": "Réseau de connexions neurales imperceptible",
           "intensite_max": 0.1,
           "duree_cycle": "20s ease-in-out infinite",
-          "intensite": { "min": 0.02, "max": 0.1, "defaut": 0.06 },
-          "compatible_secteurs": ["tech", "IA", "science", "finance"],
-          "incompatible_avec": ["FOND_PLASMA_FIELD"]
+          "intensite": {
+            "min": 0.02,
+            "max": 0.1,
+            "defaut": 0.06
+          },
+          "compatible_secteurs": [
+            "tech",
+            "IA",
+            "science",
+            "finance"
+          ],
+          "incompatible_avec": [
+            "FOND_PLASMA_FIELD"
+          ]
         },
         {
           "id": "FOND_MINIMAL_NOISE",
@@ -457,9 +855,21 @@
           "css_technique": "feTurbulence_subtil",
           "description": "Texture noise organique quasi-invisible",
           "intensite_max": 0.08,
-          "intensite": { "min": 0.02, "max": 0.08, "defaut": 0.05 },
-          "compatible_secteurs": ["minimaliste", "luxe", "mode", "design"],
-          "incompatible_avec": ["FOND_PLASMA_FIELD", "FOND_STELLAR_DRIFT"]
+          "intensite": {
+            "min": 0.02,
+            "max": 0.08,
+            "defaut": 0.05
+          },
+          "compatible_secteurs": [
+            "minimaliste",
+            "luxe",
+            "mode",
+            "design"
+          ],
+          "incompatible_avec": [
+            "FOND_PLASMA_FIELD",
+            "FOND_STELLAR_DRIFT"
+          ]
         },
         {
           "id": "FOND_CLEAN_DARK",
@@ -467,13 +877,24 @@
           "css_technique": "static_only",
           "description": "Fond parfaitement immobile — toute l'attention sur le contenu",
           "intensite_max": 0,
-          "intensite": { "min": 0, "max": 0, "defaut": 0 },
-          "compatible_secteurs": ["institutionnel", "médical", "juridique"],
-          "incompatible_avec": ["FOND_STELLAR_DRIFT", "FOND_PLASMA_FIELD", "FOND_ATMOSPHERIC_BREATH"]
+          "intensite": {
+            "min": 0,
+            "max": 0,
+            "defaut": 0
+          },
+          "compatible_secteurs": [
+            "institutionnel",
+            "médical",
+            "juridique"
+          ],
+          "incompatible_avec": [
+            "FOND_STELLAR_DRIFT",
+            "FOND_PLASMA_FIELD",
+            "FOND_ATMOSPHERIC_BREATH"
+          ]
         }
       ]
     },
-
     "cta": {
       "description": "Invitation magnétique — attire sans forcer",
       "max_effets_simultanes": 2,
@@ -484,9 +905,18 @@
           "css_technique": "scale_boxshadow_pulse",
           "description": "Le bouton pulse comme un aimant doux",
           "duree_cycle": "3s ease-in-out infinite",
-          "intensite": { "min": 0.2, "max": 0.6, "defaut": 0.35 },
-          "compatible_secteurs": ["tous"],
-          "incompatible_avec": ["CTA_STATIC_PRESENCE", "CTA_BREATH_INVITATION"]
+          "intensite": {
+            "min": 0.2,
+            "max": 0.6,
+            "defaut": 0.35
+          },
+          "compatible_secteurs": [
+            "tous"
+          ],
+          "incompatible_avec": [
+            "CTA_STATIC_PRESENCE",
+            "CTA_BREATH_INVITATION"
+          ]
         },
         {
           "id": "CTA_SHIMMER_SWEEP",
@@ -494,9 +924,19 @@
           "css_technique": "gradient_45deg_sweep",
           "description": "Reflet lumineux balayant le bouton régulièrement",
           "duree_cycle": "4s ease-in-out infinite",
-          "intensite": { "min": 0.2, "max": 0.6, "defaut": 0.4 },
-          "compatible_secteurs": ["luxe", "prestige", "créatif"],
-          "incompatible_avec": ["CTA_STATIC_PRESENCE"]
+          "intensite": {
+            "min": 0.2,
+            "max": 0.6,
+            "defaut": 0.4
+          },
+          "compatible_secteurs": [
+            "luxe",
+            "prestige",
+            "créatif"
+          ],
+          "incompatible_avec": [
+            "CTA_STATIC_PRESENCE"
+          ]
         },
         {
           "id": "CTA_ELECTRIC_BORDER",
@@ -504,9 +944,20 @@
           "css_technique": "border_gradient_rotation",
           "description": "Bordure électrique tournant autour du bouton",
           "duree_cycle": "3s linear infinite",
-          "intensite": { "min": 0.2, "max": 0.7, "defaut": 0.4 },
-          "compatible_secteurs": ["tech", "gaming", "digital", "innovation"],
-          "incompatible_avec": ["CTA_STATIC_PRESENCE"]
+          "intensite": {
+            "min": 0.2,
+            "max": 0.7,
+            "defaut": 0.4
+          },
+          "compatible_secteurs": [
+            "tech",
+            "gaming",
+            "digital",
+            "innovation"
+          ],
+          "incompatible_avec": [
+            "CTA_STATIC_PRESENCE"
+          ]
         },
         {
           "id": "CTA_BREATH_INVITATION",
@@ -514,9 +965,20 @@
           "css_technique": "opacity_background_cycle",
           "description": "Le bouton s'illumine et s'assombrit — invite doucement",
           "duree_cycle": "6s ease-in-out infinite",
-          "intensite": { "min": 0.1, "max": 0.4, "defaut": 0.25 },
-          "compatible_secteurs": ["minimaliste", "bien-être", "médical"],
-          "incompatible_avec": ["CTA_GRAVITY_PULSE", "CTA_STATIC_PRESENCE"]
+          "intensite": {
+            "min": 0.1,
+            "max": 0.4,
+            "defaut": 0.25
+          },
+          "compatible_secteurs": [
+            "minimaliste",
+            "bien-être",
+            "médical"
+          ],
+          "incompatible_avec": [
+            "CTA_GRAVITY_PULSE",
+            "CTA_STATIC_PRESENCE"
+          ]
         },
         {
           "id": "CTA_PARTICLE_ATTRACT",
@@ -525,18 +987,41 @@
           "description": "Particules attirées vers le CTA depuis les bords",
           "nombre": 6,
           "duree_cycle": "8s ease-in-out infinite",
-          "intensite": { "min": 0.2, "max": 0.5, "defaut": 0.3 },
-          "compatible_secteurs": ["tech", "créatif", "innovation"],
-          "incompatible_avec": ["CTA_STATIC_PRESENCE"]
+          "intensite": {
+            "min": 0.2,
+            "max": 0.5,
+            "defaut": 0.3
+          },
+          "compatible_secteurs": [
+            "tech",
+            "créatif",
+            "innovation"
+          ],
+          "incompatible_avec": [
+            "CTA_STATIC_PRESENCE"
+          ]
         },
         {
           "id": "CTA_STATIC_PRESENCE",
           "nom": "Présence Statique",
           "css_technique": "no_animation",
           "description": "Bouton parfaitement immobile — autorité pure",
-          "intensite": { "min": 0, "max": 0, "defaut": 0 },
-          "compatible_secteurs": ["institutionnel", "juridique"],
-          "incompatible_avec": ["CTA_GRAVITY_PULSE", "CTA_SHIMMER_SWEEP", "CTA_ELECTRIC_BORDER", "CTA_BREATH_INVITATION", "CTA_PARTICLE_ATTRACT"]
+          "intensite": {
+            "min": 0,
+            "max": 0,
+            "defaut": 0
+          },
+          "compatible_secteurs": [
+            "institutionnel",
+            "juridique"
+          ],
+          "incompatible_avec": [
+            "CTA_GRAVITY_PULSE",
+            "CTA_SHIMMER_SWEEP",
+            "CTA_ELECTRIC_BORDER",
+            "CTA_BREATH_INVITATION",
+            "CTA_PARTICLE_ATTRACT"
+          ]
         }
       ]
     }

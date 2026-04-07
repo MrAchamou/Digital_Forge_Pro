@@ -16,15 +16,15 @@ export interface CategoryCandidates {
   [category: string]: EffetCandidat[];  // ex: { dimension: [...], matiere: [...], energie: [...] }
 }
 
-// Zones plates (1 à 2 effets en séquence)
+// Toutes les zones utilisent des catégories sémantiques (multi-couches)
 export interface ZoneSelection {
-  logo: CategoryCandidates;       // multi-couches par catégorie
-  nom: CategoryCandidates;        // multi-couches par catégorie
-  titre: EffetCandidat[];         // 1 effet max
-  contact: EffetCandidat[];       // 1 effet max
-  separateur: EffetCandidat[];    // 1-2 effets (primary + secondary optionnel)
-  fond: EffetCandidat[];          // 1-2 effets (primary + secondary optionnel)
-  cta: EffetCandidat[];           // 1-2 effets (primary + secondary optionnel)
+  logo: CategoryCandidates;       // 4 couches: dimension, matiere, energie, transformation
+  nom: CategoryCandidates;        // 2 couches: lumiere, mouvement
+  titre: CategoryCandidates;      // 3 couches: apparition, texture, rythme
+  contact: CategoryCandidates;    // 3 couches: entree, emphasis, scan
+  separateur: EffetCandidat[];    // 3 couches chaos: primary + secondary + tertiary
+  fond: EffetCandidat[];          // 3 couches chaos: primary + secondary + tertiary
+  cta: EffetCandidat[];           // 3 couches chaos: primary + secondary + tertiary
 }
 
 export type VariationContext = 'A' | 'B' | 'C' | 'D';
@@ -580,9 +580,9 @@ export function selectCandidatesForAllZones(
   const logoCats  = selectCategoryCandidates(lib.zones.logo, secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
   const nomCats   = selectCategoryCandidates(lib.zones.nom,  secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
 
-  // Zones plates (effets simples + dual optionnel)
-  const titre      = selectZoneCandidates(lib.zones.titre,      secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
-  const contact    = selectZoneCandidates(lib.zones.contact,    secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
+  // Titre et contact : categories sémantiques (multi-couches)
+  const titreCats  = selectCategoryCandidates(lib.zones.titre,   secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
+  const contactCats = selectCategoryCandidates(lib.zones.contact, secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 3);
   const separateur = selectZoneCandidates(lib.zones.separateur, secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 5);
   const fond       = selectZoneCandidates(lib.zones.fond,       secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 5);
   const cta        = selectZoneCandidates(lib.zones.cta,        secteurNorm, sectorProfile, intensiteMouvement, variation, noteGMB, prixGamme, usedEffects, 5);
@@ -590,8 +590,8 @@ export function selectCandidatesForAllZones(
   const result: ZoneSelection = {
     logo: logoCats,
     nom:  nomCats,
-    titre,
-    contact,
+    titre:   titreCats,
+    contact: contactCats,
     separateur,
     fond,
     cta,
@@ -601,8 +601,8 @@ export function selectCandidatesForAllZones(
   const topChoicesForInterZone: Record<string, string> = {
     logo:       logoCats.dimension?.[0]?.id || logoCats.energie?.[0]?.id || '',
     nom:        nomCats.lumiere?.[0]?.id || '',
-    titre:      titre[0]?.id || '',
-    contact:    contact[0]?.id || '',
+    titre:      titreCats.apparition?.[0]?.id || titreCats.rythme?.[0]?.id || '',
+    contact:    contactCats.entree?.[0]?.id || contactCats.emphasis?.[0]?.id || '',
     separateur: separateur[0]?.id || '',
     fond:       fond[0]?.id || '',
     cta:        cta[0]?.id || '',
@@ -723,11 +723,15 @@ ${formatCategoryZone(selection.logo)}
   [RÈGLE] 1 effet "lumiere" obligatoire + 1 effet "mouvement" optionnel
 ${formatCategoryZone(selection.nom)}
 
-📋 TITRE :
-${formatFlatZone(selection.titre as EffetCandidat[], 1)}
+📋 TITRE — 3 COUCHES SIMULTANÉES (apparition + texture + rythme) :
+  [RÈGLE] 1 effet "apparition" (entrée one-shot) + 1 "texture" (couleur) + 1 "rythme" (fond) — TOUS présents !
+  [RÈGLE] apparition intense (0.6-0.9), texture subtile (0.1-0.3), rythme imperceptible (0.1-0.2)
+${formatCategoryZone(selection.titre as CategoryCandidates)}
 
-📞 CONTACT :
-${formatFlatZone(selection.contact as EffetCandidat[], 1)}
+📞 CONTACT — 3 COUCHES SIMULTANÉES (entree + emphasis + scan) :
+  [RÈGLE] 1 effet "entree" (cascade) + 1 "emphasis" (icônes) + 1 "scan" (fond) — TOUS présents !
+  [RÈGLE] entree intense (0.6-0.9), emphasis discret (0.1-0.2), scan imperceptible (0.1-0.15)
+${formatCategoryZone(selection.contact as CategoryCandidates)}
 
 〡SÉPARATEUR — 3 COUCHES (chaos organisé) :
   [RÈGLE] primary obligatoire, secondary + tertiary fortement recommandés — EMPILÉS simultanément !
@@ -752,7 +756,7 @@ Chaque zone a PLUSIEURS effets actifs en même temps — comme un chef qui super
 
 RÈGLES DE COMPOSITION :
 1. SUPERPOSITION OBLIGATOIRE : Chaque zone DOIT avoir le maximum de couches possibles
-   → Logo = 4 couches, Nom = 2 couches, Sep/Fond/CTA = 3 couches
+   → Logo = 4 couches, Nom = 2 couches, Titre = 3 couches, Contact = 3 couches, Sep/Fond/CTA = 3 couches
 2. HIÉRARCHIE intensité : Logo(total) > Nom(total) > CTA(total) > Séparateur > Fond > Titre > Contact
 3. CASCADE d'intensité : couche 1 = 100%, couche 2 = 75%, couche 3 = 55% — toujours visibles
 4. Cohérence de vitesse au sein d'une même zone : toutes les couches d'une zone ont la même vitesse
@@ -785,8 +789,16 @@ Réponds UNIQUEMENT en JSON strict (aucun texte avant ou après) :
     "lumiere":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
     "mouvement": { "effet_id": "ID_EXACT_ou_null", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." }
   },
-  "titre":      { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
-  "contact":    { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
+  "titre": {
+    "apparition": { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "entrée one-shot visible" },
+    "texture":    { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "dérive colorée subtile" },
+    "rythme":     { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "respiration imperceptible de fond" }
+  },
+  "contact": {
+    "entree":    { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "cascade d'apparition" },
+    "emphasis":  { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "icônes pulsent discrètement" },
+    "scan":      { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "scan très discret en fond" }
+  },
   "separateur": {
     "primary":   { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },
     "secondary": { "effet_id": "ID_EXACT", "intensity": 0.00, "speed": "slow|medium|fast", "color": "#hex", "raison": "..." },

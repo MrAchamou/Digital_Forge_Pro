@@ -168,23 +168,18 @@ export function buildChaosComposition(
   primaryColor: string,
   speed: 'slow' | 'medium' | 'fast' = 'medium',
 ): ZoneComposition {
-  const logoCats   = selection.logo as CategoryCandidates;
-  const nomCats    = selection.nom  as CategoryCandidates;
-  const sepArr     = selection.separateur as EffetCandidat[];
-  const fondArr    = selection.fond       as EffetCandidat[];
-  const ctaArr     = selection.cta        as EffetCandidat[];
-  const titreArr   = selection.titre      as EffetCandidat[];
-  const contactArr = selection.contact    as EffetCandidat[];
+  const logoCats    = selection.logo     as CategoryCandidates;
+  const nomCats     = selection.nom      as CategoryCandidates;
+  const titreCats   = selection.titre    as CategoryCandidates;
+  const contactCats = selection.contact  as CategoryCandidates;
+  const sepArr      = selection.separateur as EffetCandidat[];
+  const fondArr     = selection.fond       as EffetCandidat[];
+  const ctaArr      = selection.cta        as EffetCandidat[];
 
-  const { primary: logoPrimary, layers: logoLayers }     = pickCatLayers(logoCats,  LOGO_CATEGORY_ORDER, primaryColor, speed);
-  const { primary: nomPrimary,  layers: nomLayers  }     = pickCatLayers(nomCats,   NOM_CATEGORY_ORDER,  primaryColor, speed);
-
-  const { primary: titrePrimary,   layers: titreLayers   } = pickSemanticFusionLayers(
-    titreArr, TITRE_FUSION_MAP, TITRE_CATEGORY_ORDER, primaryColor, 'TITRE_FADE_PRESENCE', speed,
-  );
-  const { primary: contactPrimary, layers: contactLayers } = pickSemanticFusionLayers(
-    contactArr, CONTACT_FUSION_MAP, CONTACT_CATEGORY_ORDER, primaryColor, 'CONTACT_CASCADE_APPEAR', speed,
-  );
+  const { primary: logoPrimary,    layers: logoLayers    } = pickCatLayers(logoCats,    LOGO_CATEGORY_ORDER,    primaryColor, speed);
+  const { primary: nomPrimary,     layers: nomLayers     } = pickCatLayers(nomCats,     NOM_CATEGORY_ORDER,     primaryColor, speed);
+  const { primary: titrePrimary,   layers: titreLayers   } = pickCatLayers(titreCats,   TITRE_CATEGORY_ORDER,   primaryColor, speed);
+  const { primary: contactPrimary, layers: contactLayers } = pickCatLayers(contactCats, CONTACT_CATEGORY_ORDER, primaryColor, speed);
   const { primary: sepPrimary,  layers: sepLayers  } = pickSemanticFusionLayers(
     sepArr, SEP_FUSION_MAP, SEP_CATEGORY_ORDER, primaryColor, 'SEP_BREATHING_CALM', speed,
   );
@@ -296,8 +291,43 @@ export function enrichWithChaos(
     return { ...zone, layers: newLayers };
   };
 
-  result.titre   = enrichSemantic(result.titre,   selection.titre   as EffetCandidat[], TITRE_FUSION_MAP,   TITRE_CATEGORY_ORDER,   primaryColor);
-  result.contact = enrichSemantic(result.contact, selection.contact as EffetCandidat[], CONTACT_FUSION_MAP, CONTACT_CATEGORY_ORDER, primaryColor);
+  // ── Titre : forcer apparition + texture + rythme ─────
+  const titreCats2         = selection.titre   as CategoryCandidates;
+  const existingTitreCats  = new Set((result.titre.layers || []).map((l: EffectLayer) => l.category));
+  const titreLayers2       = [...(result.titre.layers || [])] as EffectLayer[];
+  for (const catName of TITRE_CATEGORY_ORDER) {
+    if (existingTitreCats.has(catName)) continue;
+    const top = ((titreCats2[catName] || []) as EffetCandidat[])[0];
+    if (!top || top.score < 0.05) continue;
+    titreLayers2.push({
+      effet_id:  top.id,
+      category:  catName,
+      intensity: parseFloat((top.intensite_recommandee * 0.65).toFixed(3)),
+      speed:     result.titre.speed || 'medium',
+      color:     result.titre.color || primaryColor,
+      raison:    `Auto-chaos titre ${catName}`,
+    });
+  }
+  result.titre.layers = titreLayers2;
+
+  // ── Contact : forcer entree + emphasis + scan ─────────
+  const contactCats2        = selection.contact  as CategoryCandidates;
+  const existingContactCats = new Set((result.contact.layers || []).map((l: EffectLayer) => l.category));
+  const contactLayers2      = [...(result.contact.layers || [])] as EffectLayer[];
+  for (const catName of CONTACT_CATEGORY_ORDER) {
+    if (existingContactCats.has(catName)) continue;
+    const top = ((contactCats2[catName] || []) as EffetCandidat[])[0];
+    if (!top || top.score < 0.05) continue;
+    contactLayers2.push({
+      effet_id:  top.id,
+      category:  catName,
+      intensity: parseFloat((top.intensite_recommandee * 0.65).toFixed(3)),
+      speed:     result.contact.speed || 'medium',
+      color:     result.contact.color || primaryColor,
+      raison:    `Auto-chaos contact ${catName}`,
+    });
+  }
+  result.contact.layers = contactLayers2;
   result.separateur = enrichSemantic(result.separateur, selection.separateur as EffetCandidat[], SEP_FUSION_MAP,   SEP_CATEGORY_ORDER,  primaryColor);
   result.fond       = enrichSemantic(result.fond,       selection.fond        as EffetCandidat[], FOND_FUSION_MAP,  FOND_CATEGORY_ORDER, primaryColor);
   result.cta        = enrichSemantic(result.cta,        selection.cta         as EffetCandidat[], CTA_FUSION_MAP,   CTA_CATEGORY_ORDER,  primaryColor);

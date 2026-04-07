@@ -476,8 +476,14 @@ async function runZoneSelectionForVariation(
 
       if (layers.length === 0) return fallbackComposition()[zoneName as keyof ZoneComposition];
 
-      // La couche primaire (dimension pour logo, lumiere pour nom, primary pour flat)
-      const primaryLayer = layers.find(l => l.category === 'dimension' || l.category === 'primary' || l.category === 'lumiere') || layers[0];
+      // La couche primaire : dimension (logo) | lumiere (nom) | apparition (titre) | entree (contact) | primary (sep/fond/cta)
+      const primaryLayer = layers.find(l =>
+        l.category === 'dimension' ||
+        l.category === 'lumiere' ||
+        l.category === 'apparition' ||
+        l.category === 'entree' ||
+        l.category === 'primary'
+      ) || layers[0];
 
       return {
         effet_id:  primaryLayer.effet_id,
