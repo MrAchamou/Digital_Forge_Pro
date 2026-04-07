@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signature Vivante — Test User | TestCorp</title>
+<meta name="description" content="Une signature exclusive en 4 variations qui raconte l&#39;histoire de TestCorp.">
+
+<!-- Open Graph -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="Signature Test User — TestCorp | EffectForge AI">
+<meta property="og:description" content="Une signature exclusive en 4 variations qui raconte l&#39;histoire de TestCorp.">
+<meta property="og:image"       content="http://localhost:5000/api/signature/export-file/sig_d9525057_1775552996526/png">
+<meta property="og:url"         content="http://localhost:5000/api/signature/preview/sig_d9525057_1775552996526">
+<meta property="og:site_name"   content="EffectForge AI">
+
+<!-- Twitter Card -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="Signature Test User — TestCorp | EffectForge AI">
+<meta name="twitter:description" content="Une signature exclusive en 4 variations qui raconte l&#39;histoire de TestCorp.">
+<meta name="twitter:image"       content="http://localhost:5000/api/signature/export-file/sig_d9525057_1775552996526/png">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f172a;
+    --accent: #6366f1;
+    --text: #e8e8ff;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Arial', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 20px 60px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse at center, #6366f122 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid #6366f144;
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin-bottom: 24px;
+    animation: fadeInDown 0.6s ease;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.8s ease;
+  }
+  .hero p {
+    font-size: 16px;
+    color: rgba(232,232,255,0.6);
+    max-width: 500px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+    animation: fadeInUp 1s ease;
+  }
+  /* ── MOCK GMAIL ── */
+  .gmail-mock {
+    max-width: 700px;
+    margin: 0 auto 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    animation: scaleIn 1.2s ease;
+  }
+  .gmail-header {
+    background: #202124;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #333;
+  }
+  .gmail-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .gmail-label {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #9aa0a6;
+    margin-left: auto;
+  }
+  .gmail-body {
+    background: #1a1a2e;
+    padding: 24px 28px;
+  }
+  .gmail-from { font-family: Arial; font-size: 13px; color: #fff; margin-bottom: 4px; }
+  .gmail-subject { font-family: Arial; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .gmail-message { font-family: Arial; font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 24px; }
+  .gmail-sig-zone {
+    border-top: 1px solid #333;
+    padding-top: 20px;
+  }
+  .cycle-counter {
+    font-family: monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    text-align: right;
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+  /* ── SECTION VARIATIONS ── */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 20px;
+  }
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .section-headline {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+  .variations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .variation-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .variation-card:hover {
+    border-color: #6366f155;
+    transform: translateY(-4px);
+  }
+  .variation-label {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-family: 'Georgia', serif;
+  }
+  .variation-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .variation-subtitle { font-size: 11px; color: rgba(232,232,255,0.4); margin-bottom: 8px; }
+  .variation-intention { font-size: 11px; color: rgba(232,232,255,0.6); line-height: 1.5; margin-bottom: 8px; }
+  .variation-emotion { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  /* ── BOUTONS INSTALLATION ── */
+  .install-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .install-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .install-card:hover {
+    border-color: #6366f166;
+    background: #6366f111;
+    transform: translateY(-4px);
+  }
+  .install-icon { font-size: 32px; }
+  .install-name { font-size: 14px; font-weight: 600; }
+  .install-btn {
+    display: inline-block;
+    background: #6366f122;
+    border: 1px solid #6366f155;
+    color: var(--accent);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    margin-top: 4px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .install-card:hover .install-btn {
+    background: #6366f144;
+  }
+  /* ── BOUTON COPIER CODE ── */
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(232,232,255,0.55);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+  }
+  .copy-btn:hover {
+    border-color: #6366f155;
+    color: var(--accent);
+    background: #6366f111;
+  }
+  .copy-btn.copied {
+    border-color: #22c55e88;
+    color: #22c55e;
+    background: #22c55e11;
+  }
+  /* ── TÉLÉCHARGEMENT ── */
+  .download-zone {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #6366f108, transparent);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin: 0;
+  }
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #6366f1, #6366f1bb);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 30px #6366f144;
+  }
+  .download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px #6366f166;
+  }
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 13px;
+    color: rgba(232,232,255,0.3);
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 40px 16px 40px; }
+    .install-grid { grid-template-columns: 1fr; }
+    .variations-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="badge">EffectForge AI — God Tier Signature</div>
+  <h1>Votre signature email prend vie</h1>
+  <p>Une signature exclusive en 4 variations qui raconte l'histoire de TestCorp.</p>
+
+  <!-- Mock Gmail -->
+  <div class="gmail-mock">
+    <div class="gmail-header">
+      <div class="gmail-dot" style="background:#ff5f57"></div>
+      <div class="gmail-dot" style="background:#ffbd2e"></div>
+      <div class="gmail-dot" style="background:#28ca41"></div>
+      <div class="gmail-label">Gmail — Boîte de réception</div>
+    </div>
+    <div class="gmail-body">
+      <div class="gmail-from">De : Test User &lt;contact@entreprise.com&gt;</div>
+      <div class="gmail-subject">Objet : Présentation de notre collaboration</div>
+      <div class="gmail-message">Bonjour,<br><br>Merci pour notre échange. Je reste disponible pour toute question.<br><br>Cordialement,</div>
+      <div class="gmail-sig-zone">
+        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="180"><rect width="600" height="180" fill="#0f172a"/><text x="20" y="40" fill="white" font-size="18">Test User</text></svg>
+      </div>
+      <!-- Barre d'énergie du cycle + compteur -->
+      <div style="margin-top:10px;">
+        <div id="energy-bar" style="height:2px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+          <div id="energy-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#6366f188,#6366f1);border-radius:2px;transition:width 0.5s ease;"></div>
+        </div>
+        <div class="cycle-counter" id="cycle-counter" style="margin-top:4px;">VARIATION A · 00:00</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VARIATIONS ── -->
+<section class="section">
+  <div class="section-title">Les 4 variations vivantes</div>
+  <div class="section-headline">Effets utilises : SOUL_AURA, NEON_PULSE</div>
+  <div class="variations-grid">
+    
+    <div class="variation-card">
+      <div class="variation-label" style="color:#6366f1">A</div>
+      <div class="variation-title">Variation A</div>
+      <div class="variation-subtitle"></div>
+      <div class="variation-intention"></div>
+      <div class="variation-emotion" style="color:#6366f1"></div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#6366f1">B</div>
+      <div class="variation-title">Variation B</div>
+      <div class="variation-subtitle"></div>
+      <div class="variation-intention"></div>
+      <div class="variation-emotion" style="color:#6366f1"></div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#6366f1">C</div>
+      <div class="variation-title">Variation C</div>
+      <div class="variation-subtitle"></div>
+      <div class="variation-intention"></div>
+      <div class="variation-emotion" style="color:#6366f1"></div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#6366f1">D</div>
+      <div class="variation-title">Variation D</div>
+      <div class="variation-subtitle"></div>
+      <div class="variation-intention"></div>
+      <div class="variation-emotion" style="color:#6366f1"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INSTALLATION ── -->
+<section class="section" style="padding-top: 0;">
+  <div class="section-title">Installation</div>
+  <div class="section-headline">Choisissez votre client email</div>
+  <div class="install-grid">
+
+    <!-- Gmail -->
+    <div class="install-card">
+      <div class="install-icon">📧</div>
+      <div class="install-name">Gmail</div>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d9525057_1775552996526/gmail" class="install-btn" download data-testid="btn-install-gmail">Installer dans Gmail</a>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d9525057_1775552996526/pdf-gmail" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-gmail"
+        data-code="PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImZyIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLjAiPgo8dGl0bGU+U2lnbmF0dXJlIEdtYWlsIOKAlCBUZXN0IFVzZXI8L3RpdGxlPgo8c3R5bGU+CiAgYm9keSB7IG1hcmdpbjogMDsgcGFkZGluZzogMDsgYmFja2dyb3VuZDogI2ZmZjsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyB9CiAgLnNpZy1jb250YWluZXIgeyBtYXgtd2lkdGg6IDYwMHB4OyBiYWNrZ3JvdW5kOiAjMGYxNzJhOyBib3JkZXItcmFkaXVzOiA4cHg7IG92ZXJmbG93OiBoaWRkZW47IH0KICAuc2lnLXN2ZyB7IGRpc3BsYXk6IGJsb2NrOyB3aWR0aDogMTAwJTsgfQogIEBtZWRpYSAocHJlZmVycy1jb2xvci1zY2hlbWU6IGxpZ2h0KSB7CiAgICAuc2lnLWNvbnRhaW5lciB7IGJveC1zaGFkb3c6IDAgMnB4IDEycHggcmdiYSgwLDAsMCwwLjEpOyB9CiAgfQogIEBtZWRpYSBvbmx5IHNjcmVlbiBhbmQgKG1heC13aWR0aDogNDgwcHgpIHsKICAgIC5zaWctY29udGFpbmVyIHsgd2lkdGg6IDEwMCUgIWltcG9ydGFudDsgYm9yZGVyLXJhZGl1czogMDsgfQogIH0KPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KPGRpdiBjbGFzcz0ic2lnLWNvbnRhaW5lciI+CiAgPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iMTgwIj48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjIwIiB5PSI0MCIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTgiPlRlc3QgVXNlcjwvdGV4dD48L3N2Zz4KPC9kaXY+CjwhLS0gU2lnbmF0dXJlIFRlc3QgVXNlciDigJQgVGVzdENvcnAg4oCUIEfDqW7DqXLDqSBwYXIgRWZmZWN0Rm9yZ2UgQUkgLS0+CjwvYm9keT4KPC9odG1sPg=="
+        onclick="copyCode(this)">📋 Copier le code HTML</button>
+    </div>
+
+    <!-- Outlook -->
+    <div class="install-card">
+      <div class="install-icon">🖥️</div>
+      <div class="install-name">Outlook</div>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d9525057_1775552996526/outlook" class="install-btn" download data-testid="btn-install-outlook">Installer dans Outlook</a>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d9525057_1775552996526/pdf-outlook" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-outlook"
+        data-code="PCFET0NUWVBFIGh0bWw+CjxodG1sIHhtbG5zOnY9InVybjpzY2hlbWFzLW1pY3Jvc29mdC1jb206dm1sIiB4bWxuczpvPSJ1cm46c2NoZW1hcy1taWNyb3NvZnQtY29tOm9mZmljZTpvZmZpY2UiPgo8aGVhZD4KPG1ldGEgY2hhcnNldD0iVVRGLTgiPgo8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CjwhLS1baWYgZ3RlIG1zbyAxNV0+Cjx4bWw+CiAgPG86T2ZmaWNlRG9jdW1lbnRTZXR0aW5ncz4KICAgIDxvOkFsbG93UE5HLz4KICAgIDxvOlBpeGVsc1BlckluY2g+OTY8L286UGl4ZWxzUGVySW5jaD4KICA8L286T2ZmaWNlRG9jdW1lbnRTZXR0aW5ncz4KPC94bWw+CjwhW2VuZGlmXS0tPgo8c3R5bGU+CiAgYm9keSB7IG1hcmdpbjogMDsgcGFkZGluZzogMDsgZm9udC1mYW1pbHk6IEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IH0KICAuc2lnbmF0dXJlLXdyYXBwZXIgeyBtYXgtd2lkdGg6IDYwMHB4OyB9CiAgQG1lZGlhIG9ubHkgc2NyZWVuIGFuZCAobWF4LXdpZHRoOiA0ODBweCkgewogICAgLnNpZ25hdHVyZS13cmFwcGVyIHsgd2lkdGg6IDEwMCUgIWltcG9ydGFudDsgfQogICAgLnNpZy1uYW1lIHsgZm9udC1zaXplOiAxNnB4ICFpbXBvcnRhbnQ7IH0KICB9Cjwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CjwhLS1baWYgbXNvXT4KPHRhYmxlIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgYm9yZGVyPSIwIiBzdHlsZT0iYmFja2dyb3VuZDojMGYxNzJhO21heC13aWR0aDo2MDBweDsiPgogIDx0cj4KICAgIDx0ZCB3aWR0aD0iMTEwIiB2YWxpZ249Im1pZGRsZSIgYWxpZ249ImNlbnRlciIgc3R5bGU9InBhZGRpbmc6MjBweCAxMHB4OyI+CiAgICAgIDx0YWJsZSBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIGJvcmRlcj0iMCI+CiAgICAgICAgPHRyPgogICAgICAgICAgPHRkIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgYWxpZ249ImNlbnRlciIgdmFsaWduPSJtaWRkbGUiCiAgICAgICAgICAgIHN0eWxlPSJiYWNrZ3JvdW5kOiM2MzY2ZjEyMjtib3JkZXI6MS41cHggc29saWQgIzYzNjZmMTtib3JkZXItcmFkaXVzOjUwJTtmb250LWZhbWlseTpBcmlhbDtmb250LXNpemU6MjRweDtmb250LXdlaWdodDo3MDA7Y29sb3I6IzYzNjZmMTsiPgogICAgICAgICAgICBUVQogICAgICAgICAgPC90ZD4KICAgICAgICA8L3RyPgogICAgICA8L3RhYmxlPgogICAgPC90ZD4KICAgIDx0ZCB3aWR0aD0iMiIgdmFsaWduPSJ0b3AiIHN0eWxlPSJwYWRkaW5nOjE2cHggMDsiPgogICAgICA8dGFibGUgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiBib3JkZXI9IjAiIHdpZHRoPSIyIiBoZWlnaHQ9IjEyMCI+CiAgICAgICAgPHRyPjx0ZCBzdHlsZT0iYmFja2dyb3VuZDojNjM2NmYxO3dpZHRoOjJweDsiPjwvdGQ+PC90cj4KICAgICAgPC90YWJsZT4KICAgIDwvdGQ+CiAgICA8dGQgdmFsaWduPSJtaWRkbGUiIHN0eWxlPSJwYWRkaW5nOjIwcHggMTVweDsiPgogICAgICA8cCBzdHlsZT0ibWFyZ2luOjA7Zm9udC1mYW1pbHk6QXJpYWw7Zm9udC1zaXplOjE4cHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOiNlOGU4ZmY7Ij5UZXN0IFVzZXI8L3A+CiAgICAgIDxwIHN0eWxlPSJtYXJnaW46NHB4IDAgMDtmb250LWZhbWlseTpBcmlhbDtmb250LXNpemU6MTFweDtjb2xvcjojNjM2NmYxO2xldHRlci1zcGFjaW5nOjFweDt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7Ij5EaXJlY3RldXI8L3A+CiAgICAgIDxwIHN0eWxlPSJtYXJnaW46NHB4IDAgMDtmb250LWZhbWlseTpBcmlhbDtmb250LXNpemU6MTJweDtjb2xvcjojZThlOGZmO29wYWNpdHk6MC43OyI+VGVzdENvcnA8L3A+CiAgICAgIDx0YWJsZSBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIGJvcmRlcj0iMCIgc3R5bGU9Im1hcmdpbi10b3A6MTBweDsiPgogICAgICAgIDx0cj48dGQgaGVpZ2h0PSIxIiBzdHlsZT0iYmFja2dyb3VuZDojZThlOGZmO29wYWNpdHk6MC4yOyIgY29sc3Bhbj0iMSI+PC90ZD48L3RyPgogICAgICA8L3RhYmxlPgogICAgICA8cCBzdHlsZT0ibWFyZ2luOjhweCAwIDA7Zm9udC1mYW1pbHk6QXJpYWw7Zm9udC1zaXplOjExcHg7Y29sb3I6I2U4ZThmZjtvcGFjaXR5OjAuNzsiPiYjOTk5MzsgdGVzdEB0ZXN0LmZyPC9wPgogICAgICAKICAgICAgCiAgICA8L3RkPgogIDwvdHI+CjwvdGFibGU+CjwhW2VuZGlmXS0tPgo8IS0tW2lmICFtc29dPjwhLS0+CjxkaXYgY2xhc3M9InNpZ25hdHVyZS13cmFwcGVyIiBzdHlsZT0iYmFja2dyb3VuZDojMGYxNzJhO3BhZGRpbmc6MTZweDtib3JkZXItcmFkaXVzOjhweDttYXgtd2lkdGg6NjAwcHg7Ij4KICA8aW1nIHNyYz0iZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUJMQUFBQUZvQ0FNQUFBQndxdklZQUFBQ3NsQk1WRVVQRnlxSGk1V1htNk1lSmpkUFZXTXRORVhoNHVULy8vL2Y0T1BLek5DdnNyaC9nNDFUV1dhcXJiUVFHQ3R2ZEgvOS9mMnNyN1VUR3kwcE1FR2ZvcW8vUlZVZEpUZW5xYkJKVDE0UkdTeGlaM1I2ZjRuKy92NFlJREw1K3ZyejgvVDQrZmtnSnpuMjl2Zng4ZklsTEQxWFhXcloyOTR3TjBjWEh6TDA5UFg2K3ZzU0dpMDVRRkNocEtzVUhDNW5iSGhWV21neU9VbU5rWnFQazV3b01FSDgvUHd2TmtibjZPcGdaWEl1TlVidjhQRzd2Y1BpNCtVMU8wdUhpNVRhM041WVhtdHpkNE41Zm9qNysveGphSFJFU2xrM1BrN3I3TzJucXJGbWEzZDFlWVQzOS9mRHhjclAwZFRKeTg4NlFWRDMrUGkrd01YZDN1RVZIQy9CdzhpNXZNSFUxZG0zdWIrbXFiRFEwdFdFaUpJZkpqZ21MVDd5OHZNek9rck8wTlFhSWpUTXp0SlhYR200dThCYllXNXVjMzVNVW1BV0hUQ2lwYXhTV0dWQ1NGZEJSMWFXbWFFYkl6V3VzYmQ3Z0lxbHFLOVFWbVRXMTlwTFVWKzh2c1EwT2t2azVlZUtqcGZlMytLTWtKbDRmWWhXVzJrOVJGT3dzN205djhXMnVMNlVsNkNDaHBDZG9LZ1hIakUzUFUxS1VGOGlLVHZtNXVqbDV1aUlqSmFwckxPR2lwTXhPRWpuNStrbkwwRHQ3dStBaEk1TlUyR29xN0t4czdwZFkyOStnbzFuYlhrWklUTnhkb0ZyY0h5YW5xYVJsWjMxOWZiWTJ0MDJQRXhPVkdJNFAwL1gyZHgzZTRhZ282dVpuYVZzY1gxcGJuckx6ZEhFeHNyczdlNnp0YnM3UWxIbzZldVRscDlJVGwwck1rUGMzZURHeDh6Rng4dHlkNEpIVGx6cDZ1eTB0cndjSkRZc00wU2twNjRuTGo5R1RGcXRzTGFjbjZlUWxKeVhtcUtPa3B2dzhQTGc0ZU9lb2FtQmhZL056OU4yZW9YcTYrMGhLRHBIVFZzcU1VSmhabk8zdXNDanBxMVJWMlNEaDVIQXdzZHRjbjV3ZFlEajVPWmFZRzE5Z1l5RmlaSkFSbFd5dEx0bGFuWlVXV2M4UTFMSHlNM1YxdGxaWDJ3aktqeDhnWXZTMDlmdTcvQjBlSU5jWW02NnZjSkd0clhnQUFBQUNYQklXWE1BQUFzVEFBQUxFd0VBbXB3WUFBQUgzVWxFUVZSNG5PM2Q5WGRjWlI0SDRDRkFQNkd6YmRJa05LV1dVaGRxUUoxQ0Jhamc3b3M3aThQaXp1THVzampMdXJ1N3U3dnYvN0huenR5Wk5HMW9DbUhQbnRMbitXWGUrNzEzM3Bua252TTVWOTc3VHFVQ0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUc5M3UrM1FyOTBHMjI5bnM2dFBsNVdSamNMK2cvL1d3RFpwUlBvMVlyRDlQdG5zYWtoWjJhOVJ1SGp3M3hyWUpvM0kwdGE2Q2NtRXNybDB5d05yWkxWYUhkbFBmVlJYMThWSkR1cnEycjJzTE9ucTZ1ckpmN3E2M3ZmV2ZYdGdteklpMjVXdG5aS2R5dVoyV3g1WU95YlpzZjlWMnlmTnprdEQ4bzQzKzBVQkJCYXcxUkJZd0Ziam5LWFZUVThKcTB2UDJkTDNPeVVFL2c4MkNLeW1FNVpQZTlkR3BZNGxoeXdjOTlZRTFpa0xEL2w4eDBadk9tTFAyMDdjdUZZejdya2wwd2Y2RTRCdE5yQTZ2emFrR0lVdzlhdVRtNlhoUC9yNUFVbmFENSs5WWs2eFBHem9VVW1PR2xxWS84WUM2NG5xMFF1U2pELzU2K2YxZGovNmh2RkpudjN4cjh2Q3FsclBMMVU2MXI4M3lkakRCejA4REhoN0J0YktpVmx3Wk10WERrcG1yQ3RMNDA1UEZsMTRRZmZKWTVQdjdWbXBWQTdkWU9qV2ZtOG9zSzVvVGY2eTlvTHJXNU1jV05hK2VIQ3lxUHVtb1pPU0kzZXRWUzZzOVR6c2xHWGxaNHo2WC96aHdGWWZXTWNuZCt4Y05PYjFaT3hUOVZwMzhyTWppc1oraTVKM1ZpcVY2M2Fla21US3pvVW4za2hnald2TmpIT0x4dkMyQlkyaHBaMURrcGF6aXpjK2tseGFPeFdkdkhEaHNjbXdpOXU3LzNyZTRxTUZGdEJ2WUozYm50WFgxWnNya29tMTg3MGZqczArNWVyTDZvSDFwcTloUFpXOFV0WjJMd05yMWllU1IrcWxqbE9UbDh2VkxjbVE4Zk9LMXVRZVIxaEFQNEcxeThlVEx6UVdEazZPTFY0WEo4YzBhcTJEQzZ4emt2Vmw3ZDR5c09ZbTdVdksycmxKKzdSNnN5WEpIdlhtRFFJTDZDZXdWaVI1cUxFd0pqbDArMHFsOG5qeXExdkwycFMya1lNSnJMdVRoOHZhckxaOWE2L0hKWjlzYkRmckc4MlVha25haTh0bEFLOFRXTGNrTTV1akNHNVBNcTk4ZlBtenZiY01CeE5ZOXlSamo2L2RhR3c0TWNtN20wc0hKcWZXV3kzSlZMc0oyRXhnSFoxYzFWeVluMlR2NHRMU1BrbG1ISHZXck1FSDF2SmkrTUtkVjkvV3UrcU1KSE9iUzNjbjQ0OW9CTmJwZGhXd21jQmEwenQxUTJ2clhrbG1GOVhsVTJ1REN4NVllKzB1V3hCWUkvc2NNOVhjbVorV3JVZDdhbDBkL3BFUGxZV1ZTVDdjL01pVGt0UlBCRnVTTDl0VndHWUNhK2JHRTJSOXNGWSs1Wjc3Nm90N3Jlb1lNTEE2a3R6VXQ3UTBQMmcwcDgyZVdPL3E0Tm90d01yTm04ekpkVWl0M3BJTXM2dUF6UVRXcE9TZ2Z2OUJjNlk4UEtrV0orOGZOMUJnVlNhV0IyWk5zMlptZzdIcUo1eDUyT3BhVjFjWFM5Y2tPYTJmVGdRV01FQmdYWlhta0t0TjNEcjZzQ0ptV2dZTXJMMTZCN0hYVFV0TzdGT1lQS1oya25sdGZWUkQ2cmNMK3hKWXdBQ0JkWDB5c1htZGFsUHpKaVU5Y3dZS3JHT1NEL1RwNU45WnMvRTJIY2NudWJGU3FleWY1TUYrT2hGWXdBQ0I5YWtrdlQ4V2NmN1FvY1ZUT3J1MU5VdnJrM3hzb01EYU84bEhOeXlzemVWbDY0L2xNSzU2ckJVSGM4TS9rd3p0M2ZTWm9iM2pzRnpEQWpZWFdKK2JsUHkydWJRMmh4YjVNaWFOK2RrcnYwdnlucUp4ZjVJcmlnY0IyOXFLc2FWOUxDOFBuaHFXSEpCWHkrYXlYTmFvM3B3Y1Y3enVuZlEwNTYyNWQyempzd1FXTU5DemhBOG1EOVJuVEtoVTVoK1FwNHZYTWJtMGNZWjNSdkxONFVWamVudFN6QSt6TG1sczN1dklKQmMxbDNaOUxmOXN6SzYxTEJjMHlyY2szNnF0WGxRZjdWVXpPeE02NnkyQkJRd1VXTHRjbnZ5NUhrRTdUczJWdGFPcE1jbGR0WlNxalB4SDh0MzZobE9UTTJzVE9ieTRhWmZUWmhTelplMVFHeksvNTcrdVRCWTMxaXpMaE9mcnJUODltNW4xVzRlM3o4enErbVgzNGRYa3NYSkxnUVgwMWRuN00xL2xnVTFsK3UrVE5YdXNHSFhHMHpOeTN3dTEwcGdrci8zOTBjc1c3NzRtNlM0UHRoNUxybHgzeVRNTDhvdCsvcWxmdXFPNENUaHp5SEdYTGlvbTYzdXl1V0paMG43aHl0TWVtdHM5UGdzYXYvdDF5VW5KNVdlZTlmejY3eVF0dFdTOHByVjFVaktqdGJWMXRGMEcxQldYemt2TksrakRSeGV6ZkNZNTZaWHYxeXRuano2OUhPeVpGOWZWRDdVcWxUbmRZNHZDNmowYWhUNTIvWFl4VEw2bTUrWG5ldXQvdStqVTlucTUvYkR6bTlYT254VHptU1k1ZVVxOWNGZnphN1haVmNCbXpmL0RxbXJicUExbWNLK2NmZjdjaTZwalJoZVgyWnVtUFY2dDdudi82M2JTT2FYdE45V1ZvMS9ZOEFuRXdnbG52VnF0dm5SYTM0ZXBwMS95eStxcXhRdnRGd0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFxVzVQL0FxL0s2ZG16RENkVEFBQUFBRWxGVGtTdVFtQ0MiIGFsdD0iU2lnbmF0dXJlIFRlc3QgVXNlciAtIFRlc3RDb3JwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjE4MCIKICAgIHN0eWxlPSJkaXNwbGF5OmJsb2NrO21heC13aWR0aDoxMDAlO2JvcmRlcjowOyIgLz4KPC9kaXY+CjwhLS08IVtlbmRpZl0tLT4KPC9ib2R5Pgo8L2h0bWw+"
+        onclick="copyCode(this)">📋 Copier le code HTML</button>
+    </div>
+
+    <!-- Apple Mail -->
+    <div class="install-card">
+      <div class="install-icon">🍎</div>
+      <div class="install-name">Apple Mail</div>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d9525057_1775552996526/svg" class="install-btn" download data-testid="btn-install-apple">Installer dans Apple Mail</a>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d9525057_1775552996526/pdf-apple" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-apple"
+        data-code="PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iMTgwIj48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjIwIiB5PSI0MCIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTgiPlRlc3QgVXNlcjwvdGV4dD48L3N2Zz4="
+        onclick="copyCode(this)">📋 Copier le SVG</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── TÉLÉCHARGEMENT ── -->
+<div class="download-zone">
+  <a href="http://localhost:5000/api/signature/download/sig_d9525057_1775552996526" class="download-btn" data-testid="btn-download-package">
+    <span>⬇</span> Telecharger mon package complet
+  </a>
+  <p style="margin-top:16px;font-size:13px;color:rgba(232,232,255,0.4);">
+    Package ZIP complet · SVG · PNG · Outlook · Gmail · 3 guides PDF · manifest.json
+  </p>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <p>Signature creee par EffectForge AI</p>
+  <p style="margin-top:8px;font-size:11px;opacity:0.4;">ID: sig_d9525057_1775552996526</p>
+</footer>
+
+<script>
+  // ══════════════════════════════════════════════════════════════════
+  //  EFFECTFORGE — MOTEUR D'ANIMATION INTERACTIVE
+  //  Cycle counter + Mouse tracking + Viewport restart + Sparkles
+  // ══════════════════════════════════════════════════════════════════
+
+  (function() {
+
+    // ── 1. CYCLE COUNTER ─────────────────────────────────────────
+    const CYCLE = 240;
+    const VAR_DUR = CYCLE / 4;
+    const VARS = ['A', 'B', 'C', 'D'];
+    let elapsed = 0;
+    const counterEl = document.getElementById('cycle-counter');
+
+    setInterval(function() {
+      elapsed = (elapsed + 1) % CYCLE;
+      const varIdx = Math.floor(elapsed / VAR_DUR);
+      const varElapsed = elapsed % VAR_DUR;
+      const m = Math.floor(varElapsed / 60).toString().padStart(2, '0');
+      const s = (varElapsed % 60).toString().padStart(2, '0');
+      if (counterEl) counterEl.textContent = 'VARIATION ' + VARS[varIdx] + ' · ' + m + ':' + s;
+    }, 1000);
+
+    // ── 2. PARALLAX SOURIS — La signature réagit au mouvement ────
+    // Utilise des CSS custom properties pour créer un micro-parallax
+    const sigZone = document.querySelector('.gmail-sig-zone');
+    const gmailMock = document.querySelector('.gmail-mock');
+
+    if (gmailMock) {
+      gmailMock.addEventListener('mousemove', function(e) {
+        const rect = gmailMock.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) / rect.width;
+        const my = (e.clientY - rect.top) / rect.height;
+
+        // Tilt subtle 3D sur le mock Gmail (1.5° max)
+        const tiltX = (my - 0.5) * -3;
+        const tiltY = (mx - 0.5) * 3;
+        gmailMock.style.transform = 'perspective(1200px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale(1.005)';
+        gmailMock.style.transition = 'transform 0.15s ease-out';
+
+        // Met à jour les variables CSS dans le SVG si accessible
+        const svgEl = gmailMock.querySelector('svg');
+        if (svgEl) {
+          svgEl.style.setProperty('--mouse-x', mx.toFixed(3));
+          svgEl.style.setProperty('--mouse-y', my.toFixed(3));
+        }
+
+        // Spawn sparkle à la position de la souris (throttlé à 120ms)
+        if (!gmailMock._lastSparkle || Date.now() - gmailMock._lastSparkle > 120) {
+          gmailMock._lastSparkle = Date.now();
+          spawnSparkle(e.clientX, e.clientY, '#6366f1');
+        }
+      });
+
+      gmailMock.addEventListener('mouseleave', function() {
+        gmailMock.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)';
+        gmailMock.style.transition = 'transform 0.6s cubic-bezier(0.4,0,0.2,1)';
+      });
+    }
+
+    // ── 3. RESTART AU SURVOL — Force un "burst" d'énergie ────────
+    // Quand la souris entre sur la signature, toutes les animations
+    // internes sont relancées pour créer une sensation de réactivité
+    let restartTimeout = null;
+    if (sigZone) {
+      sigZone.addEventListener('mouseenter', function() {
+        if (restartTimeout) clearTimeout(restartTimeout);
+        restartTimeout = setTimeout(function() {
+          restartSVGAnimations(sigZone);
+        }, 80);
+      });
+    }
+
+    function restartSVGAnimations(container) {
+      const svgEl = container.querySelector('svg');
+      if (!svgEl) return;
+      // Technique : retirer et ré-ajouter la propriété animation-play-state
+      // pour forcer un restart des animations CSS
+      const animated = svgEl.querySelectorAll('[style*="animation"]');
+      animated.forEach(function(el) {
+        el.style.animationPlayState = 'paused';
+      });
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          animated.forEach(function(el) {
+            el.style.animationPlayState = 'running';
+          });
+        });
+      });
+    }
+
+    // ── 4. INTERSECTION OBSERVER — Restart en entrant dans le viewport ──
+    // Quand l'utilisateur scroll et arrive sur la signature :
+    // les animations se re-déclenchent avec plein d'énergie
+    if ('IntersectionObserver' in window && sigZone) {
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            // Un petit délai pour que la signature soit bien visible
+            setTimeout(function() {
+              restartSVGAnimations(entry.target);
+              // Effet de "réveil" sur le mock
+              if (gmailMock) {
+                gmailMock.style.transform = 'scale(1.01)';
+                setTimeout(function() {
+                  gmailMock.style.transform = 'scale(1)';
+                  gmailMock.style.transition = 'transform 0.8s cubic-bezier(0.34,1.56,0.64,1)';
+                }, 150);
+              }
+            }, 200);
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(sigZone);
+    }
+
+    // ── 5. PULSE PÉRIODIQUE — Renforce l'illusion de non-stop ────
+    // Toutes les 25s, un "souffle" subtil traverse la signature
+    // pour que l'utilisateur ait toujours l'impression qu'elle est vivante
+    let pulseCount = 0;
+    setInterval(function() {
+      pulseCount++;
+      if (!sigZone) return;
+      const svgEl = sigZone.querySelector('svg');
+      if (!svgEl) return;
+
+      // Souffle doux : brightness augmente brièvement
+      svgEl.style.filter = 'brightness(1.08) saturate(1.1)';
+      svgEl.style.transition = 'filter 1.2s ease';
+      setTimeout(function() {
+        svgEl.style.filter = 'brightness(1) saturate(1)';
+      }, 1200);
+
+      // Spawn plusieurs sparkles pour marquer le pulse
+      if (sigZone) {
+        const rect = sigZone.getBoundingClientRect();
+        for (let i = 0; i < 4; i++) {
+          setTimeout(function() {
+            const rx = rect.left + Math.random() * rect.width;
+            const ry = rect.top + Math.random() * rect.height;
+            spawnSparkle(rx, ry, '#6366f1');
+          }, i * 150);
+        }
+      }
+    }, 25000);
+
+    // ── 6. EFFET SPARKLE — Particules visuelles sur interaction ──
+    function spawnSparkle(x, y, color) {
+      const spark = document.createElement('div');
+      const size = 3 + Math.random() * 4;
+      const vx = (Math.random() - 0.5) * 60;
+      const vy = -20 - Math.random() * 40;
+      spark.style.cssText = [
+        'position:fixed',
+        'pointer-events:none',
+        'border-radius:50%',
+        'z-index:9999',
+        'width:' + size + 'px',
+        'height:' + size + 'px',
+        'left:' + (x - size/2) + 'px',
+        'top:' + (y - size/2) + 'px',
+        'background:' + color,
+        'box-shadow:0 0 ' + (size*2) + 'px ' + color,
+        'transition:none',
+        'opacity:0.9',
+      ].join(';');
+      document.body.appendChild(spark);
+
+      let frame = 0;
+      const totalFrames = 30 + Math.floor(Math.random() * 20);
+      function tick() {
+        frame++;
+        const progress = frame / totalFrames;
+        const cy = y + vy * progress + 30 * progress * progress;
+        const cx = x + vx * progress;
+        spark.style.left = (cx - size/2) + 'px';
+        spark.style.top  = (cy - size/2) + 'px';
+        spark.style.opacity = (0.9 * (1 - progress)).toString();
+        if (frame < totalFrames) requestAnimationFrame(tick);
+        else spark.remove();
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // ── 7. INDICATEUR D'ÉNERGIE — Barre de vie visuelle ──────────
+    // Une fine barre en bas du mock montre le cycle actuel en temps réel
+    const energyBar = document.getElementById('energy-bar-fill');
+    if (energyBar) {
+      setInterval(function() {
+        const pct = ((elapsed / CYCLE) * 100).toFixed(1);
+        energyBar.style.width = pct + '%';
+      }, 500);
+    }
+
+  })();
+
+  // ── Copie 1-clic ──
+  function copyCode(btn) {
+    const b64 = btn.getAttribute('data-code');
+    if (!b64) return;
+    let decoded;
+    try { decoded = decodeURIComponent(escape(atob(b64))); }
+    catch(e) { decoded = atob(b64); }
+    navigator.clipboard.writeText(decoded).then(function() {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✅ Copié !';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    }).catch(function() {
+      const ta = document.createElement('textarea');
+      ta.value = decoded;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✅ Copié !';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

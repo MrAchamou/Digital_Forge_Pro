@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signature Vivante — Sophie Bernard | AtomStudio</title>
+<meta name="description" content="Une signature exclusive en 4 variations qui raconte l&#39;histoire de AtomStudio.">
+
+<!-- Open Graph -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="Signature Sophie Bernard — AtomStudio | EffectForge AI">
+<meta property="og:description" content="Une signature exclusive en 4 variations qui raconte l&#39;histoire de AtomStudio.">
+<meta property="og:image"       content="http://localhost:5000/api/signature/export-file/sig_d1daa863_1775553284680/png">
+<meta property="og:url"         content="http://localhost:5000/api/signature/preview/sig_d1daa863_1775553284680">
+<meta property="og:site_name"   content="EffectForge AI">
+
+<!-- Twitter Card -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="Signature Sophie Bernard — AtomStudio | EffectForge AI">
+<meta name="twitter:description" content="Une signature exclusive en 4 variations qui raconte l&#39;histoire de AtomStudio.">
+<meta name="twitter:image"       content="http://localhost:5000/api/signature/export-file/sig_d1daa863_1775553284680/png">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #1a0533;
+    --accent: #c026d3;
+    --text: #e8e8ff;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Arial', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 20px 60px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse at center, #c026d322 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid #c026d344;
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin-bottom: 24px;
+    animation: fadeInDown 0.6s ease;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.8s ease;
+  }
+  .hero p {
+    font-size: 16px;
+    color: rgba(232,232,255,0.6);
+    max-width: 500px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+    animation: fadeInUp 1s ease;
+  }
+  /* ── MOCK GMAIL ── */
+  .gmail-mock {
+    max-width: 700px;
+    margin: 0 auto 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    animation: scaleIn 1.2s ease;
+  }
+  .gmail-header {
+    background: #202124;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #333;
+  }
+  .gmail-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .gmail-label {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #9aa0a6;
+    margin-left: auto;
+  }
+  .gmail-body {
+    background: #1a1a2e;
+    padding: 24px 28px;
+  }
+  .gmail-from { font-family: Arial; font-size: 13px; color: #fff; margin-bottom: 4px; }
+  .gmail-subject { font-family: Arial; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .gmail-message { font-family: Arial; font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 24px; }
+  .gmail-sig-zone {
+    border-top: 1px solid #333;
+    padding-top: 20px;
+  }
+  .cycle-counter {
+    font-family: monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    text-align: right;
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+  /* ── SECTION VARIATIONS ── */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 20px;
+  }
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .section-headline {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+  .variations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .variation-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .variation-card:hover {
+    border-color: #c026d355;
+    transform: translateY(-4px);
+  }
+  .variation-label {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-family: 'Georgia', serif;
+  }
+  .variation-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .variation-subtitle { font-size: 11px; color: rgba(232,232,255,0.4); margin-bottom: 8px; }
+  .variation-intention { font-size: 11px; color: rgba(232,232,255,0.6); line-height: 1.5; margin-bottom: 8px; }
+  .variation-emotion { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  /* ── BOUTONS INSTALLATION ── */
+  .install-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .install-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .install-card:hover {
+    border-color: #c026d366;
+    background: #c026d311;
+    transform: translateY(-4px);
+  }
+  .install-icon { font-size: 32px; }
+  .install-name { font-size: 14px; font-weight: 600; }
+  .install-btn {
+    display: inline-block;
+    background: #c026d322;
+    border: 1px solid #c026d355;
+    color: var(--accent);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    margin-top: 4px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .install-card:hover .install-btn {
+    background: #c026d344;
+  }
+  /* ── BOUTON COPIER CODE ── */
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(232,232,255,0.55);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+  }
+  .copy-btn:hover {
+    border-color: #c026d355;
+    color: var(--accent);
+    background: #c026d311;
+  }
+  .copy-btn.copied {
+    border-color: #22c55e88;
+    color: #22c55e;
+    background: #22c55e11;
+  }
+  /* ── TÉLÉCHARGEMENT ── */
+  .download-zone {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #c026d308, transparent);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin: 0;
+  }
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #c026d3, #c026d3bb);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 30px #c026d344;
+  }
+  .download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px #c026d366;
+  }
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 13px;
+    color: rgba(232,232,255,0.3);
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 40px 16px 40px; }
+    .install-grid { grid-template-columns: 1fr; }
+    .variations-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="badge">EffectForge AI — God Tier Signature</div>
+  <h1>Votre signature email prend vie</h1>
+  <p>Une signature exclusive en 4 variations qui raconte l'histoire de AtomStudio.</p>
+
+  <!-- Mock Gmail -->
+  <div class="gmail-mock">
+    <div class="gmail-header">
+      <div class="gmail-dot" style="background:#ff5f57"></div>
+      <div class="gmail-dot" style="background:#ffbd2e"></div>
+      <div class="gmail-dot" style="background:#28ca41"></div>
+      <div class="gmail-label">Gmail — Boîte de réception</div>
+    </div>
+    <div class="gmail-body">
+      <div class="gmail-from">De : Sophie Bernard &lt;contact@entreprise.com&gt;</div>
+      <div class="gmail-subject">Objet : Présentation de notre collaboration</div>
+      <div class="gmail-message">Bonjour,<br><br>Merci pour notre échange. Je reste disponible pour toute question.<br><br>Cordialement,</div>
+      <div class="gmail-sig-zone">
+        <svg xmlns='http://www.w3.org/2000/svg' width='600' height='180'><rect width='600' height='180' fill='#1a0533'/><text x='20' y='50' fill='#c026d3' font-size='20' font-family='Arial'>Sophie Bernard</text><text x='20' y='75' fill='#e8d4ff' font-size='13' font-family='Arial'>Directrice Artistique · AtomStudio</text></svg>
+      </div>
+      <!-- Barre d'énergie du cycle + compteur -->
+      <div style="margin-top:10px;">
+        <div id="energy-bar" style="height:2px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+          <div id="energy-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#c026d388,#c026d3);border-radius:2px;transition:width 0.5s ease;"></div>
+        </div>
+        <div class="cycle-counter" id="cycle-counter" style="margin-top:4px;">VARIATION A · 00:00</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VARIATIONS ── -->
+<section class="section">
+  <div class="section-title">Les 4 variations vivantes</div>
+  <div class="section-headline">Effets utilises : SOUL_AURA, NEON_PULSE</div>
+  <div class="variations-grid">
+    
+    <div class="variation-card">
+      <div class="variation-label" style="color:#c026d3">A</div>
+      <div class="variation-title">Variation A</div>
+      <div class="variation-subtitle"></div>
+      <div class="variation-intention"></div>
+      <div class="variation-emotion" style="color:#c026d3"></div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#c026d3">B</div>
+      <div class="variation-title">Variation B</div>
+      <div class="variation-subtitle"></div>
+      <div class="variation-intention"></div>
+      <div class="variation-emotion" style="color:#c026d3"></div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#c026d3">C</div>
+      <div class="variation-title">Variation C</div>
+      <div class="variation-subtitle"></div>
+      <div class="variation-intention"></div>
+      <div class="variation-emotion" style="color:#c026d3"></div>
+    </div>
+    <div class="variation-card">
+      <div class="variation-label" style="color:#c026d3">D</div>
+      <div class="variation-title">Variation D</div>
+      <div class="variation-subtitle"></div>
+      <div class="variation-intention"></div>
+      <div class="variation-emotion" style="color:#c026d3"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INSTALLATION ── -->
+<section class="section" style="padding-top: 0;">
+  <div class="section-title">Installation</div>
+  <div class="section-headline">Choisissez votre client email</div>
+  <div class="install-grid">
+
+    <!-- Gmail -->
+    <div class="install-card">
+      <div class="install-icon">📧</div>
+      <div class="install-name">Gmail</div>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d1daa863_1775553284680/gmail" class="install-btn" download data-testid="btn-install-gmail">Installer dans Gmail</a>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d1daa863_1775553284680/pdf-gmail" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-gmail"
+        data-code="PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImZyIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLjAiPgo8dGl0bGU+U2lnbmF0dXJlIEdtYWlsIOKAlCBTb3BoaWUgQmVybmFyZDwvdGl0bGU+CjxzdHlsZT4KICBib2R5IHsgbWFyZ2luOiAwOyBwYWRkaW5nOiAwOyBiYWNrZ3JvdW5kOiAjZmZmOyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IH0KICAuc2lnLWNvbnRhaW5lciB7IG1heC13aWR0aDogNjAwcHg7IGJhY2tncm91bmQ6ICMxYTA1MzM7IGJvcmRlci1yYWRpdXM6IDhweDsgb3ZlcmZsb3c6IGhpZGRlbjsgfQogIC5zaWctc3ZnIHsgZGlzcGxheTogYmxvY2s7IHdpZHRoOiAxMDAlOyB9CiAgQG1lZGlhIChwcmVmZXJzLWNvbG9yLXNjaGVtZTogbGlnaHQpIHsKICAgIC5zaWctY29udGFpbmVyIHsgYm94LXNoYWRvdzogMCAycHggMTJweCByZ2JhKDAsMCwwLDAuMSk7IH0KICB9CiAgQG1lZGlhIG9ubHkgc2NyZWVuIGFuZCAobWF4LXdpZHRoOiA0ODBweCkgewogICAgLnNpZy1jb250YWluZXIgeyB3aWR0aDogMTAwJSAhaW1wb3J0YW50OyBib3JkZXItcmFkaXVzOiAwOyB9CiAgfQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8ZGl2IGNsYXNzPSJzaWctY29udGFpbmVyIj4KICA8c3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgd2lkdGg9JzYwMCcgaGVpZ2h0PScxODAnPjxyZWN0IHdpZHRoPSc2MDAnIGhlaWdodD0nMTgwJyBmaWxsPScjMWEwNTMzJy8+PHRleHQgeD0nMjAnIHk9JzUwJyBmaWxsPScjYzAyNmQzJyBmb250LXNpemU9JzIwJyBmb250LWZhbWlseT0nQXJpYWwnPlNvcGhpZSBCZXJuYXJkPC90ZXh0Pjx0ZXh0IHg9JzIwJyB5PSc3NScgZmlsbD0nI2U4ZDRmZicgZm9udC1zaXplPScxMycgZm9udC1mYW1pbHk9J0FyaWFsJz5EaXJlY3RyaWNlIEFydGlzdGlxdWUgwrcgQXRvbVN0dWRpbzwvdGV4dD48L3N2Zz4KPC9kaXY+CjwhLS0gU2lnbmF0dXJlIFNvcGhpZSBCZXJuYXJkIOKAlCBBdG9tU3R1ZGlvIOKAlCBHw6luw6lyw6kgcGFyIEVmZmVjdEZvcmdlIEFJIC0tPgo8L2JvZHk+CjwvaHRtbD4="
+        onclick="copyCode(this)">📋 Copier le code HTML</button>
+    </div>
+
+    <!-- Outlook -->
+    <div class="install-card">
+      <div class="install-icon">🖥️</div>
+      <div class="install-name">Outlook</div>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d1daa863_1775553284680/outlook" class="install-btn" download data-testid="btn-install-outlook">Installer dans Outlook</a>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d1daa863_1775553284680/pdf-outlook" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-outlook"
+        data-code="PCFET0NUWVBFIGh0bWw+CjxodG1sIHhtbG5zOnY9InVybjpzY2hlbWFzLW1pY3Jvc29mdC1jb206dm1sIiB4bWxuczpvPSJ1cm46c2NoZW1hcy1taWNyb3NvZnQtY29tOm9mZmljZTpvZmZpY2UiPgo8aGVhZD4KPG1ldGEgY2hhcnNldD0iVVRGLTgiPgo8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CjwhLS1baWYgZ3RlIG1zbyAxNV0+Cjx4bWw+CiAgPG86T2ZmaWNlRG9jdW1lbnRTZXR0aW5ncz4KICAgIDxvOkFsbG93UE5HLz4KICAgIDxvOlBpeGVsc1BlckluY2g+OTY8L286UGl4ZWxzUGVySW5jaD4KICA8L286T2ZmaWNlRG9jdW1lbnRTZXR0aW5ncz4KPC94bWw+CjwhW2VuZGlmXS0tPgo8c3R5bGU+CiAgYm9keSB7IG1hcmdpbjogMDsgcGFkZGluZzogMDsgZm9udC1mYW1pbHk6IEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IH0KICAuc2lnbmF0dXJlLXdyYXBwZXIgeyBtYXgtd2lkdGg6IDYwMHB4OyB9CiAgQG1lZGlhIG9ubHkgc2NyZWVuIGFuZCAobWF4LXdpZHRoOiA0ODBweCkgewogICAgLnNpZ25hdHVyZS13cmFwcGVyIHsgd2lkdGg6IDEwMCUgIWltcG9ydGFudDsgfQogICAgLnNpZy1uYW1lIHsgZm9udC1zaXplOiAxNnB4ICFpbXBvcnRhbnQ7IH0KICB9Cjwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CjwhLS1baWYgbXNvXT4KPHRhYmxlIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgYm9yZGVyPSIwIiBzdHlsZT0iYmFja2dyb3VuZDojMWEwNTMzO21heC13aWR0aDo2MDBweDsiPgogIDx0cj4KICAgIDx0ZCB3aWR0aD0iMTEwIiB2YWxpZ249Im1pZGRsZSIgYWxpZ249ImNlbnRlciIgc3R5bGU9InBhZGRpbmc6MjBweCAxMHB4OyI+CiAgICAgIDx0YWJsZSBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIGJvcmRlcj0iMCI+CiAgICAgICAgPHRyPgogICAgICAgICAgPHRkIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgYWxpZ249ImNlbnRlciIgdmFsaWduPSJtaWRkbGUiCiAgICAgICAgICAgIHN0eWxlPSJiYWNrZ3JvdW5kOiNjMDI2ZDMyMjtib3JkZXI6MS41cHggc29saWQgI2MwMjZkMztib3JkZXItcmFkaXVzOjUwJTtmb250LWZhbWlseTpBcmlhbDtmb250LXNpemU6MjRweDtmb250LXdlaWdodDo3MDA7Y29sb3I6I2MwMjZkMzsiPgogICAgICAgICAgICBTQgogICAgICAgICAgPC90ZD4KICAgICAgICA8L3RyPgogICAgICA8L3RhYmxlPgogICAgPC90ZD4KICAgIDx0ZCB3aWR0aD0iMiIgdmFsaWduPSJ0b3AiIHN0eWxlPSJwYWRkaW5nOjE2cHggMDsiPgogICAgICA8dGFibGUgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiBib3JkZXI9IjAiIHdpZHRoPSIyIiBoZWlnaHQ9IjEyMCI+CiAgICAgICAgPHRyPjx0ZCBzdHlsZT0iYmFja2dyb3VuZDojYzAyNmQzO3dpZHRoOjJweDsiPjwvdGQ+PC90cj4KICAgICAgPC90YWJsZT4KICAgIDwvdGQ+CiAgICA8dGQgdmFsaWduPSJtaWRkbGUiIHN0eWxlPSJwYWRkaW5nOjIwcHggMTVweDsiPgogICAgICA8cCBzdHlsZT0ibWFyZ2luOjA7Zm9udC1mYW1pbHk6QXJpYWw7Zm9udC1zaXplOjE4cHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOiNmYWU4ZmY7Ij5Tb3BoaWUgQmVybmFyZDwvcD4KICAgICAgPHAgc3R5bGU9Im1hcmdpbjo0cHggMCAwO2ZvbnQtZmFtaWx5OkFyaWFsO2ZvbnQtc2l6ZToxMXB4O2NvbG9yOiNjMDI2ZDM7bGV0dGVyLXNwYWNpbmc6MXB4O3RleHQtdHJhbnNmb3JtOnVwcGVyY2FzZTsiPkRpcmVjdHJpY2UgQXJ0aXN0aXF1ZTwvcD4KICAgICAgPHAgc3R5bGU9Im1hcmdpbjo0cHggMCAwO2ZvbnQtZmFtaWx5OkFyaWFsO2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiNmYWU4ZmY7b3BhY2l0eTowLjc7Ij5BdG9tU3R1ZGlvPC9wPgogICAgICA8dGFibGUgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiBib3JkZXI9IjAiIHN0eWxlPSJtYXJnaW4tdG9wOjEwcHg7Ij4KICAgICAgICA8dHI+PHRkIGhlaWdodD0iMSIgc3R5bGU9ImJhY2tncm91bmQ6I2ZhZThmZjtvcGFjaXR5OjAuMjsiIGNvbHNwYW49IjEiPjwvdGQ+PC90cj4KICAgICAgPC90YWJsZT4KICAgICAgPHAgc3R5bGU9Im1hcmdpbjo4cHggMCAwO2ZvbnQtZmFtaWx5OkFyaWFsO2ZvbnQtc2l6ZToxMXB4O2NvbG9yOiNmYWU4ZmY7b3BhY2l0eTowLjc7Ij4mIzk5OTM7IHNvcGhpZUBhdG9tc3R1ZGlvLmZyPC9wPgogICAgICAKICAgICAgCiAgICA8L3RkPgogIDwvdHI+CjwvdGFibGU+CjwhW2VuZGlmXS0tPgo8IS0tW2lmICFtc29dPjwhLS0+CjxkaXYgY2xhc3M9InNpZ25hdHVyZS13cmFwcGVyIiBzdHlsZT0iYmFja2dyb3VuZDojMWEwNTMzO3BhZGRpbmc6MTZweDtib3JkZXItcmFkaXVzOjhweDttYXgtd2lkdGg6NjAwcHg7Ij4KICA8aW1nIHNyYz0iZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUJMQUFBQUZvQ0FNQUFBQndxdklZQUFBREFGQk1WRVVhQlRQbTB2MGJCVFMxSThoRExsd3ZDRWVWZ2EzQUp0UG8xUDhkQmpVNUMxR0ViNXk5SmRFa0R6MnBJcjRsQ0Q1dEZZTWVDVGRoVEhsekZvbEpEMkZkRW5NbUVUNTZacEp3Rm9VNkpWTzVwZEdLZHFMRXNOeHRXSVcrcXRXL0p0SWdDem5rMGZ3eENVaTRKTXlQZTZjMEgwMHZHa2wvR1pTekk4WjFZSTIrSnRLS0c1NkpkS0UrREZZa0J6emt6L3JBcTlnaUJ6cFRFR3BkUjNVc0NFUXRHVWJpemZubjAvNnhuY2xsVDMwbkVrQTJJRTZkSDdGTE5tTkhNMkJtVVg1WUVXOGVCamV2SXNMZnkvYXpuc29pRFR0QksxbFJQV2xDTFZvY0J6VXJGa1RUdityYngvSzdKYzdCcmRsWFEzREp0ZUVwQ0VGRERWcTNKTXE4SmMrc0lzQlpSSEZuVTRBY0JUVWdCaml4SXNWUUQyYzRJMUdJYzZCRUwxMXBWSUZuRkgyZklMUnVXWVllQ0RiY3lQUkdEbDJaSHE1ZkUzWjlHSk04REZSMEY0bzdDMUl5Q2twQURWaUJiSm1EYlp2VndlM2J4dkZWUW01TURtUkVEbDB4Q1VxUUhLV2tJTGlmSDdPSGNwKzlxTlNnaTdneEhFbytLVmFNZDZSVFBtdmd6UGQ0WTVBeUhVdC9hNWZRdk9mRHI5cGJFbkdFR3BwM0Y0eHpYb3Uyb2MycWxzRTNDazVxRllDTkhLSldFVzI5SmRDaElMVmJSbk91bXNaclZvT0djWjZOZWFiSXROOWlUWHBNT0dWVlFHMktIS0I3R0pCNUdJK1ZIYWxrRkh0d0ZvYUhHNXluSWJ3cUNVSzBJOGg4YUpTaGpibk11ZVNjaHJPWWhMQ1FlNmpPdXVWeFhZcWtqN3ZVdit0MllvN0dzdDRuQ0VCakZIbHBGWCttSWJyWnhQQW9GRUdkaXJWRk1WNUtOR0pQTzJoNVpaR21rNzVOT1daSURsKzVKYzBjQlRSYkVuSkxEMk9qSUxlbGtiMi9xOWFUZmFvOEoxVmVTbmZYdys2c2w4TlVFR3QvR1pZcUNVT3RJOEdYSHF5Q0dwZUpHNTV5Rm9oZFNYYVpoYkdVZ0swM0lsRGR5ZlZSRUdpREdwaVNIS2MwQ2t4ckZvS3BJcnljSDdCZ0UzZVBIS01wRlVLY2lMU25rOEM0cE5COWFaV3RtTVdiSHErMEk4ZUZHNXVUSGFoT0QyVktEMkJ1RllTWEhhczJJVStXZ3E2YWhiSEt0dUU0QzFCcUZZR3FJcitpanJsd1hJbTZwdExMdCtMRXNOdTFvTXcvS2xoaUUzaTJvczYzbzg4MWJKMFhBQUFBQ1hCSVdYTUFBQXNUQUFBTEV3RUFtcHdZQUFBWitFbEVRVlI0bk8zZGQzZ1ZWZjdIOFhORHlQbEdJQmdnSUZJU1FKQWVvcEFFUlJBUUlSUkZFSmFBRkFXbE4wVllLWUtnVkVGVW1oMFJSSWtHRlEwZ29xSllkMWZzWU4rMXNPNWFmdW9xbG5WM2Y4K1pQamMzSVJGOUV1VDkrc2ZNekozSjNNdHpQNTd5UFJPbEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFjTFRJU0VsSkdSL3pTTCtVbEQzcUtQZE9Ta3BLMWJLK0NRQkszVFZrL1poWFhobXpmbUdyemtmd2NWVFVXaDhmODhqSldsY3V6WlhpR3ZxcUpwYVBmNkVVcmZWeFpYMFRBRnI5dGJsMm5YL0o4clpsSDFpSjN2MW9yZnQwV1A5T09maEhJckNBY21EUU9EK3VMQ25sTExDMDFzM0haS2l5Um1BQjVjQVlLeEt1ZjZ0NjlkdFdkQ21uZ2FYMUpXV2VXQVFXVVBhZU1uRnd5d1JuNi9KdE0zNkx3SHF3WWNPS3BRMnNUNnRhR2s2ODQyRnppK05VR1NPd2dMTFhRV3Q5YTNESHRJbS9mbUNWbGdtc3B2N1dXMllrcTZ5YldBUVdVT2JhcG1yOWFlNnZjNjNmS3JCVTdtQ3RkUTFWdGdnc29NeGRiRHFFeFJ4UEhIdlp3Z1A5WXJadVdrODg1YnBwcldNRjF1V2ZMeHd5ZmxCeHY3WnpxeUl2R3lPdzFNdUZodGFxOWp1dzU3T3hUOFk0Tis3YUdtY2VhT2h2NTdZNmNPWlRmNGwrVmR0cHA2U2M4bmloM2M0Ykc3THdLVGZFSzlaWWVObDQ4M3NJTEtETS9VbHIvZWNpajE3K1ZuKzcyT0dmMC95ZGR5UWxKZDJsSml6cVk5VWN0R2dZSFZpbm1GNm0xazIzK1EyM1Y1T1NOZ1F1TzNGRkk3dGc0YTlqU3haWTFiWFdvLzNOUWRkZFV0bTZ3TVl4ZmcxR3Y2U2twS2RVNnkrK013ZGVWV3BFVWxKU1ZWVjE4VWF6bmZyM2Z2N3B1UWYrWWMwdWFLMDNQQlFJemR1U2ttWW9OZlpPNjQxZGJ1MnFZYitYTGwva0VsaEEyYnRNYTMxN1VRZEhuTzlQMDkzcHhjOEpXdXUyUSt3azAxbzNPaVVVV0xtTHZGUDJ0WTQ1UzVqeGluL1YxTVdEU2hKWVpoQnJpTGQxK1lXQklxM3IzTDAxdE5hblRMRGl5Z29zRTNMbmpSM2dWVWI0Z1dlSGtPTzlhNzM5TGJSdXBFWTdSUjRtc0FiWk02aldMR3BEV2xoQW1idFdhMTNaLzg2R2pEUGYxSlh2My9LbEZVNzdjZ09COWRuNVdpZTFlUGxMMDlDcC9Ga3dzTzdVT3ZYaEwvLytoRG5sSDdFQzZ6d3JidnAvZWN2YlRjMFBiNVVnc0RJR2E5M2NhMHVOdGM3cjh2WXIrOHd2U1UwSkJOWkNNNkU0ZUVhWDVrNWdUYXlnZGY4T3QxdlRqTTI5TnRiMXBtMjI3Nit2ZkdtR3h2U25iWU9COVhtcTFpc0h6T2h2QlphVlZ4dFgvSGw2ZjYxbjNFR2xPMURXNGw0eVgvNm40bUljR21MaTRMWUhUUi9xUHlZYWJnc0Uxa2Jubkx0YW1QQnA2d2ZXUzdyeU9ETXlsUHV0YWFtMEtoeFlnLzZwdFo1eG1Sa1ZHblRBOU16MkhEYXdjdS9VV3E5d3R4NDBKMDIzMWl6bWp1aWpkWi9qL01EcW9sY3VOa2x6MTNnN3NGN1M3dzB4aTQzZXVVUnJmYUY3aGV1dmY4anB4L1l6Ky8vcDdtK2g5ZmxOOVhmWG1WN2l4TlpLSFRBdHVEdk0rYmxmTk5lZkVsaEFtUnR0OVhpU2JqMXdYdFNCRE5PUStjRFptTlpINjlSV2ZtRHBwazdsVnR4YmZrdktCSlp1ZnBsenlqYXQ5Y21GQStzaHJmWGIzb2gyRjYwM1pzUU9yQXIyVXNKM3BuMmJwTFVlNExXRFRJZHl2UnV3ajFmMmVyUW1zUFQ1L2x5aUNTeDlvYk5jT1dPRDF0cGRtRDNlaitjbmJ3bnNieEU4UTZuY0xsbzNkMXVQcGtQSVdrS2dyQTB5WDFsN1pIbkZpTEdCbGxaS3NGbWozalhEV0lIQU90TTlrTkZGNjVWMytZRzEzajJRT0ZqcnBFS0JsZGhGNnk2dFEwTm9nZEYwNzl5b092ZnpGOW0vUVNrMW9iblcwK05DM2Raci9jQUtWRldZd09yVE1EaTVjRWVNdC85Z0k3OG0xUVJXSDdlRVZxbnJ0TlpqdkswVkJCWlFEaVN1WCtrbnc0WTd2TEgxdjRkYUZMa1Z0RjdaMmd1c0FYNWttTEdkaDd6QTZ1TS9nZVV0clZOYlJ3ZldnVUN6elRUUU5tZzlQY1k5aGZPcS8zTC9xcmVGR3pwM05kZDZ1UmRZalZxSEErdGxieXVqdWRhTFlyMzlGVnBmRWdncy93ejF0dGFwZm4zK2VBSUxLQmNxM21vTlk5dStjenArbmZ0by9YRGdSU2RyclMvMkFpdXdVS2FpVjhsVk1UempPRUpyUFNFNnNNWm9uUnJzZk42cWRmOUJoMTlMMkdpRSs2SVpXZ2NySk13SStuUXZzUHdXb1IxWUIvek5BWUhCcXFERldtOE1CTlpUM29GQi9iVitQL0RDOStnU0F1VkQ0c1J0SzE1eUN3WHMyYlN4NGVhR1dxaTEzdVlGVmlBSjFHQ3RCM2lCZFZ1NFR6aytPckJtdUM4T3BGclY0dFlTVnAxUTQxWlR0YlhJVHF5cXFZSEpSMk9GMWpPOHdIbzNLckFDajZXNVh1c08vbGJGbEZ1blgvSkh3MHhBRHZJRHl5OGxuUkIrTitvZkJCWlFqdnhsendxcjdtcXdGU0NmYTdldlpadW90VjdzQlZid3dhS1hhTjNIQzZ3VC9QMW4rdE9FZm1EMTE3cFBrbWRqaFNlOEdzMWl5aG9xYnZCR29Fd1pSbi92L0FFVktweXY5V0F2c0ZLaUFpdFF5ZDRoTUUwNGRsOXFxUDNtZENSYmFKM3ExODczMDFyL0ozQzk0d2tzb0h5cGVMdDIyeWwvaWhvT3Y5YXJtVG9oS21PbWE2MXpZNndsakJWWVQ0YVR3bmJjWVF0SGoydXVkZjhNTjBZSzlSZTl3UHBUNEJ5cmNEUm1ZS1ZFUFFBc0VGaFBxTkI4Z0RlMTRFeHY4c1JSb0R6cGJJYmFuM2JueUtJRGE1RVhXTUdIeFpqNXM0d1NCbGF1S1VXdEVPWGF3d2FXZXQ5Tm84ZE5welhxL0M1K3BYdEpBbXRhcXRhcDAwZFBmT2V1enM3TC9NQ3lzOC95bWRiYUs2TlhTdjJId0FMSzQyTG8xRnpuT1ZrakFnZGFlWStoT1NHcXFiRlA2OHB4SlF3czFVZnJmWWUvaTBLQmRhdmJJUjBickp3SUtYRmdYYWoxeWhxaFdjZVlnVFV0S3JHL0piQ0E4c1kwZ2F6MlU2dFFGWkxkUlR6ZUN5eTNPdFFZNEk0aWxTU3dYdExhYmhDVkxyQ3F1KzI3aW40OTJDOE1ySWJod2ZRV1JRWFd2NktlR3ZobkFnc29iNTQwNHp1bXFqeWpjbWhhelV6L096RjFRamlYekx6ZDlCSUhsaWxUOVdzelN4eFlKN3RsODNHRHRSNDg2RWdDeTR4TlBlN3ZIMUJVWUptNmp1Q3ljTE1Da1RFc29Gd3g3WS9tMWgvV3VqQlVOem5vSmExVEgvUUM2M3IvakQxZVRKVWtzRDRJenlTV05MRE04dVV2ckovdURPZE42UVBMMUdmNFQ3VXhEY25ZZ1dVcVoxZjZGUmVYbStrQ0Fnc29VMVdqVnZKOW9iWCtvMWNoNVQ4NzJZekJ2eDFZbW5PeDF5UjdXdXZVQ1NVT0xMTVV4bDBzWGZMQU1xMGkzYzhiWk91UWVBU0JkU0QwcUpycFJRZldRNkczWXoyNWdjQUN5bFMvcHN1RER3MDFpNXlkOHF1cVQyamQzRzNMVkF3OHBOZ0tyQTF1MjJPNVg5NWVrc0N5Y3FSRHNGUzA0b1REQnRiRkZjeURxNXlVTWc5WWVEbVlXR09ybGlxd3pOalU5R0FvRlJWWVZSdHAvWVJiY0RiTktvVWdzSUF5MVUvclBxOE1zZnQ2cXVFNFV6bmFKY1B2dlRWYWFNMy9UZnd1OENSbEUxaDlkQWNyWnhLUE44K1B1cllVZ1pWcnhvSytHK0lNUTNXKzdNN0t3V0tuUUdEMXY5aDJZTG1KS04zY25kaWJZSjdPdGM5OWNFM1ZNL2U1RHdjdFlXREZtZmV5MkVxOGpIR3Arb2tpQTh0YUpUblkvclVIK21zVDVRUVdVS2FjUXN6M2JyL3p6dW5tTVM1YU4zSWZkQmRuUGNmaHV6SHZMalpWVUhyRGc0SEEraUJWcjV4K3d2SXgxcU9HM2VxSEVnV1dxbWc5QkhSd2kzSGJxcC84dmxsMFUwUmdoVFZmNkIyc1lUMWZlY05iNjVlUFcvUzBlWUpnNlFMTDZ0M3FMbU5HSEw5b285WWRGaGNkV0lsV0dXMkhjU01XUDYzMVlDcmRnVEozblBlb1k4ZkRidHRGcVVUenR4OWNmend2OUlqa2JWNjFlS3FYVVNVTExQV2dlWVJmUUxBODNmM04wWG5WSWZqdzkzKzlGODZ5aXFVTExLdjB5bjIzYlY4dE9yQlV4ajd2aFUwbjhvaGtvT3gxL3Z6V0dkNTZtZFJMVWtMajJZKzdqejhmTU5yZmJ3V1dxakhEUGpMRC8vTVVKUXdzcFI2L3ZiS1hHSXRqL1IyS1lHQlYrTzd0OWVPajdubVA4OHUxcnZ6K3Q4NVVac2tEUzUzcExQUnVPaTVERlJkWUtuR0U5U2NzZE9VVmJma2pGRUE1VVhYaXdtM1ZxMjhiUGEzd2N4UGFYamVpK3JzcC93cnVzZ05McWZGN2pqL2hnMTg0cXBOUlkvVHgxZDhkZmJIM1hMN1Mrc3NwRDYydnZueVBlWkx4TDVEWTc0NVhqeDg5TGRaa1k1VE9uejlVZmNSMXYvZzJBWlF4TjdBQW9Od2pzQUFjTlFnc0FFY05BZ3ZBVVlQQUFuRFVJTEFBSERVSUxBQkhqV3NQSERqZy9mVkNBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUNPektyc1o0LzRJeHlablgzR3IvN3Y4SDMyU2NVZGJwWmRSNVZMeVQzbXpwM1RzeFFuN01qTzdxYVVtcDJkL1grLzRXMEJSNTFtSWlLUnFYblBmTFdxd04zWFV0cVU2aHE3dXpjcHRDOVo1TlJTM3NyM0ltdGo3ZC9SL1FMbnA1UGt4TUtITzNaM3Y5UUpjcGI2OWYwZzhvbjdjOC91M1JOTGZZRW1YODh6SDdKY2ZVOTNzOW11KzZPSFBlVlNrWnBLcWRvaVo1ZjYxd0cvOThDeVpiNVI4NWNGVm0rNTZOY0lyR2RFcEdPTS9mV2xUbkdCVlZjcS9aYUJWVnRFZm94ek5nYUttSlpQcVF5YktwS2U5MHhlUk9RZXM5MUowZzk3RG9FRnhOUk01S2JUVDU5elJ2czNSb25rTmJiMk5ZbXZmY1NCRlJjZmYxcnBQdktmUmFiS1Y4VUcxdXg0dDYwVk03RG14enA4cEZyS1ZKR2JmbmxncGVYSi9pVlZsRkkxMjJlL1hzckFTb3VQTDNVK0FyOW56VVRzbEZKVjdoVlphNzVacFJZcnNFcHZqZlRkSmFPNkZSZFlNZm1COVZzWW1TOEx6ckdiUnI4c3NFNFZhZS8rbkZiS3dBSlFWR0FwZGEvSXJrQUw2Mi94UFpTcXZXUjFMYk9SczJQckZaT3ErWTJtbkdITlZrK3ExME1wMVRoK3Y2eU9qN2NhQXhmRXoxYkpsMzR5OU5GZ0M2dGRwMGxYTkJ2b2Z0RzdEZnhrNktaSEM0OEVKYjhnbjdTTGVGL3VKdkhQS2JWajY5QlZUZUlma08zbThnV0JGbGJ0aTRZTzNkWHBUZXQxbStWZTU3RGZ3anA3MTlCbWM1U3k5cXBrcjUzaU54M1Q1bTRhdXVCbUswQ0tOMUN5R20rVnJsYVF4OFUzRTlrWkgyOXV6VnpqVXZOT1J0cXZxeElmbjZ3YTM3ZjZxamxtNjdUaGt5ZmZiUGNqSjRzRS95OHdNbjZTcEp2N3JhMVVnZm1BN2ZjVDc0d0Nqcng1VXFWVlBRdTNzRWJ1cmpWMHdjQVMzQzl3ekFSV3pWSFNLekNHOVFmSnJISzNpUFJXU3UyOHhocm02dTAycFc2eXQyVnptakl2c1hSVTZrUTVxZVBWSXRMU0g4T3ErWG9ENitpOGF0Ym1mVk90clFlR1JkL0lxUktacnc1Nm8xQ1ZwRzY3ZjR0SS9VcnU1ZHQ3WTFpbkxYTjIzYTFVSGZmd2EvNFlWcmRaOXRFcUl1YVh0dk9HeHE2UWMrd2Yxdld5WHBGbmpZSVg2ekZacXRvMWtPSG01MlQzZC9VMVc2L1oxK2hyZHhmUEVKbGZKeUlpV1ZmR3FlRmR6UkZyb2s4TkZRbE9TZlIwcnpGVHFmYXlQNm9SV2R2NldOT2JSWTloM2RUWE9pZi8rUkwrcXdMSFFHQ3ByMFZxaHdMcmZtbXo1ZG1sU3AyYktma25MZm1rdnNoVjFndFBUWmV1SDI2dGRlOW1xYUpXSmFUTGZ4TVNFaElhbThCYTFqdnpzU3RuMWZJQ3E2Q3V5SW1UbGx5WkhiSE8zQ0x5ek9UNzZ1UkwxK2pwcnhmbDMwcFZreXpuYmlwSjM1bXlkTTFYaHdZbXZDRFhtTXZ2OEFMcm9EUllObW5KNmxsVER5cjFXc0pVYVdNTzkvQUNLKzVGa2V5cnJzcVcrNHNLckZvaWE2KzRiL1ZtU1o5N21JK25aN3JKcW1YeXNka1ltWENqeU9zSkNRbVRUYzh1Uy9KYkx0a3lTakt0MUR0RDVCNVpXbW5OQXlMMU9zbmFPcXMvRm50QWJwVklIWGZNM3JURUVzNlNpTG5mVFRFQ3Ewa3Z5WHg5eWVTKzVzNkRnYlU3VTNwdldkSXlYN0tzNEFTT1dhSEFXaVd5TGhoWUVsbGw3Vy9TVzVhWjVrSmNIVWszdmE3RysrVW5xOW1RTXpjNU5JWjFvc2czOXVYY3dOb3I2WFl2Yjc3NTZsV1RyQ1ZtbzZDK1hCUDRGcHRVc1ZveGFhTmtzaHRZTXUvbTJMT0VqVVU2V1p0cFBXTE9FdjVCWkt2NTcvZFNSR0RkRkpHaE9lYjhnNUovbUY1V004bXNxZFR6a25WQjFCalc3SzR5MC9SNTUrZEp2dW55blNHU1plNHFlYWJrajlwaWVyeXZTN29wdlNvWUpmTE0xaDVPenpFMGhsVW9zTzZYL2FibG1mYVloQUlyclpma3pUY3R5L3FTNmY5akFjZDZZTjBzY2w4b3NKeEp1enJTeS82ZTV0U1ZOVXFwWjhOZm5GQmdPWDA5SjdCK3pwSkovZ3ZqMXJyRDF4ZEVaSGZvUG1ySlBQTzkvMHJ5Y3R6QXNzYk9ZZ1RXN3ZDSWRLSEF1a2F5N2UyRFJRUld0dnVDbmwzOUFYRmpVMExMcUkvbko5UHRWR2xUNVlxb3dGb3Q2WGI1VjNlUjcrM0EybTV0UHkveWt6VkMxOWpxcGlvMWQ3OVZNL0x4cERjUEYxanpJM2JTcW9LcG9jQWFMbUtYYnIyWmJuMzh3REVyRkZobjJEV1NmbUE1eGVwNXNzVjVSUjNySzk5TFBsUkZCTllES2hSWWt5UTlVTjB3UjhRZE5lcnJOcVVjYTJXVytjOU85eFdWUk5vVkVWaHZpajJrVkVSZ05iR2JpVXFwRzJJSFZrSEVPejlidmc3ZXhFeDdETTgzVE1ScTVyMGh2UkxEZ2RWR2JuUmU4NDBzc3orNkc2ek5DOFI5WjFQdEtRdzEvNlE4YXdRcThrWmE4WUcxU2lKTzhlNVhvY0M2WHpZN3J6c1l1N1FXT0ZZVTM4S3lNK052SWgvV3MyMDNRL0R0d29rUkNpeno1UTBFMWtkU1AvREM0U0piblF2VkRXZmVUaEZyT0NudVJ6dTRWQ1h2eTF3b3NIS3VFWm41U2NlUlJRVFd6U0xPNUZ1VDJJSFZYYVNTY3hmL0RaZWFGZ3FzWnlYZitqVWRuZUR5QWl2T2IrdDhLRmZiZ1dYTkQ2cWFYaG5EV2orVG43dm9uaWtpY21OT3NZRjFrdVE3Mi9WQ2diWFcrMVFYU0JZemhUaVdoUUpyZU5RWVZucWNWK3p0aVZnTnBVdUxDcXhudzRIMXNmZGRNM1lGTC9SWThCSmZPVTBZdFVBeXJTWlpKYjh0VWFqU2ZmNVo1dnlwMjRmRkRLeDFJczZ5dmVUWWdiVXVlQmYxaStzU3BrMlZLKzJmK3NyZVVHQlZFV25tdktpbGRMVUR5NTRNckNKeWJxd0NzWnhxTDlnZlNkR0J0ZDFNSFZwdUNBWFdGTzlUcmVlM093RjFyQWZXdmRHemhQYnUyaUt2MTNMdHNyWUhGaFZZSjRVRGE2bThHSGpoTG1uZ1hhZFdjT1ZPdDFHQkRMRXVWa25xRnIwMEoyNVlwUjhhaUVRbXhRcXM1NzB2ZFZwMFlBMjFBcXU5eUdUdkx1emgreUpVQzl4VjV0K0NnZFhOS1ZtemVzbWpTaEpZMXNuYml3MnNlOXlxQzFOdEdnaXNYcExnN0wvSUMyTkFIZXVCVmFXMzVNZkZDS3lDcUM1Z2dkMXpMRWxnSGZKengrNWt4djYrZFFvMmVtWWVOckNNbXUyL2theWZZd1RXb3lJNzdPMDM3Y0RxNlMydGVkYnRFcm9GbTRlUkhieXRKYUV4ckhuZXNONGgrYkZrZ1RVeVU1YUdBbXVkMjRSVmZhMjNXRWNlY1k0c0NRWFdOWExRMmI5YUdwaHBXZUJZRlF5c0xjNXpDYUlEeSswUWVleHhaczhqWG40VkNxeXRFcG50di9BQ3R5QWgyci9sbk5NZDk5bURRWUhBbXVrTkY0VVhQOC9Pa25wS3FYTmthQ2l3Q3V6ZGRnL1hCRlphbGpzSy96OHJzR28ya0UwbCttem1SMlN5ZTF2WjFxbitrcG1QNVgvMkQ0bjVjcWhrZ1pVenp3cWU5aEt4SjBMTjFlejhycEp1QmRZNkVWTzlZQldEQkFQckh1bmxuSEdpUEZPaU93ZCs5NEdWWEVka2M4MllnYlZBSXFISzlFa1MyUm5ZM094OU13c0YxdXowMER4Y2Zla2JhN1hpNlZsZUIwdFZtV2VOR3dVQzYwYXJ0S0J3WUNWbldtV3NTNzJWZms1WncxbFMxeG9wejJsakI1YktrM3V0NHoyeTdEN1hSektsUkNOQkN5VGlGYWwzc3BwbE8wV2MxVDlYU1piOWtYU3lmMG1SZ1RYSGU4TUR4WXBXTDZiY0ZxQzVtQlZZQlpuT2tObnBtYUhBY21ZN2xkcVo1VC9wQmpnV05STTV1NkJnOXB5QkxmTkZwdGhMN1FvRlZzMDhtVExRNnIzOFh5VXpCVmJRUzE2d0p2WGFmV0ltcmZiS2o4OGx4ZzRzdFVaa2plbEZKZDVncHRsMlIrUi8xamMrNTR4WmdaYlg1R0E3N0c2Wmtod0tyS0V5YWtkeUlMQk92Y0txYU1wWllJOU5yWkVYaGlVSEE2dTd5TmRwU2lVblJKd3Yrck9TYWVvemV1UTFzQVBydVhsUzErNFVEa3NvdEVUSUY3ZlpGTjg3cW1TYVBtRE5kSG5EakdVcGRWcSs1SmtsaGQzM1M5M2s0Z0pyMGdzdGUxaFZxc09uMmxXM1RiS2tqdE5NV3l0OTJ5a1YxejZ6Z2QzclhTTVIwd0p0MGlZU0NxekVjNlMzNmRTZTNVdW0yTDhkT0VZRm5vZVZ2dDM1UDMraHdGSnplb25rZlRScjJXWjdLRWQxbkNyU2QrOWpiZEt0aGIyN0k0RzFoRkdCbFhaUVpOVEJ1NWRPc1JmMXJFcVhTSnREaDdJZkNZNzE1MXh0RGU0NEJscEQrb0hBdW1CZWVDM2hIMFQ2ZnZUVjNqeW5WUE81ek9pMWhGZUs5Sm8xcTVkVWNnSnIvaWlKblBOWW04ZzNiemlqMmdPN2l0VGRPK3ZHZksvU0xKYWJST3hDZjhzaGVTVE5sSys3YXdtN3o1UEkwcnZyWjhrTFZqbEQwWUVsSXFQcVo5ZmRMNUpsZDFYM2VpTjFyNG5NKzNoWm5zeDZ4ZzZzYnMrSXRMbG4yYndHUThOTGM1NmJJbG4xNzE0YWNaWUJBY2Q0WU0zTHYyYjdmVjQzcVhCZ3FaN1BXdXQ1NWVvdGRwZm85RVBXa3VaUnM2eTJ6ZHdYKzJZV0VWaHE1RldtQWtraVA5Z0QzenR1dE5JdHEvNG0vemt0M2NVZGRiTE9mTVNNa0FVQ1N3MjcvNEg5Z2NEcXNjeXFIWmNwbSt4bVhjZTk1bkFnc09KMm1SZU0yaFhuZHFWMm1MWERXY3ZhZVl1ZmErKzFWMlQvVkttWUZzdUhrbDRReXRIbmxVcmI5RU92aUwzNHVjZFM2MzE5ZExvcU5yQm1iODFPdCt0QmJuUzYwZDBtejh5UDJGTUx3M3ViK2NlV3llNjhRc0VzOCtsc2ZqUjY4WFBqajZ4UDdiOGxuQ3dBam5uSkhXOTQvb3pBZ3B5YWoxWTc5K2NTVlRIbTlMamgrWjMrN0dEQm85VUdEanV5eWZtUmMrYXVPeld3UEsrUWJuT3I3ZTZtbEJ0WUtxZEh0WUhoVlhoVmJxcDJROGNqckdscWNtbTFtMHZ5UnRKcWQxOTNhc2VZRDdoSzIxMXRidWhCaDAwR1BqOHN2TXJTMW5OdXRYTURuV2dBdnp0ZVlBRkFlVWRnQVRocUVGZ0FqaG9FRm9DalJyMTYvQjFTQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFkYVQrSHhDMmtWYTlaaERxQUFBQUFFbEZUa1N1UW1DQyIgYWx0PSJTaWduYXR1cmUgU29waGllIEJlcm5hcmQgLSBBdG9tU3R1ZGlvIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjE4MCIKICAgIHN0eWxlPSJkaXNwbGF5OmJsb2NrO21heC13aWR0aDoxMDAlO2JvcmRlcjowOyIgLz4KPC9kaXY+CjwhLS08IVtlbmRpZl0tLT4KPC9ib2R5Pgo8L2h0bWw+"
+        onclick="copyCode(this)">📋 Copier le code HTML</button>
+    </div>
+
+    <!-- Apple Mail -->
+    <div class="install-card">
+      <div class="install-icon">🍎</div>
+      <div class="install-name">Apple Mail</div>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d1daa863_1775553284680/svg" class="install-btn" download data-testid="btn-install-apple">Installer dans Apple Mail</a>
+      <a href="http://localhost:5000/api/signature/export-file/sig_d1daa863_1775553284680/pdf-apple" class="install-btn" style="background:transparent;border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);" download>Guide PDF</a>
+      <button class="copy-btn" data-testid="btn-copy-apple"
+        data-code="PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc2MDAnIGhlaWdodD0nMTgwJz48cmVjdCB3aWR0aD0nNjAwJyBoZWlnaHQ9JzE4MCcgZmlsbD0nIzFhMDUzMycvPjx0ZXh0IHg9JzIwJyB5PSc1MCcgZmlsbD0nI2MwMjZkMycgZm9udC1zaXplPScyMCcgZm9udC1mYW1pbHk9J0FyaWFsJz5Tb3BoaWUgQmVybmFyZDwvdGV4dD48dGV4dCB4PScyMCcgeT0nNzUnIGZpbGw9JyNlOGQ0ZmYnIGZvbnQtc2l6ZT0nMTMnIGZvbnQtZmFtaWx5PSdBcmlhbCc+RGlyZWN0cmljZSBBcnRpc3RpcXVlIMK3IEF0b21TdHVkaW88L3RleHQ+PC9zdmc+"
+        onclick="copyCode(this)">📋 Copier le SVG</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── TÉLÉCHARGEMENT ── -->
+<div class="download-zone">
+  <a href="http://localhost:5000/api/signature/download/sig_d1daa863_1775553284680" class="download-btn" data-testid="btn-download-package">
+    <span>⬇</span> Telecharger mon package complet
+  </a>
+  <p style="margin-top:16px;font-size:13px;color:rgba(232,232,255,0.4);">
+    Package ZIP complet · SVG · PNG · Outlook · Gmail · 3 guides PDF · manifest.json
+  </p>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <p>Signature creee par EffectForge AI</p>
+  <p style="margin-top:8px;font-size:11px;opacity:0.4;">ID: sig_d1daa863_1775553284680</p>
+</footer>
+
+<script>
+  // ══════════════════════════════════════════════════════════════════
+  //  EFFECTFORGE — MOTEUR D'ANIMATION INTERACTIVE
+  //  Cycle counter + Mouse tracking + Viewport restart + Sparkles
+  // ══════════════════════════════════════════════════════════════════
+
+  (function() {
+
+    // ── 1. CYCLE COUNTER ─────────────────────────────────────────
+    const CYCLE = 240;
+    const VAR_DUR = CYCLE / 4;
+    const VARS = ['A', 'B', 'C', 'D'];
+    let elapsed = 0;
+    const counterEl = document.getElementById('cycle-counter');
+
+    setInterval(function() {
+      elapsed = (elapsed + 1) % CYCLE;
+      const varIdx = Math.floor(elapsed / VAR_DUR);
+      const varElapsed = elapsed % VAR_DUR;
+      const m = Math.floor(varElapsed / 60).toString().padStart(2, '0');
+      const s = (varElapsed % 60).toString().padStart(2, '0');
+      if (counterEl) counterEl.textContent = 'VARIATION ' + VARS[varIdx] + ' · ' + m + ':' + s;
+    }, 1000);
+
+    // ── 2. PARALLAX SOURIS — La signature réagit au mouvement ────
+    // Utilise des CSS custom properties pour créer un micro-parallax
+    const sigZone = document.querySelector('.gmail-sig-zone');
+    const gmailMock = document.querySelector('.gmail-mock');
+
+    if (gmailMock) {
+      gmailMock.addEventListener('mousemove', function(e) {
+        const rect = gmailMock.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) / rect.width;
+        const my = (e.clientY - rect.top) / rect.height;
+
+        // Tilt subtle 3D sur le mock Gmail (1.5° max)
+        const tiltX = (my - 0.5) * -3;
+        const tiltY = (mx - 0.5) * 3;
+        gmailMock.style.transform = 'perspective(1200px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale(1.005)';
+        gmailMock.style.transition = 'transform 0.15s ease-out';
+
+        // Met à jour les variables CSS dans le SVG si accessible
+        const svgEl = gmailMock.querySelector('svg');
+        if (svgEl) {
+          svgEl.style.setProperty('--mouse-x', mx.toFixed(3));
+          svgEl.style.setProperty('--mouse-y', my.toFixed(3));
+        }
+
+        // Spawn sparkle à la position de la souris (throttlé à 120ms)
+        if (!gmailMock._lastSparkle || Date.now() - gmailMock._lastSparkle > 120) {
+          gmailMock._lastSparkle = Date.now();
+          spawnSparkle(e.clientX, e.clientY, '#c026d3');
+        }
+      });
+
+      gmailMock.addEventListener('mouseleave', function() {
+        gmailMock.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)';
+        gmailMock.style.transition = 'transform 0.6s cubic-bezier(0.4,0,0.2,1)';
+      });
+    }
+
+    // ── 3. RESTART AU SURVOL — Force un "burst" d'énergie ────────
+    // Quand la souris entre sur la signature, toutes les animations
+    // internes sont relancées pour créer une sensation de réactivité
+    let restartTimeout = null;
+    if (sigZone) {
+      sigZone.addEventListener('mouseenter', function() {
+        if (restartTimeout) clearTimeout(restartTimeout);
+        restartTimeout = setTimeout(function() {
+          restartSVGAnimations(sigZone);
+        }, 80);
+      });
+    }
+
+    function restartSVGAnimations(container) {
+      const svgEl = container.querySelector('svg');
+      if (!svgEl) return;
+      // Technique : retirer et ré-ajouter la propriété animation-play-state
+      // pour forcer un restart des animations CSS
+      const animated = svgEl.querySelectorAll('[style*="animation"]');
+      animated.forEach(function(el) {
+        el.style.animationPlayState = 'paused';
+      });
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          animated.forEach(function(el) {
+            el.style.animationPlayState = 'running';
+          });
+        });
+      });
+    }
+
+    // ── 4. INTERSECTION OBSERVER — Restart en entrant dans le viewport ──
+    // Quand l'utilisateur scroll et arrive sur la signature :
+    // les animations se re-déclenchent avec plein d'énergie
+    if ('IntersectionObserver' in window && sigZone) {
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            // Un petit délai pour que la signature soit bien visible
+            setTimeout(function() {
+              restartSVGAnimations(entry.target);
+              // Effet de "réveil" sur le mock
+              if (gmailMock) {
+                gmailMock.style.transform = 'scale(1.01)';
+                setTimeout(function() {
+                  gmailMock.style.transform = 'scale(1)';
+                  gmailMock.style.transition = 'transform 0.8s cubic-bezier(0.34,1.56,0.64,1)';
+                }, 150);
+              }
+            }, 200);
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(sigZone);
+    }
+
+    // ── 5. PULSE PÉRIODIQUE — Renforce l'illusion de non-stop ────
+    // Toutes les 25s, un "souffle" subtil traverse la signature
+    // pour que l'utilisateur ait toujours l'impression qu'elle est vivante
+    let pulseCount = 0;
+    setInterval(function() {
+      pulseCount++;
+      if (!sigZone) return;
+      const svgEl = sigZone.querySelector('svg');
+      if (!svgEl) return;
+
+      // Souffle doux : brightness augmente brièvement
+      svgEl.style.filter = 'brightness(1.08) saturate(1.1)';
+      svgEl.style.transition = 'filter 1.2s ease';
+      setTimeout(function() {
+        svgEl.style.filter = 'brightness(1) saturate(1)';
+      }, 1200);
+
+      // Spawn plusieurs sparkles pour marquer le pulse
+      if (sigZone) {
+        const rect = sigZone.getBoundingClientRect();
+        for (let i = 0; i < 4; i++) {
+          setTimeout(function() {
+            const rx = rect.left + Math.random() * rect.width;
+            const ry = rect.top + Math.random() * rect.height;
+            spawnSparkle(rx, ry, '#c026d3');
+          }, i * 150);
+        }
+      }
+    }, 25000);
+
+    // ── 6. EFFET SPARKLE — Particules visuelles sur interaction ──
+    function spawnSparkle(x, y, color) {
+      const spark = document.createElement('div');
+      const size = 3 + Math.random() * 4;
+      const vx = (Math.random() - 0.5) * 60;
+      const vy = -20 - Math.random() * 40;
+      spark.style.cssText = [
+        'position:fixed',
+        'pointer-events:none',
+        'border-radius:50%',
+        'z-index:9999',
+        'width:' + size + 'px',
+        'height:' + size + 'px',
+        'left:' + (x - size/2) + 'px',
+        'top:' + (y - size/2) + 'px',
+        'background:' + color,
+        'box-shadow:0 0 ' + (size*2) + 'px ' + color,
+        'transition:none',
+        'opacity:0.9',
+      ].join(';');
+      document.body.appendChild(spark);
+
+      let frame = 0;
+      const totalFrames = 30 + Math.floor(Math.random() * 20);
+      function tick() {
+        frame++;
+        const progress = frame / totalFrames;
+        const cy = y + vy * progress + 30 * progress * progress;
+        const cx = x + vx * progress;
+        spark.style.left = (cx - size/2) + 'px';
+        spark.style.top  = (cy - size/2) + 'px';
+        spark.style.opacity = (0.9 * (1 - progress)).toString();
+        if (frame < totalFrames) requestAnimationFrame(tick);
+        else spark.remove();
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // ── 7. INDICATEUR D'ÉNERGIE — Barre de vie visuelle ──────────
+    // Une fine barre en bas du mock montre le cycle actuel en temps réel
+    const energyBar = document.getElementById('energy-bar-fill');
+    if (energyBar) {
+      setInterval(function() {
+        const pct = ((elapsed / CYCLE) * 100).toFixed(1);
+        energyBar.style.width = pct + '%';
+      }, 500);
+    }
+
+  })();
+
+  // ── Copie 1-clic ──
+  function copyCode(btn) {
+    const b64 = btn.getAttribute('data-code');
+    if (!b64) return;
+    let decoded;
+    try { decoded = decodeURIComponent(escape(atob(b64))); }
+    catch(e) { decoded = atob(b64); }
+    navigator.clipboard.writeText(decoded).then(function() {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✅ Copié !';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    }).catch(function() {
+      const ta = document.createElement('textarea');
+      ta.value = decoded;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✅ Copié !';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "signature_id": "sig_d9525057_1775552996526",
+  "generated_at": "2026-04-07T09:09:56.743Z",
+  "client": {
+    "nom": "Test User",
+    "entreprise": "TestCorp",
+    "secteur": "tech"
+  },
+  "creative_decisions": {
+    "brief_creatif": null,
+    "scenario_narratif": null,
+    "configuration_technique": null
+  },
+  "effects_used": [],
+  "cycle_total": 240,
+  "variations": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "version": "2.0"
+}

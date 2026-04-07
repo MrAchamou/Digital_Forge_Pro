@@ -1167,8 +1167,38 @@ Ta réponse doit être visionnaire et précise à la fois. Réponds UNIQUEMENT e
     const styleData = JSON.parse(cleaned);
     return res.json(styleData);
   } catch (err: any) {
-    console.error('Erreur detect-style:', err);
-    return res.status(500).json({ error: err.message || 'Erreur interne' });
+    // ── Fallback sémantique : génère un style basé sur les métadonnées ──
+    // Activé quand tous les services IA sont indisponibles (pas de clés)
+    console.warn('detect-style: IA indisponible — fallback sémantique activé:', err.message);
+    const { metadata } = req.body || {};
+    const secteur = (metadata?.secteur || '').toLowerCase();
+    const entreprise = metadata?.entreprise || '';
+
+    // Mapping secteur → style visuel prédéfini
+    const STYLE_MAP: Record<string, any> = {
+      technologie: { style_visuel: 'Épuré futuriste avec accents lumineux', mots_cles: ['tech', 'précision', 'innovation', 'digital'], reference_iconique: 'Linear / Apple' },
+      santé: { style_visuel: 'Chaleureux et rassurant, blanc clinique', mots_cles: ['confiance', 'soin', 'précision', 'humain'], reference_iconique: 'Doctolib / Mayo Clinic' },
+      finance: { style_visuel: 'Sobre institutionnel avec lignes d\'autorité', mots_cles: ['fiabilité', 'prestige', 'structure', 'rigueur'], reference_iconique: 'Goldman Sachs / Amundi' },
+      luxe: { style_visuel: 'Minimalisme noir et or, élégance absolue', mots_cles: ['exclusivité', 'raffinement', 'heritage', 'désir'], reference_iconique: 'Hermès / Chanel' },
+      immobilier: { style_visuel: 'Architectural moderne, volumes et lumière', mots_cles: ['prestige', 'espace', 'qualité', 'vision'], reference_iconique: 'Barnes / Sotheby\'s Realty' },
+      design: { style_visuel: 'Créatif audacieux, couleurs et forme', mots_cles: ['créativité', 'audace', 'singularité', 'talent'], reference_iconique: 'IDEO / Pentagram' },
+    };
+
+    // Cherche un match partiel dans le secteur
+    let styleBase = { style_visuel: 'Professionnel moderne et dynamique', mots_cles: ['confiance', 'expertise', 'impact', 'qualité'], reference_iconique: 'Apple / Notion' };
+    for (const [key, val] of Object.entries(STYLE_MAP)) {
+      if (secteur.includes(key)) { styleBase = val; break; }
+    }
+
+    return res.json({
+      style_visuel: styleBase.style_visuel,
+      univers: `Un univers visuel qui reflète l'identité de ${entreprise || 'votre marque'} — ${styleBase.style_visuel.toLowerCase()}. Chaque animation est conçue pour transmettre la confiance et l'expertise de la marque en quelques secondes.`,
+      mots_cles: styleBase.mots_cles,
+      palette_narrative: 'Une palette soigneusement choisie pour véhiculer les valeurs profondes de la marque.',
+      reference_iconique: styleBase.reference_iconique,
+      justification: `Ce style correspond à l'essence de ${entreprise || 'votre entreprise'} dans le secteur ${metadata?.secteur || 'professionnel'}.`,
+      _fallback: true,
+    });
   }
 });
 
