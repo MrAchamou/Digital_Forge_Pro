@@ -29,6 +29,7 @@ function buildGodTierSVG(
     cta = '',
     logo_url,
     logo_base64,
+    logo3d,
   } = metadata;
 
   const palette: string[] = metadata.palette?.length >= 3
@@ -53,6 +54,7 @@ function buildGodTierSVG(
     cta,
     logo_url: logo_base64 || logo_url || undefined,
     photo_url: undefined,
+    logo3d: !!logo3d,
   };
 
   const ambiance = brief?.univers_visuel || brief?.style_detecte || 'professionnel moderne';

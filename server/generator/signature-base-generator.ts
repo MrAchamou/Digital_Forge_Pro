@@ -9,6 +9,7 @@ export interface SignatureData {
   cta: string;
   logo_url?: string;
   photo_url?: string;
+  logo3d?: boolean;
 }
 
 export interface StyleData {
@@ -85,7 +86,7 @@ export class SignatureBaseGenerator {
     const socialIconsXML = this.buildSocialIcons(sig.reseaux, colorAccent, textOnBg);
     const separatorXML = this.buildSeparator(colorAccent, colorSecondary);
     const photoXML = this.buildPhotoOrPlaceholder(sig.photo_url, sig.nom, colorAccent, textOnBg);
-    const logoXML = this.buildLogoOrText(sig.logo_url, sig.entreprise, colorAccent, textOnBg);
+    const logoXML = this.buildLogoOrText(sig.logo_url, sig.entreprise, colorAccent, textOnBg, sig.logo3d);
     const ctaXML = this.buildCTA(sig.cta, colorAccent, textOnBg);
 
     const emailText = sig.email ? this.escapeXml(sig.email) : '';
@@ -154,13 +155,92 @@ export class SignatureBaseGenerator {
   <text x="60" y="67" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="${textColor}">${initials}</text>`;
   }
 
-  private buildLogoOrText(logoUrl: string | undefined, company: string, accent: string, textColor: string): string {
+  private buildLogoOrText(logoUrl: string | undefined, company: string, accent: string, textColor: string, logo3d?: boolean): string {
+    if (logo3d) {
+      return logoUrl ? this.build3DLogoImage(logoUrl, accent) : this.build3DLogoText(company, accent);
+    }
     if (logoUrl) {
       return `<image href="${this.escapeXml(logoUrl)}" x="10" y="120" width="100" height="36" preserveAspectRatio="xMidYMid meet" id="company-logo"/>`;
     }
     const shortName = company.slice(0, 12);
     return `<rect x="10" y="122" width="120" height="26" rx="4" fill="${accent}" fill-opacity="0.15" id="logo-bg"/>
   <text x="70" y="139" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="${accent}" letter-spacing="1" id="company-logo-text">${this.escapeXml(shortName.toUpperCase())}</text>`;
+  }
+
+  private build3DLogoText(company: string, accent: string): string {
+    const shortName = this.escapeXml(company.slice(0, 12).toUpperCase());
+    const d = (amt: number) => this.lightenHex(accent, amt);
+    const bright = d(55);
+    const fontAttrs = `text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" letter-spacing="1"`;
+    const extLayers = [
+      { dx: 4, dy: 4, fill: d(-160) },
+      { dx: 3, dy: 3, fill: d(-130) },
+      { dx: 2, dy: 2, fill: d(-95)  },
+      { dx: 1, dy: 1, fill: d(-60)  },
+    ];
+    const extRects = extLayers.map(l =>
+      `<rect x="${10 + l.dx}" y="${122 + l.dy}" width="120" height="26" rx="4" fill="${l.fill}"/>`
+    ).join('\n  ');
+    const extTexts = extLayers.map(l =>
+      `<text x="${70 + l.dx}" y="${139 + l.dy}" ${fontAttrs} fill="${l.fill}">${shortName}</text>`
+    ).join('\n  ');
+    return `<defs>
+    <linearGradient id="logo3d-toplight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.38"/>
+      <stop offset="55%"  stop-color="white" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="black" stop-opacity="0.14"/>
+    </linearGradient>
+    <linearGradient id="logo3d-shine" x1="15%" y1="0%" x2="85%" y2="0%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+      <stop offset="50%"  stop-color="white" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ Logo 3D Extrusion — rect layers (back → front) ══ -->
+  ${extRects}
+  <!-- ══ Logo 3D Extrusion — text shadow layers ══ -->
+  ${extTexts}
+  <!-- ══ Top face: rect principale ══ -->
+  <rect x="10" y="122" width="120" height="26" rx="4" fill="${accent}" fill-opacity="0.22" id="logo-bg"/>
+  <!-- ══ Lighting gradient (top-lit) ══ -->
+  <rect x="10" y="122" width="120" height="26" rx="4" fill="url(#logo3d-toplight)" pointer-events="none"/>
+  <!-- ══ Top edge specular (bevel) ══ -->
+  <rect x="10" y="122" width="120" height="3" rx="2" fill="${bright}" fill-opacity="0.50" pointer-events="none"/>
+  <!-- ══ Right edge bevel ══ -->
+  <rect x="128" y="122" width="2" height="26" rx="1" fill="${bright}" fill-opacity="0.20" pointer-events="none"/>
+  <!-- ══ Main text (top face) ══ -->
+  <text x="70" y="139" ${fontAttrs} fill="${accent}" id="company-logo-text">${shortName}</text>
+  <!-- ══ Text specular shimmer ══ -->
+  <text x="70" y="139" ${fontAttrs} fill="url(#logo3d-shine)" pointer-events="none">${shortName}</text>`;
+  }
+
+  private build3DLogoImage(logoUrl: string, accent: string): string {
+    const safeUrl = this.escapeXml(logoUrl);
+    const d = (amt: number) => this.lightenHex(accent, amt);
+    const bright = d(55);
+    return `<defs>
+    <filter id="logo3d-img-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feColorMatrix type="matrix" in="blur"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.65 0"/>
+    </filter>
+    <linearGradient id="logo3d-img-light" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.32"/>
+      <stop offset="50%"  stop-color="white" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="black" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <!-- ══ 3D Shadow clones (profondeur perspective) ══ -->
+  <image href="${safeUrl}" x="14" y="124" width="100" height="36" preserveAspectRatio="xMidYMid meet" filter="url(#logo3d-img-shadow)" opacity="0.55"/>
+  <image href="${safeUrl}" x="12" y="122" width="100" height="36" preserveAspectRatio="xMidYMid meet" filter="url(#logo3d-img-shadow)" opacity="0.35"/>
+  <!-- ══ Bevel rect derrière l'image ══ -->
+  <rect x="9" y="119" width="102" height="38" rx="4" fill="${d(-80)}" opacity="0.6"/>
+  <!-- ══ Image principale (top face) ══ -->
+  <image href="${safeUrl}" x="10" y="120" width="100" height="36" preserveAspectRatio="xMidYMid meet" id="company-logo"/>
+  <!-- ══ Lighting gradient overlay ══ -->
+  <rect x="10" y="120" width="100" height="38" rx="3" fill="url(#logo3d-img-light)" pointer-events="none"/>
+  <!-- ══ Top edge highlight ══ -->
+  <rect x="10" y="120" width="100" height="3" rx="2" fill="${bright}" fill-opacity="0.45" pointer-events="none"/>`;
   }
 
   private buildSeparator(colorAccent: string, colorSecondary: string): string {
