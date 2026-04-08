@@ -71,13 +71,47 @@ Chaque signature est composée de **7 zones** :
 
 ## Modules Intelligents (server/modules/)
 
-### ✅ Priorité 1 — Fondamentaux visuels
+### ✅ Module 1 — VarianceEngine v1.0 (opérationnel)
+
+**Fichier** : `server/modules/variance-engine.module.ts`
+
+Génère 4 variantes visuelles distinctes d'une même signature secteur par mutation génétique de 3 couches :
+
+| Couche | Paramètres |
+|--------|-----------|
+| **PaletteGene** | Mutation HSL : hue shift, saturation ×, lightness offset pour fond + accent + texte |
+| **TimingGene** | Délais × (φ⁻¹ rapide / φ lent / staccato) + durées × + jitter déterministe |
+| **IntensityGene** | brightness(), scale factor, shadow alpha, glow radius |
+
+**4 profils génétiques :**
+- `A — Canon` : aucune mutation, fidèle au JSON secteur (fitness=0.85)
+- `B — Intense` : palette +35% saturation, délais ×φ⁻¹=0.618, brightness ×1.35 (fitness=0.91)
+- `C — Éthéré` : palette délavée -35% sat, délais ×φ=1.618, luminosité +18% (fitness=0.87)
+- `D — Contrasté` : accent hue +180° (complémentaire), staccato Δ0.25s (fitness=0.88)
+
+**Injection** : bloc `<style id="variance-override-X" data-engine="VarianceEngine-1.0.0">` injecté avant `</head>` — zéro modification HBS/JSON.
+
+**Routes API exposées :**
+```
+GET  /api/signature/variants/profiles          — 4 profils génétiques (sans rendu)
+POST /api/signature/variants                   — métadonnées + CSS overrides (sans HTML)
+POST /api/signature/variants/render            — 4 HTMLs complets (A+B+C+D)
+POST /api/signature/variants/:id/render        — 1 HTML (A ou B ou C ou D)
+```
+
+**Performance** : 4 variantes en ~40ms, 0 dépendance externe, 10/10 secteurs validés.
+
+### Modules existants (hérités)
 
 | Module | Fichier | Rôle |
 |--------|---------|------|
-| **ColorHarmonyEngine** | `color-harmony.module.ts` | Harmonies triadiques/analogues/split-comp à partir de la couleur de marque. Couleur unique par zone selon la hiérarchie visuelle. 4 mappings différents selon la variation A/B/C/D. |
-| **TimingMaster** | `timing-master.module.ts` | Durées basées sur le nombre d'or (φ=1.618) et la suite Fibonacci. Profil par variation : A=×φ lent majestueux, B=×1.0 précis, C=×1.27 atmosphérique, D=×0.618 explosif. Micro-jitter anti-monotonie. |
-| **VarianceEngine** | `variance-engine.module.ts` | Algorithme génétique garantissant la diversité A/B/C/D. Distance Jaccard sur les effets + L1 intensité + vitesse. Mutations automatiques si deux variations < 45% de distance. |
+| **TimingMaster** | `timing-master.module.ts` | Durées basées sur φ et Fibonacci. Fallback Outlook. prefers-reduced-motion. |
+| ColorHarmonyEngine | `color-harmony.module.ts` | Harmonies triadiques/analogues/split-comp |
+| Physics | `physics.module.ts` | Calculs physiques pour effets dynamiques |
+| Particles | `particles.module.ts` | Système de particules |
+| Morphing | `morphing.module.ts` | Transformations morphologiques |
+| Lighting | `lighting.module.ts` | Éclairage et ombres |
+| PresetManager | `preset-manager.module.ts` | Gestionnaire de presets |
 
 ### ✅ Priorité 2 — Intelligence de rendu
 

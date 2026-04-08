@@ -3,6 +3,7 @@ import cors from 'cors';
 import { storage } from './storage';
 import { buildEffectPreviewHTML, saveEffectPreview, getEffectPreviewHTML } from './services/effect-preview-generator';
 import { getAllSectorConfigs, getSectorConfig, renderSignature } from './services/signature-renderer';
+import { generateVariants, generateSingleVariant, getVariantProfiles, ENGINE_VERSION as VARIANCE_VERSION, VariantId } from './modules/variance-engine.module';
 import { classifySector } from './services/sector-classifier';
 import fs from 'fs';
 import path from 'path';
@@ -15,12 +16,13 @@ router.get('/system/health', (_req, res) => {
   const uptimeSec = Math.floor(process.uptime());
   const uptimeHours = (uptimeSec / 3600).toFixed(1) + 'h';
   const modules = {
-    particles:    { status: 'online', performance: 100, uptime: uptimeHours },
-    physics:      { status: 'online', performance: 99,  uptime: uptimeHours },
-    lighting:     { status: 'online', performance: 99,  uptime: uptimeHours },
-    morphing:     { status: 'online', performance: 99,  uptime: uptimeHours },
-    templates:    { status: 'online', performance: 100, uptime: uptimeHours },
-    classifier:   { status: 'online', performance: 100, uptime: uptimeHours },
+    particles:      { status: 'online', performance: 100, uptime: uptimeHours },
+    physics:        { status: 'online', performance: 99,  uptime: uptimeHours },
+    lighting:       { status: 'online', performance: 99,  uptime: uptimeHours },
+    morphing:       { status: 'online', performance: 99,  uptime: uptimeHours },
+    templates:      { status: 'online', performance: 100, uptime: uptimeHours },
+    classifier:     { status: 'online', performance: 100, uptime: uptimeHours },
+    variance_engine: { status: 'online', performance: 100, uptime: uptimeHours, version: VARIANCE_VERSION },
   };
   const moduleAvg = Math.round(
     Object.values(modules).reduce((s, m) => s + m.performance, 0) / Object.keys(modules).length
@@ -200,6 +202,87 @@ router.post('/signature/render', (req, res) => {
     const html = renderSignature(sectorId, data);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(html);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// === VARIANCE ENGINE — 4 variantes visuelles ===
+
+router.get('/signature/variants/profiles', (_req, res) => {
+  try {
+    const profiles = getVariantProfiles();
+    res.json({ profiles, engine_version: VARIANCE_VERSION });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/signature/variants', (req, res) => {
+  try {
+    const { sectorId, data } = req.body;
+    if (!sectorId) return res.status(400).json({ error: 'sectorId requis' });
+    if (!data)     return res.status(400).json({ error: 'data requis' });
+
+    const result = generateVariants(sectorId, data);
+
+    res.json({
+      sector_id:            result.sector_id,
+      base_palette:         result.base_palette,
+      engine_version:       result.engine_version,
+      generation_timestamp: result.generation_timestamp,
+      total_time_ms:        result.total_time_ms,
+      variants: result.variants.map(v => ({
+        id:           v.id,
+        metadata:     v.metadata,
+        css_overrides: v.css_overrides,
+      })),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/signature/variants/render', (req, res) => {
+  try {
+    const { sectorId, data } = req.body;
+    if (!sectorId) return res.status(400).json({ error: 'sectorId requis' });
+    if (!data)     return res.status(400).json({ error: 'data requis' });
+
+    const result = generateVariants(sectorId, data);
+
+    const htmlMap: Record<string, string> = {};
+    result.variants.forEach(v => { htmlMap[v.id] = v.html; });
+
+    res.json({
+      sector_id:            result.sector_id,
+      engine_version:       result.engine_version,
+      generation_timestamp: result.generation_timestamp,
+      total_time_ms:        result.total_time_ms,
+      variants_html:        htmlMap,
+      metadata: result.variants.map(v => ({
+        id:       v.id,
+        metadata: v.metadata,
+      })),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/signature/variants/:variantId/render', (req, res) => {
+  try {
+    const { sectorId, data } = req.body;
+    const variantId = req.params.variantId.toUpperCase() as VariantId;
+    if (!['A', 'B', 'C', 'D'].includes(variantId)) {
+      return res.status(400).json({ error: 'variantId doit être A, B, C ou D' });
+    }
+    if (!sectorId) return res.status(400).json({ error: 'sectorId requis' });
+    if (!data)     return res.status(400).json({ error: 'data requis' });
+
+    const variant = generateSingleVariant(sectorId, data, variantId);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(variant.html);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
