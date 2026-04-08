@@ -27,7 +27,7 @@ export function useFileUpload() {
       });
       setUploadProgress(progressMap);
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/uploads', {
         method: 'POST',
         body: formData,
       });

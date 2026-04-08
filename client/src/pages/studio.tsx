@@ -83,7 +83,7 @@ export default function Studio() {
   }, [step]);
 
   const handleGmbImport = async () => {
-    if (!gmbUrl.trim() || !selectedSector) return;
+    if (!gmbUrl.trim()) return;
     setIsImporting(true);
     try {
       const res = await fetch("/api/signature/scrape-gmb", {
@@ -93,17 +93,10 @@ export default function Studio() {
       });
       const data = await res.json();
       if (data.entreprise || data.nom) {
-        const merged: Record<string, string> = { ...formData };
-        for (const field of selectedSector.fields) {
-          const val = data[field.key];
-          if (val !== undefined && val !== null && val !== '') {
-            merged[field.key] = String(val);
-          }
-        }
-        if (!merged.nom && data.entreprise) merged.nom = data.entreprise;
-        setFormData(merged);
+        let activeSector = selectedSector;
 
-        if (data.secteur) {
+        // Auto-détection du secteur depuis les données GMB
+        try {
           const res2 = await fetch("/api/signature/classify-sector", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -112,10 +105,26 @@ export default function Studio() {
           const classified = await res2.json();
           if (classified.sectorId) {
             const found = templates.find(t => t.id === classified.sectorId);
-            if (found) setSelectedSector(found);
+            if (found) { setSelectedSector(found); activeSector = found; }
           }
+        } catch (_) {}
+
+        // Remplissage des champs si on a un secteur actif
+        if (activeSector) {
+          const merged: Record<string, string> = { ...formData };
+          for (const field of activeSector.fields) {
+            const val = data[field.key];
+            if (val !== undefined && val !== null && val !== '') {
+              merged[field.key] = String(val);
+            }
+          }
+          if (!merged.nom && data.entreprise) merged.nom = data.entreprise;
+          setFormData(merged);
         }
+
         toast({ title: "Import réussi", description: `Données de "${data.entreprise || data.nom}" importées.` });
+      } else {
+        toast({ title: "Aucune donnée trouvée", description: "Vérifiez l'URL Google Maps.", variant: "destructive" });
       }
     } catch (e) {
       toast({ title: "Erreur import", description: "Impossible d'importer l'URL GMB.", variant: "destructive" });
@@ -239,16 +248,16 @@ export default function Studio() {
                   />
                   <Button
                     onClick={handleGmbImport}
-                    disabled={!gmbUrl.trim() || isImporting || !selectedSector}
+                    disabled={!gmbUrl.trim() || isImporting}
                     className="bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 hover:bg-[#00D4FF]/20"
                     data-testid="btn-import-gmb"
                   >
                     {isImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Importer"}
                   </Button>
                 </div>
-                {!selectedSector && (
-                  <p className="text-xs text-white/30 mt-2">Sélectionnez d'abord un secteur ou importez pour auto-détecter</p>
-                )}
+                <p className="text-xs text-white/30 mt-2">
+                  {selectedSector ? `Secteur sélectionné : ${selectedSector.label}` : "Importez votre fiche Google pour auto-détecter le secteur"}
+                </p>
               </div>
 
               {/* Sector grid */}
