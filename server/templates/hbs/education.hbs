@@ -10,9 +10,77 @@
     --sig-muted: {{palette.muted}};
     --sig-border: {{palette.border}};
   }
-  {{{animation.keyframes}}}
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: transparent; font-family: 'Segoe UI', Arial, sans-serif; }
+
+  /* === KEYFRAMES NARRATIFS — ÉDUCATION === */
+  @keyframes sigBreathing {
+    0%,100% { transform:scale(1); }
+    50% { transform:scale(1.025); }
+  }
+  @keyframes sigSoulAura {
+    0%,100% { filter:drop-shadow(0 0 0 transparent); }
+    50% { filter:drop-shadow(0 0 8px rgba(59,130,246,0.4)); }
+  }
+  @keyframes sigTypewriter {
+    from { clip-path:inset(0 100% 0 0); }
+    to { clip-path:inset(0 0% 0 0); }
+  }
+  @keyframes sigParticleBuild {
+    0% { opacity:0; letter-spacing:0.35em; filter:blur(3px); }
+    100% { opacity:1; letter-spacing:normal; filter:blur(0); }
+  }
+  @keyframes sigDnaBuild {
+    0% { opacity:0; transform:perspective(400px) rotateX(55deg); }
+    100% { opacity:1; transform:perspective(400px) rotateX(0deg); }
+  }
+  @keyframes sigHeartbeat {
+    0%,100% { transform:scale(1); }
+    14% { transform:scale(1.1); }
+    28% { transform:scale(1); }
+    42% { transform:scale(1.06); }
+  }
+  @keyframes sigCrystalGrow {
+    0% { opacity:0; transform:scale(0.8) rotate(-2deg); filter:brightness(1.8); }
+    100% { opacity:1; transform:scale(1) rotate(0deg); filter:brightness(1); }
+  }
+  @keyframes sigFadeLayers {
+    0% { opacity:0; }
+    100% { opacity:1; }
+  }
+  @keyframes sigTypingCursor {
+    0%,100% { border-right-color:var(--sig-accent); }
+    50% { border-right-color:transparent; }
+  }
+
+  /* === ELEMENTS NARRATIFS === */
+  .sig-el-nom {
+    animation: sigBreathing 2.5s ease-in-out 0s infinite, sigSoulAura 2.5s ease-in-out 0s infinite;
+  }
+  .sig-el-titre {
+    opacity: 0;
+    overflow: hidden;
+    animation: sigTypewriter 1.5s steps(30,end) 0.8s both;
+    border-right: 2px solid var(--sig-accent);
+    animation: sigTypewriter 1.5s steps(30,end) 0.8s both, sigTypingCursor 1s step-end 0.8s infinite;
+  }
+  .sig-el-niveaux {
+    opacity: 0;
+    animation: sigDnaBuild 1.2s ease-out 1.5s both;
+  }
+  .sig-el-telephone {
+    opacity: 0;
+    animation: sigFadeLayers 0.6s ease-out 2.2s both, sigHeartbeat 2s ease-in-out 3s infinite;
+  }
+  .sig-el-certifications {
+    opacity: 0;
+    animation: sigCrystalGrow 1s ease-out 3s both;
+  }
+  .sig-el-email {
+    opacity: 0;
+    animation: sigFadeLayers 0.8s ease-out 3.5s both;
+  }
+
   .sig-wrap {
     display: inline-flex;
     background: var(--sig-bg);
@@ -21,7 +89,7 @@
     width: {{layout.width}}px;
     min-height: {{layout.height}}px;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(59, 130, 246, 0.12);
+    box-shadow: 0 2px 12px rgba(59,130,246,0.12);
   }
   .sig-photo-col {
     width: 90px;
@@ -30,15 +98,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--sig-accent)22, var(--sig-muted)33);
+    background: linear-gradient(135deg, rgba(59,130,246,0.13), rgba(147,197,253,0.2));
   }
   .sig-photo-col img { width: 100%; height: 100%; object-fit: cover; }
   .sig-photo-placeholder { font-size: 40px; }
-  .sig-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
+  .sig-body { flex: 1; display: flex; flex-direction: column; }
   .sig-header {
     padding: 14px 20px 12px;
     border-bottom: 1px solid var(--sig-border);
@@ -47,22 +111,18 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--sig-text);
+    display: inline-block;
   }
   .sig-titre {
     font-size: 13px;
     color: var(--sig-accent);
     font-weight: 600;
-    border-right: 2px solid var(--sig-accent);
     padding-right: 4px;
-    animation: {{animation.cssAnimation}};
     display: inline-block;
     margin-top: 2px;
+    overflow: hidden;
   }
-  .sig-etablissement {
-    font-size: 12px;
-    color: var(--sig-muted);
-    margin-top: 2px;
-  }
+  .sig-etablissement { font-size: 12px; color: var(--sig-muted); margin-top: 2px; }
   .sig-content {
     padding: 12px 20px;
     flex: 1;
@@ -122,22 +182,22 @@
   </div>
   <div class="sig-body">
     <div class="sig-header">
-      <div class="sig-name">{{data.nom}}</div>
-      <div class="sig-titre">{{data.titre}}</div>
+      <div class="sig-name sig-el-nom">{{data.nom}}</div>
+      <div class="sig-titre sig-el-titre">{{data.titre}}</div>
       {{#if data.etablissement}}<div class="sig-etablissement">{{data.etablissement}}</div>{{/if}}
     </div>
     <div class="sig-content">
-      <div class="sig-badges">
+      <div class="sig-badges sig-el-niveaux">
         {{#if data.niveaux}}<span class="sig-badge">{{data.niveaux}}</span>{{/if}}
-        {{#if data.certifications}}<span class="sig-badge outline">✓ {{data.certifications}}</span>{{/if}}
+        {{#if data.certifications}}<span class="sig-badge outline sig-el-certifications">✓ {{data.certifications}}</span>{{/if}}
       </div>
       <div class="sig-contacts">
-        {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item">📞 {{data.telephone}}</a>{{/if}}
-        {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item">✉ {{data.email}}</a>{{/if}}
-        {{#if data.site}}<a href="{{data.site}}" class="sig-contact-item">🌐 Plateforme</a>{{/if}}
+        {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item sig-el-telephone">📞 {{data.telephone}}</a>{{/if}}
+        {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item sig-el-email">✉ {{data.email}}</a>{{/if}}
+        {{#if data.site}}<a href="{{data.site}}" class="sig-contact-item sig-el-email">🌐 Plateforme</a>{{/if}}
       </div>
       {{#if data.telephone}}
-      <a href="tel:{{data.telephone}}" class="sig-cta">Prendre un cours →</a>
+      <a href="tel:{{data.telephone}}" class="sig-cta sig-el-telephone">Prendre un cours →</a>
       {{/if}}
     </div>
   </div>

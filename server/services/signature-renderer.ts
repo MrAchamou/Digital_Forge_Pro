@@ -20,7 +20,7 @@ export interface SectorConfig {
     muted: string;
     border: string;
   };
-  animation: {
+  animation?: {
     name: string;
     intensity: 'low' | 'medium' | 'high';
     keyframes: string;
@@ -200,7 +200,7 @@ function buildStyleBlock(config: SectorConfig): string {
   --sig-muted: ${config.palette.muted};
   --sig-border: ${config.palette.border};
 }
-${config.animation.keyframes}
+${config.animation?.keyframes ?? ''}
 </style>`;
 }
 

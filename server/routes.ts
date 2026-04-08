@@ -171,7 +171,7 @@ router.get('/signature/templates', (_req, res) => {
       layout: t.layout,
       effects: t.effects,
       palette: t.palette,
-      animation: { name: t.animation.name, intensity: t.animation.intensity },
+      animation: t.animation ? { name: t.animation.name, intensity: t.animation.intensity } : undefined,
       tone: t.tone,
       cta: t.cta,
       fieldCount: t.fields.length,

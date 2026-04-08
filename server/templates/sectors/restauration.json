@@ -3,6 +3,7 @@
   "label": "Restauration & Alimentation",
   "emoji": "🍽️",
   "description": "Restaurant, café, boulangerie, traiteur, food truck, épicerie fine...",
+  "histoire": "L'invitation à un voyage culinaire",
   "keywords": ["restaurant", "café", "boulangerie", "traiteur", "food truck", "épicerie", "pizzeria", "brasserie", "bar", "bistrot", "pâtisserie", "chocolatier", "glacier", "snack", "sandwicherie", "restauration"],
   "palette": {
     "background": "#1a0a00",
@@ -10,13 +11,6 @@
     "text": "#fef3c7",
     "muted": "#92400e",
     "border": "#d9770633"
-  },
-  "animation": {
-    "name": "flameFlicker",
-    "intensity": "medium",
-    "keyframes": "@keyframes flameFlicker { 0%, 100% { color: #d97706; text-shadow: 0 0 8px #d97706; } 33% { color: #f59e0b; text-shadow: 0 0 16px #f59e0b, 0 2px 4px #92400e; } 66% { color: #ef4444; text-shadow: 0 0 12px #ef4444; } }",
-    "selector": ".sig-name",
-    "cssAnimation": "flameFlicker 3s ease-in-out infinite"
   },
   "layout": {
     "format": "centered",
@@ -33,6 +27,73 @@
     "intensity": "medium",
     "locked": true
   },
+  "sequence_narrative": {
+    "acte1_accueil": {
+      "duree": 3000,
+      "description": "Dégradé chaud (ambre → terracotta) comme un four qui chauffe",
+      "elements": {
+        "logo": { "effets": ["BREATHING", "RAINBOW_SHIFT"], "action": "Respire comme une pâte qui lève" }
+      }
+    },
+    "acte2_mise_en_bouche": {
+      "duree": 4000,
+      "elements": {
+        "nom": { "effets": ["FIRE_WRITE", "SPARKLE_AURA"], "action": "S'écrit comme une flamme de cuisson" },
+        "titre": { "effets": ["STAR_DUST_FORM"], "action": "Étoiles qui se forment autour, comme des épices" }
+      }
+    },
+    "acte3_service": {
+      "duree": 3000,
+      "elements": {
+        "telephone": { "effets": ["HEARTBEAT", "MAGNETIC_PULL"], "action": "Battement comme un cœur qui attend le client" }
+      }
+    },
+    "acte4_ambiance": {
+      "duree": "infinite",
+      "iteration": 8000,
+      "elements": {
+        "horaires": { "effets": ["LIQUID_MORPH", "WAVE_SURF"], "action": "Ondule comme une nappe qui bouge doucement" },
+        "adresse": { "effets": ["FLOAT_DANCE"], "action": "Flotte comme un parfum qui s'élève" }
+      }
+    }
+  },
+  "elements": [
+    {
+      "id": "logo",
+      "type": "image",
+      "animation": { "effets": ["BREATHING", "SOUL_AURA", "RAINBOW_SHIFT"], "delai": 0, "duree": 3000, "iteration": "infinite" }
+    },
+    {
+      "id": "nom",
+      "type": "titre",
+      "animation": { "effets": ["FIRE_WRITE", "SPARKLE_AURA"], "delai": 0.5, "duree": 2500, "iteration": 1 }
+    },
+    {
+      "id": "titre",
+      "type": "sous-titre",
+      "animation": { "effets": ["STAR_DUST_FORM", "NEON_GLOW"], "delai": 1.2, "duree": 2000, "iteration": 1 }
+    },
+    {
+      "id": "horaires",
+      "type": "information",
+      "animation": { "effets": ["LIQUID_MORPH", "WAVE_SURF"], "delai": 2, "duree": 3000, "iteration": "infinite" }
+    },
+    {
+      "id": "adresse",
+      "type": "localisation",
+      "animation": { "effets": ["FLOAT_DANCE"], "delai": 2.5, "duree": 2000, "iteration": "infinite" }
+    },
+    {
+      "id": "telephone",
+      "type": "contact",
+      "animation": { "effets": ["HEARTBEAT", "MAGNETIC_PULL"], "delai": 3, "duree": 1000, "iteration": "infinite" }
+    },
+    {
+      "id": "note",
+      "type": "avis",
+      "animation": { "effets": ["STAR_EXPLOSION", "SPARKLE_AURA"], "delai": 3.5, "duree": 2000, "iteration": 1 }
+    }
+  ],
   "fields": [
     { "key": "nom", "label": "Nom de l'établissement", "required": true, "type": "text" },
     { "key": "titre", "label": "Type de cuisine / Spécialité", "required": true, "type": "text" },

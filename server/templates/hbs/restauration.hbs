@@ -10,9 +10,76 @@
     --sig-muted: {{palette.muted}};
     --sig-border: {{palette.border}};
   }
-  {{{animation.keyframes}}}
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: transparent; font-family: 'Georgia', 'Times New Roman', serif; }
+
+  /* === KEYFRAMES NARRATIFS — RESTAURATION === */
+  @keyframes sigBreathing {
+    0%,100% { transform:scale(1); }
+    50% { transform:scale(1.05); }
+  }
+  @keyframes sigRainbowShift {
+    0%,100% { filter:hue-rotate(0deg) saturate(1.5); }
+    50% { filter:hue-rotate(40deg) saturate(2) brightness(1.2); }
+  }
+  @keyframes sigFireWrite {
+    0% { opacity:0; clip-path:inset(0 100% 0 0); color:#ff8c42; }
+    70% { color:var(--sig-accent); }
+    100% { opacity:1; clip-path:inset(0 0% 0 0); }
+  }
+  @keyframes sigStarDust {
+    0% { opacity:0; transform:scale(0.6); filter:brightness(3); }
+    50% { filter:brightness(1.5); }
+    100% { opacity:1; transform:scale(1); filter:brightness(1); }
+  }
+  @keyframes sigLiquidMorph {
+    0%,100% { transform:translateX(0); }
+    50% { transform:translateX(3px); }
+  }
+  @keyframes sigFloatDance {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-5px); }
+  }
+  @keyframes sigHeartbeat {
+    0%,100% { transform:scale(1); }
+    14% { transform:scale(1.12); }
+    28% { transform:scale(1); }
+    42% { transform:scale(1.07); }
+  }
+  @keyframes sigSparkle {
+    0%,100% { filter:brightness(1) drop-shadow(0 0 0 transparent); }
+    50% { filter:brightness(1.4) drop-shadow(0 0 8px var(--sig-accent)); }
+  }
+
+  /* === ELEMENTS NARRATIFS === */
+  .sig-el-logo {
+    animation: sigBreathing 3s ease-in-out 0s infinite, sigRainbowShift 4s ease-in-out 0s infinite;
+  }
+  .sig-el-nom {
+    opacity: 0;
+    animation: sigFireWrite 1.5s ease-out 0.5s both, sigSparkle 3s ease-in-out 2.5s infinite;
+  }
+  .sig-el-titre {
+    opacity: 0;
+    animation: sigStarDust 1s ease-out 1.2s both;
+  }
+  .sig-el-horaires {
+    opacity: 0;
+    animation: sigLiquidMorph 3s ease-in-out 2s infinite, sigStarDust 0.8s ease-out 2s both;
+  }
+  .sig-el-adresse {
+    opacity: 0;
+    animation: sigFloatDance 2.5s ease-in-out 2.5s infinite, sigStarDust 0.8s ease-out 2.5s both;
+  }
+  .sig-el-telephone {
+    opacity: 0;
+    animation: sigHeartbeat 1.5s ease-in-out 3s infinite, sigStarDust 0.6s ease-out 3s both;
+  }
+  .sig-el-note {
+    opacity: 0;
+    animation: sigStarDust 1.2s ease-out 3.5s both;
+  }
+
   .sig-wrap {
     display: inline-block;
     background: var(--sig-bg);
@@ -67,7 +134,6 @@
     font-size: 22px;
     font-weight: 700;
     color: var(--sig-text);
-    animation: {{animation.cssAnimation}};
     display: block;
   }
   .sig-titre {
@@ -100,11 +166,7 @@
     gap: 4px;
   }
   .sig-contact-item:hover { color: var(--sig-accent); }
-  .sig-horaires {
-    font-size: 11px;
-    color: var(--sig-muted);
-    margin-bottom: 8px;
-  }
+  .sig-horaires { font-size: 11px; color: var(--sig-muted); margin-bottom: 8px; }
   .sig-footer {
     display: flex;
     justify-content: center;
@@ -114,16 +176,8 @@
     border-top: 1px solid var(--sig-border);
     flex-wrap: wrap;
   }
-  .sig-rating {
-    color: var(--sig-accent);
-    font-size: 14px;
-    font-weight: 700;
-  }
-  .sig-link {
-    font-size: 11px;
-    color: var(--sig-accent);
-    text-decoration: none;
-  }
+  .sig-rating { color: var(--sig-accent); font-size: 14px; font-weight: 700; }
+  .sig-link { font-size: 11px; color: var(--sig-accent); text-decoration: none; }
   .sig-link:hover { text-decoration: underline; }
 </style>
 </head>
@@ -136,37 +190,37 @@
   </div>
   {{/if}}
   {{#if data.logo_url}}
-  <div class="sig-logo-center"><img src="{{data.logo_url}}" alt="logo"></div>
+  <div class="sig-logo-center sig-el-logo"><img src="{{data.logo_url}}" alt="logo"></div>
   {{else}}
-  <div class="sig-logo-placeholder">🍽️</div>
+  <div class="sig-logo-placeholder sig-el-logo">🍽️</div>
   {{/if}}
   <div class="sig-body">
-    <span class="sig-name">{{data.nom}}</span>
-    <span class="sig-titre">{{data.titre}}</span>
+    <span class="sig-name sig-el-nom">{{data.nom}}</span>
+    <span class="sig-titre sig-el-titre">{{data.titre}}</span>
     <div class="sig-divider"></div>
     <div class="sig-contacts">
       {{#if data.adresse}}
-      <span class="sig-contact-item">📍 {{data.adresse}}</span>
+      <span class="sig-contact-item sig-el-adresse">📍 {{data.adresse}}</span>
       {{/if}}
       {{#if data.telephone}}
-      <a href="tel:{{data.telephone}}" class="sig-contact-item">📞 {{data.telephone}}</a>
+      <a href="tel:{{data.telephone}}" class="sig-contact-item sig-el-telephone">📞 {{data.telephone}}</a>
       {{/if}}
       {{#if data.site}}
-      <a href="{{data.site}}" class="sig-contact-item">🌐 Menu & réservation</a>
+      <a href="{{data.site}}" class="sig-contact-item sig-el-adresse">🌐 Menu & réservation</a>
       {{/if}}
     </div>
     {{#if data.horaires}}
-    <div class="sig-horaires">🕐 {{data.horaires}}</div>
+    <div class="sig-horaires sig-el-horaires">🕐 {{data.horaires}}</div>
     {{/if}}
     <div class="sig-footer">
       {{#if data.note}}
-      <span class="sig-rating">★ {{data.note}}</span>
+      <span class="sig-rating sig-el-note">★ {{data.note}}</span>
       {{/if}}
       {{#if data.instagram}}
-      <a href="{{data.instagram}}" class="sig-link">📸 Instagram</a>
+      <a href="{{data.instagram}}" class="sig-link sig-el-note">📸 Instagram</a>
       {{/if}}
       {{#if data.site}}
-      <a href="{{data.site}}" class="sig-link">Voir le menu →</a>
+      <a href="{{data.site}}" class="sig-link sig-el-note">Voir le menu →</a>
       {{/if}}
     </div>
   </div>

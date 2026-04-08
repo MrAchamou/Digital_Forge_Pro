@@ -3,6 +3,7 @@
   "label": "Transport & Logistique",
   "emoji": "🚚",
   "description": "Taxi, VTC, déménageur, livreur, transporteur, ambulancier...",
+  "histoire": "L'efficacité en mouvement perpétuel",
   "keywords": ["taxi", "vtc", "uber", "chauffeur", "déménageur", "déménagement", "livreur", "livraison", "transporteur", "ambulancier", "ambulance", "coursier", "messagerie", "fret", "logistique", "camion", "bus", "navette", "transfer"],
   "palette": {
     "background": "#0c0a09",
@@ -10,13 +11,6 @@
     "text": "#fafaf9",
     "muted": "#78716c",
     "border": "#ef444433"
-  },
-  "animation": {
-    "name": "speedPulse",
-    "intensity": "high",
-    "keyframes": "@keyframes speedPulse { 0%, 100% { transform: translateX(0); box-shadow: -4px 0 0 #ef4444; } 50% { transform: translateX(3px); box-shadow: -8px 0 0 #ef4444, -16px 0 0 #ef444444; } }",
-    "selector": ".sig-cta",
-    "cssAnimation": "speedPulse 1.5s ease-in-out infinite"
   },
   "layout": {
     "format": "functional-direct",
@@ -33,6 +27,68 @@
     "intensity": "high",
     "locked": true
   },
+  "sequence_narrative": {
+    "acte1_demarrage": {
+      "duree": 2500,
+      "description": "Orange → rouge dynamique",
+      "elements": {
+        "icone": { "effets": ["GYROSCOPE_SPIN", "TORNADO_TWIST"], "action": "Tourne comme un moteur qui démarre" }
+      }
+    },
+    "acte2_pleine_puissance": {
+      "duree": 3000,
+      "elements": {
+        "nom": { "effets": ["TYPEWRITER", "ENERGY_IONIZE"], "action": "S'écrit à toute vitesse" },
+        "telephone": { "effets": ["TORNADO_ABSORB", "ELECTRIC_FORM"], "action": "Tourbillon d'énergie qui attire l'œil" }
+      }
+    },
+    "acte3_couverture": {
+      "duree": 2500,
+      "elements": {
+        "zone": { "effets": ["WAVE_SURF"], "action": "Onde qui s'étend comme une zone de livraison" },
+        "vehicule": { "effets": ["PARTICLE_BUILD"], "action": "Flotte qui s'assemble" }
+      }
+    },
+    "acte4_disponibilite": {
+      "duree": "infinite",
+      "iteration": 5000,
+      "elements": {
+        "disponibilite": { "effets": ["NEON_GLOW"], "action": "Clignote comme un véhicule disponible" }
+      }
+    }
+  },
+  "elements": [
+    {
+      "id": "nom",
+      "type": "titre",
+      "animation": { "effets": ["TYPEWRITER", "ENERGY_IONIZE"], "delai": 0.5, "duree": 2000, "iteration": 1 }
+    },
+    {
+      "id": "titre",
+      "type": "service",
+      "animation": { "effets": ["WAVE_SURF"], "delai": 0.8, "duree": 1500, "iteration": 1 }
+    },
+    {
+      "id": "zone",
+      "type": "couverture",
+      "animation": { "effets": ["WAVE_SURF"], "delai": 1.2, "duree": 1500, "iteration": 1 }
+    },
+    {
+      "id": "telephone",
+      "type": "contact_urgence",
+      "animation": { "effets": ["TORNADO_ABSORB", "ELECTRIC_FORM"], "delai": 2, "duree": 2500, "iteration": "infinite" }
+    },
+    {
+      "id": "vehicule",
+      "type": "materiel",
+      "animation": { "effets": ["PARTICLE_BUILD"], "delai": 2.5, "duree": 2000, "iteration": 1 }
+    },
+    {
+      "id": "disponibilite",
+      "type": "horaire",
+      "animation": { "effets": ["NEON_GLOW"], "delai": 3, "duree": 1500, "iteration": "infinite" }
+    }
+  ],
   "fields": [
     { "key": "nom", "label": "Nom / Entreprise", "required": true, "type": "text" },
     { "key": "titre", "label": "Type de service", "required": true, "type": "text" },

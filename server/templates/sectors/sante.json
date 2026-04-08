@@ -3,6 +3,7 @@
   "label": "Santé & Bien-être",
   "emoji": "💆",
   "description": "Médecin, dentiste, kiné, coiffeur, esthéticienne, naturopathe, spa...",
+  "histoire": "La bulle de sérénité qui respire avec vous",
   "keywords": ["médecin", "docteur", "dentiste", "kiné", "kinésithérapeute", "coiffeur", "esthéticienne", "naturopathe", "spa", "ostéopathe", "psychologue", "diététicien", "pharmacien", "infirmier", "sage-femme", "opticien", "santé", "bien-être", "beauté"],
   "palette": {
     "background": "#f0fdf4",
@@ -10,13 +11,6 @@
     "text": "#064e3b",
     "muted": "#6ee7b7",
     "border": "#05966933"
-  },
-  "animation": {
-    "name": "breathe",
-    "intensity": "low",
-    "keyframes": "@keyframes breathe { 0%, 100% { opacity: 1; transform: scaleY(1); } 50% { opacity: 0.7; transform: scaleY(0.97); } }",
-    "selector": ".sig-accent-bar",
-    "cssAnimation": "breathe 4s ease-in-out infinite"
   },
   "layout": {
     "format": "airy",
@@ -33,6 +27,62 @@
     "intensity": "low",
     "locked": true
   },
+  "sequence_narrative": {
+    "acte1_installation": {
+      "duree": 4000,
+      "description": "Bleu clair → vert d'eau apaisant",
+      "elements": {
+        "nom": { "effets": ["BREATHING", "SOUL_AURA"], "action": "Respire comme une présence rassurante" }
+      }
+    },
+    "acte2_confiance": {
+      "duree": 3500,
+      "elements": {
+        "diplome": { "effets": ["PARTICLE_BUILD"], "action": "Particules qui se rassemblent comme des cellules qui se réparent" },
+        "titre": { "effets": ["TYPEWRITER"], "action": "S'écrit calmement, posément" }
+      }
+    },
+    "acte3_bulle": {
+      "duree": "infinite",
+      "iteration": 10000,
+      "elements": {
+        "telephone": { "effets": ["NEON_GLOW", "ENERGY_FLOW"], "action": "Lueur douce qui invite sans pression" },
+        "adresse": { "effets": ["WAVE_DISSOLVE"], "action": "Apparait et disparait comme une respiration" }
+      }
+    }
+  },
+  "elements": [
+    {
+      "id": "nom",
+      "type": "identite",
+      "animation": { "effets": ["BREATHING", "SOUL_AURA"], "delai": 0, "duree": 2000, "iteration": "infinite" }
+    },
+    {
+      "id": "titre",
+      "type": "specialite",
+      "animation": { "effets": ["TYPEWRITER"], "delai": 0.8, "duree": 1500, "iteration": 1 }
+    },
+    {
+      "id": "diplome",
+      "type": "certifications",
+      "animation": { "effets": ["PARTICLE_BUILD"], "delai": 1.3, "duree": 2000, "iteration": 1 }
+    },
+    {
+      "id": "telephone",
+      "type": "contact",
+      "animation": { "effets": ["NEON_GLOW", "NEURAL_PULSE"], "delai": 2, "duree": 1500, "iteration": "infinite" }
+    },
+    {
+      "id": "adresse",
+      "type": "localisation",
+      "animation": { "effets": ["FADE_LAYERS", "WAVE_DISSOLVE"], "delai": 2.8, "duree": 1000, "iteration": 1 }
+    },
+    {
+      "id": "assurance",
+      "type": "badge",
+      "animation": { "effets": ["NEURAL_PULSE"], "delai": 3.2, "duree": 1200, "iteration": "infinite" }
+    }
+  ],
   "fields": [
     { "key": "nom", "label": "Dr / Praticien", "required": true, "type": "text" },
     { "key": "titre", "label": "Spécialité", "required": true, "type": "text" },

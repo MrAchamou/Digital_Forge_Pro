@@ -3,6 +3,7 @@
   "label": "Services Professionnels",
   "emoji": "⚖️",
   "description": "Avocat, comptable, notaire, consultant, RH, assurance, banque...",
+  "histoire": "La présence discrète mais incontestable",
   "keywords": ["avocat", "comptable", "notaire", "consultant", "rh", "ressources humaines", "assurance", "banque", "expert-comptable", "commissaire", "auditeur", "conseiller", "cabinet", "juridique", "finance", "fiscaliste", "juriste"],
   "palette": {
     "background": "#1e1b4b",
@@ -10,13 +11,6 @@
     "text": "#e0e7ff",
     "muted": "#818cf8",
     "border": "#6366f133"
-  },
-  "animation": {
-    "name": "subtleFade",
-    "intensity": "low",
-    "keyframes": "@keyframes subtleFade { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }",
-    "selector": ".sig-accent-line",
-    "cssAnimation": "subtleFade 5s ease-in-out infinite"
   },
   "layout": {
     "format": "sober-vertical",
@@ -33,6 +27,62 @@
     "intensity": "low",
     "locked": true
   },
+  "sequence_narrative": {
+    "acte1_introduction": {
+      "duree": 3000,
+      "description": "Blanc cassé → gris perle",
+      "elements": {
+        "nom": { "effets": ["TYPEWRITER", "TIME_ECHO"], "action": "S'écrit comme un acte notarié" }
+      }
+    },
+    "acte2_legitimite": {
+      "duree": 2500,
+      "elements": {
+        "cabinet": { "effets": ["CRYSTAL_GROW"], "action": "Se cristallise comme un sceau" },
+        "ordre": { "effets": ["FADE_LAYERS"], "action": "Apparait en transparence comme un filigrane" }
+      }
+    },
+    "acte3_professionnel": {
+      "duree": "infinite",
+      "iteration": 12000,
+      "elements": {
+        "email": { "effets": ["NEURAL_PULSE"], "action": "Pulse très discrètement" },
+        "telephone": { "effets": ["TIME_ECHO"], "action": "Léger écho dans le temps" }
+      }
+    }
+  },
+  "elements": [
+    {
+      "id": "nom",
+      "type": "identite",
+      "animation": { "effets": ["TYPEWRITER", "TIME_ECHO"], "delai": 0, "duree": 2500, "iteration": 1 }
+    },
+    {
+      "id": "titre",
+      "type": "fonction",
+      "animation": { "effets": ["FADE_LAYERS"], "delai": 0.8, "duree": 1500, "iteration": 1 }
+    },
+    {
+      "id": "cabinet",
+      "type": "societe",
+      "animation": { "effets": ["CRYSTAL_GROW"], "delai": 1.2, "duree": 2000, "iteration": 1 }
+    },
+    {
+      "id": "ordre",
+      "type": "legal",
+      "animation": { "effets": ["FADE_LAYERS"], "delai": 2, "duree": 1500, "iteration": 1 }
+    },
+    {
+      "id": "email",
+      "type": "contact",
+      "animation": { "effets": ["NEURAL_PULSE"], "delai": 2.8, "duree": 1500, "iteration": "infinite" }
+    },
+    {
+      "id": "telephone",
+      "type": "contact",
+      "animation": { "effets": ["TIME_ECHO"], "delai": 3.2, "duree": 1000, "iteration": 1 }
+    }
+  ],
   "fields": [
     { "key": "nom", "label": "Nom & Prénom", "required": true, "type": "text" },
     { "key": "titre", "label": "Titre / Fonction", "required": true, "type": "text" },

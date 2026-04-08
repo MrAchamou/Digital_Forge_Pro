@@ -3,6 +3,7 @@
   "label": "Loisirs & Tourisme",
   "emoji": "🏨",
   "description": "Hôtel, agence voyage, salle de sport, photographe, événementiel...",
+  "histoire": "La promesse d'une destination de rêve",
   "keywords": ["hôtel", "agence voyage", "tourisme", "salle de sport", "fitness", "photographe", "vidéaste", "événementiel", "dj", "animateur", "loisirs", "spa", "resort", "camping", "gîte", "chambre hôtes", "location vacances", "activités"],
   "palette": {
     "background": "#020617",
@@ -10,13 +11,6 @@
     "text": "#f1f5f9",
     "muted": "#6d28d9",
     "border": "#8b5cf633"
-  },
-  "animation": {
-    "name": "stellarDrift",
-    "intensity": "high",
-    "keyframes": "@keyframes stellarDrift { 0% { text-shadow: 0 0 10px #8b5cf6; } 33% { text-shadow: 2px -2px 20px #a78bfa, 0 0 40px #8b5cf666; } 66% { text-shadow: -2px 2px 20px #7c3aed, 0 0 30px #8b5cf666; } 100% { text-shadow: 0 0 10px #8b5cf6; } }",
-    "selector": ".sig-name",
-    "cssAnimation": "stellarDrift 5s ease-in-out infinite"
   },
   "layout": {
     "format": "immersive-wide",
@@ -33,6 +27,68 @@
     "intensity": "high",
     "locked": true
   },
+  "sequence_narrative": {
+    "acte1_horizon": {
+      "duree": 4000,
+      "description": "Dégradé coucher de soleil (orange → rose → violet)",
+      "elements": {
+        "image_fond": { "effets": ["FLOAT_DANCE", "STELLAR_DRIFT"], "action": "Paysage qui se dévoile lentement" }
+      }
+    },
+    "acte2_decouverte": {
+      "duree": 3500,
+      "elements": {
+        "nom": { "effets": ["CRYSTAL_GROW", "HOLOGRAM"], "action": "Nom qui brille comme une destination de luxe" },
+        "note": { "effets": ["STAR_EXPLOSION", "SPARKLE_AURA"], "action": "Les étoiles s'allument une par une" }
+      }
+    },
+    "acte3_immersion": {
+      "duree": 3000,
+      "elements": {
+        "adresse": { "effets": ["WAVE_SURF", "FLOAT_DANCE"], "action": "Ondule comme la mer" },
+        "instagram": { "effets": ["RAINBOW_SHIFT"], "action": "Couleurs chaudes du coucher de soleil" }
+      }
+    },
+    "acte4_invitation": {
+      "duree": "infinite",
+      "iteration": 8000,
+      "elements": {
+        "telephone": { "effets": ["HEARTBEAT", "MAGNETIC_PULL"], "action": "Battement qui appelle au voyage" }
+      }
+    }
+  },
+  "elements": [
+    {
+      "id": "nom",
+      "type": "titre_principal",
+      "animation": { "effets": ["CRYSTAL_GROW", "HOLOGRAM", "STELLAR_DRIFT"], "delai": 0.5, "duree": 3000, "iteration": 1 }
+    },
+    {
+      "id": "titre",
+      "type": "sous-titre",
+      "animation": { "effets": ["STELLAR_DRIFT"], "delai": 1, "duree": 2000, "iteration": 1 }
+    },
+    {
+      "id": "note",
+      "type": "avis",
+      "animation": { "effets": ["STAR_EXPLOSION", "SPARKLE_AURA"], "delai": 1, "duree": 2000, "iteration": "infinite" }
+    },
+    {
+      "id": "adresse",
+      "type": "localisation",
+      "animation": { "effets": ["WAVE_SURF", "FLOAT_DANCE"], "delai": 1.5, "duree": 2500, "iteration": "infinite" }
+    },
+    {
+      "id": "instagram",
+      "type": "social",
+      "animation": { "effets": ["RAINBOW_SHIFT"], "delai": 2, "duree": 2000, "iteration": "infinite" }
+    },
+    {
+      "id": "telephone",
+      "type": "contact",
+      "animation": { "effets": ["HEARTBEAT", "MAGNETIC_PULL", "ENERGY_FLOW"], "delai": 2.5, "duree": 1500, "iteration": "infinite" }
+    }
+  ],
   "fields": [
     { "key": "nom", "label": "Nom / Établissement", "required": true, "type": "text" },
     { "key": "titre", "label": "Type d'activité", "required": true, "type": "text" },

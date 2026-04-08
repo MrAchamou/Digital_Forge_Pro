@@ -3,6 +3,7 @@
   "label": "Tech & Digital",
   "emoji": "💻",
   "description": "Développeur, agence web, startup, infographiste, community manager...",
+  "histoire": "La matrice vivante du code",
   "keywords": ["développeur", "dev", "agence web", "startup", "infographiste", "community manager", "designer", "ux", "ui", "data", "ia", "intelligence artificielle", "cybersécurité", "cloud", "it", "informatique", "digital", "tech", "software", "seo", "marketing digital"],
   "palette": {
     "background": "#030712",
@@ -10,13 +11,6 @@
     "text": "#e2e8f0",
     "muted": "#475569",
     "border": "#06b6d433"
-  },
-  "animation": {
-    "name": "glitchEffect",
-    "intensity": "medium",
-    "keyframes": "@keyframes glitchEffect { 0%, 95%, 100% { text-shadow: none; transform: none; } 96% { text-shadow: 2px 0 #ef4444, -2px 0 #06b6d4; transform: translateX(2px); } 97% { text-shadow: -2px 0 #ef4444, 2px 0 #06b6d4; transform: translateX(-2px); } 98% { text-shadow: 1px 0 #06b6d4; transform: translateX(0); } }",
-    "selector": ".sig-name",
-    "cssAnimation": "glitchEffect 4s steps(1) infinite"
   },
   "layout": {
     "format": "minimal-dark",
@@ -33,6 +27,62 @@
     "intensity": "medium",
     "locked": true
   },
+  "sequence_narrative": {
+    "acte1_boot": {
+      "duree": 2000,
+      "description": "Noir → bleu électrique → noir",
+      "elements": {
+        "nom": { "effets": ["GLITCH_SPAWN", "REALITY_GLITCH", "DIMENSION_SHIFT"], "action": "Glitch comme une réalité qui se charge" }
+      }
+    },
+    "acte2_initialisation": {
+      "duree": 3000,
+      "elements": {
+        "titre": { "effets": ["TYPEWRITER", "ENERGY_IONIZE"], "action": "S'écrit comme du code dans un terminal" },
+        "competences": { "effets": ["DNA_BUILD", "PARTICLE_BUILD"], "action": "Les technologies s'assemblent comme un ADN" }
+      }
+    },
+    "acte3_connexion": {
+      "duree": 2500,
+      "elements": {
+        "portfolio": { "effets": ["NEON_GLOW", "ECHO_TRAIL"], "action": "Traînée lumineuse comme une connexion réseau" }
+      }
+    },
+    "acte4_presence": {
+      "duree": "infinite",
+      "iteration": 7000,
+      "elements": {
+        "email": { "effets": ["WAVE_DISTORTION"], "action": "Onde de distorsion continue" }
+      }
+    }
+  },
+  "elements": [
+    {
+      "id": "nom",
+      "type": "identite",
+      "animation": { "effets": ["GLITCH_SPAWN", "REALITY_GLITCH", "DIMENSION_SHIFT"], "delai": 0, "duree": 3000, "iteration": 1 }
+    },
+    {
+      "id": "titre",
+      "type": "poste",
+      "animation": { "effets": ["TYPEWRITER", "ENERGY_IONIZE"], "delai": 1, "duree": 2000, "iteration": 1 }
+    },
+    {
+      "id": "competences",
+      "type": "stack",
+      "animation": { "effets": ["DNA_BUILD", "PARTICLE_BUILD"], "delai": 1.8, "duree": 2500, "iteration": 1 }
+    },
+    {
+      "id": "portfolio",
+      "type": "lien",
+      "animation": { "effets": ["NEON_GLOW", "ECHO_TRAIL"], "delai": 2.5, "duree": 2000, "iteration": "infinite" }
+    },
+    {
+      "id": "email",
+      "type": "contact",
+      "animation": { "effets": ["WAVE_DISTORTION"], "delai": 3.5, "duree": 1500, "iteration": "infinite" }
+    }
+  ],
   "fields": [
     { "key": "nom", "label": "Nom / Pseudo", "required": true, "type": "text" },
     { "key": "titre", "label": "Titre / Stack", "required": true, "type": "text" },

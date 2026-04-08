@@ -3,6 +3,7 @@
   "label": "Immobilier",
   "emoji": "🏠",
   "description": "Agent immobilier, promoteur, architecte, syndic, gestionnaire de biens...",
+  "histoire": "Le prestige qui se dévoile",
   "keywords": ["immobilier", "agent immobilier", "promoteur", "architecte", "syndic", "gestionnaire", "notaire", "diagnostiqueur", "home stager", "transaction", "location", "vente", "achat", "investissement", "patrimoine"],
   "palette": {
     "background": "#0f172a",
@@ -10,13 +11,6 @@
     "text": "#f1f5f9",
     "muted": "#64748b",
     "border": "#0ea5e933"
-  },
-  "animation": {
-    "name": "hologramScan",
-    "intensity": "medium",
-    "keyframes": "@keyframes hologramScan { 0% { background-position: 0% 0%; opacity: 0.8; } 50% { background-position: 100% 100%; opacity: 1; } 100% { background-position: 0% 0%; opacity: 0.8; } } @keyframes shimmer { 0%, 100% { box-shadow: 0 0 8px #0ea5e944; } 50% { box-shadow: 0 0 20px #0ea5e9aa, 0 0 40px #0ea5e944; } }",
-    "selector": ".sig-photo-wrap",
-    "cssAnimation": "shimmer 3s ease-in-out infinite"
   },
   "layout": {
     "format": "elegant-two-col",
@@ -33,6 +27,67 @@
     "intensity": "medium",
     "locked": true
   },
+  "sequence_narrative": {
+    "acte1_mysterieux": {
+      "duree": 2500,
+      "description": "Violet profond → or prestige",
+      "elements": {
+        "agence": { "effets": ["HOLOGRAM", "PRISM_SPLIT"], "action": "Apparait comme un cristal qui se forme" }
+      }
+    },
+    "acte2_revelation": {
+      "duree": 3000,
+      "elements": {
+        "nom": { "effets": ["CRYSTAL_GROW"], "action": "Nom qui s'illumine comme une signature de prestige" },
+        "titre": { "effets": ["DIMENSION_SHIFT"], "action": "Glisse depuis une autre dimension" }
+      }
+    },
+    "acte3_prestige": {
+      "duree": "infinite",
+      "iteration": 6000,
+      "elements": {
+        "telephone": { "effets": ["ECHO_MULTIPLE", "ENERGY_IONIZE"], "action": "Ondes qui s'étendent comme un réseau d'influence" },
+        "zone": { "effets": ["MAGNETIC_FIELD"], "action": "Champ magnétique qui délimite la zone d'expertise" }
+      }
+    }
+  },
+  "elements": [
+    {
+      "id": "agence",
+      "type": "titre_principal",
+      "animation": { "effets": ["HOLOGRAM", "PRISM_SPLIT"], "delai": 0, "duree": 3000, "iteration": 1 }
+    },
+    {
+      "id": "nom",
+      "type": "sous-titre",
+      "animation": { "effets": ["CRYSTAL_GROW"], "delai": 0.5, "duree": 2000, "iteration": 1 }
+    },
+    {
+      "id": "titre",
+      "type": "poste",
+      "animation": { "effets": ["DIMENSION_SHIFT"], "delai": 0.8, "duree": 1500, "iteration": 1 }
+    },
+    {
+      "id": "zone",
+      "type": "information",
+      "animation": { "effets": ["MAGNETIC_FIELD"], "delai": 1.5, "duree": 1500, "iteration": 1 }
+    },
+    {
+      "id": "telephone",
+      "type": "contact_prioritaire",
+      "animation": { "effets": ["ECHO_MULTIPLE", "ENERGY_IONIZE"], "delai": 2, "duree": 2000, "iteration": "infinite" }
+    },
+    {
+      "id": "email",
+      "type": "contact",
+      "animation": { "effets": ["FADE_LAYERS"], "delai": 2.5, "duree": 1000, "iteration": 1 }
+    },
+    {
+      "id": "site",
+      "type": "lien",
+      "animation": { "effets": ["TYPEWRITER"], "delai": 3, "duree": 2000, "iteration": 1 }
+    }
+  ],
   "fields": [
     { "key": "nom", "label": "Nom & Prénom", "required": true, "type": "text" },
     { "key": "titre", "label": "Titre / Poste", "required": true, "type": "text" },

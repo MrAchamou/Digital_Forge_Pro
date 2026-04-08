@@ -10,9 +10,68 @@
     --sig-muted: {{palette.muted}};
     --sig-border: {{palette.border}};
   }
-  {{{animation.keyframes}}}
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: transparent; font-family: 'Courier New', 'Lucida Console', monospace; }
+
+  /* === KEYFRAMES NARRATIFS — TECH === */
+  @keyframes sigGlitch {
+    0%,88%,100% { clip-path:none; transform:none; text-shadow:none; }
+    90% { clip-path:inset(15% 0 70% 0); transform:translateX(-4px); text-shadow:3px 0 #ef4444,-3px 0 var(--sig-accent); }
+    92% { clip-path:inset(55% 0 25% 0); transform:translateX(4px); text-shadow:-3px 0 #ef4444,3px 0 var(--sig-accent); }
+    94% { clip-path:inset(30% 0 50% 0); transform:translateX(-2px); text-shadow:none; }
+    96% { clip-path:none; transform:translateX(1px); }
+  }
+  @keyframes sigGlitchIn {
+    0% { opacity:0; clip-path:inset(50% 0 30% 0); transform:translateX(-8px); filter:blur(4px); }
+    30% { clip-path:inset(20% 0 60% 0); transform:translateX(4px); }
+    60% { clip-path:inset(70% 0 10% 0); transform:translateX(-2px); filter:blur(1px); }
+    100% { opacity:1; clip-path:none; transform:none; filter:blur(0); }
+  }
+  @keyframes sigTypewriter {
+    from { clip-path:inset(0 100% 0 0); }
+    to { clip-path:inset(0 0% 0 0); }
+  }
+  @keyframes sigDnaBuild {
+    0% { opacity:0; transform:perspective(400px) rotateX(70deg); letter-spacing:0.3em; }
+    100% { opacity:1; transform:perspective(400px) rotateX(0deg); letter-spacing:normal; }
+  }
+  @keyframes sigNeonEcho {
+    0%,100% { color:var(--sig-accent); filter:brightness(1); text-shadow:0 0 4px var(--sig-accent); }
+    50% { filter:brightness(1.6); text-shadow:0 0 12px var(--sig-accent),0 0 24px var(--sig-accent); }
+  }
+  @keyframes sigWaveDistort {
+    0%,100% { transform:none; filter:none; }
+    50% { transform:translateX(1px) skewX(0.5deg); filter:brightness(1.1); }
+  }
+  @keyframes sigBlink {
+    0%,100% { opacity:1; }
+    50% { opacity:0; }
+  }
+
+  /* === ELEMENTS NARRATIFS === */
+  .sig-el-nom {
+    opacity: 0;
+    animation: sigGlitchIn 0.8s ease-out 0s both, sigGlitch 6s steps(1) 1.5s infinite;
+  }
+  .sig-el-titre {
+    opacity: 0;
+    overflow: hidden;
+    animation: sigTypewriter 1.5s steps(30,end) 1s both;
+  }
+  .sig-el-competences {
+    opacity: 0;
+    animation: sigDnaBuild 1.2s ease-out 1.8s both;
+  }
+  .sig-el-portfolio {
+    opacity: 0;
+    animation: sigDnaBuild 0.8s ease-out 2.5s both, sigNeonEcho 3s ease-in-out 3.5s infinite;
+  }
+  .sig-el-email {
+    opacity: 0;
+    animation: sigDnaBuild 0.8s ease-out 3.5s both, sigWaveDistort 4s ease-in-out 5s infinite;
+  }
+  .sig-cursor { animation: sigBlink 1s step-end infinite; }
+
   .sig-wrap {
     display: inline-block;
     background: var(--sig-bg);
@@ -47,19 +106,16 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--sig-text);
-    animation: {{animation.cssAnimation}};
+    display: inline-block;
   }
   .sig-titre {
     font-size: 12px;
     color: var(--sig-accent);
     margin-left: 4px;
+    display: inline-block;
   }
   .sig-entreprise { font-size: 12px; color: var(--sig-muted); }
-  .sig-divider {
-    height: 1px;
-    background: var(--sig-border);
-    margin: 10px 0;
-  }
+  .sig-divider { height: 1px; background: var(--sig-border); margin: 10px 0; }
   .sig-data-row {
     display: flex;
     gap: 6px;
@@ -71,12 +127,7 @@
   .sig-val { color: var(--sig-text); }
   .sig-val a { color: var(--sig-text); text-decoration: none; }
   .sig-val a:hover { color: var(--sig-accent); }
-  .sig-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 8px;
-  }
+  .sig-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
   .sig-badge {
     font-size: 10px;
     padding: 2px 8px;
@@ -85,27 +136,17 @@
     border-radius: 3px;
     font-family: 'Courier New', monospace;
   }
-  .sig-links-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 10px;
-  }
-  .sig-link {
-    font-size: 11px;
-    color: var(--sig-accent);
-    text-decoration: none;
-  }
+  .sig-links-row { display: flex; gap: 12px; margin-top: 10px; }
+  .sig-link { font-size: 11px; color: var(--sig-accent); text-decoration: none; }
   .sig-link:hover { text-decoration: underline; }
   .sig-cursor {
     display: inline-block;
     width: 8px;
     height: 16px;
     background: var(--sig-accent);
-    animation: blink 1s step-end infinite;
     vertical-align: middle;
     margin-left: 4px;
   }
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 </style>
 </head>
 <body>
@@ -119,41 +160,41 @@
   <div class="sig-body">
     <div class="sig-line">
       <span class="sig-prompt">const</span>
-      <span class="sig-name">{{data.nom}}</span>
+      <span class="sig-name sig-el-nom">{{data.nom}}</span>
       <span class="sig-cursor"></span>
     </div>
     <div class="sig-line">
       <span class="sig-prompt"> =</span>
-      <span class="sig-titre">// {{data.titre}}</span>
+      <span class="sig-titre sig-el-titre">// {{data.titre}}</span>
       {{#if data.entreprise}}<span class="sig-entreprise">@ {{data.entreprise}}</span>{{/if}}
     </div>
     <div class="sig-divider"></div>
     {{#if data.email}}
-    <div class="sig-data-row">
+    <div class="sig-data-row sig-el-email">
       <span class="sig-key">email:</span>
       <span class="sig-val"><a href="mailto:{{data.email}}">{{data.email}}</a></span>
     </div>
     {{/if}}
     {{#if data.portfolio}}
-    <div class="sig-data-row">
+    <div class="sig-data-row sig-el-portfolio">
       <span class="sig-key">portfolio:</span>
       <span class="sig-val"><a href="{{data.portfolio}}">{{data.portfolio}}</a></span>
     </div>
     {{/if}}
     {{#if data.site}}
-    <div class="sig-data-row">
+    <div class="sig-data-row sig-el-portfolio">
       <span class="sig-key">web:</span>
       <span class="sig-val"><a href="{{data.site}}">{{data.site}}</a></span>
     </div>
     {{/if}}
     {{#if data.competences}}
-    <div class="sig-badges">
+    <div class="sig-badges sig-el-competences">
       {{#each data.competencesList}}
       <span class="sig-badge">{{this}}</span>
       {{/each}}
     </div>
     {{/if}}
-    <div class="sig-links-row">
+    <div class="sig-links-row sig-el-portfolio">
       {{#if data.linkedin}}<a href="{{data.linkedin}}" class="sig-link">[linkedin]</a>{{/if}}
       {{#if data.site}}<a href="{{data.site}}" class="sig-link">[site]</a>{{/if}}
       {{#if data.portfolio}}<a href="{{data.portfolio}}" class="sig-link">[portfolio]</a>{{/if}}

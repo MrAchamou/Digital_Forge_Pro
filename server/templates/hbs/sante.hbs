@@ -10,9 +10,68 @@
     --sig-muted: {{palette.muted}};
     --sig-border: {{palette.border}};
   }
-  {{{animation.keyframes}}}
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: transparent; font-family: 'Segoe UI', Arial, sans-serif; }
+
+  /* === KEYFRAMES NARRATIFS — SANTÉ === */
+  @keyframes sigBreathing {
+    0%,100% { transform:scale(1); opacity:1; }
+    50% { transform:scale(1.03); opacity:0.9; }
+  }
+  @keyframes sigSoulAura {
+    0%,100% { box-shadow:0 0 0 0 transparent; }
+    50% { box-shadow:0 0 16px 4px rgba(5,150,105,0.25); }
+  }
+  @keyframes sigTypewriter {
+    from { clip-path:inset(0 100% 0 0); }
+    to { clip-path:inset(0 0% 0 0); }
+  }
+  @keyframes sigParticleBuild {
+    0% { opacity:0; letter-spacing:0.4em; filter:blur(4px); }
+    100% { opacity:1; letter-spacing:normal; filter:blur(0); }
+  }
+  @keyframes sigNeonGlow {
+    0%,100% { color:var(--sig-accent); filter:brightness(1); }
+    50% { color:var(--sig-accent); filter:brightness(1.4) drop-shadow(0 0 6px var(--sig-accent)); }
+  }
+  @keyframes sigFadeWave {
+    0% { opacity:0; transform:translateY(8px); }
+    100% { opacity:1; transform:translateY(0); }
+  }
+  @keyframes sigNeuralPulse {
+    0%,100% { opacity:1; }
+    50% { opacity:0.55; }
+  }
+  @keyframes sigFadeLayers {
+    0% { opacity:0; }
+    100% { opacity:1; }
+  }
+
+  /* === ELEMENTS NARRATIFS === */
+  .sig-el-nom {
+    animation: sigBreathing 2s ease-in-out 0s infinite, sigSoulAura 2s ease-in-out 0s infinite;
+  }
+  .sig-el-titre {
+    opacity: 0;
+    animation: sigTypewriter 1.2s steps(30,end) 0.8s both;
+  }
+  .sig-el-diplome {
+    opacity: 0;
+    animation: sigParticleBuild 1s ease-out 1.3s both;
+  }
+  .sig-el-telephone {
+    opacity: 0;
+    animation: sigFadeWave 0.6s ease-out 2s both, sigNeonGlow 2s ease-in-out 2.8s infinite;
+  }
+  .sig-el-adresse {
+    opacity: 0;
+    animation: sigFadeWave 0.8s ease-out 2.8s both;
+  }
+  .sig-el-assurance {
+    opacity: 0;
+    animation: sigFadeLayers 0.8s ease-out 3.2s both, sigNeuralPulse 2.5s ease-in-out 4s infinite;
+  }
+
   .sig-wrap {
     display: inline-flex;
     align-items: center;
@@ -22,7 +81,7 @@
     width: {{layout.width}}px;
     min-height: {{layout.height}}px;
     overflow: hidden;
-    box-shadow: 0 2px 16px rgba(5, 150, 105, 0.1);
+    box-shadow: 0 2px 16px rgba(5,150,105,0.1);
   }
   .sig-photo-wrap {
     width: 100px;
@@ -31,11 +90,7 @@
     overflow: hidden;
     position: relative;
   }
-  .sig-photo-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  .sig-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
   .sig-photo-placeholder {
     width: 100px;
     align-self: stretch;
@@ -48,7 +103,7 @@
     align-self: stretch;
     background: var(--sig-accent);
     flex-shrink: 0;
-    animation: {{animation.cssAnimation}};
+    animation: sigBreathing 4s ease-in-out infinite;
   }
   .sig-body {
     flex: 1;
@@ -61,11 +116,14 @@
     font-size: 19px;
     font-weight: 700;
     color: var(--sig-text);
+    display: inline-block;
   }
   .sig-titre {
     font-size: 13px;
     color: var(--sig-accent);
     font-weight: 600;
+    overflow: hidden;
+    display: block;
   }
   .sig-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
   .sig-badge {
@@ -114,23 +172,23 @@
   <div class="sig-accent-bar"></div>
   <div class="sig-body">
     <div>
-      <div class="sig-name">{{data.nom}}</div>
-      <div class="sig-titre">{{data.titre}}</div>
+      <div class="sig-name sig-el-nom">{{data.nom}}</div>
+      <div class="sig-titre sig-el-titre">{{data.titre}}</div>
       <div class="sig-badges">
-        {{#if data.diplome}}<span class="sig-badge">✓ {{data.diplome}}</span>{{/if}}
-        {{#if data.assurance}}<span class="sig-badge">🏥 {{data.assurance}}</span>{{/if}}
+        {{#if data.diplome}}<span class="sig-badge sig-el-diplome">✓ {{data.diplome}}</span>{{/if}}
+        {{#if data.assurance}}<span class="sig-badge sig-el-assurance">🏥 {{data.assurance}}</span>{{/if}}
       </div>
     </div>
     <div class="sig-divider"></div>
     {{#if data.telephone}}
-    <a href="tel:{{data.telephone}}" class="sig-cta-phone">
+    <a href="tel:{{data.telephone}}" class="sig-cta-phone sig-el-telephone">
       📅 Prendre rendez-vous — {{data.telephone}}
     </a>
     {{/if}}
     <div class="sig-contacts">
-      {{#if data.adresse}}<span class="sig-contact-item">📍 {{data.adresse}}</span>{{/if}}
-      {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item">✉ {{data.email}}</a>{{/if}}
-      {{#if data.site}}<a href="{{data.site}}" class="sig-contact-item">🌐 {{data.site}}</a>{{/if}}
+      {{#if data.adresse}}<span class="sig-contact-item sig-el-adresse">📍 {{data.adresse}}</span>{{/if}}
+      {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item sig-el-adresse">✉ {{data.email}}</a>{{/if}}
+      {{#if data.site}}<a href="{{data.site}}" class="sig-contact-item sig-el-adresse">🌐 {{data.site}}</a>{{/if}}
     </div>
   </div>
   {{#if data.logo_url}}

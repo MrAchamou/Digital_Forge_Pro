@@ -3,6 +3,7 @@
   "label": "Commerce & Retail",
   "emoji": "🛍️",
   "description": "Boutique mode, pharmacie, librairie, fleuriste, animalerie, bijouterie...",
+  "histoire": "La fête du shopping",
   "keywords": ["boutique", "magasin", "commerce", "retail", "mode", "vêtements", "pharmacie", "librairie", "fleuriste", "animalerie", "bijouterie", "maroquinerie", "chaussures", "lingerie", "optique", "décoration", "mobilier"],
   "palette": {
     "background": "#0a0a0a",
@@ -10,13 +11,6 @@
     "text": "#fdf4ff",
     "muted": "#a21caf",
     "border": "#ec489933"
-  },
-  "animation": {
-    "name": "sparkleAura",
-    "intensity": "high",
-    "keyframes": "@keyframes sparkleAura { 0%, 100% { text-shadow: 0 0 10px #ec4899, 0 0 20px #ec489966; letter-spacing: 0.02em; } 50% { text-shadow: 0 0 20px #ec4899, 0 0 40px #f472b6, 0 0 60px #ec489966; letter-spacing: 0.05em; } }",
-    "selector": ".sig-name",
-    "cssAnimation": "sparkleAura 2.5s ease-in-out infinite"
   },
   "layout": {
     "format": "colorful",
@@ -33,6 +27,62 @@
     "intensity": "high",
     "locked": true
   },
+  "sequence_narrative": {
+    "acte1_attraction": {
+      "duree": 2000,
+      "description": "Jaune → orange → rose (feux d'artifice)",
+      "elements": {
+        "promo": { "effets": ["STAR_DUST_FORM", "RAINBOW_SHIFT"], "action": "Explosion d'étoiles colorées" }
+      }
+    },
+    "acte2_decouverte": {
+      "duree": 3000,
+      "elements": {
+        "nom": { "effets": ["CRYSTAL_GROW", "SPARKLE_AURA"], "action": "Grandit comme une enseigne qui s'allume" },
+        "titre": { "effets": ["NEON_GLOW"], "action": "Néon qui clignote joyeusement" }
+      }
+    },
+    "acte3_boutique": {
+      "duree": "infinite",
+      "iteration": 5000,
+      "elements": {
+        "horaires": { "effets": ["LIQUID_MORPH"], "action": "Ondule comme un ruban de magasin" },
+        "instagram": { "effets": ["FLOAT_DANCE", "ENERGY_FLOW"], "action": "Flotte comme un ballon de fête" }
+      }
+    }
+  },
+  "elements": [
+    {
+      "id": "nom",
+      "type": "bandeau",
+      "animation": { "effets": ["STAR_DUST_FORM", "RAINBOW_SHIFT", "NEON_GLOW"], "delai": 0, "duree": 2000, "iteration": "infinite" }
+    },
+    {
+      "id": "titre",
+      "type": "sous-titre",
+      "animation": { "effets": ["CRYSTAL_GROW", "SPARKLE_AURA"], "delai": 0.5, "duree": 2500, "iteration": 1 }
+    },
+    {
+      "id": "horaires",
+      "type": "information",
+      "animation": { "effets": ["LIQUID_MORPH"], "delai": 1.5, "duree": 2000, "iteration": "infinite" }
+    },
+    {
+      "id": "adresse",
+      "type": "localisation",
+      "animation": { "effets": ["WAVE_SURF", "FLOAT_DANCE"], "delai": 2, "duree": 3000, "iteration": "infinite" }
+    },
+    {
+      "id": "telephone",
+      "type": "contact",
+      "animation": { "effets": ["SPARKLE_AURA"], "delai": 2.5, "duree": 1500, "iteration": 1 }
+    },
+    {
+      "id": "instagram",
+      "type": "social",
+      "animation": { "effets": ["NEON_GLOW", "ENERGY_FLOW"], "delai": 2.5, "duree": 1500, "iteration": "infinite" }
+    }
+  ],
   "fields": [
     { "key": "nom", "label": "Nom de la boutique", "required": true, "type": "text" },
     { "key": "titre", "label": "Slogan / Spécialité", "required": true, "type": "text" },

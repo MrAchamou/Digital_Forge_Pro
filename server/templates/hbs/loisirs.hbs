@@ -10,9 +10,82 @@
     --sig-muted: {{palette.muted}};
     --sig-border: {{palette.border}};
   }
-  {{{animation.keyframes}}}
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: transparent; font-family: 'Segoe UI', Arial, sans-serif; }
+
+  /* === KEYFRAMES NARRATIFS — LOISIRS === */
+  @keyframes sigStellarDrift {
+    0% { opacity:0; transform:translate(-20px,10px); filter:blur(4px); }
+    100% { opacity:1; transform:translate(0,0); filter:blur(0); }
+  }
+  @keyframes sigStellarFloat {
+    0%,100% { text-shadow:0 0 10px var(--sig-accent); transform:none; }
+    33% { text-shadow:2px -2px 20px var(--sig-accent),0 0 40px rgba(139,92,246,0.5); }
+    66% { text-shadow:-2px 2px 20px var(--sig-accent),0 0 30px rgba(109,40,217,0.5); }
+  }
+  @keyframes sigCrystalHolo {
+    0% { opacity:0; transform:scale(0.8) rotate(-3deg); filter:brightness(2.5) hue-rotate(20deg); }
+    70% { filter:brightness(1.2); }
+    100% { opacity:1; transform:scale(1) rotate(0deg); filter:brightness(1); }
+  }
+  @keyframes sigStarExplosion {
+    0% { opacity:0; transform:scale(0.4); filter:brightness(5); }
+    50% { transform:scale(1.08); filter:brightness(2); }
+    100% { opacity:1; transform:scale(1); filter:brightness(1); }
+  }
+  @keyframes sigSparkleLoop {
+    0%,100% { filter:brightness(1) drop-shadow(0 0 0 transparent); }
+    50% { filter:brightness(1.5) drop-shadow(0 0 10px var(--sig-accent)); }
+  }
+  @keyframes sigWaveSurf {
+    0%,100% { transform:translateX(0) translateY(0); }
+    50% { transform:translateX(3px) translateY(-3px); }
+  }
+  @keyframes sigFloatDance {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-6px); }
+  }
+  @keyframes sigRainbow {
+    0%,100% { filter:hue-rotate(0deg) saturate(1.5); }
+    50% { filter:hue-rotate(60deg) saturate(2.2) brightness(1.1); }
+  }
+  @keyframes sigHeartbeat {
+    0%,100% { transform:scale(1); }
+    14% { transform:scale(1.12); }
+    28% { transform:scale(1); }
+    42% { transform:scale(1.07); }
+  }
+
+  /* === ELEMENTS NARRATIFS === */
+  .sig-el-nom {
+    opacity: 0;
+    animation: sigCrystalHolo 1.5s ease-out 0.5s both, sigStellarFloat 5s ease-in-out 2.5s infinite;
+  }
+  .sig-el-titre {
+    opacity: 0;
+    animation: sigStellarDrift 1s ease-out 1s both;
+  }
+  .sig-el-note {
+    opacity: 0;
+    animation: sigStarExplosion 1s ease-out 1s both, sigSparkleLoop 3s ease-in-out 2.5s infinite;
+  }
+  .sig-el-adresse {
+    opacity: 0;
+    animation: sigStellarDrift 1s ease-out 1.5s both, sigWaveSurf 3s ease-in-out 3s infinite;
+  }
+  .sig-el-instagram {
+    opacity: 0;
+    animation: sigStellarDrift 0.8s ease-out 2s both, sigRainbow 4s ease-in-out 3s infinite;
+  }
+  .sig-el-telephone {
+    opacity: 0;
+    animation: sigStellarDrift 0.8s ease-out 2.5s both, sigHeartbeat 2s ease-in-out 3.5s infinite;
+  }
+  .sig-el-cta {
+    opacity: 0;
+    animation: sigStarExplosion 1s ease-out 3s both, sigFloatDance 2s ease-in-out 4.5s infinite;
+  }
+
   .sig-wrap {
     display: inline-block;
     background: var(--sig-bg);
@@ -60,7 +133,7 @@
     font-size: 22px;
     font-weight: 800;
     color: var(--sig-text);
-    animation: {{animation.cssAnimation}};
+    display: block;
   }
   .sig-titre {
     font-size: 13px;
@@ -118,20 +191,20 @@
   </div>
   <div class="sig-body">
     <div>
-      <div class="sig-name">{{data.nom}}</div>
-      <div class="sig-titre">{{data.titre}}</div>
+      <div class="sig-name sig-el-nom">{{data.nom}}</div>
+      <div class="sig-titre sig-el-titre">{{data.titre}}</div>
     </div>
     <div class="sig-row">
-      {{#if data.adresse}}<span class="sig-contact-item">📍 {{data.adresse}}</span>{{/if}}
-      {{#if data.note}}<span class="sig-rating">★ {{data.note}}</span>{{/if}}
+      {{#if data.adresse}}<span class="sig-contact-item sig-el-adresse">📍 {{data.adresse}}</span>{{/if}}
+      {{#if data.note}}<span class="sig-rating sig-el-note">★ {{data.note}}</span>{{/if}}
     </div>
     <div class="sig-row">
-      {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item">📞 {{data.telephone}}</a>{{/if}}
-      {{#if data.site}}<a href="{{data.site}}" class="sig-contact-item">🌐 Réservation</a>{{/if}}
-      {{#if data.instagram}}<a href="{{data.instagram}}" class="sig-contact-item">📸 Instagram</a>{{/if}}
+      {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item sig-el-telephone">📞 {{data.telephone}}</a>{{/if}}
+      {{#if data.site}}<a href="{{data.site}}" class="sig-contact-item sig-el-adresse">🌐 Réservation</a>{{/if}}
+      {{#if data.instagram}}<a href="{{data.instagram}}" class="sig-contact-item sig-el-instagram">📸 Instagram</a>{{/if}}
     </div>
     {{#if data.site}}
-    <a href="{{data.site}}" class="sig-cta">Réserver maintenant ✨</a>
+    <a href="{{data.site}}" class="sig-cta sig-el-cta">Réserver maintenant ✨</a>
     {{/if}}
   </div>
 </div>

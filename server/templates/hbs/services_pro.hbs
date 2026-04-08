@@ -10,9 +10,65 @@
     --sig-muted: {{palette.muted}};
     --sig-border: {{palette.border}};
   }
-  {{{animation.keyframes}}}
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: transparent; font-family: 'Times New Roman', Georgia, serif; }
+
+  /* === KEYFRAMES NARRATIFS — SERVICES PRO === */
+  @keyframes sigTypewriter {
+    from { clip-path:inset(0 100% 0 0); }
+    to { clip-path:inset(0 0% 0 0); }
+  }
+  @keyframes sigTimeEcho {
+    0% { opacity:0; transform:scale(1.08); }
+    100% { opacity:1; transform:scale(1); }
+  }
+  @keyframes sigCrystalGrow {
+    0% { opacity:0; transform:scale(0.85) rotate(-1deg); filter:brightness(1.8); }
+    100% { opacity:1; transform:scale(1) rotate(0deg); filter:brightness(1); }
+  }
+  @keyframes sigFadeLayers {
+    0% { opacity:0; }
+    100% { opacity:1; }
+  }
+  @keyframes sigNeuralPulse {
+    0%,100% { opacity:1; }
+    50% { opacity:0.5; }
+  }
+  @keyframes sigSubtleFade {
+    0%,100% { opacity:0.7; }
+    50% { opacity:1; }
+  }
+
+  /* === ELEMENTS NARRATIFS === */
+  .sig-el-nom {
+    opacity: 0;
+    overflow: hidden;
+    animation: sigTypewriter 2s steps(30,end) 0s both;
+  }
+  .sig-el-titre {
+    opacity: 0;
+    animation: sigFadeLayers 1s ease-out 0.8s both;
+  }
+  .sig-el-cabinet {
+    opacity: 0;
+    animation: sigCrystalGrow 1s ease-out 1.2s both;
+  }
+  .sig-el-ordre {
+    opacity: 0;
+    animation: sigFadeLayers 1.2s ease-out 2s both;
+  }
+  .sig-el-email {
+    opacity: 0;
+    animation: sigFadeLayers 0.8s ease-out 2.8s both, sigNeuralPulse 4s ease-in-out 4s infinite;
+  }
+  .sig-el-telephone {
+    opacity: 0;
+    animation: sigTimeEcho 1s ease-out 3.2s both;
+  }
+  .sig-accent-line {
+    animation: sigSubtleFade 5s ease-in-out infinite;
+  }
+
   .sig-wrap {
     display: inline-flex;
     background: var(--sig-bg);
@@ -56,6 +112,7 @@
     font-weight: 700;
     color: var(--sig-text);
     letter-spacing: 0.02em;
+    display: block;
   }
   .sig-titre {
     font-size: 12px;
@@ -74,7 +131,6 @@
     height: 1px;
     background: var(--sig-accent);
     opacity: 0.4;
-    animation: {{animation.cssAnimation}};
   }
   .sig-contacts { display: flex; flex-direction: column; gap: 5px; }
   .sig-contact-item {
@@ -127,21 +183,21 @@
   </div>
   <div class="sig-body">
     <div>
-      <div class="sig-name">{{data.nom}}</div>
-      <div class="sig-titre">{{data.titre}}</div>
-      {{#if data.cabinet}}<div class="sig-cabinet">{{data.cabinet}}</div>{{/if}}
+      <span class="sig-name sig-el-nom">{{data.nom}}</span>
+      <div class="sig-titre sig-el-titre">{{data.titre}}</div>
+      {{#if data.cabinet}}<div class="sig-cabinet sig-el-cabinet">{{data.cabinet}}</div>{{/if}}
     </div>
     <div class="sig-accent-line"></div>
     <div class="sig-contacts">
-      {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item">✉ {{data.email}}</a>{{/if}}
-      {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item">☎ {{data.telephone}}</a>{{/if}}
+      {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item sig-el-email">✉ {{data.email}}</a>{{/if}}
+      {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item sig-el-telephone">☎ {{data.telephone}}</a>{{/if}}
     </div>
     <div class="sig-badges">
-      {{#if data.ordre}}<span class="sig-badge">N° {{data.ordre}}</span>{{/if}}
+      {{#if data.ordre}}<span class="sig-badge sig-el-ordre">N° {{data.ordre}}</span>{{/if}}
     </div>
     <div class="sig-links">
-      {{#if data.site}}<a href="{{data.site}}" class="sig-link">Site web</a>{{/if}}
-      {{#if data.linkedin}}<a href="{{data.linkedin}}" class="sig-link">LinkedIn</a>{{/if}}
+      {{#if data.site}}<a href="{{data.site}}" class="sig-link sig-el-telephone">Site web</a>{{/if}}
+      {{#if data.linkedin}}<a href="{{data.linkedin}}" class="sig-link sig-el-telephone">LinkedIn</a>{{/if}}
     </div>
   </div>
   {{#if data.logo_url}}
