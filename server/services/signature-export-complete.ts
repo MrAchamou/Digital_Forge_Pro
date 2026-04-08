@@ -214,67 +214,234 @@ export async function buildStaticPng(meta: ExportMetadata): Promise<Buffer> {
   }
 }
 
-// ── 3. GIF Animé (frame-by-frame avec Sharp + gif-encoder-2) ─────────────────
+// ── 3. GIF Animé Spectaculaire — Triple-Phase Engine ─────────────────────────
+//
+//  Phase 1 BUILD  (frames  0-15) : avatar rings expansion, text reveal sweep
+//  Phase 2 LIVE   (frames 16-35) : multi-ring breathing, floating particles, CTA pulse
+//  Phase 3 SHINE  (frames 36-47) : diagonal light sweep, avatar burst, CTA flash
+//
+//  48 frames × 65ms ≈ 17fps → loop de 3.1s ultra-fluide
 
 export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
   const [bg, accent] = meta.palette?.length >= 2 ? meta.palette : ['#0f172a', '#6366f1'];
-  const FRAMES = 20;
-  const DELAY = 8; // centisecondes (80ms/frame → ~12fps → 1.6s loop)
+  const textColor    = meta.palette?.[2] || '#e8e8ff';
+
+  const { nom = '', titre = '', entreprise = '', telephone = '', email = '',
+          adresse = '', code_postal = '', ville = '', site = '', note,
+          logo_url, cta = 'Nous contacter' } = meta;
+
+  const initials    = `${nom.charAt(0)}${(nom.split(' ')[1] || '').charAt(0)}`.toUpperCase();
+  const addressLine = [adresse, code_postal && ville ? `${code_postal} ${ville}` : (ville || code_postal)].filter(Boolean).join(', ');
+  const noteStars   = note ? '★'.repeat(Math.floor(note)) : '';
+  const textMuted   = `${textColor}99`;
+  const accentLight = lighten(accent, 50);
+  const [ar, ag2, ab] = hexToRgb(accent);
+
+  // ─ Helper : couleur accent avec alpha
+  const aRgba = (alpha: number) => `rgba(${ar},${ag2},${ab},${alpha.toFixed(2)})`;
+
+  // ─ Positions fixes des lignes de contact
+  const yPhone   = 113;
+  const yEmail   = telephone ? 130 : 113;
+  const yAddr    = (telephone && email) ? 147 : (telephone || email) ? 130 : 113;
+  const ySite    = (telephone || email || addressLine || noteStars) ? 165 : 148;
+  const yNote    = 168;
+
+  // ─ Particules fixes (seed déterministe)
+  const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+    x:  120 + ((i * 137.5) % 430),
+    y:  10  + ((i * 97.3)  % 160),
+    r:  1 + (i % 3) * 0.8,
+    speed: 0.3 + (i % 5) * 0.15,
+    phase: (i * 0.52) % (2 * Math.PI),
+  }));
+
+  const TOTAL   = 48;
+  const PH_BUILD = 16;   // frames 0-15
+  const PH_LIVE  = 36;   // frames 16-35
+  // frames 36-47 → SHINE
 
   const frames: Buffer[] = [];
 
-  for (let i = 0; i < FRAMES; i++) {
-    const t = i / FRAMES; // 0..1
-    // Simulation BREATHING : scale 1.0 → 1.025 → 1.0 (sinusoïde)
-    const scale = 1 + 0.02 * Math.sin(t * 2 * Math.PI);
-    // Glow opacity : 0.3 → 0.75 → 0.3
-    const glowOpacity = 0.3 + 0.45 * Math.abs(Math.sin(t * Math.PI));
-    // Accent bar opacity
-    const barOpacity = 0.5 + 0.5 * Math.abs(Math.sin(t * Math.PI));
+  for (let i = 0; i < TOTAL; i++) {
+    const tGlobal = i / TOTAL; // 0→1 boucle complète
 
-    const [r, g, b] = hexToRgb(accent);
-    const glowColor = `rgba(${r},${g},${b},${glowOpacity.toFixed(2)})`;
+    // ── Phase tags
+    const inBuild = i < PH_BUILD;
+    const inLive  = i >= PH_BUILD && i < PH_LIVE;
+    const inShine = i >= PH_LIVE;
 
-    const { nom = '', titre = '', entreprise = '', telephone = '', email = '',
-            adresse = '', code_postal = '', ville = '', site = '', note,
-            logo_url, cta = 'Nous contacter' } = meta;
-    const initials = `${nom.charAt(0)}${(nom.split(' ')[1] || '').charAt(0)}`.toUpperCase();
-    const addressLine = [adresse, code_postal && ville ? `${code_postal} ${ville}` : (ville || code_postal)].filter(Boolean).join(', ');
-    const textColor = meta.palette?.[2] || '#e8e8ff';
-    const textMuted = `${textColor}99`;
-    const noteStars = note ? '★'.repeat(Math.floor(note)) : '';
-    const accentLight = lighten(accent, 60);
+    const tBuild = inBuild ? i / PH_BUILD : 1;
+    const tLive  = inLive  ? (i - PH_BUILD) / (PH_LIVE - PH_BUILD) : (inShine ? 1 : 0);
+    const tShine = inShine ? (i - PH_LIVE) / (TOTAL - PH_LIVE) : 0;
+
+    // ── Easing ease-out cubic
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+    const eBuild  = easeOut(tBuild);
+
+    // ── Avatar multi-ring
+    const breathe    = inBuild ? 1 : 1 + 0.022 * Math.sin(tGlobal * 2 * Math.PI * 2.5);
+    const ring1Scale = breathe;
+    const ring2Scale = inBuild ? eBuild * 0.9 : 0.9 + 0.03 * Math.sin(tGlobal * 2 * Math.PI * 1.8 + 0.8);
+    const ring3Scale = inBuild ? eBuild * 0.75 : 0.75 + 0.02 * Math.sin(tGlobal * 2 * Math.PI * 3.2 + 1.6);
+
+    const ring1Op = inBuild ? eBuild * 0.55 : 0.45 + 0.2 * Math.abs(Math.sin(tGlobal * Math.PI * 2.5));
+    const ring2Op = inBuild ? eBuild * 0.3  : 0.22 + 0.15 * Math.abs(Math.sin(tGlobal * Math.PI * 1.8 + 0.5));
+    const ring3Op = inBuild ? eBuild * 0.15 : 0.1  + 0.1  * Math.abs(Math.sin(tGlobal * Math.PI * 3.2 + 1.2));
+
+    const initialsOp = inBuild ? Math.min(1, eBuild * 1.5) : 1;
+
+    // ── Barre accent gauche
+    const barH   = inBuild ? eBuild * 180 : 180;
+    const barOp  = inBuild ? eBuild : (0.7 + 0.3 * Math.abs(Math.sin(tGlobal * Math.PI * 2)));
+
+    // ── Séparateur vertical
+    const sepH   = inBuild ? eBuild * 132 : 132;
+    const sepOp  = inBuild ? eBuild * 0.35 : (0.2 + 0.15 * Math.abs(Math.sin(tGlobal * Math.PI * 1.5)));
+
+    // ── Textes – apparition progressive
+    const nomOp   = inBuild ? Math.min(1, tBuild * 3) : 1;
+    const titreOp = inBuild ? Math.min(1, Math.max(0, (tBuild - 0.2) * 3)) : 1;
+    const entOp   = inBuild ? Math.min(1, Math.max(0, (tBuild - 0.4) * 3)) : 1;
+    const infoOp  = inBuild ? Math.min(1, Math.max(0, (tBuild - 0.6) * 3)) : 1;
+
+    // ── CTA pulse
+    const ctaScale = inBuild
+      ? Math.min(1, eBuild)
+      : (inShine
+        ? 1 + 0.06 * Math.sin(tShine * Math.PI * 4)
+        : 1 + 0.025 * Math.abs(Math.sin(tGlobal * Math.PI * 3)));
+    const ctaOp   = inBuild ? eBuild : (0.88 + 0.12 * Math.abs(Math.sin(tGlobal * Math.PI * 3)));
+
+    // ── Particules flottantes (actives seulement en LIVE + SHINE)
+    const particleOp = inBuild ? 0 : (inLive ? tLive : 1);
+    const particleSvg = PARTICLES.map(p => {
+      const py = p.y + 4 * Math.sin(tGlobal * 2 * Math.PI * p.speed + p.phase);
+      const px = p.x + 2 * Math.cos(tGlobal * 2 * Math.PI * p.speed * 0.7 + p.phase);
+      const op = (0.2 + 0.5 * Math.abs(Math.sin(tGlobal * Math.PI * p.speed * 2 + p.phase))) * particleOp;
+      return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${p.r}" fill="${aRgba(op)}" />`;
+    }).join('');
+
+    // ── Light sweep diagonal (SHINE uniquement)
+    const sweepX    = -100 + tShine * 900;
+    const sweepSvg  = inShine ? `
+      <defs>
+        <linearGradient id="sweep${i}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+          <stop offset="50%"  stop-color="white" stop-opacity="${(0.15 * Math.sin(tShine * Math.PI)).toFixed(3)}"/>
+          <stop offset="100%" stop-color="white" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect x="${sweepX.toFixed(0)}" y="0" width="180" height="180"
+        fill="url(#sweep${i})" transform="skewX(-15)" rx="0"/>
+    ` : '';
+
+    // ── Avatar burst final (SHINE frame 40-47)
+    const burstOp = inShine && i >= 42
+      ? (0.3 * Math.sin(((i - 42) / 6) * Math.PI)).toFixed(3)
+      : '0';
+    const burstR  = inShine ? 55 + (i - PH_LIVE) * 3 : 50;
+
+    // ── Ligne séparatrice horizontale
+    const lineX2  = inBuild ? 112 + eBuild * 456 : 568;
 
     const frameSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
       viewBox="0 0 600 180" width="600" height="180">
       <defs>
-        <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${accent}"/>
+        <linearGradient id="bgGrad${i}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stop-color="${bg}"/>
+          <stop offset="100%" stop-color="${lighten(bg, 8)}"/>
+        </linearGradient>
+        <linearGradient id="barGrad${i}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="${accent}"/>
           <stop offset="100%" stop-color="${accentLight}"/>
         </linearGradient>
+        <radialGradient id="avatarGlow${i}" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="${accent}" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
+        </radialGradient>
       </defs>
-      <rect width="600" height="180" fill="${bg}" rx="10"/>
-      <rect x="0" y="0" width="4" height="180" fill="${accent}" opacity="${barOpacity.toFixed(2)}" rx="2"/>
-      <g transform="translate(24,90) scale(${scale.toFixed(4)})">
-        <circle r="50" fill="${glowColor}" stroke="${accent}" stroke-width="1.5"/>
-        <text text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif"
-          font-size="22" font-weight="700" fill="${accent}">${escXml(initials)}</text>
+
+      <!-- Fond -->
+      <rect width="600" height="180" fill="url(#bgGrad${i})" rx="10"/>
+
+      <!-- Particules flottantes -->
+      ${particleSvg}
+
+      <!-- Sweep lumineux diagonal (SHINE) -->
+      ${sweepSvg}
+
+      <!-- Barre accent gauche -->
+      <rect x="0" y="${(180 - barH).toFixed(1)}" width="4" height="${barH.toFixed(1)}"
+        fill="url(#barGrad${i})" opacity="${barOp.toFixed(2)}" rx="2"/>
+
+      <!-- Avatar — ring externe burst (SHINE) -->
+      <circle cx="60" cy="90" r="${burstR}"
+        fill="none" stroke="${accent}" stroke-width="0.8"
+        opacity="${burstOp}"/>
+
+      <!-- Avatar — ring 3 (halo lointain) -->
+      <circle cx="60" cy="90" r="${(50 * ring3Scale).toFixed(2)}"
+        fill="none" stroke="${accent}" stroke-width="1"
+        opacity="${ring3Op.toFixed(2)}"/>
+
+      <!-- Avatar — ring 2 (orbit intermédiaire) -->
+      <circle cx="60" cy="90" r="${(50 * ring2Scale).toFixed(2)}"
+        fill="none" stroke="${accent}" stroke-width="1.5"
+        opacity="${ring2Op.toFixed(2)}"/>
+
+      <!-- Avatar — ring 1 principal avec glow -->
+      <circle cx="60" cy="90" r="${(50 * ring1Scale).toFixed(2)}"
+        fill="${aRgba(ring1Op)}" stroke="${accent}" stroke-width="2"
+        opacity="1"/>
+
+      <!-- Avatar — radial glow interne -->
+      <circle cx="60" cy="90" r="${(44 * ring1Scale).toFixed(2)}"
+        fill="url(#avatarGlow${i})" opacity="${ring1Op.toFixed(2)}"/>
+
+      <!-- Avatar — initiales -->
+      <text x="60" y="90" text-anchor="middle" dominant-baseline="middle"
+        font-family="Arial,sans-serif" font-size="22" font-weight="700"
+        fill="${accent}" opacity="${initialsOp.toFixed(2)}">${escXml(initials)}</text>
+
+      <!-- Séparateur vertical -->
+      <rect x="96" y="${(24 + (132 - sepH)).toFixed(1)}" width="1.5" height="${sepH.toFixed(1)}"
+        fill="${accent}" opacity="${sepOp.toFixed(2)}" rx="1"/>
+
+      <!-- NOM -->
+      <text x="112" y="48" font-family="Arial,sans-serif" font-size="18" font-weight="700"
+        fill="${textColor}" opacity="${nomOp.toFixed(2)}">${escXml(nom)}</text>
+
+      <!-- TITRE -->
+      <text x="112" y="68" font-family="Arial,sans-serif" font-size="11" font-weight="600"
+        fill="${accent}" letter-spacing="1.5" opacity="${titreOp.toFixed(2)}">${escXml(titre.toUpperCase())}</text>
+
+      <!-- ENTREPRISE -->
+      <text x="112" y="86" font-family="Arial,sans-serif" font-size="12"
+        fill="${textMuted}" opacity="${entOp.toFixed(2)}">${escXml(entreprise)}</text>
+
+      <!-- Ligne séparatrice -->
+      <line x1="112" y1="96" x2="${lineX2.toFixed(0)}" y2="96"
+        stroke="${accent}" stroke-width="0.8" opacity="${(inBuild ? eBuild * 0.25 : 0.25).toFixed(2)}"/>
+
+      <!-- Infos contact -->
+      ${telephone ? `<text x="112" y="${yPhone}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="${infoOp.toFixed(2)}">☎ ${escXml(telephone)}</text>` : ''}
+      ${email     ? `<text x="112" y="${yEmail}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="${infoOp.toFixed(2)}">✉ ${escXml(email)}</text>` : ''}
+      ${addressLine ? `<text x="112" y="${yAddr}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}" opacity="${infoOp.toFixed(2)}">📍 ${escXml(addressLine)}</text>` : ''}
+      ${site      ? `<text x="112" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}" opacity="${infoOp.toFixed(2)}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
+      ${noteStars ? `<text x="112" y="${yNote}" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b" opacity="${infoOp.toFixed(2)}">${noteStars} ${note?.toFixed(1)}</text>` : ''}
+
+      <!-- CTA bouton -->
+      <g transform="translate(510,148) scale(${ctaScale.toFixed(4)}) translate(-70,-16)">
+        <rect width="140" height="32" rx="6" fill="${accent}" opacity="${ctaOp.toFixed(2)}"/>
+        <rect width="140" height="32" rx="6" fill="${accentLight}"
+          opacity="${(inShine ? 0.2 * Math.sin(tShine * Math.PI * 4) : 0).toFixed(3)}"/>
+        <text x="70" y="21" text-anchor="middle" font-family="Arial,sans-serif"
+          font-size="11" font-weight="700" fill="#ffffff">${escXml(cta)}</text>
       </g>
-      <rect x="96" y="24" width="1.5" height="132" fill="${accent}" opacity="${(0.2 + 0.15 * glowOpacity).toFixed(2)}" rx="1"/>
-      <text x="112" y="48" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="${textColor}">${escXml(nom)}</text>
-      <text x="112" y="68" font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="${accent}" letter-spacing="1.5">${escXml(titre.toUpperCase())}</text>
-      <text x="112" y="86" font-family="Arial,sans-serif" font-size="12" fill="${textMuted}">${escXml(entreprise)}</text>
-      <line x1="112" y1="96" x2="568" y2="96" stroke="${accent}" stroke-width="0.8" opacity="0.25"/>
-      ${telephone ? `<text x="112" y="113" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">☎ ${escXml(telephone)}</text>` : ''}
-      ${email ? `<text x="112" y="${telephone ? '130' : '113'}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">✉ ${escXml(email)}</text>` : ''}
-      ${addressLine ? `<text x="112" y="${(telephone && email) ? '147' : '130'}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">📍 ${escXml(addressLine)}</text>` : ''}
-      ${noteStars ? `<text x="112" y="165" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}
-      <g transform="translate(440, 132)">
-        <rect width="140" height="32" rx="6" fill="${accent}" opacity="${(0.85 + 0.1 * glowOpacity).toFixed(2)}"/>
-        <text x="70" y="21" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff">${escXml(cta)}</text>
-      </g>
-      ${logo_url ? `<image href="${escXml(logo_url)}" x="540" y="10" width="48" height="48"/>` : ''}
-      ${site ? `<text x="112" y="165" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
+
+      <!-- Logo optionnel -->
+      ${logo_url ? `<image href="${escXml(logo_url)}" x="540" y="10" width="48" height="48" opacity="${infoOp.toFixed(2)}" preserveAspectRatio="xMidYMid meet"/>` : ''}
     </svg>`;
 
     try {
@@ -288,22 +455,19 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
     }
   }
 
-  if (frames.length === 0) {
-    return buildStaticPng(meta);
-  }
+  if (frames.length === 0) return buildStaticPng(meta);
 
-  // Encoder les frames en GIF animé via gif-encoder-2
+  // ── Encoder en GIF
   try {
     const GifEncoder = (await import('gif-encoder-2')).default;
     const encoder = new GifEncoder(600, 180, 'neuquant', true, frames.length);
 
-    encoder.setRepeat(0);      // boucle infinie
-    encoder.setDelay(DELAY * 10); // delay en ms
-    encoder.setQuality(12);    // qualité (1=best, 20=fast)
+    encoder.setRepeat(0);    // boucle infinie
+    encoder.setDelay(65);    // 65ms/frame → ~15fps fluide
+    encoder.setQuality(5);   // 1=best/lent, 20=fast/rough — bon compromis
     encoder.start();
 
     for (const framePng of frames) {
-      // Sharp → raw RGBA (600×180×4 bytes)
       const raw = await sharp(framePng)
         .resize(600, 180)
         .ensureAlpha()
@@ -316,7 +480,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
     const gifBuffer = encoder.out.getData();
 
     if (!gifBuffer || gifBuffer.length < 100) throw new Error('GIF vide');
-    log(`GIF animé généré: ${Math.round(gifBuffer.length / 1024)}KB, ${frames.length} frames`, 'export-complete');
+    log(`GIF spectaculaire: ${Math.round(gifBuffer.length / 1024)}KB, ${frames.length} frames (BUILD+LIVE+SHINE)`, 'export-complete');
     return gifBuffer;
   } catch (err: any) {
     log(`GIF encoder error: ${err.message} — fallback PNG`, 'export-complete');
