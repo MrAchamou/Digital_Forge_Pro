@@ -157,8 +157,33 @@ router.get('/library/effects', async (req, res) => {
 
     const result = await storage.getEffects({ category, type, search, platform, limit, offset });
     const totalPages = Math.ceil(result.total / limit);
+
+    // Enrichit chaque effet avec les métriques clés extraites de metadata
+    const effects = result.effects.map((e) => {
+      const meta = (e.metadata as Record<string, any>) ?? {};
+      return {
+        ...e,
+        // Métriques de premier niveau remontées depuis metadata
+        particleCount:   meta.totalParticleCount ?? 0,
+        performanceTier: meta.performanceTier   ?? e.performance ?? 'medium',
+        phases:          meta.phaseSequence     ?? (meta.phaseDurations ? Object.keys(meta.phaseDurations) : []),
+        phaseCount:      (meta.phaseSequence?.length ?? Object.keys(meta.phaseDurations ?? {}).length),
+        totalCycleDurationMs: meta.totalCycleDurationMs ?? null,
+        particleSystems: meta.particleSystems   ?? null,
+        physicsConstants: meta.physics          ?? null,
+        timingConstants: meta.timingConstants   ?? null,
+        animationRanges: meta.animationRanges   ?? null,
+        addictionMechanics: meta.addictionMechanics ?? [],
+        keyFeatures:     meta.keyFeatures       ?? [],
+        physicalSystems: meta.physicalSystems   ?? [],
+        easingCurves:    meta.easingCurves       ?? [],
+        cssKeyframes:    meta.cssKeyframes       ?? [],
+        cssReady:        meta.cssReady           ?? false,
+      };
+    });
+
     res.json({
-      effects: result.effects,
+      effects,
       pagination: { page, limit, total: result.total, pages: totalPages },
     });
   } catch (err: any) {
