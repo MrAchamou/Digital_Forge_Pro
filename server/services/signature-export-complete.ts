@@ -302,18 +302,92 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
 
 // ── 4. HTML Gmail (CSS animations inline, full fidélité) ─────────────────────
 
-export function buildGmailHtml(meta: ExportMetadata, signatureHtml: string): string {
-  const { nom = '', entreprise = '' } = meta;
+// ── Génère une table 100% inline-styles, sans aucun <style> ni class ──────────
+// Compatible Gmail, Outlook.com, Yahoo, tout webmail moderne.
+// Gmail strip tout <style> et toute animation CSS — seuls les attributs
+// style="" et les balises HTML4 de présentation sont conservés.
+
+function buildInlineTable(meta: ExportMetadata): string {
+  const { nom = 'Prénom Nom', titre = 'Titre', entreprise = 'Entreprise',
+          email = '', telephone = '', site = '', adresse = '', ville = '',
+          code_postal = '', note, cta = 'Nous contacter',
+          palette = [] } = meta;
+
+  const [bg, accent, textColor] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
+  const textMuted = `${textColor}99`;
+  const initials = `${nom.charAt(0)}${(nom.split(' ')[1] || '').charAt(0)}`.toUpperCase();
+  const addressLine = [adresse, code_postal && ville ? `${code_postal} ${ville}` : (ville || code_postal)].filter(Boolean).join(', ');
+
+  // Ligne de séparation (simulée avec une cellule colorée, compatible partout)
+  const divider = `<tr><td colspan="3" height="1" style="height:1px;font-size:0;line-height:0;background:${accent};opacity:0.15;">&nbsp;</td></tr>`;
+
+  const contactRows = [
+    telephone ? `<tr><td style="padding:1px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:${textMuted};">&#9990;&nbsp;<a href="tel:${escXml(telephone)}" style="color:${accent};text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:11px;">${escXml(telephone)}</a></td></tr>` : '',
+    email ? `<tr><td style="padding:1px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:${textMuted};">&#9993;&nbsp;<a href="mailto:${escXml(email)}" style="color:${textMuted};text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:11px;">${escXml(email)}</a></td></tr>` : '',
+    addressLine ? `<tr><td style="padding:1px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:${textMuted};">&#128205;&nbsp;${escXml(addressLine)}</td></tr>` : '',
+    site ? `<tr><td style="padding:2px 0;"><a href="${escXml(site)}" style="color:${accent};text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:10px;">${escXml(site.replace(/^https?:\/\//, ''))}</a></td></tr>` : '',
+    note ? `<tr><td style="padding:2px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#f59e0b;">&#9733;&#9733;&#9733;&#9733;&#9733;&nbsp;${note.toFixed(1)}</td></tr>` : '',
+  ].filter(Boolean).join('');
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="max-width:620px;width:620px;background:${bg};border-radius:10px;border-collapse:collapse;">
+  <tr>
+    <!-- Barre accent gauche -->
+    <td width="4" style="width:4px;background:${accent};border-radius:10px 0 0 10px;font-size:0;line-height:0;">&nbsp;</td>
+    <!-- Avatar / initiales -->
+    <td width="90" valign="middle" align="center" style="padding:18px 10px;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="68" height="68" align="center" valign="middle"
+            style="width:68px;height:68px;background:${accent}22;border:2px solid ${accent};border-radius:34px;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:700;color:${accent};text-align:center;">
+            ${escXml(initials)}
+          </td>
+        </tr>
+      </table>
+    </td>
+    <!-- Séparateur vertical -->
+    <td width="1" style="width:1px;padding:18px 0;">
+      <table cellpadding="0" cellspacing="0" border="0" width="1">
+        <tr><td height="100" width="1" style="width:1px;height:100px;background:${accent};opacity:0.25;font-size:0;line-height:0;">&nbsp;</td></tr>
+      </table>
+    </td>
+    <!-- Contenu texte -->
+    <td valign="middle" style="padding:18px 16px;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="padding-bottom:2px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:${textColor};">${escXml(nom)}</td></tr>
+        <tr><td style="padding-bottom:2px;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;color:${accent};letter-spacing:1.5px;text-transform:uppercase;">${escXml(titre)}</td></tr>
+        <tr><td style="padding-bottom:10px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:${textMuted};">${escXml(entreprise)}</td></tr>
+        ${divider}
+        <tr><td style="padding-top:8px;">
+          <table cellpadding="0" cellspacing="0" border="0">
+            ${contactRows}
+          </table>
+        </td></tr>
+        ${cta ? `<tr><td style="padding-top:10px;">
+          <table cellpadding="0" cellspacing="0" border="0">
+            <tr><td style="background:${accent};padding:7px 18px;border-radius:6px;">
+              <a href="${site ? escXml(site) : '#'}" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;color:#ffffff;text-decoration:none;">${escXml(cta)}</a>
+            </td></tr>
+          </table>
+        </td></tr>` : ''}
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string): string {
+  const { nom = '' } = meta;
+  // Gmail supprime TOUT contenu dans <style> et toutes les animations CSS.
+  // On génère une table 100% inline-styles — aucun <style>, aucune class, aucune animation.
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Signature Gmail — ${escXml(nom)}</title>
 </head>
 <body style="margin:0;padding:0;background:#ffffff;">
-${signatureHtml}
-<!-- Signature ${escXml(nom)} — ${escXml(entreprise)} — EffectForge AI -->
+${buildInlineTable(meta)}
+<!-- EffectForge AI — ${escXml(nom)} -->
 </body>
 </html>`;
 }
@@ -412,13 +486,11 @@ ${signatureHtml}
 }
 
 // ── 7. HTML Universel hybride (smart multi-client) ───────────────────────────
-// Stratégie : MSO Outlook → table, non-MSO → SVG animé en <img>
+// Stratégie : MSO Outlook → table inline, non-MSO → table inline-styles
+// Les data URIs SVG/PNG sont bloqués par Gmail, on utilise uniquement des tables.
 
 export function buildUniversalHtml(
   meta: ExportMetadata,
-  svgContent: string,
-  pngBase64: string,
-  svgBase64: string
 ): string {
   const { nom = '', entreprise = '', palette = [], titre = '',
           telephone = '', email = '', site = '', adresse = '',
@@ -475,13 +547,9 @@ export function buildUniversalHtml(
 </table>
 <![endif]-->
 
-<!-- ══ Gmail / Apple Mail / Webmail — SVG animé en <img> ══ -->
+<!-- ══ Non-Outlook (Gmail, Webmail, mobile) — table inline-styles ══ -->
 <!--[if !mso]><!-->
-<img src="data:image/svg+xml;base64,${svgBase64}"
-  alt="Signature ${escXml(nom)} — ${escXml(entreprise)}"
-  width="620"
-  class="sig-animated"
-  style="display:block;max-width:100%;border:0;" />
+${buildInlineTable(meta)}
 <!--<![endif]-->
 
 </body>
@@ -1063,13 +1131,12 @@ export async function generateCompleteExport(
   ]);
 
   const animatedSvg = buildAnimatedSVG(meta);
-  const svgBase64 = Buffer.from(animatedSvg).toString('base64');
   const pngBase64 = staticPng.toString('base64');
 
   const gmailHtml     = buildGmailHtml(meta, signatureHtml);
   const outlookHtml   = buildOutlookHtml(meta, pngBase64);
   const appleHtml     = buildAppleMailHtml(meta, signatureHtml);
-  const universalHtml = buildUniversalHtml(meta, animatedSvg, pngBase64, svgBase64);
+  const universalHtml = buildUniversalHtml(meta);
   const guideHtml     = buildInstallationGuide(meta, signatureId);
 
   const zip = await buildCompleteZip({

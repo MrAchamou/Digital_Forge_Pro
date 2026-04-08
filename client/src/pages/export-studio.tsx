@@ -488,12 +488,12 @@ export default function ExportStudio() {
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 <FormatCard
-                  icon="📧" title="Gmail" subtitle="CSS animé, inline" badge="✅ Animé" color="#EA4335"
+                  icon="📧" title="Gmail" subtitle="Table 100% inline-styles" badge="✅ Compatible" color="#EA4335"
                   filename={result.formats.gmail?.filename || 'signature-gmail.html'}
                   onDownload={() => downloadText(result.preview.gmailHtml, result.formats.gmail?.filename || 'signature-gmail.html')}
                 />
                 <FormatCard
-                  icon="📮" title="Outlook" subtitle="MSO compatible, table" badge="✅ MSO" color="#0078D4"
+                  icon="📮" title="Outlook" subtitle="MSO table + PNG fallback" badge="✅ MSO" color="#0078D4"
                   filename={result.formats.outlook?.filename || 'signature-outlook.htm'}
                   onDownload={() => downloadText(result.preview.gmailHtml.replace(
                     /<!--\[if !mso\]><!-->[\s\S]*?<!--<!\[endif\]-->/,
@@ -506,7 +506,7 @@ export default function ExportStudio() {
                   onDownload={() => downloadText(result.preview.gmailHtml, result.formats.appleMail?.filename || 'signature-apple.html')}
                 />
                 <FormatCard
-                  icon="🌐" title="Universel" subtitle="Smart MSO hybrid" badge="✅ Hybride" color="#6366F1"
+                  icon="🌐" title="Universel" subtitle="Table inline, tous clients" badge="✅ Universel" color="#6366F1"
                   filename={result.formats.universal?.filename || 'signature-universelle.html'}
                   onDownload={() => downloadText(result.preview.universalHtml, result.formats.universal?.filename || 'signature-universelle.html')}
                 />
@@ -553,13 +553,13 @@ export default function ExportStudio() {
                   </thead>
                   <tbody>
                     {[
-                      { client: 'Gmail', anim: '✅ CSS', logo: '✅', links: '✅', file: 'signature-gmail.html' },
-                      { client: 'Outlook 2016-2024', anim: '🖼 GIF', logo: '✅', links: '✅', file: 'signature-outlook.htm' },
-                      { client: 'Apple Mail', anim: '✅ CSS', logo: '✅', links: '✅', file: 'signature-apple-mail.html' },
-                      { client: 'iOS Mail', anim: '✅ SVG', logo: '✅', links: '✅', file: 'signature-universelle.html' },
-                      { client: 'Outlook.com', anim: '✅ CSS', logo: '✅', links: '✅', file: 'signature-gmail.html' },
-                      { client: 'Thunderbird', anim: '✅ CSS', logo: '✅', links: '✅', file: 'signature-apple-mail.html' },
-                      { client: 'Yahoo Mail', anim: '🖼 GIF', logo: '✅', links: '✅', file: 'signature-gmail.html' },
+                      { client: 'Gmail', anim: '⚠️ Aucune (CSS ignoré)', logo: '✅', links: '✅', file: 'signature-gmail.html' },
+                      { client: 'Outlook 2016-2024', anim: '🖼 PNG statique', logo: '✅', links: '✅', file: 'signature-outlook.htm' },
+                      { client: 'Apple Mail', anim: '✅ CSS webkit', logo: '✅', links: '✅', file: 'signature-apple-mail.html' },
+                      { client: 'iOS Mail', anim: '⚠️ Aucune (table)', logo: '✅', links: '✅', file: 'signature-universelle.html' },
+                      { client: 'Outlook.com', anim: '⚠️ Aucune (CSS ignoré)', logo: '✅', links: '✅', file: 'signature-gmail.html' },
+                      { client: 'Thunderbird', anim: '✅ CSS webkit', logo: '✅', links: '✅', file: 'signature-apple-mail.html' },
+                      { client: 'Yahoo Mail', anim: '⚠️ Aucune (table)', logo: '✅', links: '✅', file: 'signature-gmail.html' },
                     ].map((row, i) => (
                       <tr key={i} className={`border-b border-white/[0.03] ${i % 2 === 0 ? '' : 'bg-white/[0.01]'}`}>
                         <td className="px-6 py-3 text-white/80 font-medium">{row.client}</td>
