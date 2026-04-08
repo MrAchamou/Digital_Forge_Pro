@@ -1,8 +1,32 @@
 import sharp from 'sharp';
 import archiver from 'archiver';
 import { PassThrough } from 'stream';
+import fs from 'fs';
+import path from 'path';
 import { log } from '../vite';
 import type { SectorConfig } from './signature-renderer';
+
+// ── Dossier de stockage des assets hébergés ───────────────────────────────────
+const SIG_ASSETS_DIR = path.join(process.cwd(), 'exports', 'hosted');
+
+async function ensureSigDir() {
+  await fs.promises.mkdir(SIG_ASSETS_DIR, { recursive: true });
+}
+
+// ── Sauvegarde des assets sur disque (pour hébergement public) ────────────────
+export async function saveSignatureAssets(signatureId: string, assets: {
+  gifBuffer: Buffer;
+  svgContent: string;
+  pngBuffer: Buffer;
+}): Promise<void> {
+  await ensureSigDir();
+  await Promise.all([
+    fs.promises.writeFile(path.join(SIG_ASSETS_DIR, `${signatureId}.gif`), assets.gifBuffer),
+    fs.promises.writeFile(path.join(SIG_ASSETS_DIR, `${signatureId}.svg`), assets.svgContent, 'utf-8'),
+    fs.promises.writeFile(path.join(SIG_ASSETS_DIR, `${signatureId}.png`), assets.pngBuffer),
+  ]);
+  log(`Assets hébergés sauvegardés: ${signatureId} (gif+svg+png)`, 'export-complete');
+}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -375,10 +399,47 @@ function buildInlineTable(meta: ExportMetadata): string {
 </table>`;
 }
 
-export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string): string {
-  const { nom = '' } = meta;
-  // Gmail supprime TOUT contenu dans <style> et toutes les animations CSS.
-  // On génère une table 100% inline-styles — aucun <style>, aucune class, aucune animation.
+export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hostedGifUrl?: string): string {
+  const { nom = '', entreprise = '', telephone = '', email = '', site = '', palette = [], cta = 'Nous contacter' } = meta;
+  const [, accent] = palette.length >= 2 ? palette : ['#0f172a', '#6366f1'];
+
+  // Si une URL hébergée est disponible : GIF animé en tête + liens cliquables en dessous.
+  // Gmail charge les images externes → signature VIVANTE dans la boîte de réception !
+  if (hostedGifUrl) {
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body style="margin:0;padding:0;background:#ffffff;">
+<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;">
+  <tr>
+    <td style="padding:0;">
+      <img src="${hostedGifUrl}" width="620" height="180"
+        style="display:block;max-width:100%;border:0;border-radius:8px;"
+        alt="${escXml(nom)} — ${escXml(entreprise)}" />
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:6px 0 0;">
+      <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;">
+        <tr>
+          ${telephone ? `<td style="padding-right:14px;"><a href="tel:${escXml(telephone)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9990; ${escXml(telephone)}</a></td>` : ''}
+          ${email ? `<td style="padding-right:14px;"><a href="mailto:${escXml(email)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9993; ${escXml(email)}</a></td>` : ''}
+          ${site ? `<td style="padding-right:14px;"><a href="${escXml(site)}" style="font-size:11px;color:${accent};text-decoration:none;">&#127760; ${escXml(site.replace(/^https?:\/\//, ''))}</a></td>` : ''}
+          ${cta && site ? `<td><a href="${escXml(site)}" style="display:inline-block;font-size:11px;font-weight:700;color:#ffffff;background:${accent};padding:5px 12px;border-radius:4px;text-decoration:none;">${escXml(cta)}</a></td>` : ''}
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- EffectForge AI — ${escXml(nom)} — animated via hosted GIF -->
+</body>
+</html>`;
+  }
+
+  // Sans URL hébergée : table 100% inline-styles statique (pas d'animation)
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -491,6 +552,7 @@ ${signatureHtml}
 
 export function buildUniversalHtml(
   meta: ExportMetadata,
+  hostedGifUrl?: string,
 ): string {
   const { nom = '', entreprise = '', palette = [], titre = '',
           telephone = '', email = '', site = '', adresse = '',
@@ -547,9 +609,30 @@ export function buildUniversalHtml(
 </table>
 <![endif]-->
 
-<!-- ══ Non-Outlook (Gmail, Webmail, mobile) — table inline-styles ══ -->
+<!-- ══ Non-Outlook (Gmail, Webmail, mobile) ══ -->
 <!--[if !mso]><!-->
-${buildInlineTable(meta)}
+${hostedGifUrl ? `
+<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;">
+  <tr>
+    <td style="padding:0;">
+      <img src="${hostedGifUrl}" width="620" height="180"
+        style="display:block;max-width:100%;border:0;border-radius:8px;"
+        alt="${escXml(nom)} — ${escXml(entreprise)}" />
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:6px 0 0;">
+      <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;">
+        <tr>
+          ${telephone ? `<td style="padding-right:14px;"><a href="tel:${escXml(telephone)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9990; ${escXml(telephone)}</a></td>` : ''}
+          ${email ? `<td style="padding-right:14px;"><a href="mailto:${escXml(email)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9993; ${escXml(email)}</a></td>` : ''}
+          ${site ? `<td style="padding-right:14px;"><a href="${escXml(site)}" style="font-size:11px;color:${accent};text-decoration:none;">&#127760; ${escXml(site.replace(/^https?:\/\//, ''))}</a></td>` : ''}
+          ${cta && site ? `<td><a href="${escXml(site)}" style="display:inline-block;font-size:11px;font-weight:700;color:#ffffff;background:${accent};padding:5px 12px;border-radius:4px;text-decoration:none;">${escXml(cta)}</a></td>` : ''}
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>` : buildInlineTable(meta)}
 <!--<![endif]-->
 
 </body>
@@ -1117,6 +1200,7 @@ export async function generateCompleteExport(
   sectorId: string,
   signatureHtml: string,
   meta: ExportMetadata,
+  hostedBaseUrl?: string,
 ): Promise<CompleteExportResult> {
   const { randomUUID } = await import('crypto');
   const signatureId = randomUUID();
@@ -1133,10 +1217,22 @@ export async function generateCompleteExport(
   const animatedSvg = buildAnimatedSVG(meta);
   const pngBase64 = staticPng.toString('base64');
 
-  const gmailHtml     = buildGmailHtml(meta, signatureHtml);
+  // ── Sauvegarde des assets sur disque pour hébergement public ──────────────
+  const hostedGifUrl = hostedBaseUrl
+    ? `${hostedBaseUrl}/api/sig/${signatureId}.gif`
+    : undefined;
+
+  // Sauvegarder en arrière-plan (ne bloque pas la génération du ZIP)
+  saveSignatureAssets(signatureId, {
+    gifBuffer: animatedGif,
+    svgContent: animatedSvg,
+    pngBuffer: staticPng,
+  }).catch(err => log(`Erreur sauvegarde assets: ${err.message}`, 'export-complete'));
+
+  const gmailHtml     = buildGmailHtml(meta, signatureHtml, hostedGifUrl);
   const outlookHtml   = buildOutlookHtml(meta, pngBase64);
   const appleHtml     = buildAppleMailHtml(meta, signatureHtml);
-  const universalHtml = buildUniversalHtml(meta);
+  const universalHtml = buildUniversalHtml(meta, hostedGifUrl);
   const guideHtml     = buildInstallationGuide(meta, signatureId);
 
   const zip = await buildCompleteZip({

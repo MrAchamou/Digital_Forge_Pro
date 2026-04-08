@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 600 180" width="600" height="180">
+  <defs>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ffda47"/>
+    </linearGradient>
+    <clipPath id="photoClip"><circle cx="60" cy="90" r="50"/></clipPath>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="180" fill="#0d1117" rx="10"/>
+
+  <!-- Glow de fond (barre accent) -->
+  <rect x="0" y="0" width="4" height="180" fill="url(#accentGrad)" rx="2"><animate attributeName="opacity" values="0.35;0.75;0.35" dur="2.8s" repeatCount="indefinite"/></rect>
+
+  <!-- Avatar cercle -->
+  <g transform="translate(24,90)">
+    <circle r="50" fill="#f59e0b18" stroke="#f59e0b" stroke-width="1.5"><animateTransform attributeName="transform" type="scale" values="1;1.025;1" dur="2.8s" repeatCount="indefinite" additive="sum"/></circle>
+    <text text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif"
+      font-size="22" font-weight="700" fill="#f59e0b">JD</text>
+  </g>
+
+  <!-- Séparateur vertical -->
+  <rect x="96" y="24" width="1.5" height="132" fill="#f59e0b" opacity="0.3" rx="1"/>
+
+  <!-- NOM -->
+  <text x="112" y="48" font-family="Arial,sans-serif" font-size="18" font-weight="700"
+    fill="#f1f5f9" opacity="0">
+    Jean Dupont<animate attributeName="opacity" values="0;1" dur="0.8s" fill="freeze"/>
+  </text>
+
+  <!-- TITRE -->
+  <text x="112" y="68" font-family="Arial,sans-serif" font-size="11" font-weight="600"
+    fill="#f59e0b" letter-spacing="1.5" text-transform="uppercase"
+    style="clip-path:inset(0 100% 0 0)">
+    PLOMBIER
+    <animate attributeName="clip-path" from="inset(0 100% 0 0)" to="inset(0 0% 0 0)" dur="1.4s" begin="0.5s" fill="freeze"/>
+  </text>
+
+  <!-- ENTREPRISE -->
+  <text x="112" y="86" font-family="Arial,sans-serif" font-size="12" fill="#f1f5f999">
+    AquaPro
+  </text>
+
+  <!-- Ligne séparatrice -->
+  <line x1="112" y1="96" x2="568" y2="96" stroke="#f59e0b" stroke-width="0.8" opacity="0.25"/>
+
+  <!-- Téléphone -->
+  <text x="112" y="113" font-family="Arial,sans-serif" font-size="11" fill="#f1f5f9" opacity="0.8">☎ 0612345678</text>
+
+  <!-- Email -->
+  <text x="112" y="130" font-family="Arial,sans-serif" font-size="11" fill="#f1f5f9" opacity="0.8">✉ jean@aquapro.fr</text>
+
+  <!-- Adresse -->
+  
+
+  <!-- Note -->
+  
+
+  <!-- CTA bouton -->
+  <g transform="translate(440, 132)">
+    <rect width="140" height="32" rx="6" fill="#f59e0b" opacity="0.92"/>
+    <text x="70" y="21" text-anchor="middle" font-family="Arial,sans-serif" font-size="11"
+      font-weight="700" fill="#ffffff">Appeler maintenant</text>
+  </g>
+
+  
+
+  <!-- Site -->
+  <text x="112" y="165" font-family="Arial,sans-serif" font-size="10" fill="#f59e0b">🌐 aquapro.fr</text>
+</svg>

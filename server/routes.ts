@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
 import { storage } from './storage';
 import { buildEffectPreviewHTML, saveEffectPreview, getEffectPreviewHTML } from './services/effect-preview-generator';
 import { getAllSectorConfigs, getSectorConfig, renderSignature } from './services/signature-renderer';
@@ -919,6 +921,46 @@ router.post('/signature/classify-sector', async (req, res) => {
   }
 });
 
+// === ASSETS HÉBERGÉS — GIF/SVG/PNG publics pour Option A =====================
+
+/**
+ * Retourne l'URL publique de base de l'application.
+ * En prod Replit: REPLIT_DOMAINS, en dev: REPLIT_DEV_DOMAIN, sinon req.hostname.
+ */
+function getPublicBaseUrl(req: express.Request): string {
+  if (process.env.REPLIT_DOMAINS) {
+    return `https://${process.env.REPLIT_DOMAINS.split(',')[0].trim()}`;
+  }
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  }
+  return `${req.protocol}://${req.get('host')}`;
+}
+
+/** Sert les GIF/SVG/PNG hébergés des signatures générées.
+ *  URL : /api/sig/{signatureId}.{gif|svg|png}
+ *  Les fichiers sont stockés dans exports/hosted/ lors de la génération.
+ */
+router.get('/sig/:filename', async (req, res) => {
+  const { filename } = req.params;
+  // Validation stricte : UUID + extension autorisée
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(gif|svg|png)$/.test(filename)) {
+    return res.status(400).json({ error: 'Nom de fichier invalide' });
+  }
+  const filePath = path.join(process.cwd(), 'exports', 'hosted', filename);
+  try {
+    await fs.promises.access(filePath, fs.constants.R_OK);
+  } catch {
+    return res.status(404).json({ error: 'Signature introuvable' });
+  }
+  const ext = path.extname(filename).slice(1) as 'gif' | 'svg' | 'png';
+  const mimeTypes = { gif: 'image/gif', svg: 'image/svg+xml', png: 'image/png' };
+  res.setHeader('Content-Type', mimeTypes[ext]);
+  res.setHeader('Cache-Control', 'public, max-age=2592000'); // 30 jours
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Autoriser chargement depuis Gmail/email clients
+  return res.sendFile(filePath);
+});
+
 // === EXPORT COMPLET MULTI-CLIENT ===
 
 router.post('/signature/full-export', async (req, res) => {
@@ -949,10 +991,12 @@ router.post('/signature/full-export', async (req, res) => {
       cta:         data.cta         || '',
     };
 
-    const result = await generateCompleteExport(sectorId, signatureHtml, meta);
+    const hostedBaseUrl = getPublicBaseUrl(req);
+    const result = await generateCompleteExport(sectorId, signatureHtml, meta, hostedBaseUrl);
 
     return res.json({
       signatureId: result.signatureId,
+      hostedGifUrl: `${hostedBaseUrl}/api/sig/${result.signatureId}.gif`,
       formats: {
         gmail:       { filename: result.formats.gmail.filename },
         outlook:     { filename: result.formats.outlook.filename },
@@ -1038,11 +1082,13 @@ router.post('/signature/full-export-gmb', async (req, res) => {
       cta:         sigData.cta,
     };
 
-    // 5. Export complet
-    const result = await generateCompleteExport(sectorId, signatureHtml, meta);
+    // 5. Export complet avec URL hébergée
+    const hostedBaseUrl = getPublicBaseUrl(req);
+    const result = await generateCompleteExport(sectorId, signatureHtml, meta, hostedBaseUrl);
 
     return res.json({
       signatureId:   result.signatureId,
+      hostedGifUrl:  `${hostedBaseUrl}/api/sig/${result.signatureId}.gif`,
       gmbData,
       sectorId,
       sectorLabel:   sectorCfg.label,
