@@ -1,75 +1,75 @@
 {
-  "lastSaved": "2026-04-08T11:53:10.320Z",
+  "lastSaved": "2026-04-08T11:57:09.957Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 2,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-08T11:58:00.991Z",
+      "cooldownCount": 1,
+      "errorCount": 3,
       "successCount": 0,
       "avgResponseTime": 0,
-      "healthScore": 60,
+      "healthScore": 52,
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": null,
-      "lastError": null
+      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
     },
     "gemini_2": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 2,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-08T11:58:01.089Z",
+      "cooldownCount": 1,
+      "errorCount": 3,
       "successCount": 0,
       "avgResponseTime": 0,
-      "healthScore": 60,
+      "healthScore": 52,
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": null,
-      "lastError": null
+      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
     },
     "gemini_3": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 2,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-08T11:58:01.248Z",
+      "cooldownCount": 1,
+      "errorCount": 3,
       "successCount": 0,
       "avgResponseTime": 0,
-      "healthScore": 60,
+      "healthScore": 52,
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": null,
-      "lastError": null
+      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
     },
     "gemini_4": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 2,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-08T11:58:01.380Z",
+      "cooldownCount": 1,
+      "errorCount": 3,
       "successCount": 0,
       "avgResponseTime": 0,
-      "healthScore": 60,
+      "healthScore": 52,
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": null,
-      "lastError": null
+      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
     },
     "gemini_5": {
       "usageToday": 0,
-      "status": "active",
-      "cooldownUntil": null,
-      "cooldownCount": 0,
-      "errorCount": 2,
+      "status": "cooldown",
+      "cooldownUntil": "2026-04-08T11:58:01.541Z",
+      "cooldownCount": 1,
+      "errorCount": 3,
       "successCount": 0,
       "avgResponseTime": 0,
-      "healthScore": 60,
+      "healthScore": 52,
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": null,
-      "lastError": null
+      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
     },
     "cerebras_1": {
       "usageToday": 0,
@@ -128,17 +128,17 @@
       "lastError": null
     },
     "cerebras_5": {
-      "usageToday": 0,
+      "usageToday": 1,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
-      "errorCount": 3,
-      "successCount": 0,
-      "avgResponseTime": 0,
-      "healthScore": 60,
-      "callsLastHour": 0,
-      "hourWindowStart": "2026-04-07T09:35:20.673Z",
-      "lastUsed": null,
+      "errorCount": 0,
+      "successCount": 1,
+      "avgResponseTime": 2597,
+      "healthScore": 85,
+      "callsLastHour": 1,
+      "hourWindowStart": "2026-04-08T11:57:04.157Z",
+      "lastUsed": "2026-04-08T11:57:04.157Z",
       "lastError": null
     },
     "serper_1": {
@@ -212,5 +212,7 @@
       "lastError": null
     }
   },
-  "monthlyUsage": {}
+  "monthlyUsage": {
+    "cerebras_2026-04": 1
+  }
 }
