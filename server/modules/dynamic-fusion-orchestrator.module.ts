@@ -1,3 +1,8 @@
+import { buildParticlesCSS } from './particles.module';
+import { buildLightingCSS }  from './lighting.module';
+import { buildMorphingCSS }  from './morphing.module';
+import { buildPhysicsCSS }   from './physics.module';
+
 /**
  * 🚀 DYNAMIC FUSION ORCHESTRATOR — v3.0
  *
@@ -46,7 +51,11 @@ export type ModuleId       =
   | 'performance-adaptive'
   | 'effect-fusion'
   | 'contextual-intelligence'
-  | 'experience-orchestrator';
+  | 'experience-orchestrator'
+  | 'particles-engine'
+  | 'lighting-engine'
+  | 'morphing-engine'
+  | 'physics-engine';
 
 export type SectorId = 'artisanat' | 'commerce' | 'education' | 'immobilier' | 'loisirs' | 'restauration' | 'sante' | 'services_pro' | 'tech' | 'transport';
 export type ColorScheme    = 'light' | 'dark' | 'auto';
@@ -56,7 +65,7 @@ export type PerformanceTier = 'ultra' | 'standard' | 'lite';
 const LEVEL_MODULES: Record<FusionLevel, ModuleId[]> = {
   1: ['variance-engine', 'timing-master', 'color-harmony'],
   2: ['variance-engine', 'timing-master', 'color-harmony', 'context-adaptation', 'performance-adaptive', 'effect-fusion'],
-  3: ['variance-engine', 'timing-master', 'color-harmony', 'context-adaptation', 'performance-adaptive', 'effect-fusion', 'contextual-intelligence', 'experience-orchestrator'],
+  3: ['variance-engine', 'timing-master', 'color-harmony', 'context-adaptation', 'performance-adaptive', 'effect-fusion', 'contextual-intelligence', 'experience-orchestrator', 'particles-engine', 'lighting-engine', 'morphing-engine', 'physics-engine'],
 };
 
 const LEVEL_NAMES: Record<FusionLevel, FusionLevelName> = {
@@ -67,14 +76,18 @@ const LEVEL_NAMES: Record<FusionLevel, FusionLevelName> = {
 
 /** Poids de qualité par module */
 const MODULE_QUALITY_WEIGHTS: Record<ModuleId, number> = {
-  'variance-engine':         0.15,
-  'timing-master':           0.15,
-  'color-harmony':           0.15,
-  'context-adaptation':      0.12,
-  'performance-adaptive':    0.12,
-  'effect-fusion':           0.12,
-  'contextual-intelligence': 0.10,
-  'experience-orchestrator': 0.09,
+  'variance-engine':         0.10,
+  'timing-master':           0.10,
+  'color-harmony':           0.10,
+  'context-adaptation':      0.09,
+  'performance-adaptive':    0.09,
+  'effect-fusion':           0.09,
+  'contextual-intelligence': 0.08,
+  'experience-orchestrator': 0.08,
+  'particles-engine':        0.10,
+  'lighting-engine':         0.10,
+  'morphing-engine':         0.08,
+  'physics-engine':          0.09,
 };
 
 // ─── Configuration d'entrée ──────────────────────────────────────────────────
@@ -308,6 +321,30 @@ async function runPipeline(
           score = 95;
           meta  = { arc: 'intro→develop→climax→rest', phi: PHI };
           break;
+
+        case 'particles-engine':
+          css   = buildParticlesCSS(input.sectorId, accent, tier);
+          score = 96;
+          meta  = { style: 'sector-adaptive', count: 'dynamic', seeding: 'deterministic' };
+          break;
+
+        case 'lighting-engine':
+          css   = buildLightingCSS(input.sectorId, accent, scheme);
+          score = 97;
+          meta  = { glowPulse: true, cardDepth: true, darkModeAware: true };
+          break;
+
+        case 'morphing-engine':
+          css   = buildMorphingCSS(input.sectorId, accent);
+          score = 95;
+          meta  = { avatarMorph: true, textReveal: true, entryAnimation: true };
+          break;
+
+        case 'physics-engine':
+          css   = buildPhysicsCSS(input.sectorId, tier);
+          score = 96;
+          meta  = { springCalc: 'Hooke', staggerEntry: true, floatResidual: true };
+          break;
       }
 
       results.push({
@@ -443,7 +480,7 @@ export function getFusionLevels(): Record<FusionLevel, { name: FusionLevelName; 
     3: {
       name:        'ultimate',
       modules:     LEVEL_MODULES[3],
-      description: 'Signature God Tier — vivante, unique, adaptative, orchestrée. Impossible à reproduire manuellement.',
+      description: 'Signature God Tier — 12 modules actifs. Particules ambiantes, éclairage néon pulsant, morphing avatar, physique spring. Impossible à reproduire manuellement.',
     },
   };
 }
@@ -469,5 +506,5 @@ export function preflightCheck(input: SignatureInput): { valid: boolean; warning
 
 console.log(
   `🚀 DynamicFusionOrchestrator v${ENGINE_VERSION} chargé — ` +
-  `Niveaux: Standard(3) | Pro(6) | Ultimate(8) | PipelineCoordinator | QualityReporter | φ=${PHI.toFixed(4)}`
+  `Niveaux: Standard(3) | Pro(6) | Ultimate(12) | Particles+Lighting+Morphing+Physics | φ=${PHI.toFixed(4)}`
 );

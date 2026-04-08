@@ -1,475 +1,177 @@
+/**
+ * 💡 LIGHTING ENGINE — v2.0 (CSS Glow & Shadow Generator)
+ *
+ * Génère des effets de lumière CSS réalistes pour signatures email :
+ * halos pulsants, drop-shadows layered, profondeur de carte, ambient glow.
+ *
+ * Inspiré des effets premium : NEON GLOW, ELECTRIC HOVER, SOUL AURA,
+ * SPARKLE AURA, HOLOGRAM, ENERGY IONIZE.
+ *
+ * OUTPUT : CSS @keyframes de glow + variables de lumière + classes injectables.
+ *
+ * @version 2.0.0
+ * @server-side true
+ */
 
-interface LightingConfig {
-  type: 'directional' | 'point' | 'spot' | 'ambient' | 'area' | 'volumetric';
-  intensity: number;
-  color: [number, number, number];
-  position?: [number, number, number];
-  direction?: [number, number, number];
-  shadows: boolean;
-  softShadows?: boolean;
-  cascades?: number;
-  volumetricScattering?: boolean;
-  aiOptimization?: boolean;
+export const ENGINE_VERSION = '2.0.0';
+const PHI = 1.6180339887;
+
+export type LightingStyle = 'neon' | 'soft' | 'dramatic' | 'subtle' | 'electric' | 'aura';
+
+interface SectorLightingProfile {
+  style:         LightingStyle;
+  glowIntensity: number;   // 0.1 - 1.0
+  shadowDepth:   'flat' | 'medium' | 'deep';
+  pulseSpeed:    number;   // multiplicateur de durée
+  colorShift:    number;   // degré de rotation hue pour le glow (-30 à +30)
+  cardDepth:     boolean;  // active box-shadow multicouche pour la carte
 }
 
-interface LightingSystem {
-  id: string;
-  lights: LightingConfig[];
-  globalSettings: {
-    ambientIntensity: number;
-    shadowQuality: 'low' | 'medium' | 'high' | 'ultra';
-    hdr: boolean;
-    bloomEffect: boolean;
-    toneMapping: 'none' | 'linear' | 'reinhard' | 'cineon' | 'aces';
-  };
-  performance: {
-    shadowDistance: number;
-    lightCulling: boolean;
-    deferredRendering: boolean;
-    forwardPlus: boolean;
-  };
-  aiMetrics: {
-    renderTime: number;
-    shadowComplexity: number;
-    lightCount: number;
-    qualityScore: number;
-  };
+const SECTOR_LIGHTING: Record<string, SectorLightingProfile> = {
+  tech:         { style: 'electric', glowIntensity: 0.85, shadowDepth: 'deep',   pulseSpeed: 1.2, colorShift:  10, cardDepth: true  },
+  startup:      { style: 'neon',     glowIntensity: 0.90, shadowDepth: 'deep',   pulseSpeed: 1.4, colorShift:  15, cardDepth: true  },
+  sante:        { style: 'soft',     glowIntensity: 0.45, shadowDepth: 'flat',   pulseSpeed: 0.6, colorShift: -10, cardDepth: false },
+  beaute:       { style: 'aura',     glowIntensity: 0.70, shadowDepth: 'medium', pulseSpeed: 0.8, colorShift:  20, cardDepth: true  },
+  finance:      { style: 'subtle',   glowIntensity: 0.30, shadowDepth: 'medium', pulseSpeed: 0.5, colorShift:   0, cardDepth: true  },
+  juridique:    { style: 'subtle',   glowIntensity: 0.25, shadowDepth: 'flat',   pulseSpeed: 0.4, colorShift:  -5, cardDepth: false },
+  creative:     { style: 'dramatic', glowIntensity: 0.95, shadowDepth: 'deep',   pulseSpeed: 1.5, colorShift:  25, cardDepth: true  },
+  immobilier:   { style: 'soft',     glowIntensity: 0.40, shadowDepth: 'medium', pulseSpeed: 0.6, colorShift:   5, cardDepth: true  },
+  restauration: { style: 'aura',     glowIntensity: 0.60, shadowDepth: 'medium', pulseSpeed: 0.9, colorShift:  15, cardDepth: true  },
+  sport:        { style: 'electric', glowIntensity: 0.95, shadowDepth: 'deep',   pulseSpeed: 1.8, colorShift:  20, cardDepth: true  },
+  default:      { style: 'soft',     glowIntensity: 0.50, shadowDepth: 'medium', pulseSpeed: 0.8, colorShift:   0, cardDepth: true  },
+};
+
+function getSectorLighting(sectorId: string): SectorLightingProfile {
+  const key = (sectorId || '').toLowerCase()
+    .replace(/[éèê]/g, 'e').replace(/[àâ]/g, 'a').replace(/\s+/g, '');
+  return Object.entries(SECTOR_LIGHTING).find(([k]) => key.includes(k))?.[1]
+    ?? SECTOR_LIGHTING.default;
 }
 
-interface LightingOptimization {
-  type: 'shadow_optimization' | 'light_culling' | 'quality_adjustment' | 'performance_boost';
-  target: string;
-  action: string;
-  estimatedGain: number;
-  priority: number;
+function hexToRgb(hex: string): [number, number, number] {
+  const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return r ? [parseInt(r[1],16), parseInt(r[2],16), parseInt(r[3],16)] : [99,102,241];
 }
 
-class AdvancedLightingSystem {
-  private lightingSystems: Map<string, LightingSystem> = new Map();
-  private aiOptimizer: any;
-  private performanceMonitor: any;
-  private autonomousManager: any;
-  private shaderCache: Map<string, any> = new Map();
-  private optimizationQueue: LightingOptimization[] = [];
-  private metrics: Map<string, number> = new Map();
-
-  constructor() {
-    this.initializeAIOptimizer();
-    this.initializePerformanceMonitor();
-    this.initializeAutonomousManager();
-    this.startContinuousOptimization();
-  }
-
-  async generateLightingSystem(config: any, context: any): Promise<any> {
-    const startTime = performance.now();
-
-    // Analyse IA du contexte et des besoins
-    const aiAnalysis = await this.performAIAnalysis(config, context);
-
-    // Génération du système d'éclairage optimisé
-    const lightingSystem = await this.createOptimizedLightingSystem(config, aiAnalysis);
-
-    // Optimisation autonome
-    const optimizations = await this.aiOptimizer.generateOptimizations(lightingSystem, aiAnalysis);
-
-    // Application des optimisations
-    const optimizedSystem = await this.applyOptimizations(lightingSystem, optimizations);
-
-    // Génération du code
-    const generatedCode = await this.generateLightingCode(optimizedSystem, context);
-
-    // Surveillance autonome
-    this.autonomousManager.monitor(optimizedSystem);
-
-    const processingTime = performance.now() - startTime;
-    this.updateMetrics(optimizedSystem, processingTime);
-
-    return {
-      id: this.generateSystemId(),
-      system: optimizedSystem,
-      code: generatedCode,
-      optimizations: optimizations.length,
-      metrics: {
-        processingTime,
-        lightCount: optimizedSystem.lights.length,
-        complexity: this.calculateComplexity(optimizedSystem),
-        estimatedPerformance: aiAnalysis.estimatedPerformance
-      }
-    };
-  }
-
-  private async performAIAnalysis(config: any, context: any): Promise<any> {
-    const analysis = {
-      sceneComplexity: this.analyzeSceneComplexity(config),
-      performanceRequirements: this.analyzePerformanceNeeds(context),
-      visualRequirements: this.analyzeVisualQuality(config),
-      platformConstraints: this.analyzePlatformLimitations(context),
-      optimizationOpportunities: await this.identifyOptimizationOpportunities(config),
-      estimatedPerformance: 0.85
-    };
-
-    // Calcul de performance estimée basé sur l'analyse
-    analysis.estimatedPerformance = this.calculatePerformanceEstimate(analysis);
-
-    return analysis;
-  }
-
-  private async createOptimizedLightingSystem(config: any, analysis: any): Promise<LightingSystem> {
-    const systemId = this.generateSystemId();
-
-    // Création des lumières optimisées
-    const lights = await this.generateOptimizedLights(config, analysis);
-
-    // Configuration globale adaptative
-    const globalSettings = this.generateAdaptiveGlobalSettings(analysis);
-
-    // Paramètres de performance
-    const performance = this.generatePerformanceSettings(analysis);
-
-    const system: LightingSystem = {
-      id: systemId,
-      lights,
-      globalSettings,
-      performance,
-      aiMetrics: {
-        renderTime: 0,
-        shadowComplexity: this.calculateShadowComplexity(lights),
-        lightCount: lights.length,
-        qualityScore: analysis.visualRequirements.targetQuality || 0.8
-      }
-    };
-
-    this.lightingSystems.set(systemId, system);
-    return system;
-  }
-
-  private async generateOptimizedLights(config: any, analysis: any): Promise<LightingConfig[]> {
-    const lights: LightingConfig[] = [];
-
-    // Génération basée sur l'analyse IA
-    if (analysis.sceneComplexity.requiresKeyLight) {
-      lights.push({
-        type: 'directional',
-        intensity: this.calculateOptimalIntensity('key', analysis),
-        color: this.calculateOptimalColor('key', analysis),
-        direction: [-0.5, -1, -0.3],
-        shadows: true,
-        softShadows: analysis.visualRequirements.quality > 0.7,
-        cascades: analysis.platformConstraints.supportsCascades ? 4 : 2,
-        aiOptimization: true
-      });
-    }
-
-    if (analysis.sceneComplexity.requiresFillLight) {
-      lights.push({
-        type: 'directional',
-        intensity: this.calculateOptimalIntensity('fill', analysis),
-        color: this.calculateOptimalColor('fill', analysis),
-        direction: [0.5, -0.5, -0.3],
-        shadows: false,
-        aiOptimization: true
-      });
-    }
-
-    if (analysis.sceneComplexity.requiresRimLight) {
-      lights.push({
-        type: 'directional',
-        intensity: this.calculateOptimalIntensity('rim', analysis),
-        color: this.calculateOptimalColor('rim', analysis),
-        direction: [0, 0, 1],
-        shadows: false,
-        aiOptimization: true
-      });
-    }
-
-    // Lumières dynamiques basées sur le contexte
-    const dynamicLights = await this.generateDynamicLights(config, analysis);
-    lights.push(...dynamicLights);
-
-    return lights;
-  }
-
-  private async generateLightingCode(system: LightingSystem, context: any): Promise<string> {
-    const platform = context.targetPlatform || 'webgl';
-
-    switch (platform) {
-      case 'webgl':
-        return this.generateWebGLLightingCode(system);
-      case 'threejs':
-        return this.generateThreeJSLightingCode(system);
-      case 'babylon':
-        return this.generateBabylonLightingCode(system);
-      default:
-        return this.generateGenericLightingCode(system);
-    }
-  }
-
-  private generateWebGLLightingCode(system: LightingSystem): string {
-    return `
-// AI-Optimized Lighting System
-class AdvancedLightingRenderer {
-  constructor(gl) {
-    this.gl = gl;
-    this.lights = ${JSON.stringify(system.lights, null, 2)};
-    this.globalSettings = ${JSON.stringify(system.globalSettings, null, 2)};
-    this.shaders = this.initializeShaders();
-    this.shadowMaps = new Map();
-    this.initializeShadowMapping();
-  }
-
-  initializeShaders() {
-    const vertexShader = this.createVertexShader();
-    const fragmentShader = this.createFragmentShader();
-    return this.createShaderProgram(vertexShader, fragmentShader);
-  }
-
-  createFragmentShader() {
-    return \`
-      precision highp float;
-      
-      uniform vec3 u_cameraPosition;
-      uniform float u_time;
-      
-      // Lighting uniforms
-      uniform int u_lightCount;
-      uniform vec3 u_lightPositions[${system.lights.length}];
-      uniform vec3 u_lightColors[${system.lights.length}];
-      uniform float u_lightIntensities[${system.lights.length}];
-      uniform int u_lightTypes[${system.lights.length}];
-      
-      // Shadow mapping
-      uniform sampler2D u_shadowMaps[${system.lights.filter(l => l.shadows).length}];
-      uniform mat4 u_lightSpaceMatrices[${system.lights.filter(l => l.shadows).length}];
-      
-      varying vec3 v_worldPosition;
-      varying vec3 v_normal;
-      varying vec2 v_uv;
-      
-      ${this.generateShadowFunctions(system)}
-      ${this.generateLightingFunctions(system)}
-      
-      void main() {
-        vec3 normal = normalize(v_normal);
-        vec3 viewDir = normalize(u_cameraPosition - v_worldPosition);
-        
-        vec3 totalLighting = vec3(0.0);
-        
-        // Calculate lighting contribution from each light
-        for(int i = 0; i < u_lightCount; i++) {
-          totalLighting += calculateLightContribution(i, v_worldPosition, normal, viewDir);
-        }
-        
-        // Apply tone mapping
-        totalLighting = ${this.getToneMappingFunction(system.globalSettings.toneMapping)};
-        
-        gl_FragColor = vec4(totalLighting, 1.0);
-      }
-    \`;
-  }
-
-  render(scene, camera) {
-    this.updateLightUniforms();
-    this.renderShadowMaps(scene);
-    this.renderScene(scene, camera);
-  }
-
-  // AI-driven dynamic optimization
-  optimizePerformance() {
-    const frameTime = this.measureFrameTime();
-    if (frameTime > 16.67) { // 60fps target
-      this.adaptiveLightCulling();
-      this.adjustShadowQuality();
-    }
-  }
+function lighten(hex: string, amt: number): string {
+  const [r,g,b] = hexToRgb(hex);
+  const c = (v: number) => Math.min(255, Math.max(0, Math.round(v + amt))).toString(16).padStart(2,'0');
+  return `#${c(r)}${c(g)}${c(b)}`;
 }
 
-export { AdvancedLightingRenderer };
-`;
+export function buildLightingCSS(sectorId: string, accentColor: string, colorScheme: string): string {
+  const profile = getSectorLighting(sectorId);
+  const [r, g, b] = hexToRgb(accentColor);
+  const isDark = colorScheme === 'dark';
+  const gi = profile.glowIntensity;
+  const speed = (3.2 / profile.pulseSpeed).toFixed(2);
+  const speedFast = (speed / PHI).toFixed(2);
+
+  // ── Glow avatar (halo animé autour du cercle avatar)
+  const glowMin = (gi * 0.3).toFixed(2);
+  const glowMax = (gi * 0.85).toFixed(2);
+  const glowSpreadMin = Math.round(gi * 8);
+  const glowSpreadMax = Math.round(gi * 22);
+  const glowBlurMin   = Math.round(gi * 12);
+  const glowBlurMax   = Math.round(gi * 32);
+
+  const avatarGlowKF = `@keyframes sig-avatar-glow {
+  0%,100% {
+    filter: drop-shadow(0 0 ${glowBlurMin}px rgba(${r},${g},${b},${glowMin}))
+            drop-shadow(0 0 ${glowSpreadMin}px rgba(${r},${g},${b},${(+glowMin*.5).toFixed(2)}));
+  }
+  50% {
+    filter: drop-shadow(0 0 ${glowBlurMax}px rgba(${r},${g},${b},${glowMax}))
+            drop-shadow(0 0 ${glowSpreadMax}px rgba(${r},${g},${b},${(+glowMax*.6).toFixed(2)}))
+            drop-shadow(0 0 ${Math.round(glowBlurMax*1.5)}px rgba(${r},${g},${b},${(+glowMin*.3).toFixed(2)}));
+  }
+}`;
+
+  // ── Glow barre accent (côté gauche de la carte)
+  const barGlowKF = `@keyframes sig-bar-glow {
+  0%,100% { box-shadow: 2px 0 ${Math.round(gi*8)}px rgba(${r},${g},${b},${(gi*.4).toFixed(2)}); }
+  50%     { box-shadow: 2px 0 ${Math.round(gi*20)}px rgba(${r},${g},${b},${(gi*.8).toFixed(2)}),
+                        2px 0 ${Math.round(gi*35)}px rgba(${r},${g},${b},${(gi*.3).toFixed(2)}); }
+}`;
+
+  // ── Pulse néon sur le CTA
+  const ctaGlowKF = `@keyframes sig-cta-glow {
+  0%,100% { box-shadow: 0 0 ${Math.round(gi*6)}px rgba(${r},${g},${b},${(gi*.5).toFixed(2)}),
+                        0 2px ${Math.round(gi*10)}px rgba(${r},${g},${b},${(gi*.3).toFixed(2)}); }
+  50%     { box-shadow: 0 0 ${Math.round(gi*14)}px rgba(${r},${g},${b},${(gi*.9).toFixed(2)}),
+                        0 2px ${Math.round(gi*22)}px rgba(${r},${g},${b},${(gi*.5).toFixed(2)}),
+                        0 0 ${Math.round(gi*30)}px rgba(${r},${g},${b},${(gi*.2).toFixed(2)}); }
+}`;
+
+  // ── Ambient glow de la carte entière (style selon profil)
+  let cardShadow = '';
+  if (profile.cardDepth) {
+    const depth = profile.shadowDepth;
+    const bg = isDark ? '0,0,0' : '0,0,0';
+    const shadowLayers = depth === 'deep'
+      ? `0 4px 6px rgba(${bg},.07),0 8px 15px rgba(${bg},.10),0 20px 40px rgba(${bg},.12),0 0 ${Math.round(gi*25)}px rgba(${r},${g},${b},${(gi*.12).toFixed(2)})`
+      : depth === 'medium'
+      ? `0 2px 4px rgba(${bg},.06),0 6px 12px rgba(${bg},.08),0 0 ${Math.round(gi*15)}px rgba(${r},${g},${b},${(gi*.08).toFixed(2)})`
+      : `0 1px 3px rgba(${bg},.05),0 3px 6px rgba(${bg},.06)`;
+
+    cardShadow = `.sig-card { box-shadow: ${shadowLayers}; border: 1px solid rgba(${r},${g},${b},${(gi*.12).toFixed(2)}); }`;
   }
 
-  private generateThreeJSLightingCode(system: LightingSystem): string {
-    return `
-// AI-Optimized Three.js Lighting System
-import * as THREE from 'three';
-
-class AdvancedThreeLighting {
-  constructor(scene, renderer) {
-    this.scene = scene;
-    this.renderer = renderer;
-    this.lights = [];
-    this.shadowMapEnabled = ${system.globalSettings.shadowQuality !== 'low'};
-    this.initializeLighting();
+  // ── Style-specific extras
+  let extraCSS = '';
+  if (profile.style === 'electric') {
+    extraCSS = `@keyframes sig-electric-flicker {
+  0%,95%,100% { opacity: 1; }
+  96% { opacity: .85; }
+  97% { opacity: 1; }
+  98% { opacity: .9; }
+}
+.sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite, sig-electric-flicker ${speedFast}s linear infinite; }`;
+  } else if (profile.style === 'neon') {
+    extraCSS = `.sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite; }
+.sig-name { text-shadow: 0 0 ${Math.round(gi*8)}px rgba(${r},${g},${b},${(gi*.4).toFixed(2)}); }`;
+  } else if (profile.style === 'dramatic') {
+    extraCSS = `.sig-avatar { animation: sig-avatar-glow ${speedFast}s ease-in-out infinite; }
+.sig-title { text-shadow: 0 0 ${Math.round(gi*6)}px rgba(${r},${g},${b},${(gi*.5).toFixed(2)}); }
+.sig-cta { animation: sig-cta-glow ${speed}s ease-in-out infinite; }`;
+  } else if (profile.style === 'aura') {
+    const accentAlt = lighten(accentColor, 30);
+    extraCSS = `@keyframes sig-aura-rotate {
+  0%   { background: radial-gradient(circle at 30% 40%, rgba(${r},${g},${b},${(gi*.25).toFixed(2)}) 0%, transparent 60%); }
+  50%  { background: radial-gradient(circle at 70% 60%, rgba(${r},${g},${b},${(gi*.35).toFixed(2)}) 0%, transparent 60%); }
+  100% { background: radial-gradient(circle at 30% 40%, rgba(${r},${g},${b},${(gi*.25).toFixed(2)}) 0%, transparent 60%); }
+}
+.sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite; }
+.sig-card::before { content:''; position:absolute; inset:0; border-radius:inherit; animation:sig-aura-rotate ${(+speed*1.5).toFixed(2)}s ease-in-out infinite; pointer-events:none; }`;
+  } else {
+    // soft / subtle
+    extraCSS = `.sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite; }`;
   }
 
-  initializeLighting() {
-    // Configure renderer for advanced lighting
-    this.renderer.shadowMap.enabled = this.shadowMapEnabled;
-    this.renderer.shadowMap.type = ${this.getThreeShadowType(system.globalSettings.shadowQuality)};
-    this.renderer.toneMapping = ${this.getThreeToneMapping(system.globalSettings.toneMapping)};
-    this.renderer.toneMappingExposure = 1.0;
+  const rootVars = `:root {
+  --sig-glow-color: rgba(${r},${g},${b},${gi.toFixed(2)});
+  --sig-glow-intensity: ${gi.toFixed(2)};
+  --sig-glow-speed: ${speed}s;
+  --sig-lighting-style: "${profile.style}";
+  --sig-shadow-depth: "${profile.shadowDepth}";
+}`;
 
-    ${system.lights.map((light, index) => this.generateThreeLightCode(light, index)).join('\n')}
+  const reducedMotion = `@media (prefers-reduced-motion: reduce) {
+  .sig-avatar, .sig-bar, .sig-cta { animation: none !important; filter: none !important; }
+}`;
 
-    // AI-driven ambient lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, ${system.globalSettings.ambientIntensity});
-    this.scene.add(ambientLight);
-  }
-
-  ${this.generateThreeLightMethods(system)}
-
-  // Autonomous optimization
-  update(deltaTime) {
-    this.optimizeDynamicLighting(deltaTime);
-    this.adjustPerformanceBasedOnFramerate();
-  }
+  return [
+    `/* ── LightingEngine v${ENGINE_VERSION} — ${profile.style} | glow:${gi.toFixed(1)} | ${sectorId} */`,
+    rootVars,
+    avatarGlowKF,
+    barGlowKF,
+    ctaGlowKF,
+    `.sig-bar { animation: sig-bar-glow ${speed}s ease-in-out infinite; }`,
+    cardShadow,
+    extraCSS,
+    reducedMotion,
+  ].filter(Boolean).join('\n\n');
 }
 
-export { AdvancedThreeLighting };
-`;
-  }
-
-  private initializeAIOptimizer() {
-    this.aiOptimizer = {
-      generateOptimizations: async (system: LightingSystem, analysis: any) => {
-        const optimizations: LightingOptimization[] = [];
-
-        // Shadow optimization
-        if (analysis.performanceRequirements.target === 'high_performance') {
-          optimizations.push({
-            type: 'shadow_optimization',
-            target: 'shadow_quality',
-            action: 'reduce_shadow_resolution',
-            estimatedGain: 0.3,
-            priority: 8
-          });
-        }
-
-        // Light culling optimization
-        if (system.lights.length > 8) {
-          optimizations.push({
-            type: 'light_culling',
-            target: 'light_count',
-            action: 'implement_frustum_culling',
-            estimatedGain: 0.25,
-            priority: 7
-          });
-        }
-
-        return optimizations;
-      }
-    };
-  }
-
-  private initializePerformanceMonitor() {
-    this.performanceMonitor = {
-      measureFrameTime: () => performance.now(),
-      trackShadowComplexity: (system: LightingSystem) => {
-        return system.lights.filter(l => l.shadows).length * 0.1;
-      }
-    };
-  }
-
-  private initializeAutonomousManager() {
-    this.autonomousManager = {
-      monitor: (system: LightingSystem) => {
-        this.monitorLightingPerformance(system);
-      },
-      optimize: (system: LightingSystem) => {
-        this.autonomouslyOptimizeSystem(system);
-      }
-    };
-  }
-
-  private startContinuousOptimization() {
-    setInterval(() => {
-      this.performAutonomousOptimization();
-    }, 5000);
-
-    setInterval(() => {
-      this.performQualityCheck();
-    }, 30000);
-  }
-
-  private async performAutonomousOptimization() {
-    for (const [id, system] of this.lightingSystems) {
-      const performance = this.measureSystemPerformance(system);
-      
-      if (performance.frameTime > 16.67) {
-        await this.optimizeSystem(system);
-      }
-    }
-  }
-
-  // Utility methods
-  private generateSystemId(): string {
-    return `lighting_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private calculateComplexity(system: LightingSystem): number {
-    let complexity = 0;
-    complexity += system.lights.length * 0.1;
-    complexity += system.lights.filter(l => l.shadows).length * 0.3;
-    complexity += system.globalSettings.shadowQuality === 'ultra' ? 0.4 : 0;
-    return Math.min(complexity, 1);
-  }
-
-  private updateMetrics(system: LightingSystem, processingTime: number) {
-    this.metrics.set('lastProcessingTime', processingTime);
-    this.metrics.set('averageComplexity', this.calculateComplexity(system));
-    this.metrics.set('lightSystemsCount', this.lightingSystems.size);
-  }
-
-  // Public API
-  public getSystemMetrics() {
-    const systems = Array.from(this.lightingSystems.values());
-    
-    return {
-      totalSystems: systems.length,
-      totalLights: systems.reduce((sum, sys) => sum + sys.lights.length, 0),
-      averageComplexity: this.calculateAverageComplexity(systems),
-      shadowSystems: systems.filter(sys => sys.lights.some(l => l.shadows)).length,
-      hdrSystems: systems.filter(sys => sys.globalSettings.hdr).length
-    };
-  }
-
-  public getLightingSystem(id: string): LightingSystem | undefined {
-    return this.lightingSystems.get(id);
-  }
-
-  private calculateAverageComplexity(systems: LightingSystem[]): number {
-    if (systems.length === 0) return 0;
-    return systems.reduce((sum, sys) => sum + this.calculateComplexity(sys), 0) / systems.length;
-  }
-
-  // Placeholder methods for completion
-  private analyzeSceneComplexity(config: any): any { return { requiresKeyLight: true, requiresFillLight: true, requiresRimLight: false }; }
-  private analyzePerformanceNeeds(context: any): any { return { target: 'balanced' }; }
-  private analyzeVisualQuality(config: any): any { return { targetQuality: 0.8 }; }
-  private analyzePlatformLimitations(context: any): any { return { supportsCascades: true }; }
-  private async identifyOptimizationOpportunities(config: any): Promise<any> { return []; }
-  private calculatePerformanceEstimate(analysis: any): number { return 0.85; }
-  private calculateOptimalIntensity(type: string, analysis: any): number { return type === 'key' ? 1.0 : 0.5; }
-  private calculateOptimalColor(type: string, analysis: any): [number, number, number] { return [1, 1, 1]; }
-  private generateAdaptiveGlobalSettings(analysis: any): any { return { ambientIntensity: 0.1, shadowQuality: 'medium', hdr: true, bloomEffect: false, toneMapping: 'aces' }; }
-  private generatePerformanceSettings(analysis: any): any { return { shadowDistance: 100, lightCulling: true, deferredRendering: true, forwardPlus: false }; }
-  private calculateShadowComplexity(lights: LightingConfig[]): number { return lights.filter(l => l.shadows).length * 0.2; }
-  private async generateDynamicLights(config: any, analysis: any): Promise<LightingConfig[]> { return []; }
-  private generateShadowFunctions(system: LightingSystem): string { return '// Shadow functions'; }
-  private generateLightingFunctions(system: LightingSystem): string { return '// Lighting functions'; }
-  private getToneMappingFunction(toneMapping: string): string { return 'totalLighting'; }
-  private getThreeShadowType(quality: string): string { return 'THREE.PCFSoftShadowMap'; }
-  private getThreeToneMapping(toneMapping: string): string { return 'THREE.ACESFilmicToneMapping'; }
-  private generateThreeLightCode(light: LightingConfig, index: number): string { return `// Light ${index}`; }
-  private generateThreeLightMethods(system: LightingSystem): string { return '// Light methods'; }
-  private async applyOptimizations(system: LightingSystem, optimizations: LightingOptimization[]): Promise<LightingSystem> { return system; }
-  private monitorLightingPerformance(system: LightingSystem): void { }
-  private autonomouslyOptimizeSystem(system: LightingSystem): void { }
-  private measureSystemPerformance(system: LightingSystem): any { return { frameTime: 16 }; }
-  private async optimizeSystem(system: LightingSystem): Promise<void> { }
-  private performQualityCheck(): void { }
-  private generateGenericLightingCode(system: LightingSystem): string { return '// Generic lighting code'; }
-  private generateBabylonLightingCode(system: LightingSystem): string { return '// Babylon lighting code'; }
-}
-
-export const lighting = new AdvancedLightingSystem();
-export const lightingModule = lighting;
+export const LIGHTING_VERSION = ENGINE_VERSION;
+console.log(`💡 LightingEngine v${ENGINE_VERSION} chargé — 6 styles | GlowPulse | CardDepth | SectorAware(10) | WCAG-safe`);
