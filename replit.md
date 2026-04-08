@@ -101,12 +101,112 @@ POST /api/signature/variants/:id/render        — 1 HTML (A ou B ou C ou D)
 
 **Performance** : 4 variantes en ~40ms, 0 dépendance externe, 10/10 secteurs validés.
 
+### ✅ Module 2 — TimingMaster v3.0 (opérationnel)
+
+**Fichier** : `server/modules/timing-master.module.ts`
+
+Orchestrateur temporel de précision militaire — synchronise toutes les zones sur un métronome BPM commun via un arc narratif intro→développement→climax→repos.
+
+| Composant | Description |
+|-----------|-------------|
+| **MetronomeSync** | Délais calculés en beats (60/BPM) — toutes les zones respirent ensemble |
+| **SectorAwareness** | 10 profils métier : Finance(BPM=44, ×φ=1.618) → Startup(BPM=96, ×φ⁻¹=0.618) |
+| **NarrativeTimeline** | fond=intro(0 beats) → logo/nom/sep=develop(2) → titre/contact=climax(4) → cta=rest(7) |
+| **DeterministicJitter** | Jitter djb2-hash — 100% reproductible, zéro Math.random() |
+| **CharacterStagger** | Délai Fibonacci par lettre pour TYPEWRITER/NAME_REVEAL |
+| **CSS Injection** | Bloc `<style id="timing-master-v3">` + MSO Outlook + prefers-reduced-motion |
+
+**Routes API exposées :**
+```
+GET  /api/timing/sectors           — 10 profils secteur (BPM, easing, intensity)
+GET  /api/timing/profile           — Profil complet variation + secteur
+GET  /api/timing/profiles/all      — Matrice 40 profils (10 secteurs × 4 variations)
+POST /api/timing/css               — Bloc CSS injectable (style + Outlook + reduced-motion)
+POST /api/timing/inject            — Injection CSS dans un HTML complet
+```
+
+**Performance** : 40 profils précalculables, 0 dépendance externe, 7 zones × arc narratif, 8/8 tests validés.
+
+### ✅ Module 3 — ColorHarmonyEngine v3.0 (opérationnel)
+
+**Fichier** : `server/modules/color-harmony.module.ts`
+
+Moteur de cohérence chromatique — génère des harmonies, adapte la palette secteur au logo uploadé, valide WCAG et injecte les variables CSS.
+
+| Composant | Description |
+|-----------|-------------|
+| **HarmonyGenerator** | 7 types : complementary, triadic, analogous, split-comp, tetradic, monochromatic, square |
+| **SectorPaletteAdapter** | Adapte bg + accent + text + muted + border à une couleur dominante de logo |
+| **AccessibilityGuard** | WCAG 2.1 AA (ratio ≥ 4.5) / AAA (≥ 7.0) — ajustement automatique par itération HSL |
+| **GradientEngine** | linear + radial + conic CSS générés automatiquement depuis la palette |
+| **CSS Variable Injector** | `--sig-bg` `--sig-accent` `--sig-text` `--sig-muted` `--sig-border` avant `</head>` |
+
+**Routes API exposées :**
+```
+GET  /api/color/types           — 7 types d'harmonies disponibles
+POST /api/color/analyze         — Analyse HSL + luminance + contraste WCAG
+POST /api/color/harmony         — Génère une harmonie + palette + CSS variables
+POST /api/color/harmonies/all   — Les 7 harmonies pour une couleur
+POST /api/color/adapt           — Adapte palette secteur à couleur dominante logo
+POST /api/color/inject          — Injecte CSS (WCAG auto-enforced) dans un HTML
+```
+
+**Performance** : 0 dépendance externe, WCAG auto-enforced à l'injection, 7/7 tests validés.
+
+### ✅ Module 4 — ContextAdaptationEngine v3.0 (opérationnel)
+
+**Fichier** : `server/modules/context-adaptation.module.ts`
+
+Adapte automatiquement la signature à chaque client email et mode couleur — élimine le problème "texte blanc sur fond blanc" en mode clair.
+
+| Composant | Description |
+|-----------|-------------|
+| **ClientDetector** | Identifie le client email depuis User-Agent ou hint (10 clients) |
+| **ColorSchemeAdapter** | Génère palettes light + dark automatiquement, prefers-color-scheme natif |
+| **ClientCSSGenerator** | Overrides spécifiques : MSO/Outlook, Gmail inline-only, Apple Mail webkit |
+| **SafetyValidator** | Garantit contraste ≥ 4.5 (WCAG AA) dans les 4 combinaisons client×mode |
+| **HTML Injector** | CSS + MSO + dark-mode avant `</head>`, compatible VarianceEngine+Timing+Color |
+
+**Routes API exposées :**
+```
+GET  /api/context/clients         — 10 profils clients email
+POST /api/context/detect          — Détecte le client depuis hint/User-Agent
+POST /api/context/adapt           — CSS + inline + MSO pour un client + scheme
+POST /api/context/adapt/all       — Matrice 10 clients en une passe
+POST /api/context/inject          — Injecte dans un HTML complet
+```
+
+**Performance** : 0 dépendance externe, 10/10 clients validés, SafetyValidator WCAG auto.
+
+### ✅ Module 5 — PerformanceAdaptiveEngine v3.0 (opérationnel)
+
+**Fichier** : `server/modules/performance-adaptive.module.ts`
+
+Génère 3 niveaux de CSS d'animation (Ultra / Standard / Lite) et dégrade automatiquement selon les capacités détectées de l'appareil.
+
+| Composant | Description |
+|-----------|-------------|
+| **TierResolver** | Score (0-100) → tier depuis 7 hints (device, GPU, connexion, FPS, mobile, reducedMotion, dataSaver) |
+| **CSSLayerGenerator** | Ultra (fps60/100% particules), Standard (fps30/50%), Lite (fps15/0% → transitions seules) |
+| **MediaQueryStack** | `prefers-reduced-motion` + `prefers-data-saver` + `update:slow` + mobile 480px 1.5dppx |
+| **RuntimeDetectionSnippet** | Snippet JS inline — mesure FPS réel sur 30 frames, ajuste tier via CSS vars dynamiquement |
+| **HTML Injector** | CSS + media queries avant `</head>`, snippet JS avant `</body>`, compatible tous modules antérieurs |
+
+**Routes API exposées :**
+```
+GET  /api/performance/tiers         — 3 configs Ultra/Standard/Lite
+POST /api/performance/resolve       — Résout le tier depuis les hints
+POST /api/performance/adapt         — CSS adaptatif complet pour les hints
+GET  /api/performance/tiers/all     — Matrice 3 tiers pré-générée
+POST /api/performance/inject        — Injecte dans un HTML complet + snippet JS FPS
+```
+
+**Performance** : 7 hints analysés, score signé (-95 à 100), TierResolver 4 profils validés, 5 media queries empilés.
+
 ### Modules existants (hérités)
 
 | Module | Fichier | Rôle |
 |--------|---------|------|
-| **TimingMaster** | `timing-master.module.ts` | Durées basées sur φ et Fibonacci. Fallback Outlook. prefers-reduced-motion. |
-| ColorHarmonyEngine | `color-harmony.module.ts` | Harmonies triadiques/analogues/split-comp |
 | Physics | `physics.module.ts` | Calculs physiques pour effets dynamiques |
 | Particles | `particles.module.ts` | Système de particules |
 | Morphing | `morphing.module.ts` | Transformations morphologiques |

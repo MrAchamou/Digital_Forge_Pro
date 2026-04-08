@@ -4,6 +4,49 @@ import { storage } from './storage';
 import { buildEffectPreviewHTML, saveEffectPreview, getEffectPreviewHTML } from './services/effect-preview-generator';
 import { getAllSectorConfigs, getSectorConfig, renderSignature } from './services/signature-renderer';
 import { generateVariants, generateSingleVariant, getVariantProfiles, ENGINE_VERSION as VARIANCE_VERSION, VariantId } from './modules/variance-engine.module';
+import {
+  getTimingProfile,
+  getAllTimingProfiles,
+  getSectorTimingProfiles,
+  generateFullTimingBlock,
+  injectTimingIntoHTML,
+  ENGINE_VERSION as TIMING_VERSION,
+  VariationContext,
+} from './modules/timing-master.module';
+import {
+  generateHarmony,
+  generateAllHarmonies,
+  adaptPaletteToLogo,
+  injectColorIntoHTML,
+  analyzeColor,
+  getHarmonyTypes,
+  isValidHex,
+  getContrastRatio,
+  enforceAccessibility,
+  ENGINE_VERSION as COLOR_VERSION,
+  HarmonyType,
+} from './modules/color-harmony.module';
+import {
+  adaptToContext,
+  adaptForAllClients,
+  injectContextIntoHTML,
+  getClientProfiles,
+  getClientProfile,
+  detectEmailClient,
+  ENGINE_VERSION as CTX_VERSION,
+  EmailClient,
+  ColorScheme,
+} from './modules/context-adaptation.module';
+import {
+  adaptPerformance,
+  adaptAllTiers,
+  injectPerformanceIntoHTML,
+  getTierConfigs,
+  resolveTier,
+  ENGINE_VERSION as PERF_VERSION,
+  PerformanceTier,
+  PerformanceHints,
+} from './modules/performance-adaptive.module';
 import { classifySector } from './services/sector-classifier';
 import fs from 'fs';
 import path from 'path';
@@ -22,7 +65,11 @@ router.get('/system/health', (_req, res) => {
     morphing:       { status: 'online', performance: 99,  uptime: uptimeHours },
     templates:      { status: 'online', performance: 100, uptime: uptimeHours },
     classifier:     { status: 'online', performance: 100, uptime: uptimeHours },
-    variance_engine: { status: 'online', performance: 100, uptime: uptimeHours, version: VARIANCE_VERSION },
+    variance_engine:  { status: 'online', performance: 100, uptime: uptimeHours, version: VARIANCE_VERSION },
+    timing_master:     { status: 'online', performance: 100, uptime: uptimeHours, version: TIMING_VERSION },
+    color_harmony:         { status: 'online', performance: 100, uptime: uptimeHours, version: COLOR_VERSION },
+    context_adaptation:      { status: 'online', performance: 100, uptime: uptimeHours, version: CTX_VERSION },
+    performance_adaptive:    { status: 'online', performance: 100, uptime: uptimeHours, version: PERF_VERSION },
   };
   const moduleAvg = Math.round(
     Object.values(modules).reduce((s, m) => s + m.performance, 0) / Object.keys(modules).length
@@ -283,6 +330,465 @@ router.post('/signature/variants/:variantId/render', (req, res) => {
     const variant = generateSingleVariant(sectorId, data, variantId);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(variant.html);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// === TIMING MASTER v3.0 ===
+
+/**
+ * GET /api/timing/sectors — Liste des 10 profils secteur avec leurs BPM et paramètres.
+ */
+router.get('/timing/sectors', (_req, res) => {
+  try {
+    const sectors = getSectorTimingProfiles();
+    res.json({
+      version: TIMING_VERSION,
+      count:   sectors.length,
+      sectors: sectors.map(s => ({
+        sectorId:   s.sectorId,
+        bpm:        s.bpm,
+        globalMult: s.globalMult,
+        easing:     s.easing,
+        jitterBase: s.jitterBase,
+        intensity:  s.intensity,
+        beatMs:     Math.round((60 / s.bpm) * 1000),
+      })),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/timing/profile — Retourne le profil complet pour une variation + secteur.
+ * Query : variation=A|B|C|D  sectorId=tech|finance|...  reducedMotion=true|false
+ */
+router.get('/timing/profile', (req, res) => {
+  try {
+    const variation     = ((req.query.variation as string) || 'B').toUpperCase() as VariationContext;
+    const sectorId      = (req.query.sectorId  as string) || 'standard';
+    const reducedMotion = req.query.reducedMotion === 'true';
+
+    if (!['A', 'B', 'C', 'D'].includes(variation)) {
+      return res.status(400).json({ error: 'variation doit être A, B, C ou D' });
+    }
+
+    const profile = getTimingProfile(variation, { sectorId, reducedMotion });
+    res.json({ version: TIMING_VERSION, profile });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/timing/profiles/all — Matrice complète : 10 secteurs × 4 variations = 40 profils.
+ */
+router.get('/timing/profiles/all', (_req, res) => {
+  try {
+    const profiles = getAllTimingProfiles();
+    res.json({
+      version: TIMING_VERSION,
+      count:   Object.keys(profiles).length,
+      profiles,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/timing/css — Génère le bloc CSS TimingMaster pour injection.
+ * Body : { variation, sectorId, zoneColors?, reducedMotion? }
+ */
+router.post('/timing/css', (req, res) => {
+  try {
+    const { variation = 'B', sectorId = 'standard', zoneColors = {}, reducedMotion = false } = req.body;
+    if (!['A', 'B', 'C', 'D'].includes(variation?.toUpperCase())) {
+      return res.status(400).json({ error: 'variation doit être A, B, C ou D' });
+    }
+
+    const profile = getTimingProfile(variation.toUpperCase() as VariationContext, {
+      sectorId,
+      reducedMotion,
+    });
+    const block = generateFullTimingBlock(profile, {
+      instanceId:  `api-${variation}-${sectorId}`,
+      zoneColors,
+      withOutlook: true,
+    });
+
+    res.json({
+      version:       TIMING_VERSION,
+      variation:     variation.toUpperCase(),
+      sectorId,
+      profile,
+      styleTag:      block.styleTag,
+      outlookBlock:  block.outlookBlock,
+      reducedMotion: block.reducedMotion,
+      totalSize:     block.styleTag.length + block.outlookBlock.length + block.reducedMotion.length,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/timing/inject — Injecte le CSS TimingMaster dans un HTML complet.
+ * Body : { html, variation, sectorId?, reducedMotion?, zoneColors? }
+ */
+router.post('/timing/inject', (req, res) => {
+  try {
+    const { html, variation = 'B', sectorId = 'standard', reducedMotion = false, zoneColors = {} } = req.body;
+    if (!html) return res.status(400).json({ error: 'html requis' });
+
+    const result = injectTimingIntoHTML(
+      html,
+      variation.toUpperCase() as VariationContext,
+      { sectorId, reducedMotion, zoneColors }
+    );
+
+    res.json({
+      version:      TIMING_VERSION,
+      injected:     result.injected,
+      cssBlockSize: result.cssBlockSize,
+      profile:      result.profile,
+      html:         result.html,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// === COLOR HARMONY ENGINE v3.0 ===
+
+/**
+ * GET /api/color/types — Liste des 7 types d'harmonies disponibles.
+ */
+router.get('/color/types', (_req, res) => {
+  const types = getHarmonyTypes();
+  res.json({
+    version: COLOR_VERSION,
+    count:   types.length,
+    types:   types.map(t => ({
+      id:          t,
+      label:       t.charAt(0).toUpperCase() + t.slice(1).replace(/-/g, ' '),
+      colorCount:  t === 'monochromatic' ? 4 : t === 'tetradic' || t === 'square' ? 3 : t === 'complementary' ? 1 : 2,
+    })),
+  });
+});
+
+/**
+ * POST /api/color/analyze — Analyse une couleur hex (HSL, luminance, WCAG).
+ * Body : { hex }
+ */
+router.post('/color/analyze', (req, res) => {
+  try {
+    const { hex } = req.body;
+    if (!hex || !isValidHex(hex)) return res.status(400).json({ error: 'hex invalide (ex: #06b6d4)' });
+    const info       = analyzeColor(hex);
+    const complement = getContrastRatio(hex, '#ffffff');
+    res.json({
+      version:         COLOR_VERSION,
+      ...info,
+      contrastOnWhite: complement,
+      contrastOnBlack: getContrastRatio(hex, '#000000'),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/color/harmony — Génère une harmonie pour une couleur et un type donné.
+ * Body : { hex, type? }
+ */
+router.post('/color/harmony', (req, res) => {
+  try {
+    const { hex, type = 'complementary' } = req.body;
+    if (!hex || !isValidHex(hex)) return res.status(400).json({ error: 'hex invalide' });
+    const validTypes = getHarmonyTypes();
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ error: `type invalide. Valeurs: ${validTypes.join(', ')}` });
+    }
+
+    const result = generateHarmony(hex, type as HarmonyType);
+    res.json({ version: COLOR_VERSION, ...result });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/color/harmonies/all — Génère les 7 harmonies pour une couleur.
+ * Body : { hex }
+ */
+router.post('/color/harmonies/all', (req, res) => {
+  try {
+    const { hex } = req.body;
+    if (!hex || !isValidHex(hex)) return res.status(400).json({ error: 'hex invalide' });
+
+    const results = generateAllHarmonies(hex);
+    res.json({
+      version:  COLOR_VERSION,
+      baseColor: hex,
+      count:     Object.keys(results).length,
+      harmonies: results,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/color/adapt — Adapte la palette d'un secteur à une couleur de logo.
+ * Body : { dominantColor, originalPalette: { background, accent, text, muted, border }, harmonyType? }
+ */
+router.post('/color/adapt', (req, res) => {
+  try {
+    const { dominantColor, originalPalette, harmonyType = 'analogous' } = req.body;
+    if (!dominantColor || !isValidHex(dominantColor)) return res.status(400).json({ error: 'dominantColor invalide' });
+    if (!originalPalette?.background || !originalPalette?.accent) {
+      return res.status(400).json({ error: 'originalPalette requis : { background, accent, text, muted, border }' });
+    }
+
+    const result = adaptPaletteToLogo(dominantColor, originalPalette, harmonyType as HarmonyType);
+    res.json({ version: COLOR_VERSION, ...result });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/color/inject — Injecte la palette CSS dans un HTML.
+ * Body : { html, palette: { background, accent, text, muted, border } }
+ */
+router.post('/color/inject', (req, res) => {
+  try {
+    const { html, palette } = req.body;
+    if (!html)    return res.status(400).json({ error: 'html requis' });
+    if (!palette) return res.status(400).json({ error: 'palette requise' });
+
+    // Applique l'accessibilité WCAG avant injection
+    const safePalette = enforceAccessibility(palette);
+    const result      = injectColorIntoHTML(html, safePalette);
+    res.json({ version: COLOR_VERSION, ...result });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// === CONTEXT ADAPTATION ENGINE v3.0 ===
+
+/**
+ * GET /api/context/clients — Liste des 10 profils clients email.
+ */
+router.get('/context/clients', (_req, res) => {
+  try {
+    const profiles = getClientProfiles();
+    res.json({
+      version: CTX_VERSION,
+      count:   profiles.length,
+      clients: profiles.map(p => ({
+        id:               p.id,
+        label:            p.label,
+        animationSupport: p.animationSupport,
+        cssSupport:       p.cssSupport,
+        darkModeSupport:  p.darkModeSupport,
+        msoConditional:   p.msoConditional,
+        notes:            p.notes,
+      })),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/context/detect — Détecte le client email depuis un User-Agent ou hint.
+ * Body : { hint?, userAgent? }
+ */
+router.post('/context/detect', (req, res) => {
+  try {
+    const { hint, userAgent } = req.body;
+    const client  = detectEmailClient(hint, userAgent);
+    const profile = getClientProfile(client);
+    res.json({ version: CTX_VERSION, client, profile });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/context/adapt — Génère l'adaptation contextuelle (CSS + inline + MSO).
+ * Body : { palette, client?, scheme? }
+ */
+router.post('/context/adapt', (req, res) => {
+  try {
+    const { palette, client = 'generic', scheme = 'auto' } = req.body;
+    if (!palette?.background) return res.status(400).json({ error: 'palette requis : { background, accent, text, muted, border }' });
+
+    const result = adaptToContext(palette, client as EmailClient, scheme as ColorScheme);
+    res.json({
+      version:      CTX_VERSION,
+      client:       result.client,
+      scheme:       result.scheme,
+      cssBlock:     result.cssBlock,
+      inlineStyle:  result.inlineStyle,
+      msoBlock:     result.msoBlock,
+      palette:      result.adaptedPalette.safePalette,
+      lightPalette: result.adaptedPalette.lightPalette,
+      darkPalette:  result.adaptedPalette.darkPalette,
+      warnings:     result.warnings,
+      profile:      result.profile,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/context/adapt/all — Adapte pour les 10 clients en une passe.
+ * Body : { palette, scheme? }
+ */
+router.post('/context/adapt/all', (req, res) => {
+  try {
+    const { palette, scheme = 'auto' } = req.body;
+    if (!palette?.background) return res.status(400).json({ error: 'palette requis' });
+
+    const results = adaptForAllClients(palette, scheme as ColorScheme);
+    const summary = Object.entries(results).map(([client, r]) => ({
+      client,
+      animationSupport: r.profile.animationSupport,
+      cssSupport:       r.profile.cssSupport,
+      darkModeSupport:  r.profile.darkModeSupport,
+      warnings:         r.warnings.length,
+      hasMSO:           !!r.msoBlock,
+    }));
+
+    res.json({
+      version:  CTX_VERSION,
+      count:    Object.keys(results).length,
+      scheme,
+      summary,
+      results,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/context/inject — Injecte l'adaptation contextuelle dans un HTML.
+ * Body : { html, palette, client?, scheme? }
+ */
+router.post('/context/inject', (req, res) => {
+  try {
+    const { html, palette, client = 'generic', scheme = 'auto' } = req.body;
+    if (!html)              return res.status(400).json({ error: 'html requis' });
+    if (!palette?.background) return res.status(400).json({ error: 'palette requis' });
+
+    const result = injectContextIntoHTML(html, palette, client as EmailClient, scheme as ColorScheme);
+    res.json({ version: CTX_VERSION, ...result });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// === PERFORMANCE ADAPTIVE ENGINE v3.0 ===
+
+/**
+ * GET /api/performance/tiers — Configuration des 3 tiers (Ultra / Standard / Lite).
+ */
+router.get('/performance/tiers', (_req, res) => {
+  try {
+    const configs = getTierConfigs();
+    res.json({
+      version: PERF_VERSION,
+      count:   configs.length,
+      tiers:   configs.map(c => ({
+        tier:               c.tier,
+        label:              c.label,
+        animationEnabled:   c.animationEnabled,
+        particleDensity:    c.particleDensity,
+        keyframeComplexity: c.keyframeComplexity,
+        frameTarget:        c.frameTarget,
+      })),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/performance/resolve — Résout le tier optimal depuis les hints.
+ * Body : { deviceTier?, gpuTier?, connectionType?, isMobile?, reducedMotion?, dataSaver?, maxFPS?, userAgent? }
+ */
+router.post('/performance/resolve', (req, res) => {
+  try {
+    const hints  = req.body as PerformanceHints;
+    const result = resolveTier(hints);
+    res.json({ version: PERF_VERSION, tier: result.tier, reasoning: result.reasoning });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/performance/adapt — Génère le CSS adaptatif pour les hints fournis.
+ * Body : { hints?: PerformanceHints }
+ */
+router.post('/performance/adapt', (req, res) => {
+  try {
+    const hints  = (req.body.hints ?? req.body) as PerformanceHints;
+    const result = adaptPerformance(hints);
+    res.json({
+      version:        PERF_VERSION,
+      tier:           result.tier,
+      label:          result.tierConfig.label,
+      frameTarget:    result.tierConfig.frameTarget,
+      cssBlock:       result.cssBlock,
+      mediaQueryBlock: result.mediaQueryBlock,
+      inlineVars:     result.inlineVars,
+      reasoning:      result.reasoning,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/performance/tiers/all — CSS pré-généré pour les 3 tiers.
+ */
+router.get('/performance/tiers/all', (_req, res) => {
+  try {
+    const all = adaptAllTiers();
+    const summary = (Object.entries(all) as [PerformanceTier, typeof all.ultra][]).map(([tier, r]) => ({
+      tier,
+      label:          r.tierConfig.label,
+      frameTarget:    r.tierConfig.frameTarget,
+      particleDensity: r.tierConfig.particleDensity,
+      reasoning:      r.reasoning,
+      cssSize:        r.cssBlock.length,
+    }));
+    res.json({ version: PERF_VERSION, count: 3, tiers: summary });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/performance/inject — Injecte le CSS adaptatif dans un HTML.
+ * Body : { html, hints?: PerformanceHints }
+ */
+router.post('/performance/inject', (req, res) => {
+  try {
+    const { html, hints = {} } = req.body;
+    if (!html) return res.status(400).json({ error: 'html requis' });
+
+    const result = injectPerformanceIntoHTML(html, hints as PerformanceHints);
+    res.json({ version: PERF_VERSION, ...result });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
