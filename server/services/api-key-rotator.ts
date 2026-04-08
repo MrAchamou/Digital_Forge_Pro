@@ -330,7 +330,7 @@ class ApiKeyRotator {
     }
   }
 
-  // ─── Sélection pondérée par score de santé ─────────────────────────────────
+  // ─── Sélection round-robin avec protection santé ───────────────────────────
   async selectBestKey(service: ServiceName): Promise<ApiKey> {
     await this.init();
     this.checkCircuitBreaker(service);
@@ -341,22 +341,27 @@ class ApiKeyRotator {
       throw new Error(`Aucune clé ${service} configurée. Ajoutez une clé via l'interface ou les secrets Replit.`);
     }
 
-    // PRIORITÉ 1 : clés actives sous leur limite, triées par score de santé (desc)
+    // PRIORITÉ 1 : clés actives sous leur limite
+    // Tri principal : round-robin par lastUsed (la moins récemment utilisée en premier)
+    // Tri secondaire : score de santé (évite les clés dégradées si plusieurs sont disponibles)
     const activeKeys = allKeys.filter(k => k.status === 'active' && k.usageToday < k.dailyLimit);
 
     if (activeKeys.length > 0) {
       activeKeys.sort((a, b) => {
-        // Score composite : health (40%) + usage restant (30%) + rapidité (30%)
-        const aUsagePct = a.usageToday / a.dailyLimit;
-        const bUsagePct = b.usageToday / b.dailyLimit;
-        const aScore = a.healthScore - aUsagePct * 30 - (a.avgResponseTime / 5000) * 30;
-        const bScore = b.healthScore - bUsagePct * 30 - (b.avgResponseTime / 5000) * 30;
-        if (Math.abs(aScore - bScore) > 2) return bScore - aScore;
-        const aLast = a.lastUsed?.getTime() || 0;
-        const bLast = b.lastUsed?.getTime() || 0;
-        return aLast - bLast;
+        // Clés jamais utilisées (lastUsed=null) ont la priorité absolue
+        const aLast = a.lastUsed?.getTime() ?? -1;
+        const bLast = b.lastUsed?.getTime() ?? -1;
+
+        // Tri principal : la moins récemment utilisée d'abord (round-robin strict)
+        if (aLast !== bLast) return aLast - bLast;
+
+        // Tie-break : meilleur score de santé
+        return b.healthScore - a.healthScore;
       });
-      return activeKeys[0];
+
+      const selected = activeKeys[0];
+      log(`🔄 Clé sélectionnée: ${selected.id} (lastUsed: ${selected.lastUsed ? Math.round((Date.now() - selected.lastUsed.getTime()) / 1000) + 's ago' : 'jamais'}, health: ${Math.round(selected.healthScore)})`, 'api-rotator');
+      return selected;
     }
 
     // PRIORITÉ 2 : clés en cooldown (attendre la plus proche si < 30s)
