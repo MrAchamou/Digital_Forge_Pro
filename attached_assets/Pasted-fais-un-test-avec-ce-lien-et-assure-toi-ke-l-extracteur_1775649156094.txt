@@ -1,0 +1,55 @@
+fais un test avec ce lien et assure toi ke l'extracteur est en place et fonctionnel
+https://maps.app.goo.gl/AHCG5n9JQZLUh5RM9
+
+38 minutes ago
+
+Testing GMB scraper functionality
+Je teste directement le scraper avec ce lien Google Maps.
+
+
+2 actions
+Le champ s'appelle gmb_url. Je reteste avec la bonne clé et vérifie en même temps le code du scraper.
+
+
+3 actions
+Les données sont retournées avec les clés françaises mais toutes vides. Je lis le cœur de la logique d'extraction.
+
+
+5 actions
+Le problème est clair : le scraper a été vidé de sa logique Serper et ne fait qu'extraire le nom depuis l'URL. Il faut reconstruire le vrai appel Serper. Je vérifie d'abord les clés disponibles.
+
+
+3 actions
+Parfait — l'URL se résout bien vers "Cabinet dentaire de l'Avenue" à Paris. Le nom est extrait mais toute la logique Serper a été supprimée. Je la reconstruit complètement.
+
+
+2 actions
+L'API Serper Places fonctionne et remonte les vraies données. Je vais aussi tester le search classique pour récupérer le téléphone et les horaires, puis je reconstruis toute la logique de scraping.
+
+
+4 actions
+Avec adresse précise, le téléphone apparaît : 01 88 33 49 41. L'API Serper fonctionne parfaitement. Le problème est que toute la logique Serper a été remplacée par du code mort. Je reconstruis le scraper complet.
+
+
+2 actions
+Je réécris entièrement le fichier en gardant l'interface et les maps utilitaires, mais en reconstruisant la logique Serper de A à Z.
+
+
+6 actions
+Le scraper fonctionne — 10 champs extraits. Il reste deux lacunes : téléphone vide et ville/code postal vides. Je trace le problème : la requête Serper ne contient pas assez de contexte pour déclencher ces champs. Je corrige les deux points.
+
+
+2 actions
+Le problème est clair : avec le nom seul, Serper ne retourne ni adresse ni téléphone. J'améliore la stratégie : double tentative et utilisation des coordonnées pour enrichir la requête.
+
+
+6 actions
+Deux stratégies fonctionnent : second appel Places avec code postal ET extraction depuis les snippets Search. J'implémente les deux en cascade dans le scraper.
+
+
+2 actions
+Maintenant je mets à jour la fonction principale pour utiliser ces deux nouvelles fonctions d'extraction.
+
+
+6 actions
+Excellent résultat — téléphone, note, site, logo et coords récupérés. Il reste juste l'extraction ville/code postal car l'adresse ne comporte pas de virgule. Je corrige le parseur d'adresse.
