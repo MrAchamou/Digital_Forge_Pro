@@ -1,5 +1,6 @@
 import { log } from '../vite';
 import { rotator } from './api-key-rotator';
+import { applyLogo3D } from './logo-3d-transformer';
 
 export interface GmbScrapedData {
   nom: string;
@@ -21,6 +22,7 @@ export interface GmbScrapedData {
   horaires: string[];
   logo_url: string;
   logo_base64: string;
+  logo_3d_base64: string;
   photos: string[];
   coordonnees: { lat: number; lng: number } | null;
   reseaux_sociaux: Record<string, string>;
@@ -511,7 +513,7 @@ function generateDemoData(name: string, url: string): GmbScrapedData {
     description: `${name} — importé depuis Google My Business`,
     adresse: '', ville: '', pays: 'France', code_postal: '',
     note: 0, avis: 0, horaires: [],
-    logo_url: '', logo_base64: '', photos: [],
+    logo_url: '', logo_base64: '', logo_3d_base64: '', photos: [],
     coordonnees: null, reseaux_sociaux: {},
     mots_cles: [], slogan: '',
     cta: SECTOR_CTA_MAP[sector] || SECTOR_CTA_MAP.default,
@@ -662,10 +664,11 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
   const description = kg?.description
     || `${place.title} — ${category}${ville ? `, ${ville}` : ''}`;
 
-  // 11. Logo (parallèle avec le reste)
+  // 11. Logo → base64 → transformation 3D
   const website = (place.website as string) || kg?.website || '';
   const logo_url = await fetchLogoUrl(website);
   const logo_base64 = logo_url ? await fetchLogoBase64(logo_url) : '';
+  const logo_3d_base64 = logo_base64 ? await applyLogo3D(logo_base64) : '';
 
   // 12. Coordonnées
   const coordonnees = (place.latitude && place.longitude)
@@ -700,6 +703,7 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
     horaires,
     logo_url,
     logo_base64,
+    logo_3d_base64,
     photos: [],
     coordonnees,
     reseaux_sociaux,
