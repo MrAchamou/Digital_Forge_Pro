@@ -3,278 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  :root {
-    --sig-bg: {{palette.background}};
-    --sig-accent: {{palette.accent}};
-    --sig-text: {{palette.text}};
-    --sig-muted: {{palette.muted}};
-    --sig-border: {{palette.border}};
-  }
+  :root { --sig-bg:{{palette.background}}; --sig-accent:{{palette.accent}}; --sig-text:{{palette.text}}; --sig-muted:{{palette.muted}}; --sig-border:{{palette.border}}; }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:transparent; font-family:'Segoe UI',Arial,sans-serif; }
-
-  @keyframes sigLogoGlow {
-    0%,100% { box-shadow:0 0 0 2px var(--sig-accent), 0 0 12px var(--sig-accent)40; }
-    50% { box-shadow:0 0 0 3px var(--sig-accent), 0 0 28px var(--sig-accent)70, 0 0 50px var(--sig-accent)30; }
-  }
-  @keyframes sigLogoPulse {
-    0%,100% { transform:scale(1); }
-    50% { transform:scale(1.04); }
-  }
-  @keyframes sigLogoIn {
-    0% { opacity:0; transform:scale(0.7) rotate(-8deg); }
-    60% { transform:scale(1.08) rotate(2deg); }
-    100% { opacity:1; transform:scale(1) rotate(0); }
-  }
-  @keyframes sigFireWrite {
-    0% { opacity:0; clip-path:inset(0 100% 0 0); color:#ff6b35; }
-    70% { color:var(--sig-accent); }
-    100% { opacity:1; clip-path:inset(0 0% 0 0); }
-  }
-  @keyframes sigMagneticPull {
-    0% { opacity:0; transform:scale(0.75); }
-    60% { transform:scale(1.06); }
-    100% { opacity:1; transform:scale(1); }
-  }
-  @keyframes sigWaveDissolve {
-    0% { opacity:0; transform:translateY(10px); }
-    100% { opacity:1; transform:translateY(0); }
-  }
+  @keyframes sigLogoGlow { 0%,100% { box-shadow:0 0 0 2px var(--sig-accent), 0 0 12px var(--sig-accent)40; } 50% { box-shadow:0 0 0 3px var(--sig-accent), 0 0 28px var(--sig-accent)70, 0 0 50px var(--sig-accent)30; } }
+  @keyframes sigLogoPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.04); } }
+  @keyframes sigLogoIn { 0% { opacity:0; transform:scale(0.7) rotate(-8deg); } 60% { transform:scale(1.08) rotate(2deg); } 100% { opacity:1; transform:scale(1) rotate(0); } }
+  @keyframes sigFireWrite { 0% { opacity:0; clip-path:inset(0 100% 0 0); color:#ff6b35; } 70% { color:var(--sig-accent); } 100% { opacity:1; clip-path:inset(0 0% 0 0); } }
+  @keyframes sigMagneticPull { 0% { opacity:0; transform:scale(0.75); } 60% { transform:scale(1.06); } 100% { opacity:1; transform:scale(1); } }
+  @keyframes sigWaveDissolve { 0% { opacity:0; transform:translateY(10px); } 100% { opacity:1; transform:translateY(0); } }
   @keyframes sigFadeLayers { 0% { opacity:0; } 100% { opacity:1; } }
-  @keyframes sigNeonGlow {
-    0%,100% { text-shadow:0 0 6px var(--sig-accent)80; }
-    50% { text-shadow:0 0 16px var(--sig-accent), 0 0 32px var(--sig-accent)60; }
-  }
-  @keyframes sigElectricForm {
-    0% { opacity:0; transform:scaleX(0.2); filter:brightness(3); }
-    50% { filter:brightness(1.5); }
-    100% { opacity:1; transform:scaleX(1); filter:brightness(1); }
-  }
-  @keyframes sigBarSlide {
-    0% { transform:scaleX(0); opacity:0; }
-    100% { transform:scaleX(1); opacity:1; }
-  }
+  @keyframes sigNeonGlow { 0%,100% { text-shadow:0 0 6px var(--sig-accent)80; } 50% { text-shadow:0 0 16px var(--sig-accent), 0 0 32px var(--sig-accent)60; } }
+  @keyframes sigElectricForm { 0% { opacity:0; transform:scaleX(0.2); filter:brightness(3); } 50% { filter:brightness(1.5); } 100% { opacity:1; transform:scaleX(1); filter:brightness(1); } }
+  @keyframes sigBarSlide { 0% { transform:scaleX(0); opacity:0; } 100% { transform:scaleX(1); opacity:1; } }
 
-  .sig-wrap {
-    display:inline-flex;
-    flex-direction:column;
-    background:var(--sig-bg);
-    border:1px solid var(--sig-border);
-    border-radius:10px;
-    width:{{layout.width}}px;
-    overflow:hidden;
-    position:relative;
-  }
-  .sig-top-bar {
-    height:3px;
-    background:linear-gradient(90deg, transparent, var(--sig-accent), var(--sig-accent), transparent);
-    transform-origin:left;
-    animation:sigBarSlide 0.8s ease-out 0s both;
-  }
-  .sig-main {
-    display:flex;
-    align-items:stretch;
-    padding:16px 18px;
-    gap:16px;
-  }
+  .sig-wrap { display:inline-flex; flex-direction:column; background:var(--sig-bg); border:1px solid var(--sig-border); border-radius:10px; width:{{layout.width}}px; overflow:hidden; position:relative; }
+  .sig-top-bar { height:4px; background:linear-gradient(90deg, transparent, var(--sig-accent), var(--sig-accent), transparent); transform-origin:left; animation:sigBarSlide 0.8s ease-out 0s both; }
+  .sig-main { display:flex; align-items:stretch; padding:16px 18px; gap:16px; }
 
-  /* === LOGO ZONE === */
-  .sig-logo-zone {
-    flex-shrink:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:8px;
-  }
-  .sig-logo-frame {
-    width:72px;
-    height:72px;
-    border-radius:10px;
-    overflow:hidden;
-    background:linear-gradient(135deg, var(--sig-accent)20, var(--sig-accent)05);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    animation:sigLogoIn 0.9s cubic-bezier(0.34,1.56,0.64,1) 0s both, sigLogoGlow 3s ease-in-out 1.5s infinite, sigLogoPulse 3s ease-in-out 2s infinite;
-  }
-  .sig-logo-frame img { width:100%; height:100%; object-fit:contain; padding:6px; }
-  .sig-logo-emoji { font-size:34px; line-height:1; }
-  .sig-logo-dot {
-    width:8px; height:8px; border-radius:50%;
-    background:var(--sig-accent);
-    animation:sigNeonGlow 2s ease-in-out 2s infinite;
-  }
+  .sig-logo-zone { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .sig-logo-frame { width:88px; height:88px; border-radius:10px; overflow:hidden; background:linear-gradient(135deg, var(--sig-accent)20, var(--sig-accent)05); display:flex; align-items:center; justify-content:center; animation:sigLogoIn 0.9s cubic-bezier(0.34,1.56,0.64,1) 0s both, sigLogoGlow 3s ease-in-out 1.5s infinite, sigLogoPulse 3s ease-in-out 2s infinite; }
+  .sig-logo-frame img { width:100%; height:100%; object-fit:contain; padding:8px; }
+  .sig-logo-emoji { font-size:40px; line-height:1; }
+  .sig-logo-dot { width:8px; height:8px; border-radius:50%; background:var(--sig-accent); animation:sigNeonGlow 2s ease-in-out 2s infinite; }
 
-  /* === DIVIDER VERTICAL === */
-  .sig-vdivider {
-    width:1px;
-    background:linear-gradient(180deg, transparent, var(--sig-accent)60, transparent);
-    flex-shrink:0;
-    margin:4px 0;
-  }
+  .sig-vdivider { width:1px; background:linear-gradient(180deg, transparent, var(--sig-accent)60, transparent); flex-shrink:0; margin:4px 0; }
 
-  /* === INFO ZONE === */
-  .sig-info { flex:1; display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .sig-info { flex:1; display:flex; flex-direction:column; gap:7px; min-width:0; }
 
   .sig-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
   .sig-header-left { display:flex; flex-direction:column; gap:2px; }
-  .sig-name {
-    font-size:18px; font-weight:800; color:var(--sig-text); line-height:1.1;
-    opacity:0; animation:sigFireWrite 1.1s ease-out 0.3s both;
-  }
-  .sig-titre {
-    font-size:11px; font-weight:700; color:var(--sig-accent);
-    text-transform:uppercase; letter-spacing:0.1em;
-    opacity:0; animation:sigFireWrite 1.1s ease-out 0.55s both;
-  }
-  .sig-rating {
-    display:flex; align-items:center; gap:4px;
-    font-size:11px; color:var(--sig-muted);
-    opacity:0; animation:sigFadeLayers 0.8s ease-out 1.2s both;
-    white-space:nowrap; flex-shrink:0;
-  }
-  .sig-stars { color:#fbbf24; font-size:11px; }
+  .sig-name { font-size:18px; font-weight:800; color:var(--sig-text); line-height:1.15; opacity:0; animation:sigFireWrite 1.1s ease-out 0.3s both; }
+  .sig-titre { font-size:11px; font-weight:700; color:var(--sig-accent); text-transform:uppercase; letter-spacing:0.1em; opacity:0; animation:sigFireWrite 1.1s ease-out 0.55s both; }
+  .sig-entreprise { font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFadeLayers 0.8s ease-out 0.7s both; }
+  .sig-rating { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFadeLayers 0.8s ease-out 1.2s both; white-space:nowrap; flex-shrink:0; }
+  .sig-stars { color:#fbbf24; letter-spacing:1px; }
 
-  .sig-hdivider {
-    height:1px;
-    background:linear-gradient(90deg, var(--sig-accent)50, transparent);
-    opacity:0; animation:sigFadeLayers 0.8s ease-out 0.8s both;
-  }
+  .sig-hdivider { height:1px; background:linear-gradient(90deg, var(--sig-accent)50, transparent); opacity:0; animation:sigFadeLayers 0.8s ease-out 0.8s both; }
 
-  .sig-contacts {
-    display:grid; grid-template-columns:1fr 1fr; gap:5px 14px;
-  }
-  .sig-contact-item {
-    display:flex; align-items:center; gap:5px;
-    font-size:12px; color:var(--sig-text); text-decoration:none;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    opacity:0;
-  }
-  .sig-contact-item.phone {
-    font-size:14px; font-weight:800; color:var(--sig-accent);
-    animation:sigMagneticPull 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.9s both, sigNeonGlow 2.5s ease-in-out 2s infinite;
-  }
-  .sig-contact-item.email { animation:sigWaveDissolve 0.8s ease-out 1.1s both; }
-  .sig-contact-item.site  { animation:sigWaveDissolve 0.8s ease-out 1.2s both; }
-  .sig-contact-item.addr  { animation:sigWaveDissolve 0.8s ease-out 1.3s both; }
-  .sig-contact-item.hours { animation:sigFadeLayers 0.8s ease-out 1.5s both; }
-  .sig-icon {
-    width:14px; height:14px; flex-shrink:0; font-size:12px;
-    display:inline-flex; align-items:center; justify-content:center;
-    color:var(--sig-accent);
-  }
+  .sig-contacts { display:flex; flex-direction:column; gap:5px; }
+  .sig-contact-item { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--sig-text); text-decoration:none; overflow:hidden; opacity:0; }
+  .sig-contact-item.phone { font-size:15px; font-weight:800; color:var(--sig-accent); animation:sigMagneticPull 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.9s both, sigNeonGlow 2.5s ease-in-out 2s infinite; }
+  .sig-contact-item.email { animation:sigWaveDissolve 0.8s ease-out 1.05s both; }
+  .sig-contact-item.site { animation:sigWaveDissolve 0.8s ease-out 1.15s both; }
+  .sig-contact-item.addr { animation:sigWaveDissolve 0.8s ease-out 1.25s both; }
+  .sig-icon { width:15px; flex-shrink:0; font-size:12px; display:inline-flex; align-items:center; justify-content:center; color:var(--sig-accent); }
 
-  .sig-badges {
-    display:flex; flex-wrap:wrap; gap:5px; margin-top:2px;
-  }
-  .sig-badge {
-    display:inline-flex; align-items:center; gap:4px;
-    padding:3px 9px; border-radius:4px;
-    font-size:10px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
-    opacity:0;
-  }
-  .sig-badge.filled {
-    background:var(--sig-accent); color:var(--sig-bg);
-    animation:sigElectricForm 0.8s ease-out 1.6s both;
-  }
-  .sig-badge.outline {
-    background:transparent; border:1px solid var(--sig-accent); color:var(--sig-accent);
-    animation:sigFadeLayers 0.8s ease-out 1.8s both;
-  }
+  .sig-zone-block { display:flex; align-items:center; gap:7px; padding:5px 8px; background:var(--sig-accent)10; border-left:2px solid var(--sig-accent)60; border-radius:0 4px 4px 0; font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFadeLayers 0.8s ease-out 1.35s both; }
 
-  /* === CTA BAR === */
-  .sig-cta-bar {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:9px 18px;
-    background:linear-gradient(90deg, var(--sig-accent)18, transparent);
-    border-top:1px solid var(--sig-accent)30;
-    opacity:0; animation:sigFadeLayers 1s ease-out 2s both;
-  }
-  .sig-cta-text {
-    font-size:11px; font-weight:600; color:var(--sig-accent); letter-spacing:0.04em;
-  }
-  .sig-cta-arrow {
-    font-size:14px; color:var(--sig-accent);
-    animation:sigNeonGlow 2s ease-in-out 3s infinite;
-  }
-
-  a { text-decoration:none; color:inherit; }
-  a:hover { color:var(--sig-accent); }
+  .sig-footer { display:flex; align-items:center; justify-content:space-between; padding:8px 18px; background:linear-gradient(90deg, var(--sig-accent)15, transparent); border-top:1px solid var(--sig-accent)30; opacity:0; animation:sigFadeLayers 1s ease-out 1.6s both; gap:10px; }
+  .sig-badges { display:flex; flex-wrap:wrap; gap:5px; }
+  .sig-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:4px; font-size:10px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; }
+  .sig-badge.filled { background:var(--sig-accent); color:var(--sig-bg); }
+  .sig-badge.outline { background:transparent; border:1px solid var(--sig-accent); color:var(--sig-accent); }
+  .sig-cta { display:flex; align-items:center; gap:5px; white-space:nowrap; }
+  .sig-cta-text { font-size:11px; font-weight:600; color:var(--sig-accent); letter-spacing:0.04em; }
+  .sig-cta-arrow { font-size:14px; color:var(--sig-accent); animation:sigNeonGlow 2s ease-in-out 3s infinite; }
+  a { text-decoration:none; color:inherit; } a:hover { color:var(--sig-accent); }
 </style>
 </head>
 <body>
 <div class="sig-wrap">
   <div class="sig-top-bar"></div>
-
   <div class="sig-main">
-    <!-- LOGO -->
     <div class="sig-logo-zone">
       <div class="sig-logo-frame">
-        {{#if data.logo_url}}
-          <img src="{{data.logo_url}}" alt="{{data.entreprise}}">
-        {{else}}
-          <span class="sig-logo-emoji">🔧</span>
-        {{/if}}
+        {{#if data.logo_url}}<img src="{{data.logo_url}}" alt="{{data.entreprise}}">
+        {{else}}<span class="sig-logo-emoji">🔧</span>{{/if}}
       </div>
       <div class="sig-logo-dot"></div>
     </div>
-
     <div class="sig-vdivider"></div>
-
-    <!-- INFOS -->
     <div class="sig-info">
       <div class="sig-header">
         <div class="sig-header-left">
           <span class="sig-name">{{data.nom}}</span>
           <span class="sig-titre">{{data.titre}}</span>
+          {{#if data.entreprise}}<span class="sig-entreprise">{{data.entreprise}}</span>{{/if}}
         </div>
-        {{#if data.note}}
-        <div class="sig-rating">
-          <span class="sig-stars">★</span> {{data.note}}
-        </div>
-        {{/if}}
+        {{#if data.note}}<div class="sig-rating"><span class="sig-stars">★</span> {{data.note}}</div>{{/if}}
       </div>
-
       <div class="sig-hdivider"></div>
-
       <div class="sig-contacts">
-        {{#if data.telephone}}
-        <a href="tel:{{data.telephone}}" class="sig-contact-item phone">
-          <span class="sig-icon">📞</span> {{data.telephone}}
-        </a>
-        {{/if}}
-        {{#if data.email}}
-        <a href="mailto:{{data.email}}" class="sig-contact-item email">
-          <span class="sig-icon">✉</span> {{data.email}}
-        </a>
-        {{/if}}
-        {{#if data.site}}
-        <a href="{{data.site}}" class="sig-contact-item site" target="_blank">
-          <span class="sig-icon">🌐</span> {{data.site}}
-        </a>
-        {{/if}}
-        {{#if data.zone}}
-        <div class="sig-contact-item addr">
-          <span class="sig-icon">📍</span> {{data.zone}}
-        </div>
-        {{/if}}
+        {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item phone"><span class="sig-icon">📞</span>{{data.telephone}}</a>{{/if}}
+        {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item email"><span class="sig-icon">✉</span>{{data.email}}</a>{{/if}}
+        {{#if data.site}}<a href="{{data.site}}" class="sig-contact-item site" target="_blank"><span class="sig-icon">🌐</span>{{data.site}}</a>{{/if}}
       </div>
-
-      {{#if data.urgence}}
-      <div class="sig-badges">
-        <span class="sig-badge filled">⚡ {{data.urgence}}</span>
-        {{#if data.siret}}<span class="sig-badge outline">✓ {{data.siret}}</span>{{/if}}
-      </div>
-      {{else}}
-        {{#if data.siret}}<div class="sig-badges"><span class="sig-badge outline">✓ {{data.siret}}</span></div>{{/if}}
-      {{/if}}
+      {{#if data.zone}}<div class="sig-zone-block"><span class="sig-icon">📍</span>{{data.zone}}</div>{{/if}}
     </div>
   </div>
-
-  <!-- CTA -->
-  <div class="sig-cta-bar">
-    <span class="sig-cta-text">{{cta}}</span>
-    <span class="sig-cta-arrow">→</span>
+  <div class="sig-footer">
+    <div class="sig-badges">
+      {{#if data.urgence}}<span class="sig-badge filled">⚡ {{data.urgence}}</span>{{/if}}
+      {{#if data.siret}}<span class="sig-badge outline">✓ {{data.siret}}</span>{{/if}}
+    </div>
+    <div class="sig-cta">
+      <span class="sig-cta-text">{{cta}}</span>
+      <span class="sig-cta-arrow">→</span>
+    </div>
   </div>
 </div>
 </body>
