@@ -658,6 +658,293 @@ export function buildInstallationGuide(
 
 // ── 9. Assemblage ZIP complet ─────────────────────────────────────────────────
 
+// ── Générateurs de fichiers premium pour le ZIP ───────────────────────────────
+
+function escZip(s: string): string {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function buildReadmeMd(params: {
+  signatureId: string;
+  nom: string;
+  titre: string;
+  entreprise: string;
+  email: string;
+  telephone: string;
+  site: string;
+  secteur: string;
+  palette: string[];
+  effectsUsed?: string[];
+}): string {
+  const { signatureId, nom, titre, entreprise, email, telephone, site, secteur, palette, effectsUsed = [] } = params;
+  const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  return `# 🎨 Signature Email Animée — ${nom}
+> Générée par **EffectForge AI** · ${dateStr}
+
+---
+
+## 👤 Identité
+
+| Champ | Valeur |
+|-------|--------|
+| **Nom** | ${nom} |
+| **Titre** | ${titre || '—'} |
+| **Entreprise** | ${entreprise || '—'} |
+| **Secteur** | ${secteur} |
+| **Email** | ${email || '—'} |
+| **Téléphone** | ${telephone || '—'} |
+| **Site web** | ${site || '—'} |
+| **ID Signature** | \`${signatureId}\` |
+
+---
+
+## 📦 Contenu du package
+
+| Fichier | Description | Client recommandé |
+|---------|-------------|-------------------|
+| \`PREVIEW — Ouvrez ce fichier.html\` | **Commencez ici** — aperçu interactif de votre signature | Navigateur |
+| \`signature-gmail.html\` | Version CSS animée | Gmail, Outlook.com, Yahoo |
+| \`signature-outlook.htm\` | Version MSO compatible, table HTML | Outlook 2016–2024 (Windows) |
+| \`signature-apple-mail.html\` | Version CSS webkit animée | Apple Mail, iOS Mail |
+| \`signature-universelle.html\` | Version hybride SVG/CSS | Thunderbird, autres |
+| \`signature-animee.svg\` | SVG animé standalone | Intégration web, embed |
+| \`signature-animee.gif\` | GIF animé universel | Clients sans CSS |
+| \`signature-statique.png\` | Image PNG haute résolution | Fallback universel |
+| \`GUIDE_INSTALLATION.html\` | Guide pas-à-pas interactif | — |
+| \`palette-de-marque.html\` | Charte colorimétrique officielle | — |
+| \`metadata.json\` | Configuration technique complète | Développeurs |
+
+---
+
+## 🚀 Installation rapide
+
+### Gmail
+1. Ouvrir **Gmail** → ⚙️ Paramètres → *Voir tous les paramètres*
+2. Onglet **Général** → section **Signature** → *Créer une signature*
+3. Cliquer sur l'icône **\`< >\`** (HTML) dans l'éditeur de signature
+4. Copier-coller le contenu de \`signature-gmail.html\`
+5. **Enregistrer les modifications** en bas de page
+
+### Outlook 2016–2024
+1. **Fichier** → **Options** → **Courrier** → **Signatures**
+2. Cliquer **Nouveau** → donner un nom
+3. Dans l'onglet **Message**, cliquer sur l'icône HTML
+4. Coller le contenu de \`signature-outlook.htm\`
+5. **OK** pour enregistrer
+
+### Apple Mail
+1. **Mail** → **Préférences** → **Signatures**
+2. Sélectionner votre compte → cliquer **+**
+3. Désactiver *"Toujours utiliser la police par défaut"*
+4. Glisser \`signature-apple-mail.html\` dans la zone de signature
+5. Redémarrer Apple Mail
+
+> 💡 **Conseil** : Ouvrez d'abord \`GUIDE_INSTALLATION.html\` pour un guide visuel complet avec captures d'écran.
+
+---
+
+## 🎨 Palette de marque
+
+${palette.map((c, i) => {
+  const labels = ['Fond principal', "Couleur d'accent", 'Texte clair'];
+  return `- **${labels[i] || `Couleur ${i + 1}`}** : \`${c.toUpperCase()}\``;
+}).join('\n')}
+
+${effectsUsed.length > 0 ? `\n## ✦ Effets visuels actifs\n\n${effectsUsed.map(e => `- \`${e}\``).join('\n')}` : ''}
+
+---
+
+## ⚠️ Compatibilité
+
+| Client | Animation | Format recommandé |
+|--------|-----------|-------------------|
+| Gmail | ✅ CSS animé | signature-gmail.html |
+| Outlook 2016–2024 | 🖼 GIF (1er frame statique possible) | signature-outlook.htm |
+| Apple Mail | ✅ CSS animé | signature-apple-mail.html |
+| iOS Mail | ✅ SVG animé | signature-universelle.html |
+| Outlook.com | ✅ CSS animé | signature-gmail.html |
+| Thunderbird | ✅ CSS animé | signature-apple-mail.html |
+| Yahoo Mail | 🖼 GIF | signature-gmail.html |
+
+---
+
+## 📞 Support
+
+Ce package a été généré par **EffectForge AI — God Tier Engine v3.0**.
+Pour toute assistance, consultez le \`GUIDE_INSTALLATION.html\` inclus.
+
+---
+
+*© EffectForge AI · ${nom} · ${entreprise} · ${dateStr}*
+`;
+}
+
+function buildStandalonePreviewHtml(params: {
+  signatureId: string;
+  nom: string;
+  titre: string;
+  entreprise: string;
+  email: string;
+  telephone: string;
+  site: string;
+  secteur: string;
+  palette: string[];
+  animatedSvg: string;
+  effectsUsed?: string[];
+}): string {
+  const { signatureId, nom, titre, entreprise, email, telephone, site, secteur, palette, animatedSvg, effectsUsed = [] } = params;
+  const [bg, accent, textLight] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
+  const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signature Vivante — ${escZip(nom)} · ${escZip(entreprise)}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{--bg:${bg};--accent:${accent};--text:${textLight};--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.10);}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:48px 20px 80px;}
+  .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--accent);border-radius:100px;padding:6px 18px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:28px;background:color-mix(in srgb,var(--accent) 10%,transparent);}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+  h1{font-size:clamp(26px,5vw,44px);font-weight:700;line-height:1.15;letter-spacing:-1px;margin-bottom:10px;text-align:center;}
+  h1 span{color:var(--accent);}
+  .subline{font-size:14px;opacity:0.45;margin-bottom:48px;text-align:center;}
+  .preview-card{width:100%;max-width:720px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 40px 80px rgba(0,0,0,0.5),0 0 60px color-mix(in srgb,var(--accent) 14%,transparent);margin-bottom:40px;position:relative;}
+  .preview-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+  .preview-inner{padding:0;}
+  .preview-inner svg,.preview-inner img{display:block;width:100%;height:auto;}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:720px;margin-bottom:40px;}
+  @media(max-width:600px){.info-grid{grid-template-columns:1fr;}}
+  .info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+  .info-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;opacity:0.35;margin-bottom:8px;}
+  .info-value{font-size:14px;font-weight:500;opacity:0.85;}
+  .info-value a{color:var(--accent);text-decoration:none;}
+  .palette-row{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;}
+  .swatch{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);flex-shrink:0;}
+  .swatch-label{font-size:10px;font-family:monospace;opacity:0.4;margin-top:4px;text-align:center;}
+  .effects-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{font-size:10px;padding:3px 10px;border-radius:100px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--accent);letter-spacing:0.5px;}
+  .btns{display:flex;gap:12px;flex-wrap:wrap;width:100%;max-width:720px;margin-bottom:48px;}
+  .btn{flex:1;min-width:160px;padding:13px 20px;border-radius:10px;font-size:13px;font-weight:600;text-align:center;border:none;cursor:pointer;text-decoration:none;display:block;transition:opacity .2s;}
+  .btn:hover{opacity:.85;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);opacity:.65;}
+  .id-card{width:100%;max-width:720px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:40px;}
+  .id-card p{font-size:12px;opacity:.35;margin-bottom:4px;}
+  .id-card code{font-size:12px;font-family:monospace;opacity:.6;letter-spacing:1px;}
+  footer{text-align:center;font-size:11px;opacity:.2;letter-spacing:1px;}
+</style>
+</head>
+<body>
+
+<div style="margin-bottom:32px;text-align:center;">
+  <div class="badge"><span class="dot"></span>Signature Vivante · EffectForge AI</div>
+  <h1>${escZip(nom)}<br><span>${escZip(entreprise)}</span></h1>
+  <p class="subline">${escZip(titre || secteur)} · Créée le ${dateStr}</p>
+</div>
+
+<div class="preview-card">
+  <div class="preview-inner">
+    ${animatedSvg}
+  </div>
+</div>
+
+<div class="info-grid">
+  <div class="info-card">
+    <div class="info-label">Identité</div>
+    <div class="info-value">${escZip(nom)}<br><span style="opacity:.55;font-size:12px;">${escZip(titre)}</span></div>
+  </div>
+  <div class="info-card">
+    <div class="info-label">Entreprise</div>
+    <div class="info-value">${escZip(entreprise)}<br><span style="opacity:.55;font-size:12px;">${escZip(secteur)}</span></div>
+  </div>
+  ${email ? `<div class="info-card"><div class="info-label">Email</div><div class="info-value"><a href="mailto:${escZip(email)}">${escZip(email)}</a></div></div>` : ''}
+  ${telephone ? `<div class="info-card"><div class="info-label">Téléphone</div><div class="info-value">${escZip(telephone)}</div></div>` : ''}
+  ${site ? `<div class="info-card"><div class="info-label">Site web</div><div class="info-value"><a href="${escZip(site)}" target="_blank">${escZip(site.replace('https://',''))}</a></div></div>` : ''}
+  <div class="info-card">
+    <div class="info-label">Palette de marque</div>
+    <div class="info-value">
+      <div class="palette-row">
+        ${palette.map(c => `<div><div class="swatch" style="background:${c};"></div><div class="swatch-label">${c}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+  ${effectsUsed.length > 0 ? `<div class="info-card"><div class="info-label">Effets visuels</div><div class="info-value"><div class="effects-list">${effectsUsed.map(e => `<span class="chip">${escZip(e)}</span>`).join('')}</div></div></div>` : ''}
+</div>
+
+<div class="btns">
+  <a href="signature-gmail.html" class="btn btn-primary" target="_blank">📧 Installer dans Gmail</a>
+  <a href="signature-outlook.htm" class="btn btn-outline" target="_blank">📮 Installer dans Outlook</a>
+  <a href="signature-apple-mail.html" class="btn btn-outline" target="_blank">🍎 Installer dans Apple Mail</a>
+  <a href="GUIDE_INSTALLATION.html" class="btn btn-outline" target="_blank">📋 Guide complet</a>
+</div>
+
+<div class="id-card">
+  <div><p>Identifiant de signature</p><code>${escZip(signatureId)}</code></div>
+  <div style="text-align:right;"><p>Générée par</p><p style="font-size:13px;opacity:.6;font-weight:600;">EffectForge AI v3.0</p></div>
+</div>
+
+<footer>© EffectForge AI · ${escZip(nom)} · ${escZip(entreprise)} · ${dateStr}</footer>
+</body>
+</html>`;
+}
+
+function buildPaletteHtmlZip(params: {
+  nom: string;
+  entreprise: string;
+  palette: string[];
+  signatureId: string;
+}): string {
+  const { nom, entreprise, palette, signatureId } = params;
+  const [bg, accent, textLight] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
+  function hexToRgb(hex: string): string {
+    const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return r ? `${parseInt(r[1],16)}, ${parseInt(r[2],16)}, ${parseInt(r[3],16)}` : '0, 0, 0';
+  }
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Palette de Marque — ${escZip(nom)}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:${bg};color:${textLight};font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+  .label{font-size:11px;text-transform:uppercase;letter-spacing:3px;opacity:.35;margin-bottom:12px;}
+  h1{font-size:clamp(22px,4vw,36px);font-weight:700;margin-bottom:8px;}
+  h1 span{color:${accent};}
+  .sub{font-size:14px;opacity:.45;margin-bottom:48px;}
+  .swatches{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin-bottom:48px;}
+  .swatch-block{text-align:center;}
+  .swatch-big{width:120px;height:120px;border-radius:20px;border:1px solid rgba(255,255,255,.12);box-shadow:0 8px 24px rgba(0,0,0,.4);margin-bottom:12px;}
+  .swatch-name{font-size:11px;opacity:.4;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;}
+  .swatch-hex{font-size:14px;font-family:monospace;font-weight:600;opacity:.8;}
+  .swatch-rgb{font-size:10px;opacity:.3;font-family:monospace;margin-top:2px;}
+  footer{font-size:11px;opacity:.2;}
+</style>
+</head>
+<body>
+  <p class="label">Charte Colorimétrique · EffectForge AI</p>
+  <h1>${escZip(nom)} · <span>${escZip(entreprise)}</span></h1>
+  <p class="sub">Palette officielle de votre signature email animée</p>
+  <div class="swatches">
+    ${palette.map((c, i) => {
+      const labels = ["Fond principal", "Couleur d'accent", "Texte clair"];
+      return `<div class="swatch-block">
+        <div class="swatch-big" style="background:${c};"></div>
+        <div class="swatch-name">${labels[i] || `Couleur ${i+1}`}</div>
+        <div class="swatch-hex">${c.toUpperCase()}</div>
+        <div class="swatch-rgb">rgb(${hexToRgb(c)})</div>
+      </div>`;
+    }).join('')}
+  </div>
+  <footer>Signature ${escZip(signatureId)} · EffectForge AI</footer>
+</body>
+</html>`;
+}
+
 export async function buildCompleteZip(params: {
   signatureId: string;
   gmailHtml: string;
@@ -669,6 +956,8 @@ export async function buildCompleteZip(params: {
   animatedGif: Buffer;
   guideHtml: string;
   nom: string;
+  meta?: ExportMetadata;
+  effectsUsed?: string[];
 }): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const archive = archiver('zip', { zlib: { level: 9 } });
@@ -681,32 +970,72 @@ export async function buildCompleteZip(params: {
     archive.on('error', reject);
     archive.pipe(passthrough);
 
+    const { meta = {} as ExportMetadata, effectsUsed = [] } = params;
     const slug = params.nom.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'signature';
 
-    archive.append(params.gmailHtml,        { name: `${slug}/signature-gmail.html` });
-    archive.append(params.outlookHtml,      { name: `${slug}/signature-outlook.htm` });
-    archive.append(params.appleHtml,        { name: `${slug}/signature-apple-mail.html` });
-    archive.append(params.universalHtml,    { name: `${slug}/signature-universelle.html` });
-    archive.append(params.animatedSvg,      { name: `${slug}/signature-animee.svg` });
-    archive.append(params.staticPng,        { name: `${slug}/signature-statique.png` });
-    archive.append(params.animatedGif,      { name: `${slug}/signature-animee.gif` });
-    archive.append(params.guideHtml,        { name: `${slug}/GUIDE_INSTALLATION.html` });
+    const readmeParams = {
+      signatureId: params.signatureId,
+      nom: params.nom,
+      titre: meta.titre || '',
+      entreprise: meta.entreprise || params.nom,
+      email: meta.email || '',
+      telephone: meta.telephone || '',
+      site: meta.site || '',
+      secteur: meta.secteur || '',
+      palette: meta.palette || ['#0f172a', '#6366f1', '#e8e8ff'],
+      effectsUsed,
+    };
+
+    const readmeMd = buildReadmeMd(readmeParams);
+    const previewHtml = buildStandalonePreviewHtml({
+      ...readmeParams,
+      animatedSvg: params.animatedSvg,
+    });
+    const paletteHtml = buildPaletteHtmlZip({
+      nom: params.nom,
+      entreprise: meta.entreprise || params.nom,
+      palette: meta.palette || ['#0f172a', '#6366f1', '#e8e8ff'],
+      signatureId: params.signatureId,
+    });
+
+    archive.append(previewHtml,          { name: `${slug}/PREVIEW — Ouvrez ce fichier.html` });
+    archive.append(params.gmailHtml,     { name: `${slug}/signature-gmail.html` });
+    archive.append(params.outlookHtml,   { name: `${slug}/signature-outlook.htm` });
+    archive.append(params.appleHtml,     { name: `${slug}/signature-apple-mail.html` });
+    archive.append(params.universalHtml, { name: `${slug}/signature-universelle.html` });
+    archive.append(params.animatedSvg,   { name: `${slug}/signature-animee.svg` });
+    archive.append(params.staticPng,     { name: `${slug}/signature-statique.png` });
+    archive.append(params.animatedGif,   { name: `${slug}/signature-animee.gif` });
+    archive.append(params.guideHtml,     { name: `${slug}/GUIDE_INSTALLATION.html` });
+    archive.append(paletteHtml,          { name: `${slug}/palette-de-marque.html` });
+    archive.append(readmeMd,             { name: `${slug}/README.md` });
     archive.append(JSON.stringify({
       signatureId: params.signatureId,
       generatedAt: new Date().toISOString(),
       engine: 'EffectForge AI v3.0',
+      client: {
+        nom: params.nom,
+        titre: meta.titre || '',
+        entreprise: meta.entreprise || params.nom,
+        secteur: meta.secteur || '',
+        email: meta.email || '',
+      },
+      palette: meta.palette || [],
+      effectsUsed,
       compatibility: {
         gmail:    'CSS animated',
-        outlook:  'MSO table + static PNG',
-        apple:    'CSS animated',
-        mobile:   'Responsive',
-        universal: 'SVG SMIL animated',
+        outlook:  'MSO table + GIF fallback',
+        apple:    'CSS animated webkit',
+        mobile:   'Responsive SVG',
+        universal: 'SVG SMIL + CSS hybrid',
       },
       files: [
+        '📋 PREVIEW — Ouvrez ce fichier.html',
         'signature-gmail.html', 'signature-outlook.htm',
         'signature-apple-mail.html', 'signature-universelle.html',
         'signature-animee.svg', 'signature-animee.gif',
         'signature-statique.png', 'GUIDE_INSTALLATION.html',
+        'palette-de-marque.html', 'README.md',
       ],
     }, null, 2), { name: `${slug}/metadata.json` });
 
@@ -747,6 +1076,8 @@ export async function generateCompleteExport(
     signatureId, nom: meta.nom || 'signature',
     gmailHtml, outlookHtml, appleHtml, universalHtml,
     animatedSvg, staticPng, animatedGif, guideHtml,
+    meta,
+    effectsUsed: [],
   });
 
   log(`Export complet terminé — ZIP: ${Math.round(zip.length / 1024)}KB`, 'export-complete');
