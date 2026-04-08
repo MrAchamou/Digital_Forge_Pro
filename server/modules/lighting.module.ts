@@ -65,7 +65,7 @@ export function buildLightingCSS(sectorId: string, accentColor: string, colorSch
   const isDark = colorScheme === 'dark';
   const gi = profile.glowIntensity;
   const speed = (3.2 / profile.pulseSpeed).toFixed(2);
-  const speedFast = (speed / PHI).toFixed(2);
+  const speedFast = (parseFloat(speed) / PHI).toFixed(2);
 
   // ── Glow avatar (halo animé autour du cercle avatar)
   const glowMin = (gi * 0.3).toFixed(2);

@@ -84,8 +84,6 @@ import {
   ENGINE_VERSION as DFO_VERSION,
   SignatureInput,
 } from './modules/dynamic-fusion-orchestrator.module';
-import fs from 'fs';
-import path from 'path';
 
 const router = express.Router();
 
