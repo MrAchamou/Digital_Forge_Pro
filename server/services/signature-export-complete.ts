@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { log } from '../vite';
 import type { SectorConfig } from './signature-renderer';
+import { selectEffectsForSector, renderEffectLayer, buildEffectCtx } from './gif-effect-engine';
 
 // ── Dossier de stockage des assets hébergés ───────────────────────────────────
 const SIG_ASSETS_DIR = path.join(process.cwd(), 'exports', 'hosted');
@@ -240,6 +241,10 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
   // ─ Helper : couleur accent avec alpha
   const aRgba = (alpha: number) => `rgba(${ar},${ag2},${ab},${alpha.toFixed(2)})`;
 
+  // ─ Sélection des effets SVG selon le secteur de la signature
+  const activeEffects = selectEffectsForSector(meta.secteur || '');
+  log(`GIF Effects actifs: ${activeEffects.length} effets pour secteur "${meta.secteur}"`, 'export-complete');
+
   // ─ Positions fixes des lignes de contact
   const yPhone   = 113;
   const yEmail   = telephone ? 130 : 113;
@@ -345,6 +350,14 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
     // ── Ligne séparatrice horizontale
     const lineX2  = inBuild ? 112 + eBuild * 456 : 568;
 
+    // ── Effets SVG premium (GIF Effect Engine)
+    const effectCtx = buildEffectCtx({
+      frameIdx: i, totalFrames: TOTAL,
+      phaseBuildup: PH_BUILD, phaseLive: PH_LIVE,
+      accent, bg, textColor,
+    });
+    const effectLayerSvg = renderEffectLayer(activeEffects, effectCtx);
+
     const frameSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
       viewBox="0 0 600 180" width="600" height="180">
       <defs>
@@ -364,6 +377,9 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
 
       <!-- Fond -->
       <rect width="600" height="180" fill="url(#bgGrad${i})" rx="10"/>
+
+      <!-- ═══ Calque effets premium SVG ═══ -->
+      ${effectLayerSvg}
 
       <!-- Particules flottantes -->
       ${particleSvg}
