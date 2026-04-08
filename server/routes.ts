@@ -48,6 +48,7 @@ import {
   PerformanceHints,
 } from './modules/performance-adaptive.module';
 import { classifySector } from './services/sector-classifier';
+import { reloadAndEnrichAllEffects } from './utils/premium-effects-loader';
 import fs from 'fs';
 import path from 'path';
 
@@ -1254,6 +1255,24 @@ router.post('/presets/:id/use', async (req, res) => {
     return res.json(preset);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
+  }
+});
+
+// === ENRICHISSEMENT DES EFFETS — Parser militaire ===
+
+router.post('/library/effects/enrich', async (_req, res) => {
+  try {
+    console.log('🔬 Lancement enrichissement parser militaire...');
+    const result = await reloadAndEnrichAllEffects();
+    res.json({
+      success: true,
+      updated: result.updated,
+      skipped: result.skipped,
+      errors:  result.errors,
+      message: `✅ ${result.updated} effets enrichis, ${result.skipped} ignorés`,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 

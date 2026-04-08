@@ -1,0 +1,53 @@
+Ce qu'on peut faire avec notre outil
+Notre plateforme génère déjà des signatures HTML animées côté serveur. Ces modules viendraient enrichir la qualité du rendu à deux niveaux : côté serveur lors de la génération, et côté client dans la prévisualisation.
+
+Liste des modules à créer — Rôle & Rendu
+MODULE 1 — VarianceEngine
+Rôle : Pour un même secteur et les mêmes données, génère automatiquement 4-5 variantes visuellement distinctes. Algorithme génétique interne qui croise les paramètres d'animation (durée, intensité, couleur, timing).
+Rendu : Au lieu d'une seule signature, l'utilisateur voit un carrousel de variantes et choisit celle qui lui plaît.
+
+MODULE 2 — TimingMaster
+Rôle : Remplace les animation-delay fixes dans nos HBS par des séquences basées sur le nombre d'or (1.618) et Fibonacci. Synchronise tous les éléments animés sur un même métronome interne.
+Rendu : Les animations semblent "vivantes" — les éléments n'arrivent plus mécaniquement, ils respirent ensemble avec des rythmes naturels.
+
+MODULE 3 — ColorHarmonyEngine
+Rôle : Analyse la palette du secteur (nos variables CSS --sig-accent, etc.) et génère automatiquement des harmonies complémentaires, triadiques, ou des dégradés intelligents. Peut ajuster dynamiquement les couleurs selon le logo uploadé.
+Rendu : Les signatures ont une cohérence chromatique professionnelle. Si l'utilisateur uploade un logo violet, les accents s'adaptent automatiquement.
+
+MODULE 4 — ContextAdaptationEngine
+Rôle : Détecte si la signature sera utilisée en fond clair ou sombre (Outlook/Gmail/Apple Mail) et ajuste les variables CSS en conséquence. Analyse aussi le client mail cible.
+Rendu : La même signature reste lisible et élégante quel que soit le client mail — plus de texte blanc sur fond blanc en mode clair.
+
+MODULE 5 — PerformanceAdaptiveEngine
+Rôle : Côté prévisualisation frontend, détecte les capacités du navigateur (GPU, FPS réel) et réduit automatiquement la densité d'animations si nécessaire. Génère 3 niveaux de CSS : Ultra, Standard, Lite.
+Rendu : La prévisualisation est fluide sur mobile bas de gamme. La version exportée inclut des media queries prefers-reduced-motion.
+
+MODULE 6 — EffectFusionEngine
+Rôle : Combine 2-3 effets de notre bibliothèque des 55 (ex: FIRE_WRITE + SPARKLE_AURA à 60%/40%) en générant un keyframe CSS hybride mathématiquement interpolé. Respecte la sequence_narrative des JSON secteurs.
+Rendu : Des effets totalement inédits générés à la volée — ni un ni l'autre, mais un mélange fluide et cohérent.
+
+MODULE 7 — ContextualIntelligenceModerator
+Rôle : Gardien de la qualité — évalue la complexité de la signature générée et empêche la sur-animation. Si trop d'effets sont combinés sur un élément court, il réduit automatiquement.
+Rendu : Zéro signature "criarde" ou illisible. Le modérateur garantit un équilibre entre expressivité et professionnalisme.
+
+MODULE 8 — ExperienceOrchestrator
+Rôle : Définit un arc narratif complet (intro → développement → climax → repos) pour l'ensemble de la signature. Coordonne les actes de la sequence_narrative en une chorégraphie cohérente.
+Rendu : La signature se "raconte" vraiment — on sent une ouverture, un moment fort, puis une conclusion apaisée, comme un mini-film de 4 secondes.
+
+MODULE 9 — PresetManager
+Rôle : Sauvegarde les configurations utilisateur (niveau d'animation, variante choisie, ajustements de couleur) dans la base de données. Génère des presets intelligents selon le secteur.
+Rendu : L'utilisateur retrouve exactement sa signature à chaque connexion. On peut proposer des "templates populaires" basés sur les presets les plus utilisés.
+
+MODULE 10 — DynamicFusionOrchestrator
+Rôle : Le chef d'orchestre qui coordonne tous les modules ci-dessus en 3 niveaux de fusion : Niveau 1 (Standard, 3 modules), Niveau 2 (Pro, 6 modules), Niveau 3 (Ultimate, tous les modules). C'est le point d'entrée unique.
+Rendu : L'utilisateur choisit son niveau de sophistication. Niveau 1 = signature propre et rapide. Niveau 3 = signature vivante, unique, adaptative — impossible à reproduire manuellement.
+
+Résumé du gain global
+Sans modules	Avec modules
+1 signature fixe par secteur	4-5 variantes générées automatiquement
+Animations mécaniques	Rythmes naturels basés sur le nombre d'or
+Palette figée	Couleurs harmoniques adaptées au logo
+Même rendu partout	Adapté à chaque client mail et device
+Effets individuels	Fusions inédites entre effets
+Risque de surcharge visuelle	Modération automatique garantie
+Pas de mémoire	Presets sauvegardés par utilisateur
