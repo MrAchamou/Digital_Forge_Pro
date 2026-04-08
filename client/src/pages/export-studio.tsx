@@ -1,0 +1,581 @@
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Download, Mail, Smartphone, Monitor, Globe, Zap,
+  CheckCircle, Loader2, ExternalLink, Copy, Package,
+  Sparkles, ChevronDown, ChevronRight, Eye
+} from "lucide-react";
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface ExportResult {
+  signatureId: string;
+  gmbData?: any;
+  sectorId?: string;
+  sectorLabel?: string;
+  formats: Record<string, { filename: string }>;
+  preview: {
+    gmailHtml: string;
+    universalHtml: string;
+    animatedSvgB64: string;
+    staticPngB64: string;
+    animatedGifB64: string;
+    guideHtml: string;
+    zipB64: string;
+  };
+}
+
+// ── Composant téléchargement ──────────────────────────────────────────────────
+
+function downloadB64(b64: string, filename: string, mime: string) {
+  const blob = new Blob([Uint8Array.from(atob(b64), c => c.charCodeAt(0))], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function downloadText(text: string, filename: string, mime = 'text/html') {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ── Carte format export ───────────────────────────────────────────────────────
+
+function FormatCard({
+  icon, title, subtitle, badge, color, onDownload, filename
+}: {
+  icon: string; title: string; subtitle: string; badge: string; color: string;
+  onDownload: () => void; filename: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 flex flex-col gap-3 hover:border-white/20 transition-colors"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{icon}</span>
+          <div>
+            <p className="text-sm font-semibold text-white">{title}</p>
+            <p className="text-xs text-white/40">{subtitle}</p>
+          </div>
+        </div>
+        <span
+          className="text-xs px-2 py-0.5 rounded-full border shrink-0"
+          style={{ color, borderColor: `${color}44`, background: `${color}18` }}
+        >{badge}</span>
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={onDownload}
+          data-testid={`btn-download-${title.toLowerCase().replace(/\s+/g, '-')}`}
+          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all"
+          style={{ background: `${color}22`, color, border: `1px solid ${color}44` }}
+        >
+          <Download size={12} /> Télécharger
+        </button>
+      </div>
+      <p className="text-[10px] text-white/25 font-mono truncate">{filename}</p>
+    </motion.div>
+  );
+}
+
+// ── Section preview ───────────────────────────────────────────────────────────
+
+function PreviewSection({ result }: { result: ExportResult }) {
+  const [activeTab, setActiveTab] = useState<'animated' | 'gmail' | 'gif' | 'static'>('animated');
+  const [showGuide, setShowGuide] = useState(false);
+
+  const tabs = [
+    { id: 'animated' as const, label: 'SVG Animé', icon: '✦' },
+    { id: 'gif'      as const, label: 'GIF Animé', icon: '🎞' },
+    { id: 'gmail'    as const, label: 'Gmail HTML', icon: '📧' },
+    { id: 'static'   as const, label: 'PNG Statique', icon: '🖼' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-1 p-1 bg-white/[0.04] rounded-xl border border-white/[0.06] w-fit">
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            data-testid={`tab-preview-${t.id}`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              activeTab === t.id
+                ? 'bg-forge-purple text-white'
+                : 'text-white/50 hover:text-white/80'
+            }`}
+          >
+            <span>{t.icon}</span> {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-xl overflow-hidden border border-white/10 min-h-[200px] flex items-center justify-center">
+        {activeTab === 'animated' && (
+          <img
+            src={`data:image/svg+xml;base64,${result.preview.animatedSvgB64}`}
+            alt="Signature animée SVG"
+            className="w-full max-w-[620px] block"
+          />
+        )}
+        {activeTab === 'gif' && (
+          <img
+            src={`data:image/gif;base64,${result.preview.animatedGifB64}`}
+            alt="Signature GIF animé"
+            className="w-full max-w-[620px] block"
+          />
+        )}
+        {activeTab === 'gmail' && (
+          <iframe
+            srcDoc={result.preview.gmailHtml}
+            className="w-full h-[220px] border-0"
+            title="Aperçu Gmail"
+            sandbox="allow-same-origin"
+          />
+        )}
+        {activeTab === 'static' && (
+          <img
+            src={`data:image/png;base64,${result.preview.staticPngB64}`}
+            alt="Signature PNG statique"
+            className="w-full max-w-[620px] block"
+          />
+        )}
+      </div>
+
+      <button
+        onClick={() => setShowGuide(!showGuide)}
+        data-testid="btn-toggle-guide"
+        className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
+      >
+        {showGuide ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        Guide d'installation
+      </button>
+
+      {showGuide && (
+        <div className="rounded-xl overflow-hidden border border-white/10 bg-white">
+          <iframe
+            srcDoc={result.preview.guideHtml}
+            className="w-full h-[600px] border-0"
+            title="Guide d'installation"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Formulaire de données ─────────────────────────────────────────────────────
+
+interface FormData {
+  gmbUrl: string;
+  nom: string;
+  titre: string;
+  sectorId: string;
+  telephone: string;
+  email: string;
+  site: string;
+  adresse: string;
+  ville: string;
+  code_postal: string;
+  cta: string;
+}
+
+const SECTORS = [
+  { id: 'sante', label: '💆 Santé & Bien-être' },
+  { id: 'tech', label: '💻 Tech & Numérique' },
+  { id: 'immobilier', label: '🏠 Immobilier' },
+  { id: 'restauration', label: '🍽 Restauration' },
+  { id: 'education', label: '🎓 Éducation' },
+  { id: 'artisanat', label: '🔨 Artisanat' },
+  { id: 'commerce', label: '🛒 Commerce' },
+  { id: 'services_pro', label: '💼 Services Pro' },
+  { id: 'loisirs', label: '🎭 Loisirs' },
+  { id: 'transport', label: '🚗 Transport' },
+];
+
+// ── Page principale ───────────────────────────────────────────────────────────
+
+export default function ExportStudio() {
+  const { toast } = useToast();
+  const [mode, setMode] = useState<'gmb' | 'manual'>('gmb');
+  const [result, setResult] = useState<ExportResult | null>(null);
+  const [form, setForm] = useState<FormData>({
+    gmbUrl: '', nom: '', titre: '', sectorId: 'sante',
+    telephone: '', email: '', site: '', adresse: '',
+    ville: '', code_postal: '', cta: 'Nous contacter',
+  });
+
+  const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  // Mutation GMB pipeline complet
+  const gmbExport = useMutation({
+    mutationFn: async (body: { gmb_url: string; extra_data: any }): Promise<ExportResult> => {
+      const res = await apiRequest('POST', '/api/signature/full-export-gmb', body);
+      return res.json();
+    },
+    onSuccess: (data: ExportResult) => {
+      setResult(data);
+      toast({ title: 'Export complet généré !', description: `7 formats prêts pour ${data.sectorLabel || data.sectorId}` });
+    },
+    onError: (e: any) => toast({ title: 'Erreur', description: e.message, variant: 'destructive' }),
+  });
+
+  // Mutation export manuel
+  const manualExport = useMutation({
+    mutationFn: async (body: { sectorId: string; data: any }): Promise<ExportResult> => {
+      const res = await apiRequest('POST', '/api/signature/full-export', body);
+      return res.json();
+    },
+    onSuccess: (data: ExportResult) => {
+      setResult(data);
+      toast({ title: 'Export complet généré !', description: '7 formats exportés avec succès' });
+    },
+    onError: (e: any) => toast({ title: 'Erreur', description: e.message, variant: 'destructive' }),
+  });
+
+  const isPending = gmbExport.isPending || manualExport.isPending;
+
+  const handleSubmit = () => {
+    if (mode === 'gmb') {
+      if (!form.gmbUrl) return toast({ title: 'URL Google Maps requise', variant: 'destructive' });
+      gmbExport.mutate({
+        gmb_url: form.gmbUrl,
+        extra_data: {
+          nom: form.nom || undefined,
+          titre: form.titre || undefined,
+          email: form.email || undefined,
+        },
+      });
+    } else {
+      if (!form.nom) return toast({ title: 'Le nom est requis', variant: 'destructive' });
+      manualExport.mutate({
+        sectorId: form.sectorId,
+        data: {
+          nom: form.nom, titre: form.titre, entreprise: '',
+          telephone: form.telephone, email: form.email, site: form.site,
+          adresse: form.adresse, ville: form.ville, code_postal: form.code_postal,
+          cta: form.cta,
+        },
+      });
+    }
+  };
+
+  const downloadAll = () => {
+    if (!result) return;
+    downloadB64(result.preview.zipB64, result.formats.gmail?.filename?.replace('gmail.html', 'package.zip') || 'signature-package.zip', 'application/zip');
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-8 h-8 rounded-lg bg-forge-purple/20 border border-forge-purple/40 flex items-center justify-center">
+            <Package size={16} className="text-forge-purple" />
+          </div>
+          <h1 className="text-2xl font-bold text-white">Export Studio</h1>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-forge-cyan/10 border border-forge-cyan/30 text-forge-cyan">
+            Multi-client universel
+          </span>
+        </div>
+        <p className="text-white/50 text-sm">
+          Génère en un clic : Gmail animé · Outlook compatible · Apple Mail · GIF universel · Guide d'installation
+        </p>
+      </div>
+
+      {/* Mode selector */}
+      <div className="flex gap-2 p-1 bg-white/[0.04] rounded-xl border border-white/[0.06] w-fit">
+        {[
+          { id: 'gmb' as const, label: '🔗 Depuis Google Maps' },
+          { id: 'manual' as const, label: '✏️ Saisie manuelle' },
+        ].map(m => (
+          <button
+            key={m.id}
+            onClick={() => setMode(m.id)}
+            data-testid={`btn-mode-${m.id}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              mode === m.id ? 'bg-forge-purple text-white' : 'text-white/50 hover:text-white/80'
+            }`}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Formulaire */}
+      <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 space-y-5">
+        <AnimatePresence mode="wait">
+          {mode === 'gmb' ? (
+            <motion.div key="gmb" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <div>
+                <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">URL Google Maps *</label>
+                <input
+                  type="url"
+                  value={form.gmbUrl}
+                  onChange={e => update('gmbUrl', e.target.value)}
+                  placeholder="https://maps.app.goo.gl/..."
+                  data-testid="input-gmb-url"
+                  className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Prénom Nom (optionnel)</label>
+                  <input
+                    type="text"
+                    value={form.nom}
+                    onChange={e => update('nom', e.target.value)}
+                    placeholder="Dr. Jean Martin"
+                    data-testid="input-nom"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Titre / Spécialité (optionnel)</label>
+                  <input
+                    type="text"
+                    value={form.titre}
+                    onChange={e => update('titre', e.target.value)}
+                    placeholder="Chirurgien-Dentiste"
+                    data-testid="input-titre"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div key="manual" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Secteur *</label>
+                  <select
+                    value={form.sectorId}
+                    onChange={e => update('sectorId', e.target.value)}
+                    data-testid="select-sector"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-forge-purple/60 transition-colors"
+                  >
+                    {SECTORS.map(s => <option key={s.id} value={s.id} className="bg-gray-900">{s.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Nom complet *</label>
+                  <input type="text" value={form.nom} onChange={e => update('nom', e.target.value)}
+                    placeholder="Dr. Jean Martin" data-testid="input-nom-manual"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Titre</label>
+                  <input type="text" value={form.titre} onChange={e => update('titre', e.target.value)}
+                    placeholder="Chirurgien-Dentiste" data-testid="input-titre-manual"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Téléphone</label>
+                  <input type="text" value={form.telephone} onChange={e => update('telephone', e.target.value)}
+                    placeholder="01 88 33 49 41" data-testid="input-telephone"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Email</label>
+                  <input type="email" value={form.email} onChange={e => update('email', e.target.value)}
+                    placeholder="contact@cabinet.fr" data-testid="input-email"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Site web</label>
+                  <input type="url" value={form.site} onChange={e => update('site', e.target.value)}
+                    placeholder="https://cabinet.fr" data-testid="input-site"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Adresse</label>
+                  <input type="text" value={form.adresse} onChange={e => update('adresse', e.target.value)}
+                    placeholder="139 Avenue de France" data-testid="input-adresse"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Code postal</label>
+                  <input type="text" value={form.code_postal} onChange={e => update('code_postal', e.target.value)}
+                    placeholder="75013" data-testid="input-cp"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Bouton génération */}
+        <button
+          onClick={handleSubmit}
+          disabled={isPending}
+          data-testid="btn-generate-export"
+          className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ background: 'linear-gradient(135deg, #6366f1, #00d4ff)', color: '#fff' }}
+        >
+          {isPending ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              Génération en cours... (SVG · GIF · 5 formats HTML · ZIP)
+            </>
+          ) : (
+            <>
+              <Sparkles size={18} />
+              Générer la Signature Vivante Complète
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Résultat */}
+      <AnimatePresence>
+        {result && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            {/* Badge succès */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <CheckCircle size={20} className="text-green-400" />
+                <div>
+                  <p className="text-sm font-semibold text-white">7 formats générés avec succès</p>
+                  <p className="text-xs text-white/40">ID: {result.signatureId?.slice(0, 8)} · {result.sectorLabel || result.sectorId}</p>
+                </div>
+              </div>
+              <button
+                onClick={downloadAll}
+                data-testid="btn-download-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
+                style={{ background: 'linear-gradient(135deg, #6366f1, #00d4ff)', color: '#fff' }}
+              >
+                <Download size={14} />
+                Tout télécharger (.zip)
+              </button>
+            </div>
+
+            {/* Aperçu */}
+            <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6">
+              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Eye size={14} /> Aperçu par format
+              </h3>
+              <PreviewSection result={result} />
+            </div>
+
+            {/* Grille des formats */}
+            <div>
+              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Package size={14} /> Formats disponibles
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <FormatCard
+                  icon="📧" title="Gmail" subtitle="CSS animé, inline" badge="✅ Animé" color="#EA4335"
+                  filename={result.formats.gmail?.filename || 'signature-gmail.html'}
+                  onDownload={() => downloadText(result.preview.gmailHtml, result.formats.gmail?.filename || 'signature-gmail.html')}
+                />
+                <FormatCard
+                  icon="📮" title="Outlook" subtitle="MSO compatible, table" badge="✅ MSO" color="#0078D4"
+                  filename={result.formats.outlook?.filename || 'signature-outlook.htm'}
+                  onDownload={() => downloadText(result.preview.gmailHtml.replace(
+                    /<!--\[if !mso\]><!-->[\s\S]*?<!--<!\[endif\]-->/,
+                    ''
+                  ), result.formats.outlook?.filename || 'signature-outlook.htm')}
+                />
+                <FormatCard
+                  icon="🍎" title="Apple Mail" subtitle="CSS animé webkit" badge="✅ Animé" color="#007AFF"
+                  filename={result.formats.appleMail?.filename || 'signature-apple-mail.html'}
+                  onDownload={() => downloadText(result.preview.gmailHtml, result.formats.appleMail?.filename || 'signature-apple.html')}
+                />
+                <FormatCard
+                  icon="🌐" title="Universel" subtitle="Smart MSO hybrid" badge="✅ Hybride" color="#6366F1"
+                  filename={result.formats.universal?.filename || 'signature-universelle.html'}
+                  onDownload={() => downloadText(result.preview.universalHtml, result.formats.universal?.filename || 'signature-universelle.html')}
+                />
+                <FormatCard
+                  icon="✦" title="SVG Animé" subtitle="SMIL, embed en img" badge="✅ SMIL" color="#00d4ff"
+                  filename={result.formats.animatedSvg?.filename || 'signature-animee.svg'}
+                  onDownload={() => downloadB64(result.preview.animatedSvgB64, result.formats.animatedSvg?.filename || 'signature-animee.svg', 'image/svg+xml')}
+                />
+                <FormatCard
+                  icon="🎞" title="GIF Animé" subtitle="Universal, Outlook 1er frame" badge="✅ GIF" color="#f59e0b"
+                  filename={result.formats.animatedGif?.filename || 'signature-animee.gif'}
+                  onDownload={() => downloadB64(result.preview.animatedGifB64, result.formats.animatedGif?.filename || 'signature-animee.gif', 'image/gif')}
+                />
+                <FormatCard
+                  icon="🖼" title="PNG Statique" subtitle="Fallback universel" badge="✅ Universel" color="#6b7280"
+                  filename={result.formats.staticPng?.filename || 'signature-statique.png'}
+                  onDownload={() => downloadB64(result.preview.staticPngB64, result.formats.staticPng?.filename || 'signature-statique.png', 'image/png')}
+                />
+                <FormatCard
+                  icon="📋" title="Guide Installation" subtitle="Instructions par client" badge="✅ Guide" color="#059669"
+                  filename="GUIDE_INSTALLATION.html"
+                  onDownload={() => downloadText(result.preview.guideHtml, 'GUIDE_INSTALLATION.html')}
+                />
+              </div>
+            </div>
+
+            {/* Compatibilité matrix */}
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/[0.06]">
+                <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider flex items-center gap-2">
+                  <Zap size={14} /> Matrice de compatibilité
+                </h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-white/[0.06]">
+                      <th className="text-left px-6 py-3 text-white/40 font-medium">Client email</th>
+                      <th className="px-4 py-3 text-white/40 font-medium">Animations</th>
+                      <th className="px-4 py-3 text-white/40 font-medium">Logo</th>
+                      <th className="px-4 py-3 text-white/40 font-medium">Liens cliquables</th>
+                      <th className="px-4 py-3 text-white/40 font-medium">Fichier recommandé</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { client: 'Gmail', anim: '✅ CSS', logo: '✅', links: '✅', file: 'signature-gmail.html' },
+                      { client: 'Outlook 2016-2024', anim: '🖼 GIF', logo: '✅', links: '✅', file: 'signature-outlook.htm' },
+                      { client: 'Apple Mail', anim: '✅ CSS', logo: '✅', links: '✅', file: 'signature-apple-mail.html' },
+                      { client: 'iOS Mail', anim: '✅ SVG', logo: '✅', links: '✅', file: 'signature-universelle.html' },
+                      { client: 'Outlook.com', anim: '✅ CSS', logo: '✅', links: '✅', file: 'signature-gmail.html' },
+                      { client: 'Thunderbird', anim: '✅ CSS', logo: '✅', links: '✅', file: 'signature-apple-mail.html' },
+                      { client: 'Yahoo Mail', anim: '🖼 GIF', logo: '✅', links: '✅', file: 'signature-gmail.html' },
+                    ].map((row, i) => (
+                      <tr key={i} className={`border-b border-white/[0.03] ${i % 2 === 0 ? '' : 'bg-white/[0.01]'}`}>
+                        <td className="px-6 py-3 text-white/80 font-medium">{row.client}</td>
+                        <td className="px-4 py-3 text-center text-white/60">{row.anim}</td>
+                        <td className="px-4 py-3 text-center">{row.logo}</td>
+                        <td className="px-4 py-3 text-center">{row.links}</td>
+                        <td className="px-4 py-3 text-center font-mono text-white/40">{row.file}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

@@ -919,6 +919,158 @@ router.post('/signature/classify-sector', async (req, res) => {
   }
 });
 
+// === EXPORT COMPLET MULTI-CLIENT ===
+
+router.post('/signature/full-export', async (req, res) => {
+  try {
+    const { sectorId, data } = req.body;
+    if (!sectorId) return res.status(400).json({ error: 'sectorId requis' });
+    if (!data)     return res.status(400).json({ error: 'data requis' });
+
+    const { renderSignature } = await import('./services/signature-renderer');
+    const { generateCompleteExport } = await import('./services/signature-export-complete');
+
+    const signatureHtml = renderSignature(sectorId, data);
+
+    const meta = {
+      nom:         data.nom         || '',
+      titre:       data.titre       || '',
+      entreprise:  data.entreprise  || '',
+      email:       data.email       || '',
+      telephone:   data.telephone   || '',
+      site:        data.site        || '',
+      adresse:     data.adresse     || '',
+      ville:       data.ville       || '',
+      code_postal: data.code_postal || '',
+      note:        data.note        || 0,
+      logo_url:    data.logo_url    || '',
+      secteur:     sectorId,
+      palette:     data.palette     || [],
+      cta:         data.cta         || '',
+    };
+
+    const result = await generateCompleteExport(sectorId, signatureHtml, meta);
+
+    return res.json({
+      signatureId: result.signatureId,
+      formats: {
+        gmail:       { filename: result.formats.gmail.filename },
+        outlook:     { filename: result.formats.outlook.filename },
+        appleMail:   { filename: result.formats.appleMail.filename },
+        universal:   { filename: result.formats.universal.filename },
+        animatedSvg: { filename: result.formats.animatedSvg.filename },
+        staticPng:   { filename: result.formats.staticPng.filename },
+        animatedGif: { filename: result.formats.animatedGif.filename },
+      },
+      zip: { filename: result.zip.filename },
+      // Contenu inline pour le frontend
+      preview: {
+        gmailHtml:    result.formats.gmail.html,
+        universalHtml: result.formats.universal.html,
+        animatedSvgB64: Buffer.from(result.formats.animatedSvg.svg).toString('base64'),
+        staticPngB64:   result.formats.staticPng.buffer.toString('base64'),
+        animatedGifB64: result.formats.animatedGif.buffer.toString('base64'),
+        guideHtml:      result.guide.html,
+        zipB64:         result.zip.buffer.toString('base64'),
+      },
+    });
+  } catch (err: any) {
+    console.error(`[routes] Erreur full-export: ${err.message}`);
+    return res.status(500).json({ error: err.message || 'Erreur interne' });
+  }
+});
+
+router.post('/signature/full-export-gmb', async (req, res) => {
+  try {
+    const { gmb_url, extra_data } = req.body;
+    if (!gmb_url) return res.status(400).json({ error: 'gmb_url requis' });
+
+    const { scrapeGMB } = await import('./services/gmb-scraper');
+    const { classifySector } = await import('./services/sector-classifier');
+    const { getSectorConfig, renderSignature } = await import('./services/signature-renderer');
+    const { generateCompleteExport } = await import('./services/signature-export-complete');
+
+    // 1. Scrape GMB
+    const gmbData = await scrapeGMB(gmb_url);
+
+    // 2. Classification secteur
+    const sectorResult = await classifySector(gmbData);
+    const sectorId = sectorResult.sectorId;
+    const sectorCfg = getSectorConfig(sectorId);
+
+    // 3. Merge données GMB + extra_data utilisateur
+    const sigData = {
+      nom:         extra_data?.nom         || '',
+      titre:       extra_data?.titre       || '',
+      entreprise:  gmbData.entreprise      || '',
+      email:       gmbData.email           || extra_data?.email || '',
+      telephone:   gmbData.telephone       || '',
+      site:        gmbData.site            || '',
+      adresse:     gmbData.adresse         || '',
+      ville:       gmbData.ville           || '',
+      code_postal: gmbData.code_postal     || '',
+      note:        gmbData.note            || 0,
+      logo_url:    gmbData.logo_url        || '',
+      logo_base64: gmbData.logo_base64     || '',
+      secteur:     sectorId,
+      palette:     gmbData.palette?.length ? gmbData.palette : Object.values(sectorCfg.palette),
+      cta:         gmbData.cta             || sectorCfg.cta || 'Nous contacter',
+      ...extra_data,
+    };
+
+    // 4. Rendu HTML signature
+    const signatureHtml = renderSignature(sectorId, sigData);
+
+    const meta = {
+      nom:         sigData.nom,
+      titre:       sigData.titre,
+      entreprise:  sigData.entreprise,
+      email:       sigData.email,
+      telephone:   sigData.telephone,
+      site:        sigData.site,
+      adresse:     sigData.adresse,
+      ville:       sigData.ville,
+      code_postal: sigData.code_postal,
+      note:        sigData.note,
+      logo_url:    sigData.logo_url,
+      secteur:     sectorId,
+      palette:     sigData.palette,
+      cta:         sigData.cta,
+    };
+
+    // 5. Export complet
+    const result = await generateCompleteExport(sectorId, signatureHtml, meta);
+
+    return res.json({
+      signatureId:   result.signatureId,
+      gmbData,
+      sectorId,
+      sectorLabel:   sectorCfg.label,
+      formats: {
+        gmail:       { filename: result.formats.gmail.filename },
+        outlook:     { filename: result.formats.outlook.filename },
+        appleMail:   { filename: result.formats.appleMail.filename },
+        universal:   { filename: result.formats.universal.filename },
+        animatedSvg: { filename: result.formats.animatedSvg.filename },
+        staticPng:   { filename: result.formats.staticPng.filename },
+        animatedGif: { filename: result.formats.animatedGif.filename },
+      },
+      preview: {
+        gmailHtml:      result.formats.gmail.html,
+        universalHtml:  result.formats.universal.html,
+        animatedSvgB64: Buffer.from(result.formats.animatedSvg.svg).toString('base64'),
+        staticPngB64:   result.formats.staticPng.buffer.toString('base64'),
+        animatedGifB64: result.formats.animatedGif.buffer.toString('base64'),
+        guideHtml:      result.guide.html,
+        zipB64:         result.zip.buffer.toString('base64'),
+      },
+    });
+  } catch (err: any) {
+    console.error(`[routes] Erreur full-export-gmb: ${err.message}`);
+    return res.status(500).json({ error: err.message || 'Erreur interne' });
+  }
+});
+
 // === GMB SCRAPING ===
 
 router.post('/signature/scrape-gmb', async (req, res) => {
