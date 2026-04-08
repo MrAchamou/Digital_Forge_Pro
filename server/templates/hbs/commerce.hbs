@@ -3,190 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  :root {
-    --sig-bg: {{palette.background}};
-    --sig-accent: {{palette.accent}};
-    --sig-text: {{palette.text}};
-    --sig-muted: {{palette.muted}};
-    --sig-border: {{palette.border}};
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: transparent; font-family: 'Segoe UI', Arial, sans-serif; }
+  :root { --sig-bg:{{palette.background}}; --sig-accent:{{palette.accent}}; --sig-text:{{palette.text}}; --sig-muted:{{palette.muted}}; --sig-border:{{palette.border}}; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:transparent; font-family:'Segoe UI',Arial,sans-serif; }
+  @keyframes sigLogoGlow { 0%,100% { box-shadow:0 0 0 2px var(--sig-accent),0 0 12px var(--sig-accent)40; } 50% { box-shadow:0 0 0 3px var(--sig-accent),0 0 28px var(--sig-accent)70,0 0 50px var(--sig-accent)30; } }
+  @keyframes sigLogoIn { 0% { opacity:0; transform:translateY(-20px) scale(0.8); } 70% { transform:translateY(4px) scale(1.04); } 100% { opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes sigSparkle { 0%,100% { text-shadow:0 0 6px var(--sig-accent)80; filter:brightness(1); } 50% { text-shadow:0 0 18px var(--sig-accent),0 0 36px var(--sig-accent)60; filter:brightness(1.3); } }
+  @keyframes sigBarSlide { 0% { transform:scaleX(0); } 100% { transform:scaleX(1); } }
+  @keyframes sigFade { 0% { opacity:0; } 100% { opacity:1; } }
+  @keyframes sigSlideUp { 0% { opacity:0; transform:translateY(12px); } 100% { opacity:1; transform:translateY(0); } }
+  @keyframes sigSlideRight { 0% { opacity:0; transform:translateX(-12px); } 100% { opacity:1; transform:translateX(0); } }
 
-  /* === KEYFRAMES NARRATIFS — COMMERCE === */
-  @keyframes sigStarDustRainbow {
-    0% { opacity:0; transform:scale(0.5); filter:brightness(4) hue-rotate(0deg); }
-    50% { filter:brightness(2) hue-rotate(120deg); }
-    100% { opacity:1; transform:scale(1); filter:brightness(1) hue-rotate(0deg); }
-  }
-  @keyframes sigNeonPulse {
-    0%,100% { text-shadow:0 0 8px var(--sig-accent),0 0 16px var(--sig-accent); letter-spacing:0.02em; }
-    50% { text-shadow:0 0 20px var(--sig-accent),0 0 40px var(--sig-accent),0 0 60px var(--sig-accent); letter-spacing:0.05em; }
-  }
-  @keyframes sigCrystalSparkle {
-    0% { opacity:0; transform:scale(0.7) rotate(-3deg); filter:brightness(2.5); }
-    70% { filter:brightness(1.3); }
-    100% { opacity:1; transform:scale(1) rotate(0deg); filter:brightness(1); }
-  }
-  @keyframes sigLiquidMorph {
-    0%,100% { transform:translateX(0) scaleX(1); }
-    50% { transform:translateX(2px) scaleX(1.01); }
-  }
-  @keyframes sigFloatEnergy {
-    0%,100% { transform:translateY(0); filter:brightness(1); }
-    50% { transform:translateY(-4px); filter:brightness(1.3) drop-shadow(0 0 6px var(--sig-accent)); }
-  }
-  @keyframes sigGradientShift {
-    0% { background-position:0% 50%; }
-    100% { background-position:200% 50%; }
-  }
-  @keyframes sigFadeUp {
-    0% { opacity:0; transform:translateY(10px); }
-    100% { opacity:1; transform:translateY(0); }
-  }
-
-  /* === ELEMENTS NARRATIFS === */
-  .sig-el-nom {
-    opacity: 0;
-    animation: sigStarDustRainbow 1.2s ease-out 0s both, sigNeonPulse 2.5s ease-in-out 1.5s infinite;
-  }
-  .sig-el-titre {
-    opacity: 0;
-    animation: sigCrystalSparkle 1s ease-out 0.5s both;
-  }
-  .sig-el-horaires {
-    opacity: 0;
-    animation: sigFadeUp 0.8s ease-out 1.5s both, sigLiquidMorph 3s ease-in-out 2.5s infinite;
-  }
-  .sig-el-adresse {
-    opacity: 0;
-    animation: sigFadeUp 0.8s ease-out 2s both;
-  }
-  .sig-el-telephone {
-    opacity: 0;
-    animation: sigFadeUp 0.6s ease-out 2.5s both;
-  }
-  .sig-el-instagram {
-    opacity: 0;
-    animation: sigFadeUp 0.6s ease-out 2.5s both, sigFloatEnergy 2s ease-in-out 3.5s infinite;
-  }
-
-  .sig-wrap {
-    display: inline-block;
-    background: var(--sig-bg);
-    border: 1px solid var(--sig-border);
-    border-radius: 10px;
-    width: {{layout.width}}px;
-    overflow: hidden;
-    position: relative;
-  }
-  .sig-top-bar {
-    height: 4px;
-    background: linear-gradient(to right, var(--sig-accent), var(--sig-muted), var(--sig-accent));
-    background-size: 200% 100%;
-    animation: sigGradientShift 3s linear infinite;
-  }
-  .sig-body {
-    padding: 18px 24px 20px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  .sig-logo-block {
-    flex-shrink: 0;
-    width: 70px;
-    height: 70px;
-    border-radius: 12px;
-    border: 2px solid var(--sig-accent);
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, rgba(162,28,175,0.13), rgba(236,72,153,0.07));
-  }
-  .sig-logo-block img { width: 100%; height: 100%; object-fit: contain; }
-  .sig-logo-emoji { font-size: 32px; }
-  .sig-content { flex: 1; }
-  .sig-name {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--sig-text);
-    display: block;
-  }
-  .sig-titre {
-    font-size: 13px;
-    color: var(--sig-accent);
-    font-style: italic;
-    margin-top: 2px;
-    display: block;
-  }
-  .sig-info-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 16px;
-    margin-top: 10px;
-  }
-  .sig-info {
-    font-size: 12px;
-    color: var(--sig-text);
-    opacity: 0.8;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .sig-info a { color: inherit; text-decoration: none; }
-  .sig-info a:hover { color: var(--sig-accent); }
-  .sig-bottom {
-    padding: 10px 24px 14px;
-    border-top: 1px solid var(--sig-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .sig-horaires { font-size: 11px; color: var(--sig-muted); }
-  .sig-social { display: flex; gap: 8px; }
-  .sig-social a {
-    font-size: 11px;
-    color: var(--sig-accent);
-    text-decoration: none;
-    padding: 3px 8px;
-    border: 1px solid var(--sig-accent);
-    border-radius: 20px;
-  }
-  .sig-social a:hover { background: var(--sig-accent); color: var(--sig-bg); }
+  .sig-wrap { display:inline-flex; flex-direction:column; background:var(--sig-bg); border:1px solid var(--sig-border); border-radius:10px; width:{{layout.width}}px; overflow:hidden; }
+  .sig-top-bar { height:3px; background:linear-gradient(90deg, var(--sig-accent), #f472b6, var(--sig-accent)); transform-origin:left; animation:sigBarSlide 0.8s ease-out both; }
+  .sig-main { display:flex; align-items:stretch; padding:16px 18px; gap:16px; }
+  .sig-logo-zone { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .sig-logo-frame { width:72px; height:72px; border-radius:10px; overflow:hidden; background:linear-gradient(135deg,var(--sig-accent)20,var(--sig-accent)05); display:flex; align-items:center; justify-content:center; animation:sigLogoIn 0.9s cubic-bezier(0.34,1.56,0.64,1) 0s both,sigLogoGlow 3s ease-in-out 1.5s infinite; }
+  .sig-logo-frame img { width:100%; height:100%; object-fit:contain; padding:6px; }
+  .sig-logo-emoji { font-size:34px; line-height:1; }
+  .sig-logo-dot { width:8px; height:8px; border-radius:50%; background:var(--sig-accent); animation:sigSparkle 2s ease-in-out 2s infinite; }
+  .sig-vdivider { width:1px; background:linear-gradient(180deg,transparent,var(--sig-accent)60,transparent); flex-shrink:0; margin:4px 0; }
+  .sig-info { flex:1; display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .sig-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .sig-header-left { display:flex; flex-direction:column; gap:2px; }
+  .sig-name { font-size:18px; font-weight:800; color:var(--sig-text); line-height:1.1; opacity:0; animation:sigSlideRight 0.9s ease-out 0.3s both; }
+  .sig-titre { font-size:11px; font-weight:700; color:var(--sig-accent); text-transform:uppercase; letter-spacing:0.1em; opacity:0; animation:sigSlideRight 0.8s ease-out 0.55s both; }
+  .sig-rating { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFade 0.8s ease-out 1.2s both; white-space:nowrap; flex-shrink:0; }
+  .sig-stars { color:#fbbf24; font-size:11px; }
+  .sig-hdivider { height:1px; background:linear-gradient(90deg,var(--sig-accent)50,transparent); opacity:0; animation:sigFade 0.8s ease-out 0.8s both; }
+  .sig-contacts { display:grid; grid-template-columns:1fr 1fr; gap:5px 14px; }
+  .sig-contact-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--sig-text); text-decoration:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:0; }
+  .sig-contact-item.phone { font-size:14px; font-weight:800; color:var(--sig-accent); animation:sigSlideUp 0.7s ease-out 0.9s both,sigSparkle 2.5s ease-in-out 2s infinite; }
+  .sig-contact-item.email { animation:sigSlideUp 0.8s ease-out 1.1s both; }
+  .sig-contact-item.site { animation:sigSlideUp 0.8s ease-out 1.2s both; }
+  .sig-contact-item.hours { animation:sigFade 0.8s ease-out 1.4s both; }
+  .sig-icon { width:14px; height:14px; flex-shrink:0; font-size:12px; display:inline-flex; align-items:center; justify-content:center; color:var(--sig-accent); }
+  .sig-badges { display:flex; flex-wrap:wrap; gap:5px; margin-top:2px; }
+  .sig-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:4px; font-size:10px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; opacity:0; }
+  .sig-badge.filled { background:var(--sig-accent); color:var(--sig-bg); animation:sigFade 0.8s ease-out 1.6s both; }
+  .sig-badge.outline { background:transparent; border:1px solid var(--sig-accent); color:var(--sig-accent); animation:sigFade 0.8s ease-out 1.8s both; }
+  .sig-cta-bar { display:flex; align-items:center; justify-content:space-between; padding:9px 18px; background:linear-gradient(90deg,var(--sig-accent)18,transparent); border-top:1px solid var(--sig-accent)30; opacity:0; animation:sigFade 1s ease-out 2s both; }
+  .sig-cta-text { font-size:11px; font-weight:600; color:var(--sig-accent); letter-spacing:0.04em; }
+  .sig-cta-arrow { font-size:14px; color:var(--sig-accent); animation:sigSparkle 2s ease-in-out 3s infinite; }
+  a { text-decoration:none; color:inherit; } a:hover { color:var(--sig-accent); }
 </style>
 </head>
 <body>
 <div class="sig-wrap">
   <div class="sig-top-bar"></div>
-  <div class="sig-body">
-    <div class="sig-logo-block">
-      {{#if data.logo_url}}
-      <img src="{{data.logo_url}}" alt="{{data.nom}}">
-      {{else}}
-      <span class="sig-logo-emoji">🛍️</span>
-      {{/if}}
+  <div class="sig-main">
+    <div class="sig-logo-zone">
+      <div class="sig-logo-frame">
+        {{#if data.logo_url}}<img src="{{data.logo_url}}" alt="{{data.entreprise}}">
+        {{else}}<span class="sig-logo-emoji">🛍️</span>{{/if}}
+      </div>
+      <div class="sig-logo-dot"></div>
     </div>
-    <div class="sig-content">
-      <span class="sig-name sig-el-nom">{{data.nom}}</span>
-      <span class="sig-titre sig-el-titre">{{data.titre}}</span>
-      <div class="sig-info-row">
-        {{#if data.adresse}}<span class="sig-info sig-el-adresse">📍 {{data.adresse}}</span>{{/if}}
-        {{#if data.telephone}}<span class="sig-info sig-el-telephone">📞 <a href="tel:{{data.telephone}}">{{data.telephone}}</a></span>{{/if}}
-        {{#if data.site}}<span class="sig-info sig-el-adresse">🛒 <a href="{{data.site}}">Boutique en ligne</a></span>{{/if}}
+    <div class="sig-vdivider"></div>
+    <div class="sig-info">
+      <div class="sig-header">
+        <div class="sig-header-left">
+          <span class="sig-name">{{data.nom}}</span>
+          <span class="sig-titre">{{data.titre}}</span>
+        </div>
+        {{#if data.note}}<div class="sig-rating"><span class="sig-stars">★</span> {{data.note}}</div>{{/if}}
+      </div>
+      <div class="sig-hdivider"></div>
+      <div class="sig-contacts">
+        {{#if data.telephone}}<a href="tel:{{data.telephone}}" class="sig-contact-item phone"><span class="sig-icon">📞</span> {{data.telephone}}</a>{{/if}}
+        {{#if data.email}}<a href="mailto:{{data.email}}" class="sig-contact-item email"><span class="sig-icon">✉</span> {{data.email}}</a>{{/if}}
+        {{#if data.site}}<a href="{{data.site}}" class="sig-contact-item site" target="_blank"><span class="sig-icon">🌐</span> {{data.site}}</a>{{/if}}
+        {{#if data.horaires}}<div class="sig-contact-item hours"><span class="sig-icon">🕐</span> {{data.horaires}}</div>{{/if}}
+      </div>
+      <div class="sig-badges">
+        {{#if data.collection}}<span class="sig-badge filled">✦ {{data.collection}}</span>{{/if}}
+        {{#if data.livraison}}<span class="sig-badge outline">🚚 {{data.livraison}}</span>{{/if}}
       </div>
     </div>
   </div>
-  <div class="sig-bottom">
-    {{#if data.horaires}}
-    <span class="sig-horaires sig-el-horaires">🕐 {{data.horaires}}</span>
-    {{/if}}
-    <div class="sig-social">
-      {{#if data.instagram}}<a href="{{data.instagram}}" class="sig-el-instagram">📸 Instagram</a>{{/if}}
-      {{#if data.site}}<a href="{{data.site}}" class="sig-el-instagram">🛒 Shop</a>{{/if}}
-    </div>
+  <div class="sig-cta-bar">
+    <span class="sig-cta-text">{{cta}}</span>
+    <span class="sig-cta-arrow">→</span>
   </div>
 </div>
 </body>
