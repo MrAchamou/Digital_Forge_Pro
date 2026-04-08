@@ -278,7 +278,7 @@ export default function Studio() {
                       style={{ color: t.palette.accent }}
                     >
                       <div className="w-4 h-0.5 rounded-full" style={{ background: t.palette.accent }} />
-                      <span className="text-[9px] font-semibold tracking-wider uppercase">{t.animation.name}</span>
+                      <span className="text-[9px] font-semibold tracking-wider uppercase">{t.animation?.name ?? '—'}</span>
                     </div>
                   </button>
                 ))}
@@ -316,7 +316,7 @@ export default function Studio() {
               <div>
                 <div className="font-bold text-white">{selectedSector.label}</div>
                 <div className="text-xs" style={{ color: selectedSector.palette.accent }}>
-                  {selectedSector.tone} · Animation : {selectedSector.animation.name}
+                  {selectedSector.tone} · Animation : {selectedSector.animation?.name ?? '—'}
                 </div>
               </div>
               <div className="ml-auto">

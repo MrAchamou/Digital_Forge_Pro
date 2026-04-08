@@ -262,7 +262,7 @@ export default function Status() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate" data-testid={`text-job-description-${job.id}`}>
-                        {job.description.length > 50 ? `${job.description.slice(0, 50)}...` : job.description}
+                        {(job.description?.length ?? 0) > 50 ? `${job.description?.slice(0, 50)}...` : (job.description ?? '—')}
                       </p>
                       <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-400 capitalize">
@@ -535,7 +535,7 @@ export default function Status() {
                         serviceKeys.map((key) => {
                           const usagePct = key.dailyLimit > 0 ? Math.round((key.usageToday / key.dailyLimit) * 100) : 0;
                           const cooldownStr = getCooldownRemaining(key.cooldownUntil);
-                          const keyNum = key.id.split('_')[1];
+                          const keyNum = key.id?.split('_')[1] ?? key.id;
 
                           return (
                             <div key={key.id} className="flex items-center gap-4 px-4 py-3 text-sm" data-testid={`key-row-${key.id}`}>

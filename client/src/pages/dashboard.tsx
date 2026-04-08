@@ -323,7 +323,7 @@ export default function Dashboard() {
                       <div className="text-xs font-medium text-white capitalize truncate">{name}</div>
                     </div>
                     <div className="text-xs font-mono" style={{ color }}>
-                      {mod.performance.toFixed(0)}%
+                      {(mod.performance ?? 0).toFixed(0)}%
                     </div>
                   </div>
                 );
