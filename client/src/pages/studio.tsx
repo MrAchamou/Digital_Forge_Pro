@@ -40,6 +40,7 @@ export default function Studio() {
   const [gmbUrl, setGmbUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [extractedData, setExtractedData] = useState<Record<string, any> | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: templatesData, isLoading } = useQuery<{ templates: SectorConfig[] }>({
@@ -109,20 +110,60 @@ export default function Studio() {
           }
         } catch (_) {}
 
-        // Remplissage des champs si on a un secteur actif
+        // Construction de la base de données fusionnées
+        const merged: Record<string, string> = { ...formData };
+
+        // Toujours stocker logo_url et logo_base64 (utilisés dans le rendu HBS)
+        if (data.logo_url) merged.logo_url = data.logo_url;
+        if (data.logo_base64) merged.logo_base64 = data.logo_base64;
+
+        // Aplatir les réseaux sociaux dans les champs directs
+        if (data.reseaux_sociaux && typeof data.reseaux_sociaux === 'object') {
+          for (const [platform, url] of Object.entries(data.reseaux_sociaux)) {
+            if (url && typeof url === 'string') merged[platform] = url;
+          }
+        }
+
+        // Champs directs depuis les données GMB
+        const directFields: Record<string, string | number | string[]> = {
+          nom: data.nom || data.entreprise || '',
+          entreprise: data.entreprise || '',
+          titre: data.titre || '',
+          telephone: data.telephone || '',
+          email: data.email || '',
+          site: data.site || '',
+          adresse: data.adresse || '',
+          ville: data.ville || '',
+          code_postal: data.code_postal || '',
+          note: data.note ? String(data.note) : '',
+          horaires: Array.isArray(data.horaires) && data.horaires.length > 0
+            ? data.horaires.slice(0, 3).join(' | ')
+            : (data.horaires || ''),
+          secteur: data.secteur || '',
+        };
+        for (const [key, val] of Object.entries(directFields)) {
+          if (val !== undefined && val !== null && val !== '') merged[key] = String(val);
+        }
+
+        // Remplissage des champs spécifiques au secteur actif
         if (activeSector) {
-          const merged: Record<string, string> = { ...formData };
           for (const field of activeSector.fields) {
             const val = data[field.key];
-            if (val !== undefined && val !== null && val !== '') {
+            if (val !== undefined && val !== null && val !== '' && !merged[field.key]) {
               merged[field.key] = String(val);
             }
           }
-          if (!merged.nom && data.entreprise) merged.nom = data.entreprise;
-          setFormData(merged);
         }
 
-        toast({ title: "Import réussi", description: `Données de "${data.entreprise || data.nom}" importées.` });
+        setFormData(merged);
+        setExtractedData(data);
+
+        const filledCount = Object.keys(merged).filter(k => merged[k]).length;
+        const logoFound = !!data.logo_url;
+        toast({
+          title: "Import réussi ✓",
+          description: `${filledCount} champs extraits${logoFound ? ' + logo trouvé' : ''} pour "${data.entreprise || data.nom}".`,
+        });
       } else {
         toast({ title: "Aucune donnée trouvée", description: "Vérifiez l'URL Google Maps.", variant: "destructive" });
       }
@@ -258,6 +299,77 @@ export default function Studio() {
                 <p className="text-xs text-white/30 mt-2">
                   {selectedSector ? `Secteur sélectionné : ${selectedSector.label}` : "Importez votre fiche Google pour auto-détecter le secteur"}
                 </p>
+
+                {/* Panneau de résultats après import */}
+                {extractedData && (
+                  <div className="mt-4 p-4 bg-white/[0.04] border border-white/[0.08] rounded-lg">
+                    <div className="flex items-start gap-4">
+                      {/* Logo */}
+                      {extractedData.logo_url && (
+                        <div className="flex-shrink-0">
+                          <img
+                            src={extractedData.logo_url}
+                            alt="logo"
+                            className="w-12 h-12 object-contain rounded-md bg-white/10 p-1"
+                            data-testid="img-extracted-logo"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        </div>
+                      )}
+                      {!extractedData.logo_url && (
+                        <div className="flex-shrink-0 w-12 h-12 rounded-md bg-white/5 border border-white/10 flex items-center justify-center text-xl">
+                          🏢
+                        </div>
+                      )}
+
+                      {/* Infos extraites */}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-white text-sm truncate" data-testid="text-extracted-name">
+                          {extractedData.entreprise || extractedData.nom || '—'}
+                        </div>
+                        <div className="text-xs text-white/40 mt-0.5 space-y-0.5">
+                          {extractedData.telephone && (
+                            <div className="flex items-center gap-1.5">
+                              <Phone className="w-3 h-3 text-[#00D4FF]" />
+                              <span data-testid="text-extracted-phone">{extractedData.telephone}</span>
+                            </div>
+                          )}
+                          {extractedData.email && (
+                            <div className="flex items-center gap-1.5">
+                              <Mail className="w-3 h-3 text-[#00D4FF]" />
+                              <span className="truncate" data-testid="text-extracted-email">{extractedData.email}</span>
+                            </div>
+                          )}
+                          {extractedData.site && (
+                            <div className="flex items-center gap-1.5">
+                              <Globe className="w-3 h-3 text-[#00D4FF]" />
+                              <span className="truncate" data-testid="text-extracted-site">{extractedData.site}</span>
+                            </div>
+                          )}
+                          {extractedData.adresse && (
+                            <div className="flex items-center gap-1.5">
+                              <MapPin className="w-3 h-3 text-[#00D4FF]" />
+                              <span data-testid="text-extracted-address">{extractedData.adresse}{extractedData.ville ? `, ${extractedData.ville}` : ''}</span>
+                            </div>
+                          )}
+                          {extractedData.note > 0 && (
+                            <div className="flex items-center gap-1.5">
+                              <Star className="w-3 h-3 text-yellow-400" />
+                              <span data-testid="text-extracted-rating">{extractedData.note}/5 ({extractedData.avis} avis)</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Badge logo */}
+                      <div className="flex-shrink-0 text-right">
+                        <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium ${extractedData.logo_url ? 'bg-green-500/15 text-green-400' : 'bg-white/10 text-white/30'}`} data-testid="badge-logo-status">
+                          {extractedData.logo_url ? '✓ Logo' : 'Pas de logo'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Sector grid */}
@@ -358,6 +470,31 @@ export default function Studio() {
                 {isImporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Importer"}
               </Button>
             </div>
+
+            {/* Résumé des données extraites */}
+            {extractedData && (
+              <div className="mt-3 flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.06] rounded-lg">
+                {extractedData.logo_url ? (
+                  <img
+                    src={extractedData.logo_url}
+                    alt="logo"
+                    className="w-10 h-10 object-contain rounded bg-white/10 p-0.5 flex-shrink-0"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded bg-white/5 border border-white/10 flex items-center justify-center text-lg flex-shrink-0">🏢</div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-medium text-white truncate">{extractedData.entreprise || extractedData.nom}</div>
+                  <div className="text-[10px] text-white/30 mt-0.5">
+                    {[extractedData.telephone, extractedData.email, extractedData.ville].filter(Boolean).join(' · ')}
+                  </div>
+                </div>
+                <span className={`flex-shrink-0 text-[10px] px-2 py-0.5 rounded-full ${extractedData.logo_url ? 'bg-green-500/15 text-green-400' : 'bg-white/10 text-white/30'}`}>
+                  {extractedData.logo_url ? '✓ Logo' : 'Pas de logo'}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Fields */}
