@@ -373,36 +373,122 @@ export default function Studio() {
               </div>
 
               {/* Sector grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                {templates.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => selectSector(t)}
-                    className="relative group p-4 rounded-xl border transition-all duration-200 text-left overflow-hidden hover:scale-[1.02] hover:shadow-lg"
-                    style={{
-                      background: `${t.palette.background}cc`,
-                      borderColor: `${t.palette.accent}44`,
-                    }}
-                    data-testid={`sector-card-${t.id}`}
-                  >
-                    <div
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ background: `radial-gradient(circle at 50% 50%, ${t.palette.accent}18, transparent 70%)` }}
-                    />
-                    <div className="text-2xl mb-2">{t.emoji}</div>
-                    <div className="text-xs font-bold text-white mb-1 leading-tight">{t.label}</div>
-                    <div className="text-[10px] leading-relaxed" style={{ color: t.palette.muted }}>
-                      {t.description.split(',')[0].split('.')[0]}
-                    </div>
-                    <div
-                      className="mt-3 flex items-center gap-1"
-                      style={{ color: t.palette.accent }}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                {templates.map((t) => {
+                  const isSelected = selectedSector?.id === t.id;
+                  const firstExample = t.description.split(',')[0].trim();
+                  const toneLabel = t.tone.split(',')[0].trim();
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => selectSector(t)}
+                      className="relative group text-left overflow-hidden rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5"
+                      style={{
+                        background: `linear-gradient(155deg, ${t.palette.background} 0%, ${t.palette.background}ee 100%)`,
+                        borderColor: isSelected ? t.palette.accent : `${t.palette.accent}28`,
+                        boxShadow: isSelected
+                          ? `0 0 0 1px ${t.palette.accent}60, 0 4px 24px ${t.palette.accent}25, 0 0 60px ${t.palette.accent}10`
+                          : `0 2px 12px rgba(0,0,0,0.3)`,
+                      }}
+                      data-testid={`sector-card-${t.id}`}
                     >
-                      <div className="w-4 h-0.5 rounded-full" style={{ background: t.palette.accent }} />
-                      <span className="text-[9px] font-semibold tracking-wider uppercase">{t.animation?.name ?? '—'}</span>
-                    </div>
-                  </button>
-                ))}
+                      {/* Top accent shimmer line */}
+                      <div
+                        className="absolute top-0 left-0 right-0 h-px"
+                        style={{ background: `linear-gradient(90deg, transparent 0%, ${t.palette.accent}90 40%, ${t.palette.accent} 50%, ${t.palette.accent}90 60%, transparent 100%)` }}
+                      />
+
+                      {/* Hover radial glow */}
+                      <div
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                        style={{ background: `radial-gradient(ellipse at 50% -10%, ${t.palette.accent}22 0%, transparent 65%)` }}
+                      />
+
+                      {/* Top-right corner accent orb */}
+                      <div
+                        className="absolute -top-6 -right-6 w-20 h-20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        style={{ background: `radial-gradient(circle, ${t.palette.accent}20, transparent 70%)` }}
+                      />
+
+                      {/* Selected checkmark */}
+                      {isSelected && (
+                        <div
+                          className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold z-10"
+                          style={{ background: t.palette.accent, color: t.palette.background }}
+                        >
+                          ✓
+                        </div>
+                      )}
+
+                      <div className="relative p-5">
+                        {/* Emoji bubble */}
+                        <div
+                          className="w-11 h-11 rounded-xl flex items-center justify-center text-xl mb-4 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
+                          style={{
+                            background: `linear-gradient(135deg, ${t.palette.accent}25, ${t.palette.accent}10)`,
+                            boxShadow: `0 0 0 1px ${t.palette.accent}35, 0 2px 8px ${t.palette.accent}15`,
+                          }}
+                        >
+                          {t.emoji}
+                        </div>
+
+                        {/* Label */}
+                        <div className="text-sm font-bold leading-tight mb-1 text-white">
+                          {t.label}
+                        </div>
+
+                        {/* Example */}
+                        <div className="text-[11px] text-white/40 mb-3 leading-snug">
+                          {firstExample}
+                        </div>
+
+                        {/* Tone badge */}
+                        <div
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider mb-4"
+                          style={{
+                            background: `${t.palette.accent}18`,
+                            color: t.palette.accent,
+                            border: `1px solid ${t.palette.accent}35`,
+                          }}
+                        >
+                          {toneLabel}
+                        </div>
+
+                        {/* Field count dots + CTA */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: Math.min(t.fieldCount ?? 6, 8) }).map((_, i) => (
+                              <div
+                                key={i}
+                                className="rounded-full transition-all duration-300"
+                                style={{
+                                  width: i < 4 ? '5px' : '4px',
+                                  height: i < 4 ? '5px' : '4px',
+                                  background: i < 4 ? t.palette.accent : `${t.palette.accent}35`,
+                                }}
+                              />
+                            ))}
+                            <span className="text-[9px] ml-1 text-white/30">{t.fieldCount ?? 6}</span>
+                          </div>
+                          <div
+                            className="text-[9px] font-bold tracking-wider uppercase opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center gap-0.5"
+                            style={{ color: t.palette.accent }}
+                          >
+                            CHOISIR <span className="text-[10px]">›</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bottom accent bar for selected */}
+                      {isSelected && (
+                        <div
+                          className="absolute bottom-0 left-0 right-0 h-0.5"
+                          style={{ background: `linear-gradient(90deg, transparent, ${t.palette.accent}, transparent)` }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </>
           )}

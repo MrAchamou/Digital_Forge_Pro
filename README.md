@@ -126,7 +126,7 @@ Google My Business URL
 | **Command Center** | `/` | Dashboard — métriques système, queue, activité récente |
 | **God Generator** | `/generator` | Pipeline principal — saisie URL GMB, progression live, viewer résultat |
 | **Neural Library** | `/library` | Parcourir et prévisualiser les 55 effets animés avec métriques enrichies |
-| **Studio** | `/studio` | Studio d'animation — construire et tester des animations SVG personnalisées |
+| **Générateur Signatures** | `/studio` | Générateur de signatures email professionnelles — import GMB, sélection de secteur (10 cartes), formulaire, aperçu + export HTML/Clipboard |
 | **Reality Preview** | `/preview` | Renderer SVG live — coller un SVG et prévisualiser instantanément |
 | **AI Expansion** | `/expansion` | Croissance de la librairie par IA — décrire et générer de nouveaux effets |
 | **Upload** | `/upload` | Import de signatures existantes pour transformation |
@@ -536,6 +536,58 @@ effectforge-ai/
 | Pages frontend | 9 |
 | Fichiers générés par génération | 10 |
 | Score qualité DFO Ultimate | 94/100 God Tier ✓ |
+
+---
+
+## Générateur de Signatures Email (`/studio`)
+
+Module autonome de génération de signatures HTML professionnelles, sans pipeline Triple-IA :
+
+### Pipeline utilisateur (3 étapes)
+
+```
+Étape 1 — Secteur
+  ├── [Optionnel] Import URL Google My Business
+  │   ├── Scraping Serper (Places + Search en parallèle, 5 clés round-robin)
+  │   ├── Extraction : nom, téléphone, adresse, note, site, réseaux sociaux
+  │   ├── Logo : Clearbit → Brandfetch → Google Favicon (fallback garanti)
+  │   └── Auto-détection du secteur via Cerebras (fallback si Gemini 429)
+  └── Sélection manuelle parmi 10 cartes de secteur premium
+
+Étape 2 — Informations
+  └── Formulaire pré-rempli depuis l'import GMB (champs spécifiques au secteur)
+
+Étape 3 — Aperçu & Export
+  ├── Rendu HTML via Handlebars (template .hbs par secteur)
+  ├── Copier dans le presse-papier
+  └── Télécharger en HTML
+```
+
+### 10 secteurs disponibles
+
+| Secteur | Emoji | Accent | Ton | Champs |
+|---------|-------|--------|-----|--------|
+| Artisanat & Travaux | 🔧 | Ambre `#f59e0b` | Sérieux, réactif | 8 |
+| Commerce & Retail | 🛍️ | Rose `#ec4899` | Dynamique, tendance | 7 |
+| Éducation & Formation | 🎓 | Bleu `#3b82f6` | Bienveillant, progressif | 8 |
+| Immobilier | 🏠 | Ciel `#0ea5e9` | Prestige, expertise locale | 8 |
+| Loisirs & Tourisme | 🏨 | Violet `#8b5cf6` | Cinématique, inspirant | 7 |
+| Restauration & Alimentation | 🍽️ | Or `#d97706` | Chaleureux, gourmand | 8 |
+| Santé & Bien-être | 💆 | Émeraude `#059669` | Rassurant, bienveillant | 8 |
+| Services Professionnels | ⚖️ | Indigo `#6366f1` | Sobre, formel, autorité | 8 |
+| Tech & Digital | 💻 | Cyan `#06b6d4` | Futuriste, innovant | 8 |
+| Transport & Logistique | 🚚 | Rouge `#ef4444` | Rapide, direct | 8 |
+
+### Résultats de tests (validés le 08/04/2026)
+
+| Test | Résultat |
+|------|----------|
+| Templates chargés | ✅ 10/10 |
+| Serper GMB scraper | ✅ Opérationnel (nom, téléphone, site, logo) |
+| Clés Serper actives | ✅ 5/5 (round-robin, circuit breaker) |
+| Rendu HTML signature | ✅ ~5268 chars par secteur |
+| Import logo | ✅ Clearbit → Brandfetch → favicon (fallback garanti) |
+| Classification secteur | ✅ Cerebras (fallback Gemini 429) |
 
 ---
 
