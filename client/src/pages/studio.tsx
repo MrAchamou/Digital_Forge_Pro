@@ -147,7 +147,7 @@ export default function Studio() {
 
         // Remplissage des champs spécifiques au secteur actif
         if (activeSector) {
-          for (const field of activeSector.fields) {
+          for (const field of (activeSector.fields ?? [])) {
             const val = data[field.key];
             if (val !== undefined && val !== null && val !== '' && !merged[field.key]) {
               merged[field.key] = String(val);
@@ -205,9 +205,9 @@ export default function Studio() {
     setStep(3);
   };
 
-  const requiredFilled = selectedSector?.fields
+  const requiredFilled = (selectedSector?.fields ?? [])
     .filter(f => f.required)
-    .every(f => (formData[f.key] ?? "").trim() !== "") ?? false;
+    .every(f => (formData[f.key] ?? "").trim() !== "");
 
   return (
     <div className="min-h-screen" data-testid="studio-page">
@@ -585,7 +585,7 @@ export default function Studio() {
 
           {/* Fields */}
           <div className="space-y-4">
-            {selectedSector.fields.map((field) => {
+            {(selectedSector.fields ?? []).map((field) => {
               const IconComp = FIELD_ICONS[field.type] || User;
               return (
                 <div key={field.key} data-testid={`field-${field.key}`}>
@@ -737,7 +737,7 @@ export default function Studio() {
                   {selectedSector.tone}
                 </div>
                 <div className="space-y-1 text-xs text-white/40 mb-4">
-                  {selectedSector.fields.map(f => (
+                  {(selectedSector.fields ?? []).map(f => (
                     <div key={f.key} className="flex justify-between">
                       <span>{f.label}</span>
                       <span style={{ color: formData[f.key] ? selectedSector.palette.accent : undefined }}>

@@ -288,7 +288,8 @@ router.get('/signature/templates', (_req, res) => {
       animation: t.animation ? { name: t.animation.name, intensity: t.animation.intensity } : undefined,
       tone: t.tone,
       cta: t.cta,
-      fieldCount: t.fields.length,
+      fields: t.fields ?? [],
+      fieldCount: (t.fields ?? []).length,
     }));
     res.json({ templates, total: templates.length });
   } catch (err: any) {
