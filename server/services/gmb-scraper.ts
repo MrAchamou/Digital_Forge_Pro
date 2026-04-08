@@ -1,4 +1,5 @@
 import { log } from '../vite';
+import { rotator } from './api-key-rotator';
 
 export interface GmbScrapedData {
   nom: string;
@@ -329,56 +330,63 @@ async function fetchLogoBase64(logoUrl: string): Promise<string> {
   }
 }
 
-// ── Récupération de la clé Serper active ─────────────────────────────────────
-function getSerperKey(): string {
-  for (let i = 1; i <= 10; i++) {
-    const k = process.env[`SERPER_KEY_${i}`];
-    if (k && k.length > 8) return k;
-  }
-  return '';
-}
-
-// ── Appel Serper Places API ───────────────────────────────────────────────────
-async function callSerperPlaces(query: string, serperKey: string): Promise<any[]> {
+// ── Appel Serper Places API (avec rotateur) ───────────────────────────────────
+async function callSerperPlaces(query: string): Promise<any[]> {
+  let activeKey: any = null;
+  const start = Date.now();
   try {
-    log(`Serper Places: "${query}"`, 'gmb-scraper');
+    activeKey = await rotator.selectBestKey('serper');
+    log(`Serper Places: "${query}" [clé: ${activeKey.id}]`, 'gmb-scraper');
     const res = await fetch('https://google.serper.dev/places', {
       method: 'POST',
       headers: {
-        'X-API-KEY': serperKey,
+        'X-API-KEY': activeKey.key,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ q: query, gl: 'fr', hl: 'fr' }),
       signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) {
-      log(`Serper Places HTTP ${res.status}`, 'gmb-scraper');
+      const text = await res.text();
+      log(`Serper Places HTTP ${res.status} [clé: ${activeKey.id}]`, 'gmb-scraper');
+      await rotator.handleError(activeKey, res.status, text);
       return [];
     }
+    await rotator.recordSuccess(activeKey, Date.now() - start);
     const data = await res.json() as any;
     return (data.places as any[]) || [];
   } catch (err: any) {
+    if (activeKey) await rotator.handleError(activeKey, 0, err.message);
     log(`Serper Places erreur: ${err.message}`, 'gmb-scraper');
     return [];
   }
 }
 
-// ── Appel Serper Search API (pour email, réseaux sociaux, Knowledge Graph) ───
-async function callSerperSearch(query: string, serperKey: string): Promise<any> {
+// ── Appel Serper Search API (avec rotateur) ───────────────────────────────────
+async function callSerperSearch(query: string): Promise<any> {
+  let activeKey: any = null;
+  const start = Date.now();
   try {
-    log(`Serper Search: "${query}"`, 'gmb-scraper');
+    activeKey = await rotator.selectBestKey('serper');
+    log(`Serper Search: "${query}" [clé: ${activeKey.id}]`, 'gmb-scraper');
     const res = await fetch('https://google.serper.dev/search', {
       method: 'POST',
       headers: {
-        'X-API-KEY': serperKey,
+        'X-API-KEY': activeKey.key,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ q: query, gl: 'fr', hl: 'fr', num: 5 }),
       signal: AbortSignal.timeout(15000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const text = await res.text();
+      await rotator.handleError(activeKey, res.status, text);
+      return null;
+    }
+    await rotator.recordSuccess(activeKey, Date.now() - start);
     return await res.json();
   } catch (err: any) {
+    if (activeKey) await rotator.handleError(activeKey, 0, err.message);
     log(`Serper Search erreur: ${err.message}`, 'gmb-scraper');
     return null;
   }
@@ -476,23 +484,16 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
     return generateDemoData('Mon Entreprise', gmbUrl);
   }
 
-  // 2. Récupération clé Serper
-  const serperKey = getSerperKey();
-  if (!serperKey) {
-    log(`Aucune clé Serper disponible`, 'gmb-scraper');
-    return generateDemoData(extractedName, gmbUrl);
-  }
-
-  // 3. Appels Serper Places + Search en parallèle
+  // 2. Appels Serper Places + Search en parallèle (le rotateur gère les clés)
   const [places, searchData] = await Promise.all([
-    callSerperPlaces(extractedName, serperKey),
-    callSerperSearch(`${extractedName} téléphone adresse`, serperKey),
+    callSerperPlaces(extractedName),
+    callSerperSearch(`${extractedName} téléphone adresse`),
   ]);
 
   // Si aucun résultat Places, essayer avec les coordonnées
   let allPlaces = places;
   if (allPlaces.length === 0 && lat && lng) {
-    allPlaces = await callSerperPlaces(`${extractedName} France`, serperKey);
+    allPlaces = await callSerperPlaces(`${extractedName} France`);
   }
 
   // Sélection du meilleur résultat
@@ -540,8 +541,7 @@ async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
   if (!telephone && rawAddress) {
     const rawAddrSanitized = rawAddress.replace(/[.,]/g, '');
     const detailedPlaces = await callSerperPlaces(
-      `${place.title} ${rawAddrSanitized}`.trim(),
-      serperKey
+      `${place.title} ${rawAddrSanitized}`.trim()
     );
     const detailedPlace = pickBestPlace(detailedPlaces, place.title);
     if (detailedPlace?.phoneNumber) {
