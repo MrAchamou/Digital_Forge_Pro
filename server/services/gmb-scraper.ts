@@ -113,9 +113,9 @@ function detectSector(category: string, description: string = ''): string {
   return 'default';
 }
 
-// ── Résolution URL courte ────────────────────────────────────────────────────
+// ── Résolution URL courte (goo.gl, maps.app.goo.gl, share.google, etc.) ─────
 async function resolveShortUrl(url: string): Promise<string> {
-  const isShort = /maps\.app\.goo\.gl|goo\.gl\/maps/i.test(url);
+  const isShort = /maps\.app\.goo\.gl|goo\.gl\/maps|share\.google/i.test(url);
   if (!isShort) return url;
 
   try {
@@ -124,13 +124,35 @@ async function resolveShortUrl(url: string): Promise<string> {
       method: 'GET',
       redirect: 'follow',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept-Language': 'fr-FR,fr;q=0.9',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
-      signal: AbortSignal.timeout(12000),
+      signal: AbortSignal.timeout(15000),
     });
     const resolved = response.url;
-    log(`URL résolue → ${resolved.slice(0, 150)}`, 'gmb-scraper');
+    log(`URL résolue → ${resolved.slice(0, 200)}`, 'gmb-scraper');
+
+    // Si l'URL résolue contient le nom du lieu, on la retourne directement
+    if (resolved.includes('/maps/place/') || resolved.includes('maps.google.com')) {
+      return resolved;
+    }
+
+    // Sinon, tenter d'extraire le nom depuis le HTML de la page
+    try {
+      const html = await response.text();
+      // Chercher le titre de la page Google Maps (contient le nom du lieu)
+      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      if (titleMatch?.[1]) {
+        const titleText = titleMatch[1].replace(/\s*[-–|].*$/, '').trim(); // Enlever " - Google Maps"
+        if (titleText && titleText.length > 2 && !titleText.toLowerCase().includes('google')) {
+          log(`Nom extrait du HTML: "${titleText}"`, 'gmb-scraper');
+          // Retourner une URL synthétique avec le nom encodé
+          return `https://www.google.com/maps/place/${encodeURIComponent(titleText)}`;
+        }
+      }
+    } catch { /* ignore */ }
+
     return resolved;
   } catch (err: any) {
     log(`Impossible de résoudre URL courte: ${err.message}`, 'gmb-scraper');
@@ -471,18 +493,67 @@ function generateDemoData(name: string, url: string): GmbScrapedData {
   };
 }
 
+// ── Extraction nom depuis CID Google Maps ─────────────────────────────────────
+async function resolveNameFromCid(resolvedUrl: string): Promise<string> {
+  try {
+    // Extraire le CID depuis l'URL (ex: ?cid=1234567890)
+    const cidMatch = resolvedUrl.match(/[?&]cid=(\d+)/);
+    if (!cidMatch) return '';
+
+    // Chercher dans le HTML si disponible, ou via une requête directe
+    const res = await fetch(resolvedUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'fr-FR,fr;q=0.9',
+      },
+      signal: AbortSignal.timeout(10000),
+      redirect: 'follow',
+    });
+
+    const html = await res.text();
+    // Chercher le nom dans le titre ou les métadonnées
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    if (titleMatch?.[1]) {
+      const name = titleMatch[1].replace(/\s*[-–|].*Google.*$/i, '').trim();
+      if (name.length > 2) {
+        log(`Nom depuis CID HTML: "${name}"`, 'gmb-scraper');
+        return name;
+      }
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
 // ── Scraping principal via Serper ─────────────────────────────────────────────
 async function scrapeWithSerper(gmbUrl: string): Promise<GmbScrapedData> {
   // 1. Résolution URL courte
   const resolvedUrl = await resolveShortUrl(gmbUrl);
-  const { name: extractedName, lat, lng } = extractInfoFromUrl(resolvedUrl);
+  let { name: extractedName, lat, lng } = extractInfoFromUrl(resolvedUrl);
 
   log(`Nom extrait depuis l'URL: "${extractedName}"`, 'gmb-scraper');
 
+  // 1b. Fallback : extraire le nom depuis un CID Google Maps si présent
+  if (!extractedName && resolvedUrl.includes('cid=')) {
+    extractedName = await resolveNameFromCid(resolvedUrl);
+  }
+
+  // 1c. Fallback ultime : extraire le paramètre q= de l'URL résolue
   if (!extractedName) {
-    log(`Aucun nom extractible, retour données démo`, 'gmb-scraper');
+    try {
+      const urlObj = new URL(resolvedUrl.includes('://') ? resolvedUrl : 'https://placeholder.com/' + resolvedUrl);
+      const qParam = urlObj.searchParams.get('q');
+      if (qParam && qParam.length > 2) extractedName = qParam.trim();
+    } catch { /* URL malformée, on ignore */ }
+  }
+
+  if (!extractedName) {
+    log(`Aucun nom extractible après toutes les tentatives, retour données démo`, 'gmb-scraper');
     return generateDemoData('Mon Entreprise', gmbUrl);
   }
+
+  log(`Nom final utilisé pour le scraping: "${extractedName}"`, 'gmb-scraper');
 
   // 2. Appels Serper Places + Search en parallèle (le rotateur gère les clés)
   const [places, searchData] = await Promise.all([
