@@ -95,6 +95,35 @@ export class SignatureBaseGenerator {
     const s3d = sig.sections3d || {};
     const { colorBg, colorAccent, colorSecondary, textOnBg, textMuted } = colors;
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // GRILLE FIXE — toutes les zones sont définies en coordonnées absolues SVG.
+    // Aucun élément ne peut sortir de sa zone grâce aux clipPath.
+    // SVG : 600 × 180 px
+    // ═══════════════════════════════════════════════════════════════════════════
+    //
+    //  ┌─────────────────┬──┬────────────────────────────────────────────────┐
+    //  │   LEFT COL      │SE│               RIGHT COL                        │
+    //  │  x=0  w=158     │P │  x=170  w=426                                  │
+    //  │                 │  │  [Name  ─────────────clip 230─────]  [CTA    ] │
+    //  │  Avatar         │  │  [Titre ─────────────clip 230─────]            │
+    //  │  cx=76 cy=76    │  │  [Company ─────clip 230────────────]            │
+    //  │  r=52           │  │  ── divider ────────────────────── ─           │
+    //  │                 │  │  [Email  ──────────────────────────]            │
+    //  │  Logo/Text      │  │  [Phone  ──────────────────────────]            │
+    //  │  y=136 h=28     │  │  [Site   ──────────────────────────]            │
+    //  │                 │  │  [Social icons ──clip 216──]  [CTA pill       ]│
+    //  └─────────────────┴──┴────────────────────────────────────────────────┘
+    //
+    // Clip zones (local to their parent group) :
+    //   clip-left-col    : 0,0 → 142,152   (left content area)
+    //   clip-right-col   : 0,0 → 424,152   (right content area)
+    //   clip-name-zone   : 0,0 → 230,30    (name — avoids CTA overlap)
+    //   clip-titre-zone  : 0,0 → 230,20    (titre)
+    //   clip-company-zone: 0,0 → 380,18    (company)
+    //   clip-contact-zone: 0,0 → 408,60    (3 rows × 18px + 6px guard)
+    //   clip-social-zone : 0,0 → 214,22    (social icons — stops before CTA)
+    // ═══════════════════════════════════════════════════════════════════════════
+
     const photoXML    = this.buildPhotoOrPlaceholder(sig.photo_url, sig.nom, colorAccent, textOnBg, s3d.photo);
     const logoXML     = this.buildLogoOrText(sig.logo_url, sig.entreprise, colorAccent, textOnBg, sig.logo3d);
     const separatorXML= this.buildSeparator(colorAccent, colorSecondary, s3d.separator);
@@ -105,44 +134,91 @@ export class SignatureBaseGenerator {
     const ctaXML      = this.buildCTA(sig.cta, colorAccent, textOnBg, s3d.cta);
 
     return `<g id="base-static">
-  <!-- Background base -->
+
+  <!-- ── Clip paths — zones fixes inviolables ── -->
+  <!-- Règle : les clips Y sont très larges (-500 / +2000) pour ne jamais tronquer -->
+  <!-- la hauteur ; seul le X est contraint selon la colonne ou la zone.           -->
+  <defs>
+    <!-- Colonne gauche : limite physique x=0→142, y=0→152 -->
+    <clipPath id="clip-left-col">
+      <rect x="0" y="0" width="142" height="152"/>
+    </clipPath>
+    <!-- Colonne droite : limite physique x=0→424, y=0→152 -->
+    <clipPath id="clip-right-col">
+      <rect x="0" y="0" width="424" height="152"/>
+    </clipPath>
+    <!-- Textes étroits (nom + titre) : largeur max 230px, hauteur libre -->
+    <clipPath id="clip-text-narrow">
+      <rect x="0" y="-500" width="230" height="2000"/>
+    </clipPath>
+    <!-- Textes larges (entreprise + contact) : largeur max 408px, hauteur libre -->
+    <clipPath id="clip-text-wide">
+      <rect x="-4" y="-500" width="416" height="2000"/>
+    </clipPath>
+    <!-- Icônes sociales : s'arrête strictement avant le CTA (x=220) -->
+    <clipPath id="clip-social-zone">
+      <rect x="0" y="-500" width="214" height="2000"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background ── -->
   <rect id="bg-base" x="0" y="0" width="600" height="180" fill="${colorBg}" rx="12"/>
 
-  <!-- Left column: photo + logo -->
-  <g id="left-col" transform="translate(16, 16)">
+  <!-- ── COLONNE GAUCHE : avatar + logo ── -->
+  <!-- Zone : x=0→158, y=0→180 | Contenu offset translate(16,16) -->
+  <g id="left-col" transform="translate(16, 16)" clip-path="url(#clip-left-col)">
+    <!-- Avatar : cx=60 cy=60 r=52 → abs cx=76 cy=76 | top=24 bottom=128 -->
     ${photoXML}
+    <!-- Logo/texte entreprise : y=120 h=28 → abs y=136 bottom=164 -->
     ${logoXML}
   </g>
 
-  <!-- Separator vertical -->
+  <!-- ── SÉPARATEUR VERTICAL ── -->
+  <!-- Fixe : x=170, y=16, height=148, bottom=164 -->
   <g id="separator-v" transform="translate(170, 16)">
     ${separatorXML}
   </g>
 
-  <!-- Right column: info -->
-  <g id="right-col" transform="translate(186, 20)">
-    ${nameXML}
-    ${titreXML}
-    <!-- Company -->
-    <text id="sig-company" x="0" y="56" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="${textMuted}">${this.escapeXml(sig.entreprise)}</text>
+  <!-- ── COLONNE DROITE : informations ── -->
+  <!-- Zone : x=186→610 clippée à 424px | y=20→172 clippée à 152px -->
+  <g id="right-col" transform="translate(186, 20)" clip-path="url(#clip-right-col)">
 
-    <!-- Separator horizontal thin -->
-    <line x1="0" y1="64" x2="380" y2="64" stroke="${colorAccent}" stroke-width="1" stroke-opacity="0.4"/>
+    <!-- Nom — baseline local y=22, abs y=42 — largeur max 230px -->
+    <g clip-path="url(#clip-text-narrow)">
+      ${nameXML}
+    </g>
 
-    <!-- Contact info -->
-    <g id="contact-block" transform="translate(0, 72)">
+    <!-- Titre — baseline local y=40, abs y=60 — largeur max 230px -->
+    <g clip-path="url(#clip-text-narrow)">
+      ${titreXML}
+    </g>
+
+    <!-- Entreprise — baseline local y=56, abs y=76 — largeur max 408px -->
+    <g clip-path="url(#clip-text-wide)">
+      <text id="sig-company" x="0" y="56" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="${textMuted}">${this.escapeXml(sig.entreprise)}</text>
+    </g>
+
+    <!-- Diviseur horizontal — local y=64, abs y=84 -->
+    <line x1="0" y1="64" x2="408" y2="64" stroke="${colorAccent}" stroke-width="1" stroke-opacity="0.35"/>
+
+    <!-- Contact — translate(0,72) → email abs y=92 | phone abs y=110 | site abs y=128 -->
+    <!-- Espacement 18px uniforme (flat et 3D). Largeur max 408px. -->
+    <g id="contact-block" transform="translate(0, 72)" clip-path="url(#clip-text-wide)">
       ${contactXML}
     </g>
 
-    <!-- Social icons -->
-    <g id="social-icons" transform="translate(0, 120)">
+    <!-- Icônes sociales — translate(0,118) → abs y=138 — max 214px (avant CTA) -->
+    <!-- Position fixe : toujours à gauche, indépendante du nombre d'icônes -->
+    <g id="social-icons" transform="translate(0, 118)" clip-path="url(#clip-social-zone)">
       ${socialXML}
     </g>
 
-    <!-- CTA -->
-    <g id="cta-block" transform="translate(220, 110)">
+    <!-- CTA — translate(220,108) → abs x=406 y=128 — fixe en bas à droite -->
+    <!-- Ne bouge JAMAIS quelle que soit la longueur des autres éléments -->
+    <g id="cta-block" transform="translate(220, 108)">
       ${ctaXML}
     </g>
+
   </g>
 </g>`;
   }
@@ -380,10 +456,11 @@ export class SignatureBaseGenerator {
     const siteText  = site ? this.escapeXml(site.replace(/^https?:\/\//, '')) : '';
 
     if (!is3d) {
+      // Espacement 18px uniforme — identique au mode 3D pour cohérence de layout
       return [
-        emailText ? `<text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">✉  <tspan fill="${textOnBg}">${emailText}</tspan></text>` : '',
-        phoneText ? `<text x="0" y="15" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">✆  <tspan fill="${textOnBg}">${phoneText}</tspan></text>` : '',
-        siteText  ? `<text x="0" y="30" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">⊕  <tspan fill="${accent}">${siteText}</tspan></text>` : '',
+        emailText ? `<text x="0" y="0"  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">✉  <tspan fill="${textOnBg}">${emailText}</tspan></text>` : '',
+        phoneText ? `<text x="0" y="18" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">✆  <tspan fill="${textOnBg}">${phoneText}</tspan></text>` : '',
+        siteText  ? `<text x="0" y="36" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="${textMuted}">⊕  <tspan fill="${accent}">${siteText}</tspan></text>` : '',
       ].join('\n  ');
     }
 
