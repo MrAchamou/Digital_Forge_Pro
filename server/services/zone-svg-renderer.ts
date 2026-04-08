@@ -959,7 +959,8 @@ export function renderZoneComposition(
   const c2 = palette[2] ?? '#e2e8f0';
 
   // ── ColorHarmonyEngine : palette enrichie par zone ────────────────────────
-  const zoneColors = enrichZoneColors(c1, c0, variationIndex);
+  const varIndexNum = ['A', 'B', 'C', 'D'].indexOf(variationIndex);
+  const zoneColors = enrichZoneColors(c1, c0, varIndexNum >= 0 ? varIndexNum : 0);
 
   const resolveColor = (decision: ZoneEffectDecision, zone: string, fallback: string) => {
     if (decision.color && decision.color !== '#000000') return decision.color;
@@ -982,38 +983,47 @@ export function renderZoneComposition(
   const titreDelay = delayOffset + (zd['titre']      ?? 0);
   const contDelay  = delayOffset + (zd['contact']    ?? 0);
 
+  // Décision par défaut pour les zones non fournies
+  const defaultDecision: ZoneEffectDecision = {
+    effet_id: 'FADE LAYERS',
+    intensity: 0.5,
+    speed: 'medium' as any,
+    color: c1,
+    opacity: 1,
+  };
+
   const logoResult = renderZoneWithLayers(
-    'logo', withColor(composition.logo, 'logo', c1), varId, logoDelay,
+    'logo', withColor(composition.logo ?? defaultDecision, 'logo', c1), varId, logoDelay,
     (dec, vid, delay) => renderLogoEffect(d_fn, dec, vid, delay, logoUrl), c1
   );
 
   const nomResult = renderZoneWithLayers(
-    'nom', withColor(composition.nom, 'nom', c1), varId, nomDelay,
+    'nom', withColor(composition.nom ?? defaultDecision, 'nom', c1), varId, nomDelay,
     (dec, vid, delay) => renderNomEffect(d_fn, dec, vid, delay), c1
   );
 
   const sepResult = renderZoneWithLayers(
-    'separateur', withColor(composition.separateur, 'separateur', c1), varId, sepDelay,
+    'separateur', withColor(composition.separateur ?? defaultDecision, 'separateur', c1), varId, sepDelay,
     (dec, vid, delay) => renderSeparateurEffect(d_fn, dec, vid, delay), c1
   );
 
   const fondResult = renderZoneWithLayers(
-    'fond', withColor(composition.fond, 'fond', c1), varId, fondDelay,
+    'fond', withColor(composition.fond ?? defaultDecision, 'fond', c1), varId, fondDelay,
     (dec, vid, delay) => renderFondEffect(d_fn, dec, vid, delay), c1
   );
 
   const ctaResult = renderZoneWithLayers(
-    'cta', withColor(composition.cta, 'cta', c1), varId, ctaDelay,
+    'cta', withColor(composition.cta ?? defaultDecision, 'cta', c1), varId, ctaDelay,
     (dec, vid, delay) => renderCtaEffect(d_fn, dec, vid, delay), c1
   );
 
   const titreResult = renderZoneWithLayers(
-    'titre', withColor(composition.titre, 'titre', c2), varId, titreDelay,
+    'titre', withColor(composition.titre ?? { ...defaultDecision, color: c2 }, 'titre', c2), varId, titreDelay,
     (dec, vid, delay) => renderTitreEffect(d_fn, dec, vid, delay), c2
   );
 
   const contactResult = renderZoneWithLayers(
-    'contact', withColor(composition.contact, 'contact', c1), varId, contDelay,
+    'contact', withColor(composition.contact ?? defaultDecision, 'contact', c1), varId, contDelay,
     (dec, vid, delay) => renderContactEffect(d_fn, dec, vid, delay), c1
   );
 
