@@ -12,7 +12,7 @@
   @keyframes sigBarSlide { 0% { transform:scaleX(0); } 100% { transform:scaleX(1); } }
   @keyframes sigFade { 0% { opacity:0; } 100% { opacity:1; } }
   @keyframes sigSlideUp { 0% { opacity:0; transform:translateY(14px); } 100% { opacity:1; transform:translateY(0); } }
-  @keyframes sigTypewriter { 0% { opacity:0; clip-path:inset(0 100% 0 0); } 100% { opacity:1; clip-path:inset(0 0% 0 0); } }
+  @keyframes sigTypewriter { 0% { opacity:0; transform:translateX(-10px); } 100% { opacity:1; transform:translateX(0); } }
 
   .sig-wrap { display:inline-flex; flex-direction:column; background:var(--sig-bg); border:1px solid var(--sig-border); border-radius:10px; width:{{layout.width}}px; overflow:hidden; }
   .sig-top-bar { height:4px; background:linear-gradient(90deg, transparent, var(--sig-accent), var(--sig-accent)80, transparent); transform-origin:left; animation:sigBarSlide 0.8s ease-out both; }

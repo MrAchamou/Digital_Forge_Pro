@@ -1,5 +1,5 @@
 {
-  "lastSaved": "2026-04-08T20:15:26.917Z",
+  "lastSaved": "2026-04-08T20:20:56.634Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
@@ -212,8 +212,5 @@
       "lastError": null
     }
   },
-  "monthlyUsage": {
-    "serper_2026-04": 22,
-    "cerebras_2026-04": 9
-  }
+  "monthlyUsage": {}
 }

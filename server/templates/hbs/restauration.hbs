@@ -8,11 +8,11 @@
   body { background:transparent; font-family:'Segoe UI',Arial,sans-serif; }
   @keyframes sigLogoGlow { 0%,100% { box-shadow:0 0 0 2px var(--sig-accent),0 0 14px var(--sig-accent)50,0 0 30px var(--sig-accent)20; } 50% { box-shadow:0 0 0 3px var(--sig-accent),0 0 28px var(--sig-accent)80,0 0 60px var(--sig-accent)40; } }
   @keyframes sigLogoIn { 0% { opacity:0; transform:scale(0.7) rotate(10deg); } 65% { transform:scale(1.07) rotate(-2deg); } 100% { opacity:1; transform:scale(1) rotate(0); } }
-  @keyframes sigFlame { 0%,100% { text-shadow:0 0 6px var(--sig-accent)80,0 0 14px #ff8c0050; filter:brightness(1); } 50% { text-shadow:0 0 18px var(--sig-accent),0 0 36px #ff6b00,0 0 60px var(--sig-accent)50; filter:brightness(1.4); } }
+  @keyframes sigFlame { 0%,100% { text-shadow:0 0 6px var(--sig-accent)80,0 0 14px #ff8c0050; } 50% { text-shadow:0 0 18px var(--sig-accent),0 0 36px #ff6b00,0 0 60px var(--sig-accent)50; } }
   @keyframes sigBarSlide { 0% { transform:scaleX(0); } 100% { transform:scaleX(1); } }
   @keyframes sigFade { 0% { opacity:0; } 100% { opacity:1; } }
   @keyframes sigSlideUp { 0% { opacity:0; transform:translateY(12px); } 100% { opacity:1; transform:translateY(0); } }
-  @keyframes sigWarmReveal { 0% { opacity:0; clip-path:inset(0 100% 0 0); } 100% { opacity:1; clip-path:inset(0 0% 0 0); } }
+  @keyframes sigWarmReveal { 0% { opacity:0; transform:translateX(-10px); } 100% { opacity:1; transform:translateX(0); } }
 
   .sig-wrap { display:inline-flex; flex-direction:column; background:var(--sig-bg); border:1px solid var(--sig-border); border-radius:10px; width:{{layout.width}}px; overflow:hidden; }
   .sig-top-bar { height:4px; background:linear-gradient(90deg, transparent, var(--sig-accent), #f97316, var(--sig-accent), transparent); transform-origin:left; animation:sigBarSlide 0.8s ease-out both; }

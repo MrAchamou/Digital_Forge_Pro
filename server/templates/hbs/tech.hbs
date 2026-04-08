@@ -12,8 +12,8 @@
   @keyframes sigBarSlide { 0% { transform:scaleX(0); } 100% { transform:scaleX(1); } }
   @keyframes sigFade { 0% { opacity:0; } 100% { opacity:1; } }
   @keyframes sigSlideUp { 0% { opacity:0; transform:translateY(10px); } 100% { opacity:1; transform:translateY(0); } }
-  @keyframes sigGlitch { 0%,90%,100% { transform:translate(0); clip-path:none; } 92% { transform:translate(-2px,1px); clip-path:inset(10% 0 80% 0); color:#0ff; } 94% { transform:translate(2px,-1px); clip-path:inset(60% 0 20% 0); color:#f0f; } 96% { transform:translate(0); clip-path:none; } }
-  @keyframes sigTypewriter { 0% { opacity:0; clip-path:inset(0 100% 0 0); } 100% { opacity:1; clip-path:inset(0 0% 0 0); } }
+  @keyframes sigGlitch { 0%,90%,100% { transform:translate(0); color:inherit; } 92% { transform:translate(-2px,1px); color:#0ff; } 94% { transform:translate(2px,-1px); color:#f0f; } 96% { transform:translate(0); } }
+  @keyframes sigReveal { 0% { opacity:0; transform:translateX(-10px); } 100% { opacity:1; transform:translateX(0); } }
 
   .sig-wrap { display:inline-flex; flex-direction:column; background:var(--sig-bg); border:1px solid var(--sig-border); border-radius:10px; width:{{layout.width}}px; overflow:hidden; position:relative; }
   .sig-top-bar { height:4px; background:linear-gradient(90deg, transparent, var(--sig-accent), #22d3ee, #a78bfa, var(--sig-accent), transparent); transform-origin:left; animation:sigBarSlide 0.8s ease-out both; }
@@ -31,7 +31,7 @@
 
   .sig-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
   .sig-header-left { display:flex; flex-direction:column; gap:2px; }
-  .sig-name { font-size:18px; font-weight:800; color:var(--sig-text); line-height:1.15; opacity:0; animation:sigTypewriter 1.2s ease-out 0.3s both, sigGlitch 8s ease-in-out 3s infinite; }
+  .sig-name { font-size:18px; font-weight:800; color:var(--sig-text); line-height:1.15; opacity:0; animation:sigReveal 1.2s ease-out 0.3s both, sigGlitch 8s ease-in-out 3s infinite; }
   .sig-titre { font-size:11px; font-weight:700; color:var(--sig-accent); text-transform:uppercase; letter-spacing:0.12em; opacity:0; animation:sigSlideUp 0.8s ease-out 0.6s both; }
   .sig-entreprise { font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFade 0.8s ease-out 0.75s both; }
   .sig-rating { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFade 0.8s ease-out 1.2s both; white-space:nowrap; flex-shrink:0; }
