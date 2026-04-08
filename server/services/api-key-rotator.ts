@@ -360,7 +360,10 @@ class ApiKeyRotator {
       });
 
       const selected = activeKeys[0];
-      log(`🔄 Clé sélectionnée: ${selected.id} (lastUsed: ${selected.lastUsed ? Math.round((Date.now() - selected.lastUsed.getTime()) / 1000) + 's ago' : 'jamais'}, health: ${Math.round(selected.healthScore)})`, 'api-rotator');
+      // Marquer lastUsed IMMÉDIATEMENT à la sélection pour garantir la rotation
+      // même si la clé échoue (pas seulement sur les succès)
+      selected.lastUsed = new Date();
+      log(`🔄 Clé sélectionnée: ${selected.id} (health: ${Math.round(selected.healthScore)}, pool actif: ${activeKeys.length}/${allKeys.length})`, 'api-rotator');
       return selected;
     }
 
