@@ -365,9 +365,9 @@ export function moderate(config: ModerationConfig): ModerationResult {
 }
 
 /**
- * Calcule uniquement le score de complexité (sans modération complète).
+ * Calcule uniquement le score de complexité (sans modération complète) — alias publié.
  */
-export { scoreComplexity };
+export { scoreComplexity as computeComplexityScore };
 
 /**
  * Génère le CSS d'atténuation pour injection directe.

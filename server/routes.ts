@@ -49,6 +49,39 @@ import {
 } from './modules/performance-adaptive.module';
 import { classifySector } from './services/sector-classifier';
 import { reloadAndEnrichAllEffects } from './utils/premium-effects-loader';
+import {
+  fuseEffects,
+  checkFusionCompatibility,
+  suggestFusionWeights,
+  injectFusionIntoHTML,
+  ENGINE_VERSION as FUSION_VERSION,
+  FusionConfig,
+} from './modules/effect-fusion.module';
+import {
+  moderate,
+  computeComplexityScore as scoreComplexity,
+  generateModerationCSS,
+  getSectorCeilings,
+  ENGINE_VERSION as MODERATION_VERSION,
+  ModerationConfig,
+} from './modules/contextual-intelligence.module';
+import {
+  orchestrate,
+  injectOrchestrationIntoHTML,
+  getSectorProfiles,
+  getElementRoleMap,
+  getArcTimings,
+  ENGINE_VERSION as ORCH_VERSION,
+  OrchestratorConfig,
+} from './modules/experience-orchestrator.module';
+import {
+  orchestrateFusion,
+  getFusionLevels,
+  getModulesForLevel,
+  preflightCheck,
+  ENGINE_VERSION as DFO_VERSION,
+  SignatureInput,
+} from './modules/dynamic-fusion-orchestrator.module';
 import fs from 'fs';
 import path from 'path';
 
@@ -69,8 +102,12 @@ router.get('/system/health', (_req, res) => {
     variance_engine:  { status: 'online', performance: 100, uptime: uptimeHours, version: VARIANCE_VERSION },
     timing_master:     { status: 'online', performance: 100, uptime: uptimeHours, version: TIMING_VERSION },
     color_harmony:         { status: 'online', performance: 100, uptime: uptimeHours, version: COLOR_VERSION },
-    context_adaptation:      { status: 'online', performance: 100, uptime: uptimeHours, version: CTX_VERSION },
-    performance_adaptive:    { status: 'online', performance: 100, uptime: uptimeHours, version: PERF_VERSION },
+    context_adaptation:        { status: 'online', performance: 100, uptime: uptimeHours, version: CTX_VERSION },
+    performance_adaptive:      { status: 'online', performance: 100, uptime: uptimeHours, version: PERF_VERSION },
+    effect_fusion:             { status: 'online', performance: 100, uptime: uptimeHours, version: FUSION_VERSION },
+    contextual_intelligence:   { status: 'online', performance: 100, uptime: uptimeHours, version: MODERATION_VERSION },
+    experience_orchestrator:   { status: 'online', performance: 100, uptime: uptimeHours, version: ORCH_VERSION },
+    dynamic_fusion_orchestrator: { status: 'online', performance: 100, uptime: uptimeHours, version: DFO_VERSION },
   };
   const moduleAvg = Math.round(
     Object.values(modules).reduce((s, m) => s + m.performance, 0) / Object.keys(modules).length
@@ -1253,6 +1290,288 @@ router.post('/presets/:id/use', async (req, res) => {
     const preset = await usePreset(req.params.id);
     if (!preset) return res.status(404).json({ error: 'Preset introuvable' });
     return res.json(preset);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// === MODULE 6 — EFFECT FUSION ENGINE v1.0 ===
+
+/**
+ * GET /api/fusion/levels — Informations sur les modes de fusion disponibles.
+ */
+router.get('/fusion/levels', (_req, res) => {
+  res.json({
+    version: FUSION_VERSION,
+    blendModes: ['additive', 'weighted', 'sequential'],
+    narrativeActs: ['intro', 'develop', 'climax', 'rest'],
+    qualityLevels: ['draft', 'standard', 'premium'],
+    maxEffects: 3,
+    description: 'Fusionne 2-3 effets premium en un keyframe CSS hybride interpolé',
+  });
+});
+
+/**
+ * POST /api/fusion/compatibility — Vérifie la compatibilité de 2-3 effets avant fusion.
+ * Body : { effects: EffectInput[] }
+ */
+router.post('/fusion/compatibility', (req, res) => {
+  try {
+    const { effects } = req.body;
+    if (!effects || !Array.isArray(effects) || effects.length < 2) {
+      return res.status(400).json({ error: 'Au moins 2 effets requis dans effects[]' });
+    }
+    const report = checkFusionCompatibility(effects);
+    return res.json({ version: FUSION_VERSION, ...report });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/fusion/suggest-weights — Suggère des poids optimaux pour une fusion.
+ * Body : { effectCount, sectorId, narrativeAct }
+ */
+router.post('/fusion/suggest-weights', (req, res) => {
+  try {
+    const { effectCount, sectorId, narrativeAct } = req.body;
+    if (!effectCount || !sectorId || !narrativeAct) {
+      return res.status(400).json({ error: 'effectCount, sectorId et narrativeAct requis' });
+    }
+    const weights = suggestFusionWeights(effectCount, sectorId, narrativeAct);
+    return res.json({ version: FUSION_VERSION, effectCount, sectorId, narrativeAct, weights });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/fusion/fuse — Fusionne 2-3 effets en un keyframe CSS hybride.
+ * Body : { effects, blendMode, narrativeAct, sectorId?, quality?, instanceId? }
+ */
+router.post('/fusion/fuse', (req, res) => {
+  try {
+    const config: FusionConfig = req.body;
+    if (!config.effects || config.effects.length < 2) {
+      return res.status(400).json({ error: 'Au moins 2 effets requis' });
+    }
+    if (!config.blendMode)    config.blendMode = 'weighted';
+    if (!config.narrativeAct) config.narrativeAct = 'climax';
+    if (!config.quality)      config.quality = 'standard';
+
+    const result = fuseEffects(config);
+    return res.json({ version: FUSION_VERSION, ...result });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/fusion/inject — Fusionne des effets et injecte le CSS dans un HTML.
+ * Body : { html, config: FusionConfig }
+ */
+router.post('/fusion/inject', (req, res) => {
+  try {
+    const { html, config } = req.body;
+    if (!html)   return res.status(400).json({ error: 'html requis' });
+    if (!config) return res.status(400).json({ error: 'config de fusion requise' });
+
+    const fusion = fuseEffects(config as FusionConfig);
+    const result = injectFusionIntoHTML(html, fusion);
+    return res.json({ version: FUSION_VERSION, fusion, ...result });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// === MODULE 7 — CONTEXTUAL INTELLIGENCE MODERATOR v1.0 ===
+
+/**
+ * GET /api/moderation/ceilings — Plafonds de complexité par secteur.
+ */
+router.get('/moderation/ceilings', (_req, res) => {
+  res.json({
+    version: MODERATION_VERSION,
+    ceilings: getSectorCeilings(),
+    idealRange: { min: 55, max: 75 },
+    description: 'Plafonds de complexité acceptable par secteur d\'activité',
+  });
+});
+
+/**
+ * POST /api/moderation/score — Calcule le score de complexité d\'une configuration.
+ * Body : { effects: EffectProfile[], sectorId, elementLength?, targetDurationMs? }
+ */
+router.post('/moderation/score', (req, res) => {
+  try {
+    const config: ModerationConfig = req.body;
+    if (!config.effects || !config.sectorId) {
+      return res.status(400).json({ error: 'effects[] et sectorId requis' });
+    }
+    const score = scoreComplexity(config);
+    return res.json({ version: MODERATION_VERSION, ...score });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/moderation/moderate — Modère une configuration complète et propose des ajustements.
+ * Body : { effects: EffectProfile[], sectorId, elementLength?, targetDurationMs? }
+ */
+router.post('/moderation/moderate', (req, res) => {
+  try {
+    const config: ModerationConfig = req.body;
+    if (!config.effects || !config.sectorId) {
+      return res.status(400).json({ error: 'effects[] et sectorId requis' });
+    }
+    const result = moderate(config);
+    return res.json({ version: MODERATION_VERSION, ...result });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/moderation/css — Génère le CSS d\'atténuation pour une modération donnée.
+ * Body : { effects: EffectProfile[], sectorId }
+ */
+router.post('/moderation/css', (req, res) => {
+  try {
+    const config: ModerationConfig = req.body;
+    if (!config.effects || !config.sectorId) {
+      return res.status(400).json({ error: 'effects[] et sectorId requis' });
+    }
+    const result = moderate(config);
+    const css    = generateModerationCSS(result);
+    return res.json({ version: MODERATION_VERSION, approved: result.approved, summary: result.summary, css });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// === MODULE 8 — EXPERIENCE ORCHESTRATOR v3.0 ===
+
+/**
+ * GET /api/orchestration/profiles — Profils narratifs par secteur.
+ */
+router.get('/orchestration/profiles', (_req, res) => {
+  res.json({
+    version: ORCH_VERSION,
+    profiles: getSectorProfiles(),
+    elementRoles: getElementRoleMap(),
+    arcRatios: { intro: '23.6%', develop: '38.2%', climax: '23.6%', rest: '14.6%' },
+    phi: 1.6180339887,
+  });
+});
+
+/**
+ * GET /api/orchestration/arc/:sectorId — Timings de l\'arc narratif pour un secteur.
+ */
+router.get('/orchestration/arc/:sectorId', (req, res) => {
+  try {
+    const { sectorId } = req.params;
+    const totalMs = req.query.totalMs ? parseInt(req.query.totalMs as string) : undefined;
+    const acts = getArcTimings(sectorId as any, totalMs);
+    return res.json({ version: ORCH_VERSION, sectorId, totalMs: totalMs ?? 4000, acts });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/orchestration/orchestrate — Orchestre une signature complète selon un arc narratif.
+ * Body : { elements, sectorId, totalDurationMs?, style?, accentAct? }
+ */
+router.post('/orchestration/orchestrate', (req, res) => {
+  try {
+    const config: OrchestratorConfig = req.body;
+    if (!config.elements || !config.sectorId) {
+      return res.status(400).json({ error: 'elements[] et sectorId requis' });
+    }
+    const instanceId = `orch-${Date.now().toString(36)}`;
+    const result = orchestrate(config, instanceId);
+    return res.json({ version: ORCH_VERSION, ...result });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/orchestration/inject — Orchestre et injecte le CSS narratif dans un HTML.
+ * Body : { html, config: OrchestratorConfig }
+ */
+router.post('/orchestration/inject', (req, res) => {
+  try {
+    const { html, config } = req.body;
+    if (!html)   return res.status(400).json({ error: 'html requis' });
+    if (!config) return res.status(400).json({ error: 'config d\'orchestration requise' });
+
+    const instanceId = `orch-${Date.now().toString(36)}`;
+    const result = orchestrate(config as OrchestratorConfig, instanceId);
+    const injected = injectOrchestrationIntoHTML(html, result);
+    return res.json({ version: ORCH_VERSION, orchestration: result, ...injected });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// === MODULE 10 — DYNAMIC FUSION ORCHESTRATOR v3.0 ===
+
+/**
+ * GET /api/dfo/levels — Les 3 niveaux de fusion disponibles.
+ */
+router.get('/dfo/levels', (_req, res) => {
+  res.json({
+    version: DFO_VERSION,
+    levels: getFusionLevels(),
+    description: 'Point d\'entrée unique pour une génération God Tier complète',
+  });
+});
+
+/**
+ * GET /api/dfo/modules/:level — Modules actifs pour un niveau donné (1, 2 ou 3).
+ */
+router.get('/dfo/modules/:level', (req, res) => {
+  try {
+    const level = parseInt(req.params.level) as 1 | 2 | 3;
+    if (![1, 2, 3].includes(level)) {
+      return res.status(400).json({ error: 'Niveau invalide — doit être 1, 2 ou 3' });
+    }
+    const modules = getModulesForLevel(level);
+    return res.json({ version: DFO_VERSION, level, modules, count: modules.length });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/dfo/preflight — Vérifie la validité d\'un input avant orchestration complète.
+ * Body : SignatureInput
+ */
+router.post('/dfo/preflight', (req, res) => {
+  try {
+    const input: SignatureInput = req.body;
+    const check = preflightCheck(input);
+    return res.json({ version: DFO_VERSION, ...check });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/dfo/orchestrate — Orchestre une signature complète selon le niveau choisi.
+ * Body : { name, title, company, sectorId, baseHtml, fusionLevel, accentColor?, colorScheme?, options? }
+ */
+router.post('/dfo/orchestrate', async (req, res) => {
+  try {
+    const input: SignatureInput = req.body;
+    if (!input.baseHtml)    return res.status(400).json({ error: 'baseHtml requis' });
+    if (!input.sectorId)    return res.status(400).json({ error: 'sectorId requis' });
+    if (!input.fusionLevel) return res.status(400).json({ error: 'fusionLevel (1|2|3) requis' });
+
+    const result = await orchestrateFusion(input);
+    return res.json(result);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }

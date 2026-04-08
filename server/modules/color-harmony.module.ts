@@ -596,11 +596,15 @@ export function getHarmonyTypes(): HarmonyType[] {
 
 /** Ajuste automatiquement une palette pour passer WCAG AA */
 export function enforceAccessibility(palette: SignaturePalette): SignaturePalette {
+  const bg = palette.background ?? '#ffffff';
   return {
-    ...palette,
-    text:   enforceWCAGContrast(palette.text,   palette.background, 7.0),
-    accent: enforceWCAGContrast(palette.accent,  palette.background, 4.5),
-    muted:  enforceWCAGContrast(palette.muted,   palette.background, 4.5),
+    background: bg,
+    accent:     palette.accent ? enforceWCAGContrast(palette.accent, bg, 4.5) : '#0066cc',
+    text:       palette.text   ? enforceWCAGContrast(palette.text,   bg, 7.0) : '#111111',
+    muted:      palette.muted  ? enforceWCAGContrast(palette.muted,  bg, 4.5) : '#555555',
+    border:     palette.border ?? '#e0e0e0',
+    ...(palette.highlight && { highlight: palette.highlight }),
+    ...(palette.gradient  && { gradient:  palette.gradient  }),
   };
 }
 
