@@ -20,7 +20,7 @@ const navItems = [
   { path: "/", label: "Command Center", icon: Home, color: "#00D4FF" },
   { path: "/generator", label: "God Generator", icon: Wand2, color: "#7C3AED" },
   { path: "/library", label: "Neural Library", icon: Database, color: "#00D4FF" },
-  { path: "/studio", label: "Signature Vivante", icon: Mail, color: "#FF006E" },
+  { path: "/studio", label: "Générateur Signatures", icon: Mail, color: "#FF006E" },
   { path: "/expansion", label: "AI Expansion", icon: Brain, color: "#7C3AED" },
   { path: "/preview", label: "Reality Preview", icon: Eye, color: "#00D4FF" },
   { path: "/status", label: "System Matrix", icon: BarChart3, color: "#FF006E" },
@@ -158,8 +158,8 @@ export default function Navigation() {
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03]">
               <Activity className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="text-[10px] text-green-400 font-semibold tracking-wider">GOD MODE</div>
-                <div className="text-[10px] text-white/30 truncate">All systems operational</div>
+                <div className="text-[10px] text-green-400 font-semibold tracking-wider">SYSTÈME ACTIF</div>
+                <div className="text-[10px] text-white/30 truncate">10 templates · 55 effets</div>
               </div>
               <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
             </div>

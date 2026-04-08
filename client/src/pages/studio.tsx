@@ -1,1665 +1,573 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Sparkles, Download, CheckCircle2, Circle, Loader2, Brain, Cpu, Zap, Bot,
-  RefreshCw, Link2, Upload, ImageIcon, Wand2, Star, MapPin, Phone, Mail,
-  Globe, Building2, User, Briefcase, ChevronDown, ChevronUp, Eye, EyeOff,
-  Package, Send, ExternalLink, Copy, Check, Box, AlignCenter, Type, Tag,
-  Share2, SeparatorVertical,
+  ArrowLeft, ArrowRight, Check, Loader2, Copy, Download,
+  RefreshCw, Link2, Mail, Phone, Globe, MapPin, Star,
+  User, Briefcase, Building2, Clock, Tag, ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface StepStatus { status: 'idle' | 'running' | 'done' | 'error'; data?: any; }
-
-interface PipelineState {
-  scraping: StepStatus; brain1: StepStatus; brain2: StepStatus;
-  brain3: StepStatus; svgGen: StepStatus;
-}
-
-interface DeliveryStepStatus {
-  step: string;
+interface SectorConfig {
+  id: string;
   label: string;
-  status: 'pending' | 'running' | 'done' | 'error';
-  error?: string;
+  emoji: string;
+  description: string;
+  palette: { background: string; accent: string; text: string; muted: string };
+  animation: { name: string; intensity: string };
+  fields: Array<{ key: string; label: string; required: boolean; type: string }>;
+  tone: string;
+  cta: string;
+  fieldCount: number;
 }
 
-interface DeliveryResult {
-  signature_id: string;
-  preview_url: string;
-  download_url: string;
-  email_sent: boolean;
-  package_contents: string[];
-  steps: DeliveryStepStatus[];
-}
-
-interface Sections3D {
-  photo?: boolean;
-  separator?: boolean;
-  nom?: boolean;
-  titre?: boolean;
-  contact?: boolean;
-  social?: boolean;
-  cta?: boolean;
-}
-
-interface FormData {
-  nom: string; titre: string; entreprise: string;
-  telephone: string; email: string; site: string;
-  secteur: string; cta: string; palette: string[];
-  adresse: string; ville: string; pays: string;
-  note: number; avis: number; description: string;
-  logo_url: string; logo_base64: string; logo3d: boolean;
-  sections3d: Sections3D;
-  style_visuel: string; slogan: string;
-  mots_cles: string[]; ton: string;
-  reseaux_sociaux: Record<string, string>;
-  client_email: string;
-}
-
-interface StyleDetectResult {
-  style_visuel: string; univers: string; mots_cles: string[];
-  palette_narrative: string; reference_iconique: string; justification: string;
-}
-
-interface PipelineResult {
-  brief_creatif?: any; scenario_narratif?: any; configuration_technique?: any;
-  status_pipeline?: string; svg_content?: string; signature_id?: string;
-  svg_url?: string; pdf_instructions_url?: string; config_json_url?: string;
-}
-
-// ─── Canvas Live ──────────────────────────────────────────────────────────────
-
-const CANVAS_PHASES = [
-  "Fond noir apparaît", "Séparateur se dessine", "Zone avatar trace un cercle",
-  "Initiales apparaissent", "Nom s'écrit lettre à lettre", "Titre slide depuis la gauche",
-  "Infos contact en cascade", "Icônes réseaux pop in", "CTA se dessine",
-  "Effets vivants s'activent", "Preview final 4 variations",
-];
-
-function LiveCanvas({ phase, metadata }: { phase: number; metadata: FormData }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number>(0);
-  const progressRef = useRef(0);
-  const variantRef = useRef(0);
-  const variantTimerRef = useRef(0);
-  const logoImgRef = useRef<HTMLImageElement | null>(null);
-
-  const palette = metadata.palette?.length >= 3 ? metadata.palette : ['#0f0f0f', '#6366f1', '#e8e8ff'];
-  const [bg, accent, textColor] = palette;
-
-  useEffect(() => {
-    const logoSrc = metadata.logo_base64 || metadata.logo_url;
-    if (logoSrc) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => { logoImgRef.current = img; };
-      img.onerror = () => { logoImgRef.current = null; };
-      img.src = logoSrc;
-    } else {
-      logoImgRef.current = null;
-    }
-  }, [metadata.logo_base64, metadata.logo_url]);
-
-  const draw = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const W = canvas.width; const H = canvas.height;
-    progressRef.current = Math.min(progressRef.current + 0.006, 1);
-    const p = progressRef.current; const ph = phase;
-
-    ctx.fillStyle = ph >= 0 ? bg : '#000';
-    ctx.globalAlpha = ph >= 0 ? Math.min(p * 2, 1) : 1;
-    ctx.fillRect(0, 0, W, H);
-    ctx.globalAlpha = 1;
-
-    if (ph >= 1) {
-      const sepH = Math.min((p - 0.1) * 3, 1) * (H - 40);
-      ctx.beginPath(); ctx.moveTo(130, 20); ctx.lineTo(130, 20 + sepH);
-      ctx.strokeStyle = accent; ctx.lineWidth = 2;
-      ctx.shadowColor = accent; ctx.shadowBlur = 8; ctx.stroke(); ctx.shadowBlur = 0;
-    }
-
-    if (ph >= 2) {
-      const circleP = Math.min((p - 0.2) * 3, 1);
-      ctx.beginPath(); ctx.arc(65, H / 2, 48, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * circleP);
-      ctx.strokeStyle = accent; ctx.lineWidth = 2; ctx.stroke();
-    }
-
-    if (ph >= 3) {
-      const alpha = Math.min((p - 0.3) * 4, 1);
-      ctx.globalAlpha = alpha;
-      if (logoImgRef.current) {
-        const logoSize = 68; const lx = 65 - logoSize / 2; const ly = H / 2 - logoSize / 2;
-        ctx.save(); ctx.beginPath(); ctx.arc(65, H / 2, 38, 0, Math.PI * 2);
-        ctx.clip(); ctx.drawImage(logoImgRef.current, lx, ly, logoSize, logoSize);
-        ctx.restore();
-      } else {
-        ctx.font = 'bold 26px system-ui'; ctx.fillStyle = accent; ctx.textAlign = 'center';
-        ctx.fillText(`${metadata.nom.charAt(0)}${(metadata.nom.split(' ')[1] || '').charAt(0)}`, 65, H / 2 + 10);
-        ctx.textAlign = 'left';
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    if (ph >= 4) {
-      const lettersToShow = Math.floor(Math.min((p - 0.35) * 6, 1) * (metadata.nom || '').length);
-      ctx.font = 'bold 18px system-ui'; ctx.fillStyle = textColor; ctx.globalAlpha = 0.9;
-      ctx.fillText((metadata.nom || '').slice(0, lettersToShow), 148, H / 2 - 28);
-      ctx.globalAlpha = 1;
-    }
-
-    if (ph >= 5) {
-      const slideX = Math.max(0, (1 - Math.min((p - 0.45) * 5, 1)) * -60);
-      ctx.font = '11px system-ui'; ctx.fillStyle = accent;
-      ctx.globalAlpha = Math.min((p - 0.45) * 5, 1);
-      ctx.fillText((metadata.titre || '').toUpperCase(), 148 + slideX, H / 2 - 10);
-      ctx.globalAlpha = 1;
-    }
-
-    if (ph >= 6) {
-      const lines = [metadata.entreprise, metadata.email, metadata.telephone].filter(Boolean);
-      lines.forEach((line, i) => {
-        const alpha = Math.min((p - 0.5 - i * 0.05) * 8, 1);
-        if (alpha <= 0) return;
-        ctx.font = '10px system-ui'; ctx.fillStyle = textColor;
-        ctx.globalAlpha = alpha * 0.65;
-        ctx.fillText(line, 148, H / 2 + 10 + i * 16);
-      });
-      ctx.globalAlpha = 1;
-    }
-
-    if (ph >= 7) {
-      ['in', 'ig', 'tw'].forEach((icon, i) => {
-        const t = Math.min((p - 0.6 - i * 0.04) * 8, 1);
-        if (t <= 0) return;
-        const bounce = 1 + Math.sin(t * Math.PI) * 0.3 * (1 - t);
-        ctx.save(); ctx.translate(148 + i * 30 + 12, H / 2 + 52); ctx.scale(bounce, bounce);
-        ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2);
-        ctx.strokeStyle = accent; ctx.lineWidth = 1.5; ctx.globalAlpha = t; ctx.stroke();
-        ctx.font = '7px system-ui'; ctx.fillStyle = accent; ctx.textAlign = 'center';
-        ctx.fillText(icon, 0, 3); ctx.restore(); ctx.globalAlpha = 1; ctx.textAlign = 'left';
-      });
-    }
-
-    if (ph >= 8 && metadata.cta) {
-      const alpha = Math.min((p - 0.75) * 8, 1); ctx.globalAlpha = alpha;
-      ctx.beginPath(); ctx.roundRect(W - 168, H / 2 - 18, 148, 32, 16);
-      ctx.strokeStyle = accent; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.font = '10px system-ui'; ctx.fillStyle = accent; ctx.textAlign = 'center';
-      ctx.fillText(metadata.cta, W - 94, H / 2 + 5); ctx.textAlign = 'left'; ctx.globalAlpha = 1;
-    }
-
-    if (ph >= 9) {
-      const haloAlpha = 0.15 + Math.sin(Date.now() / 800) * 0.1;
-      ctx.beginPath(); ctx.arc(65, H / 2, 55 + Math.sin(Date.now() / 600) * 4, 0, Math.PI * 2);
-      const grad = ctx.createRadialGradient(65, H / 2, 30, 65, H / 2, 60);
-      grad.addColorStop(0, accent + '44'); grad.addColorStop(1, accent + '00');
-      ctx.fillStyle = grad; ctx.globalAlpha = haloAlpha; ctx.fill(); ctx.globalAlpha = 1;
-    }
-
-    if (ph >= 10) {
-      variantTimerRef.current++;
-      if (variantTimerRef.current > 180) { variantTimerRef.current = 0; variantRef.current = (variantRef.current + 1) % 4; }
-      const vColor = [accent, '#ec4899', '#f59e0b', '#10b981'][variantRef.current];
-      ctx.font = 'bold 10px system-ui'; ctx.fillStyle = vColor; ctx.globalAlpha = 0.5;
-      ctx.fillText(`VARIATION ${'ABCD'[variantRef.current]}`, W - 90, H - 12); ctx.globalAlpha = 1;
-      const t = Date.now() / 1000; const sepGlow = 0.4 + Math.sin(t * 2) * 0.2;
-      ctx.beginPath(); ctx.moveTo(130, 20); ctx.lineTo(130, H - 20);
-      ctx.strokeStyle = vColor; ctx.lineWidth = 1.5; ctx.shadowColor = vColor;
-      ctx.shadowBlur = 12 * sepGlow; ctx.stroke(); ctx.shadowBlur = 0;
-    }
-
-    animFrameRef.current = requestAnimationFrame(draw);
-  }, [bg, accent, textColor, metadata, phase]);
-
-  useEffect(() => {
-    progressRef.current = 0;
-    cancelAnimationFrame(animFrameRef.current);
-    animFrameRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, [draw]);
-
-  return (
-    <div className="relative w-full">
-      <canvas ref={canvasRef} width={560} height={200} className="w-full rounded-xl border border-white/10" style={{ background: bg }} />
-      {phase < 10 && phase >= 0 && (
-        <div className="absolute bottom-3 left-3 text-xs text-white/40 bg-black/40 px-2 py-1 rounded-md">
-          {CANVAS_PHASES[Math.min(phase, CANVAS_PHASES.length - 1)]}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Step Indicator ───────────────────────────────────────────────────────────
-
-function StepIndicator({ icon: Icon, label, sublabel, status }: {
-  icon: any; label: string; sublabel?: string; status: StepStatus;
-}) {
-  return (
-    <div className={`flex items-start gap-3 p-3 rounded-xl border transition-all duration-500 ${
-      status.status === 'done' ? 'border-green-500/30 bg-green-500/5' :
-      status.status === 'running' ? 'border-forge-cyan/40 bg-forge-cyan/5' :
-      status.status === 'error' ? 'border-red-500/30 bg-red-500/5' :
-      'border-white/10 bg-white/2'
-    }`}>
-      <div className={`mt-0.5 flex-shrink-0 ${
-        status.status === 'done' ? 'text-green-400' : status.status === 'running' ? 'text-forge-cyan' :
-        status.status === 'error' ? 'text-red-400' : 'text-white/20'
-      }`}>
-        {status.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> :
-         status.status === 'running' ? <Loader2 className="w-4 h-4 animate-spin" /> :
-         <Circle className="w-4 h-4" />}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${status.status === 'running' ? 'text-forge-cyan' : 'text-white/40'}`} />
-          <span className={`text-xs font-medium truncate ${status.status === 'idle' ? 'text-white/30' : 'text-white/80'}`}>{label}</span>
-        </div>
-        {sublabel && <p className="text-xs text-white/30 mt-0.5 truncate">{sublabel}</p>}
-        {status.status === 'running' && (
-          <div className="mt-1.5 h-1 rounded-full bg-white/10 overflow-hidden">
-            <div className="h-full bg-forge-cyan rounded-full animate-pulse" style={{ width: '60%' }} />
-          </div>
-        )}
-        {status.status === 'done' && status.data && (
-          <div className="mt-1">
-            {status.data.mot_clef_narratif && <p className="text-xs text-forge-cyan font-medium">"{status.data.mot_clef_narratif}"</p>}
-            {status.data.arc_emotionnel && <p className="text-xs text-white/50">{status.data.arc_emotionnel}</p>}
-            {status.data.cycle_total && <p className="text-xs text-white/50">Cycle: {status.data.cycle_total}s</p>}
-            {status.data.entreprise && <p className="text-xs text-green-400 font-medium">{status.data.entreprise}</p>}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── Meta Panel ───────────────────────────────────────────────────────────────
-
-function MetaPanel({ pipeline }: { pipeline: PipelineState }) {
-  return (
-    <div className="space-y-3 h-full">
-      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest">Méta Créative</h3>
-
-      {pipeline.brain1.status !== 'idle' && (
-        <div className={`rounded-xl border p-3 space-y-2 transition-all ${pipeline.brain1.status === 'done' ? 'border-violet-500/30 bg-violet-500/5' : 'border-white/10'}`}>
-          <div className="flex items-center gap-2">
-            <Brain className="w-3.5 h-3.5 text-violet-400" />
-            <span className="text-xs font-semibold text-violet-300">💡 GPT-4o Vision</span>
-            {pipeline.brain1.status === 'running' && <Loader2 className="w-3 h-3 text-violet-400 animate-spin ml-auto" />}
-            {pipeline.brain1.status === 'done' && <CheckCircle2 className="w-3 h-3 text-green-400 ml-auto" />}
-          </div>
-          {pipeline.brain1.data && (
-            <div className="space-y-1 text-xs text-white/50">
-              {pipeline.brain1.data.references_visuelles && (
-                <p>Réf : <span className="text-violet-300">{pipeline.brain1.data.references_visuelles.slice(0, 3).join(', ')}</span></p>
-              )}
-              {pipeline.brain1.data.univers_visuel && (
-                <p className="italic text-white/40 line-clamp-2">"{pipeline.brain1.data.univers_visuel}"</p>
-              )}
-              {pipeline.brain1.data.differentiateur && (
-                <p className="text-white/60">{pipeline.brain1.data.differentiateur}</p>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {pipeline.brain2.status !== 'idle' && (
-        <div className={`rounded-xl border p-3 space-y-2 transition-all ${pipeline.brain2.status === 'done' ? 'border-pink-500/30 bg-pink-500/5' : 'border-white/10'}`}>
-          <div className="flex items-center gap-2">
-            <Bot className="w-3.5 h-3.5 text-pink-400" />
-            <span className="text-xs font-semibold text-pink-300">🎭 Claude Opus</span>
-            {pipeline.brain2.status === 'running' && <Loader2 className="w-3 h-3 text-pink-400 animate-spin ml-auto" />}
-            {pipeline.brain2.status === 'done' && <CheckCircle2 className="w-3 h-3 text-green-400 ml-auto" />}
-          </div>
-          {pipeline.brain2.data && (
-            <div className="space-y-1 text-xs text-white/50">
-              {pipeline.brain2.data.arc_emotionnel && (
-                <p>Arc : <span className="text-pink-300">{pipeline.brain2.data.arc_emotionnel}</span></p>
-              )}
-              {pipeline.brain2.data.fil_conducteur && (
-                <p className="italic text-white/40 line-clamp-2">"{pipeline.brain2.data.fil_conducteur}"</p>
-              )}
-              {pipeline.brain2.data.variations && (
-                <div className="grid grid-cols-2 gap-1 mt-1">
-                  {Object.entries(pipeline.brain2.data.variations).map(([k, v]: any) => (
-                    <div key={k} className="text-xs">
-                      <span className="text-white/30">Var {k} : </span>
-                      <span className="text-pink-200">{v.titre}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {pipeline.brain3.status !== 'idle' && (
-        <div className={`rounded-xl border p-3 space-y-2 transition-all ${pipeline.brain3.status === 'done' ? 'border-amber-500/30 bg-amber-500/5' : 'border-white/10'}`}>
-          <div className="flex items-center gap-2">
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-xs font-semibold text-amber-300">⚡ Gemini Pro</span>
-            {pipeline.brain3.status === 'running' && <Loader2 className="w-3 h-3 text-amber-400 animate-spin ml-auto" />}
-            {pipeline.brain3.status === 'done' && <CheckCircle2 className="w-3 h-3 text-green-400 ml-auto" />}
-          </div>
-          {pipeline.brain3.data && (
-            <div className="space-y-1 text-xs text-white/50">
-              {pipeline.brain3.data.cycle_total && <p>Cycle : <span className="text-amber-300">{pipeline.brain3.data.cycle_total}s</span></p>}
-              {pipeline.brain3.data.notes_techniques && <p className="text-white/40 line-clamp-2">{pipeline.brain3.data.notes_techniques}</p>}
-              <div className="flex gap-2 mt-1">
-                <span className="text-green-400 text-xs">Gmail ✓</span>
-                <span className="text-green-400 text-xs">Outlook ✓</span>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Logo Section ─────────────────────────────────────────────────────────────
-
-function LogoSection({ form, onUpdate }: { form: FormData; onUpdate: (data: Partial<FormData>) => void }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast({ title: "Format invalide", description: "Seules les images sont acceptées", variant: "destructive" });
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const base64 = ev.target?.result as string;
-      onUpdate({ logo_base64: base64, logo_url: '' });
-      toast({ title: "Logo importé", description: file.name });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const currentLogo = form.logo_base64 || form.logo_url;
-  const hasLogo = !!currentLogo;
-
-  return (
-    <div className="space-y-2">
-      <Label className="text-white/40 text-xs uppercase tracking-wider">Logo</Label>
-      <div className="flex items-center gap-3">
-        {/* Aperçu logo */}
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border ${
-          hasLogo ? 'border-white/20 bg-white/5' : 'border-dashed border-white/20 bg-white/3'
-        }`}>
-          {hasLogo ? (
-            <img
-              src={currentLogo}
-              alt="Logo"
-              className="w-10 h-10 object-contain rounded-lg"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-          ) : (
-            <ImageIcon className="w-5 h-5 text-white/20" />
-          )}
-        </div>
-
-        <div className="flex-1 space-y-1.5">
-          {/* URL du logo (depuis scraper) */}
-          <Input
-            value={form.logo_url}
-            onChange={e => onUpdate({ logo_url: e.target.value, logo_base64: '' })}
-            placeholder="URL logo (auto-détecté)"
-            className="bg-white/5 border-white/10 text-white text-xs h-7"
-            data-testid="input-logo-url"
-          />
-          {/* Bouton upload manuel */}
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-          <Button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            variant="outline"
-            className="h-7 w-full border-dashed border-white/20 text-white/50 hover:text-white hover:border-white/40 text-xs gap-1.5"
-            data-testid="button-upload-logo"
-          >
-            <Upload className="w-3 h-3" />
-            {form.logo_base64 ? 'Remplacer le logo' : 'Importer un logo manuellement'}
-          </Button>
-        </div>
-      </div>
-
-      {/* Toggle Logo 3D */}
-      <button
-        type="button"
-        onClick={() => onUpdate({ logo3d: !form.logo3d })}
-        data-testid="toggle-logo3d"
-        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border transition-all text-xs ${
-          form.logo3d
-            ? 'border-violet-500/60 bg-violet-500/10 text-violet-300'
-            : 'border-white/10 bg-white/3 text-white/40 hover:border-white/20 hover:text-white/60'
-        }`}
-      >
-        <span className="flex items-center gap-2">
-          <Box className="w-3.5 h-3.5" />
-          <span className="font-medium">Pré-rendu Logo 3D</span>
-          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-            form.logo3d ? 'bg-violet-500/30 text-violet-200' : 'bg-white/5 text-white/30'
-          }`}>
-            {form.logo3d ? 'ACTIF' : 'INACTIF'}
-          </span>
-        </span>
-        <span className={`text-[10px] leading-none ${form.logo3d ? 'text-violet-400' : 'text-white/20'}`}>
-          Extrusion · Éclairage · Profondeur
-        </span>
-      </button>
-      {form.logo3d && (
-        <p className="text-[10px] text-violet-300/60 pl-1">
-          Le logo sera extrudé en volume 3D SVG natif avant l'injection des effets d'animation.
-        </p>
-      )}
-    </div>
-  );
-}
-
-// ─── Sections 3D Panel ────────────────────────────────────────────────────────
-
-const SECTION_DEFS: { key: keyof Sections3D; label: string; sub: string; Icon: any }[] = [
-  { key: 'photo',     label: 'Photo',     sub: 'Halo · Profondeur · Arc',    Icon: User           },
-  { key: 'separator', label: 'Séparateur', sub: 'Extrusion · Bevel',         Icon: SeparatorVertical },
-  { key: 'nom',       label: 'Nom',       sub: 'Ombre · Shimmer',            Icon: Type           },
-  { key: 'titre',     label: 'Titre',     sub: 'Couches colorées',           Icon: Tag            },
-  { key: 'contact',   label: 'Contact',   sub: 'Pill surélevé · Highlight',  Icon: Mail           },
-  { key: 'social',    label: 'Icônes',    sub: 'Boutons extrudés',           Icon: Share2         },
-  { key: 'cta',       label: 'CTA',       sub: 'Bouton 3D · Bevel · Glow',   Icon: Zap            },
-];
-
-function Sections3DPanel({ form, onUpdate }: { form: FormData; onUpdate: (data: Partial<FormData>) => void }) {
-  const s3d = form.sections3d || {};
-  const activeCount = SECTION_DEFS.filter(d => s3d[d.key]).length;
-
-  const toggle = (key: keyof Sections3D) => {
-    onUpdate({ sections3d: { ...s3d, [key]: !s3d[key] } });
-  };
-
-  const toggleAll = () => {
-    if (activeCount === SECTION_DEFS.length) {
-      onUpdate({ sections3d: {} });
-    } else {
-      const all: Sections3D = {};
-      SECTION_DEFS.forEach(d => { all[d.key] = true; });
-      onUpdate({ sections3d: all });
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-white/40 text-xs uppercase tracking-wider flex items-center gap-1.5">
-          <Box className="w-3 h-3" /> Pré-rendu 3D par section
-        </Label>
-        <button
-          type="button"
-          onClick={toggleAll}
-          data-testid="toggle-sections3d-all"
-          className="text-[10px] px-2 py-0.5 rounded-full border border-violet-500/40 text-violet-400 hover:bg-violet-500/10 transition-colors"
-        >
-          {activeCount === SECTION_DEFS.length ? 'Tout désactiver' : 'Tout activer'}
-        </button>
-      </div>
-      <div className="grid grid-cols-2 gap-1.5">
-        {SECTION_DEFS.map(({ key, label, sub, Icon }) => {
-          const active = !!s3d[key];
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => toggle(key)}
-              data-testid={`toggle-section3d-${key}`}
-              className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border transition-all text-left ${
-                active
-                  ? 'border-violet-500/60 bg-violet-500/10 text-violet-300'
-                  : 'border-white/8 bg-white/3 text-white/35 hover:border-white/20 hover:text-white/55'
-              }`}
-            >
-              <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${active ? 'text-violet-400' : 'text-white/25'}`} />
-              <span className="min-w-0">
-                <span className="block text-[11px] font-medium leading-tight">{label}</span>
-                <span className={`block text-[9px] leading-tight truncate ${active ? 'text-violet-400/70' : 'text-white/20'}`}>{sub}</span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      {activeCount > 0 && (
-        <p className="text-[10px] text-violet-300/55 pl-0.5">
-          {activeCount} section{activeCount > 1 ? 's' : ''} en mode volume 3D SVG natif.
-        </p>
-      )}
-    </div>
-  );
-}
-
-// ─── Palette Presets ─────────────────────────────────────────────────────────
-
-const GRADIENT_PRESETS = [
-  {
-    name: "Or Noir",      emoji: "✨",
-    colors: ["#0d0d1a", "#c9a84c", "#f0e6c8"],
-    grad: "linear-gradient(135deg, #0d0d1a 0%, #c9a84c 60%, #f0e6c8 100%)",
-  },
-  {
-    name: "Cyber Azure",  emoji: "⚡",
-    colors: ["#020b18", "#00d4ff", "#e0f7ff"],
-    grad: "linear-gradient(135deg, #020b18 0%, #00d4ff 55%, #e0f7ff 100%)",
-  },
-  {
-    name: "Luxe Rose",    emoji: "🌸",
-    colors: ["#130510", "#e879a0", "#fde8f0"],
-    grad: "linear-gradient(135deg, #130510 0%, #e879a0 55%, #fde8f0 100%)",
-  },
-  {
-    name: "Émeraude",     emoji: "💚",
-    colors: ["#061410", "#22c55e", "#d1fae5"],
-    grad: "linear-gradient(135deg, #061410 0%, #22c55e 55%, #d1fae5 100%)",
-  },
-  {
-    name: "Bordeaux",     emoji: "🍷",
-    colors: ["#130208", "#be185d", "#fce7f3"],
-    grad: "linear-gradient(135deg, #130208 0%, #be185d 55%, #fce7f3 100%)",
-  },
-  {
-    name: "Sunset Pro",   emoji: "🌅",
-    colors: ["#180800", "#f97316", "#fff0e0"],
-    grad: "linear-gradient(135deg, #180800 0%, #f97316 55%, #fff0e0 100%)",
-  },
-  {
-    name: "Violet Luxe",  emoji: "💜",
-    colors: ["#0c0818", "#7c3aed", "#ede9fe"],
-    grad: "linear-gradient(135deg, #0c0818 0%, #7c3aed 55%, #ede9fe 100%)",
-  },
-  {
-    name: "Titane",       emoji: "🔩",
-    colors: ["#0c0e12", "#94a3b8", "#f1f5f9"],
-    grad: "linear-gradient(135deg, #0c0e12 0%, #94a3b8 55%, #f1f5f9 100%)",
-  },
-  {
-    name: "Ivoire Luxe",  emoji: "🤍",
-    colors: ["#f5f0e8", "#c9a84c", "#1a1a2e"],
-    grad: "linear-gradient(135deg, #f5f0e8 0%, #c9a84c 50%, #1a1a2e 100%)",
-  },
-  {
-    name: "Onyx Blanc",   emoji: "🖤",
-    colors: ["#080808", "#e2e8f0", "#ffffff"],
-    grad: "linear-gradient(135deg, #080808 0%, #e2e8f0 55%, #ffffff 100%)",
-  },
-  {
-    name: "Indigo Nuit",  emoji: "🌌",
-    colors: ["#04050f", "#4f46e5", "#c7d2fe"],
-    grad: "linear-gradient(135deg, #04050f 0%, #4f46e5 55%, #c7d2fe 100%)",
-  },
-  {
-    name: "Ambre Forêt",  emoji: "🌿",
-    colors: ["#0a0d08", "#65a30d", "#ecfccb"],
-    grad: "linear-gradient(135deg, #0a0d08 0%, #65a30d 55%, #ecfccb 100%)",
-  },
-];
-
-// ─── Gradient Palette Section ─────────────────────────────────────────────────
-
-function GradientPaletteSection({ form, onUpdate }: { form: FormData; onUpdate: (d: Partial<FormData>) => void }) {
-  const [c0, c1, c2] = form.palette;
-  const activePalette = form.palette;
-
-  const isActive = (preset: typeof GRADIENT_PRESETS[0]) =>
-    preset.colors[0] === activePalette[0] && preset.colors[1] === activePalette[1];
-
-  const previewGrad = `linear-gradient(135deg, ${c0} 0%, ${c1} 55%, ${c2} 100%)`;
-
-  return (
-    <div className="space-y-3">
-      <Label className="text-white/40 text-xs uppercase tracking-wider flex items-center gap-1.5">
-        <span>🎨</span> Palette & Ambiance visuelle
-      </Label>
-
-      {/* Presets en grille */}
-      <div className="grid grid-cols-4 gap-1.5">
-        {GRADIENT_PRESETS.map((preset) => (
-          <button
-            key={preset.name}
-            data-testid={`btn-palette-preset-${preset.name.toLowerCase().replace(/\s+/g, '-')}`}
-            onClick={() => onUpdate({ palette: [...preset.colors] })}
-            title={preset.name}
-            className={`
-              relative group rounded-lg overflow-hidden border transition-all duration-200
-              ${isActive(preset)
-                ? "border-white/50 ring-1 ring-white/30 scale-[1.03]"
-                : "border-white/10 hover:border-white/30 hover:scale-[1.02]"}
-            `}
-          >
-            {/* Gradient preview */}
-            <div className="w-full h-10" style={{ background: preset.grad }} />
-            {/* Label */}
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-1 bg-gradient-to-t from-black/70 to-transparent">
-              <span className="text-[9px] text-white/90 font-medium leading-tight text-center px-0.5">{preset.name}</span>
-            </div>
-            {/* Checkmark si actif */}
-            {isActive(preset) && (
-              <div className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-white/90 flex items-center justify-center">
-                <svg viewBox="0 0 10 10" className="w-2 h-2"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Aperçu dégradé actuel */}
-      <div className="rounded-xl overflow-hidden border border-white/10" style={{ height: 36, background: previewGrad }}>
-        <div className="h-full flex items-center px-3 gap-2 bg-gradient-to-r from-black/40 to-transparent">
-          <span className="text-xs text-white/80 font-medium">Aperçu dégradé actuel</span>
-          <div className="flex gap-1 ml-auto">
-            {[c0, c1, c2].map((c, i) => (
-              <div key={i} className="w-4 h-4 rounded-full border border-white/30 shadow-inner" style={{ background: c }} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Couleurs personnalisées */}
-      <div>
-        <Label className="text-white/30 text-xs mb-2 block">Personnaliser les couleurs</Label>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { label: "Fond", idx: 0 },
-            { label: "Accent", idx: 1 },
-            { label: "Texte", idx: 2 },
-          ].map(({ label, idx }) => (
-            <div key={idx} className="space-y-1">
-              <span className="text-[10px] text-white/30 uppercase tracking-wider">{label}</span>
-              <div className="relative flex items-center gap-1">
-                <label className="relative cursor-pointer">
-                  <div
-                    className="w-7 h-7 rounded-lg border border-white/20 shadow-inner cursor-pointer"
-                    style={{ background: form.palette[idx] }}
-                  />
-                  <input
-                    type="color"
-                    value={form.palette[idx]}
-                    onChange={e => {
-                      const np = [...form.palette];
-                      np[idx] = e.target.value;
-                      onUpdate({ palette: np });
-                    }}
-                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-                    data-testid={`input-color-picker-${idx}`}
-                  />
-                </label>
-                <input
-                  type="text"
-                  value={form.palette[idx]}
-                  onChange={e => {
-                    const np = [...form.palette];
-                    np[idx] = e.target.value;
-                    onUpdate({ palette: np });
-                  }}
-                  className="flex-1 bg-white/5 border border-white/10 text-white text-[10px] h-7 rounded-lg font-mono text-center px-1"
-                  data-testid={`input-palette-hex-${idx}`}
-                  maxLength={7}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Style Visuel avec IA ─────────────────────────────────────────────────────
-
-function StyleVisuelSection({ form, onUpdate }: { form: FormData; onUpdate: (data: Partial<FormData>) => void }) {
-  const { toast } = useToast();
-  const [styleResult, setStyleResult] = useState<StyleDetectResult | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [showPalette, setShowPalette] = useState(true);
-
-  const detectStyleMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch('/api/signature/detect-style', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ metadata: form }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      return res.json() as Promise<StyleDetectResult>;
-    },
-    onSuccess: (data) => {
-      setStyleResult(data);
-      onUpdate({ style_visuel: data.style_visuel });
-      toast({ title: "✨ Style détecté par l'IA", description: data.reference_iconique ? `Inspiré de ${data.reference_iconique}` : data.style_visuel });
-    },
-    onError: (err: any) => {
-      toast({ title: "Erreur détection style", description: err.message, variant: "destructive" });
-    },
-  });
-
-  return (
-    <div className="space-y-2">
-      <Label className="text-white/40 text-xs uppercase tracking-wider">Style Visuel</Label>
-      <div className="flex gap-2">
-        <Input
-          value={form.style_visuel}
-          onChange={e => onUpdate({ style_visuel: e.target.value })}
-          placeholder="Décrivez le style ou laissez l'IA le détecter…"
-          className="bg-white/5 border-white/10 text-white text-xs h-8 flex-1"
-          data-testid="input-style-visuel"
-        />
-        <Button
-          type="button"
-          onClick={() => detectStyleMutation.mutate()}
-          disabled={detectStyleMutation.isPending}
-          className="h-8 px-3 bg-gradient-to-r from-violet-600/80 to-amber-500/80 border border-violet-400/30 text-white hover:opacity-90 text-xs font-semibold gap-1.5 whitespace-nowrap flex-shrink-0"
-          data-testid="button-detect-style-ai"
-          title="Gemini analyse vos données et révèle le style parfait"
-        >
-          {detectStyleMutation.isPending ? (
-            <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Magie…</>
-          ) : (
-            <><Wand2 className="w-3.5 h-3.5" /> Utiliser l'IA</>
-          )}
-        </Button>
-      </div>
-
-      {/* Résultat détaillé Gemini */}
-      {styleResult && (
-        <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs font-semibold text-amber-300">{styleResult.reference_iconique}</span>
-            </div>
-            <button
-              onClick={() => setShowDetails(!showDetails)}
-              className="text-white/30 hover:text-white/60 transition-colors"
-              data-testid="button-toggle-style-details"
-            >
-              {showDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-            </button>
-          </div>
-
-          <div className="flex flex-wrap gap-1">
-            {styleResult.mots_cles?.map((mot, i) => (
-              <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/20">
-                {mot}
-              </span>
-            ))}
-          </div>
-
-          {showDetails && (
-            <div className="space-y-2 pt-1 border-t border-white/10">
-              <p className="text-xs text-white/50 italic">"{styleResult.univers}"</p>
-              <p className="text-xs text-white/40">{styleResult.palette_narrative}</p>
-              <p className="text-xs text-white/40">{styleResult.justification}</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Séparateur + toggle palette */}
-      <div className="pt-1 border-t border-white/8">
-        <button
-          onClick={() => setShowPalette(!showPalette)}
-          className="w-full flex items-center justify-between text-white/30 hover:text-white/60 transition-colors py-0.5"
-          data-testid="button-toggle-palette"
-        >
-          <span className="text-xs uppercase tracking-wider flex items-center gap-1.5">
-            🎨 Palette & dégradés
-          </span>
-          {showPalette ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-        </button>
-        {showPalette && (
-          <div className="pt-2">
-            <GradientPaletteSection form={form} onUpdate={onUpdate} />
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── Main Studio ──────────────────────────────────────────────────────────────
-
-const DEFAULT_FORM: FormData = {
-  nom: "Jean Dupont", titre: "Directeur Créatif", entreprise: "Studio Nova",
-  telephone: "+33 6 12 34 56 78", email: "jean@studionova.fr", site: "https://studionova.fr",
-  secteur: "Design & Créatif", cta: "Réserver un appel",
-  palette: ["#0f0f0f", "#6366f1", "#e8e8ff"],
-  adresse: "", ville: "Paris", pays: "France",
-  note: 0, avis: 0, description: "", logo_url: "", logo_base64: "", logo3d: false,
-  sections3d: {},
-  style_visuel: "", slogan: "", mots_cles: [], ton: "professionnel et moderne",
-  reseaux_sociaux: {},
-  client_email: "",
+const FIELD_ICONS: Record<string, any> = {
+  phone: Phone, email: Mail, url: Globe, text: User,
+  badge: Tag, hours: Clock, rating: Star,
 };
 
-// ─── DeliverySection ──────────────────────────────────────────────────────────
-
-const DELIVERY_STEP_ICONS: Record<string, string> = {
-  png: '🖼', formats: '📄', cerebras: '🧠', pdfs: '📋', preview: '🌐', zip: '📦', email: '📧',
-};
-
-function DeliverySection({
-  svgContent, form, result, onDelivered,
-}: {
-  svgContent: string;
-  form: FormData;
-  result: PipelineResult | null;
-  onDelivered: (dr: DeliveryResult) => void;
-}) {
-  const { toast } = useToast();
-  const [clientEmail, setClientEmail] = useState(form.client_email || form.email || '');
-  const [deliveryResult, setDeliveryResult] = useState<DeliveryResult | null>(null);
-  const [copied, setCopied] = useState(false);
-
-  const deliveryMutation = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        svg_content: svgContent,
-        client_email: clientEmail || undefined,
-        metadata: {
-          ...form,
-          palette: form.palette,
-        },
-        creative_config: {
-          brief: result?.brief_creatif || null,
-          scenario: result?.scenario_narratif || null,
-          technique: result?.configuration_technique || null,
-        },
-      };
-
-      const res = await fetch('/api/signature/deliver', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Erreur serveur');
-      }
-
-      return res.json() as Promise<DeliveryResult>;
-    },
-    onSuccess: (data) => {
-      setDeliveryResult(data);
-      onDelivered(data);
-      toast({ title: '✅ Livraison complète !', description: 'Votre package God Tier est prêt.' });
-    },
-    onError: (err: Error) => {
-      toast({ title: 'Erreur de livraison', description: err.message, variant: 'destructive' });
-    },
-  });
-
-  const isRunning = deliveryMutation.isPending;
-
-  const copyLink = () => {
-    if (deliveryResult?.preview_url) {
-      navigator.clipboard.writeText(deliveryResult.preview_url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  if (!svgContent) return null;
-
-  return (
-    <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-4 space-y-4 mt-4">
-      {/* En-tête */}
-      <div className="flex items-center gap-2">
-        <Package className="w-4 h-4 text-violet-400" />
-        <h3 className="text-sm font-semibold text-violet-300 uppercase tracking-widest">
-          Livraison God Tier
-        </h3>
-      </div>
-
-      {/* Email client */}
-      {!deliveryResult && (
-        <div className="space-y-2">
-          <Label className="text-white/40 text-xs flex items-center gap-1.5">
-            <Mail className="w-3 h-3" /> Email client (optionnel)
-          </Label>
-          <Input
-            type="email"
-            value={clientEmail}
-            onChange={e => setClientEmail(e.target.value)}
-            placeholder="client@entreprise.com"
-            className="bg-white/5 border-white/10 text-white text-xs h-8"
-            data-testid="input-client-email"
-          />
-          <p className="text-xs text-white/30">
-            Si renseigné, l'email de livraison avec les 3 PDFs sera envoyé automatiquement.
-          </p>
-        </div>
-      )}
-
-      {/* Bouton lancer */}
-      {!deliveryResult && (
-        <Button
-          onClick={() => deliveryMutation.mutate()}
-          disabled={isRunning}
-          className="w-full h-10 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-sm rounded-xl hover:opacity-90"
-          data-testid="button-launch-delivery"
-        >
-          {isRunning ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" /> Pipeline livraison en cours…
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <Send className="w-4 h-4" /> Lancer la Livraison Complète
-            </span>
-          )}
-        </Button>
-      )}
-
-      {/* Statut en temps réel */}
-      {(isRunning || deliveryResult) && (
-        <div className="space-y-2">
-          {(deliveryResult?.steps || [
-            { step: 'png', label: 'Génération du fallback PNG', status: isRunning ? 'running' : 'pending' },
-            { step: 'formats', label: 'Création versions Outlook + Gmail', status: 'pending' },
-            { step: 'cerebras', label: 'Cerebras rédige les instructions', status: 'pending' },
-            { step: 'pdfs', label: 'Génération des PDFs', status: 'pending' },
-            { step: 'preview', label: 'Construction de la page preview', status: 'pending' },
-            { step: 'zip', label: 'Assemblage du package ZIP', status: 'pending' },
-            { step: 'email', label: 'Envoi de l\'email client', status: 'pending' },
-          ] as DeliveryStepStatus[]).map((s) => (
-            <div key={s.step} className="flex items-center gap-3 py-1">
-              <span className="text-base w-5 text-center">{DELIVERY_STEP_ICONS[s.step] || '•'}</span>
-              <span className="text-xs text-white/60 flex-1">{s.label}</span>
-              {s.status === 'running' && <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin" />}
-              {s.status === 'done' && <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />}
-              {s.status === 'error' && <span className="text-xs text-red-400">✗</span>}
-              {s.status === 'pending' && <Circle className="w-3.5 h-3.5 text-white/20" />}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Résultat */}
-      {deliveryResult && (
-        <div className="space-y-3 pt-2 border-t border-white/10">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-green-400" />
-            <span className="text-sm font-semibold text-green-400">LIVRAISON COMPLÈTE</span>
-            {deliveryResult.email_sent && (
-              <span className="ml-auto text-xs text-white/40 flex items-center gap-1">
-                <Send className="w-3 h-3" /> Email envoyé
-              </span>
-            )}
-          </div>
-
-          {/* Boutons d'action */}
-          <a
-            href={deliveryResult.preview_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
-            <Button
-              className="w-full h-9 bg-violet-600/20 border border-violet-500/40 text-violet-300 hover:bg-violet-600/30 text-xs"
-              data-testid="button-view-preview"
-            >
-              <ExternalLink className="w-3.5 h-3.5 mr-2" /> Voir la page de prévisualisation
-            </Button>
-          </a>
-
-          <a
-            href={`/api/signature/download/${deliveryResult.signature_id}`}
-            download
-            className="block"
-          >
-            <Button
-              className="w-full h-9 bg-green-600/20 border border-green-500/40 text-green-300 hover:bg-green-600/30 text-xs"
-              data-testid="button-download-package"
-            >
-              <Download className="w-3.5 h-3.5 mr-2" /> Télécharger le package complet (.zip)
-            </Button>
-          </a>
-
-          <Button
-            onClick={() => deliveryMutation.mutate()}
-            variant="outline"
-            className="w-full h-9 border-white/15 text-white/40 hover:text-white text-xs"
-            data-testid="button-resend-delivery"
-          >
-            <Send className="w-3.5 h-3.5 mr-2" /> Renvoyer l'email client
-          </Button>
-
-          {/* Lien de prévisualisation */}
-          <div className="rounded-lg bg-black/30 p-3 space-y-2">
-            <p className="text-xs text-white/30">Lien de prévisualisation client</p>
-            <div className="flex items-center gap-2">
-              <p className="text-xs text-white/60 font-mono flex-1 truncate">
-                {deliveryResult.preview_url}
-              </p>
-              <button
-                onClick={copyLink}
-                className="text-white/40 hover:text-white transition-colors"
-                data-testid="button-copy-preview-link"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Contenu du package */}
-          <div className="rounded-lg bg-black/20 p-3">
-            <p className="text-xs text-white/30 mb-2">Package ZIP contient</p>
-            <div className="flex flex-wrap gap-1">
-              {deliveryResult.package_contents.map((f) => (
-                <span key={f} className="text-xs px-2 py-0.5 rounded bg-white/5 text-white/40 border border-white/8 font-mono">
-                  {f}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-const idle: StepStatus = { status: 'idle' };
+const STEP_LABELS = ["Secteur", "Informations", "Aperçu & Export"];
 
 export default function Studio() {
   const { toast } = useToast();
-  const [, navigate] = useLocation();
-  const [gmbUrl, setGmbUrl] = useState('');
-  const [form, setForm] = useState<FormData>(DEFAULT_FORM);
-  const [gmbFilledFields, setGmbFilledFields] = useState<Set<string>>(new Set());
-  const [canvasPhase, setCanvasPhase] = useState(-1);
-  const [svgContent, setSvgContent] = useState('');
-  const [result, setResult] = useState<PipelineResult | null>(null);
-  const [showFullForm, setShowFullForm] = useState(false);
-  const [pipeline, setPipeline] = useState<PipelineState>({
-    scraping: idle, brain1: idle, brain2: idle, brain3: idle, svgGen: idle,
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [selectedSector, setSelectedSector] = useState<SectorConfig | null>(null);
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [previewHtml, setPreviewHtml] = useState<string>("");
+  const [isRendering, setIsRendering] = useState(false);
+  const [gmbUrl, setGmbUrl] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { data: templatesData, isLoading } = useQuery<{ templates: SectorConfig[] }>({
+    queryKey: ["/api/signature/templates"],
   });
 
-  const updateForm = (data: Partial<FormData>) => setForm(prev => ({ ...prev, ...data }));
-  const setStep = (key: keyof PipelineState, s: StepStatus) => setPipeline(prev => ({ ...prev, [key]: s }));
+  const templates = templatesData?.templates ?? [];
 
-  // Classe CSS pour les inputs auto-remplis par GMB
-  const gmbCls = (field: string) =>
-    gmbFilledFields.has(field)
-      ? 'bg-green-500/8 border-green-500/40 text-white text-xs h-8 ring-1 ring-green-500/20'
-      : 'bg-white/5 border-white/10 text-white text-xs h-8';
-
-  // Badge "GMB" affiché dans le label si le champ a été auto-rempli
-  const GmbBadge = ({ field }: { field: string }) =>
-    gmbFilledFields.has(field)
-      ? <span className="ml-1 text-[9px] font-bold text-green-400 bg-green-500/15 px-1 py-0.5 rounded-sm leading-none">GMB</span>
-      : null;
-
-  // ── Scraping GMB ───
-  const scrapeMutation = useMutation({
-    mutationFn: async (url: string) => {
-      const res = await fetch('/api/signature/scrape-gmb', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gmb_url: url }),
+  const renderPreview = useCallback(async (sectorId: string, data: Record<string, string>) => {
+    setIsRendering(true);
+    try {
+      const res = await fetch("/api/signature/render", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sectorId, data }),
       });
-      if (!res.ok) throw new Error(await res.text());
-      return res.json();
-    },
-    onMutate: () => setStep('scraping', { status: 'running' }),
-    onSuccess: (data) => {
-      setStep('scraping', { status: 'done', data });
+      if (res.ok) {
+        const html = await res.text();
+        setPreviewHtml(html);
+      }
+    } catch (e) {
+      console.error("render error", e);
+    } finally {
+      setIsRendering(false);
+    }
+  }, []);
 
-      // Champs remplis automatiquement (pour marquage visuel)
-      const filled = new Set<string>();
-      const mark = (key: string, val: any) => { if (val) filled.add(key); return val; };
+  useEffect(() => {
+    if (!selectedSector || step !== 3) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      renderPreview(selectedSector.id, formData);
+    }, 400);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [formData, selectedSector, step, renderPreview]);
 
-      setForm(prev => ({
-        ...prev,
-        // Nom/titre réinitialisés pour que l'utilisateur les remplisse lui-même
-        nom:   '',
-        titre: '',
-        // Tous les champs GMB
-        entreprise:      mark('entreprise', data.entreprise)      || prev.entreprise,
-        telephone:       mark('telephone',  data.telephone)       || prev.telephone,
-        email:           mark('email',      data.email)           || prev.email,
-        site:            mark('site',       data.site)            || prev.site,
-        secteur:         mark('secteur',    data.secteur)         || prev.secteur,
-        cta:             mark('cta',        data.cta)             || prev.cta,
-        palette:         data.palette?.length >= 3 ? (mark('palette', true), data.palette) : prev.palette,
-        ton:             mark('ton',        data.ton)             || prev.ton,
-        description:     mark('description',data.description)     || prev.description,
-        adresse:         mark('adresse',    data.adresse)         || prev.adresse,
-        ville:           mark('ville',      data.ville)           || prev.ville,
-        pays:            mark('pays',       data.pays)            || prev.pays,
-        note:            data.note  || prev.note,
-        avis:            data.avis  || prev.avis,
-        slogan:          mark('slogan',     data.slogan)          || prev.slogan,
-        mots_cles:       data.mots_cles?.length ? (mark('mots_cles', true), data.mots_cles) : prev.mots_cles,
-        reseaux_sociaux: Object.keys(data.reseaux_sociaux || {}).length
-                           ? (mark('reseaux_sociaux', true), data.reseaux_sociaux)
-                           : prev.reseaux_sociaux,
-        logo_url:    data.logo_base64 ? (mark('logo', true), '') : (data.logo_url ? (mark('logo', true), data.logo_url) : prev.logo_url),
-        logo_base64: data.logo_base64 ? (mark('logo', true), data.logo_base64) : prev.logo_base64,
-      }));
+  useEffect(() => {
+    if (selectedSector && step === 3 && !previewHtml) {
+      renderPreview(selectedSector.id, formData);
+    }
+  }, [step]);
 
-      setGmbFilledFields(filled);
-      setShowFullForm(true);
-
-      const found: string[] = [];
-      if (filled.has('telephone'))  found.push('📞 tél');
-      if (filled.has('email'))      found.push('✉ email');
-      if (filled.has('site'))       found.push('🌐 site');
-      if (filled.has('logo'))       found.push('🖼 logo');
-      if (filled.has('reseaux_sociaux')) found.push(`🔗 ${Object.keys(data.reseaux_sociaux).join('/')}`);
-
-      const ratingStr = data.note ? ` · ★${data.note}${data.avis ? ` (${data.avis} avis)` : ''}` : '';
-      const cityStr   = data.ville ? ` · ${data.ville}` : '';
-      toast({
-        title: `✅ ${data.entreprise} importé`,
-        description: `${ratingStr}${cityStr}${found.length ? ' — ' + found.join('  ') : ''}`,
+  const handleGmbImport = async () => {
+    if (!gmbUrl.trim() || !selectedSector) return;
+    setIsImporting(true);
+    try {
+      const res = await fetch("/api/signature/scrape-gmb", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gmb_url: gmbUrl }),
       });
-    },
-    onError: (err: any) => {
-      setStep('scraping', { status: 'error' });
-      toast({ title: "Erreur GMB", description: err.message, variant: "destructive" });
-    },
-  });
+      const data = await res.json();
+      if (data.entreprise || data.nom) {
+        const merged: Record<string, string> = { ...formData };
+        for (const field of selectedSector.fields) {
+          const val = data[field.key];
+          if (val !== undefined && val !== null && val !== '') {
+            merged[field.key] = String(val);
+          }
+        }
+        if (!merged.nom && data.entreprise) merged.nom = data.entreprise;
+        setFormData(merged);
 
-  // ── Pipeline IA ───
-  const pipelineMutation = useMutation({
-    mutationFn: async () => {
-      setStep('brain1', { status: 'running' });
-      setCanvasPhase(0);
-      await delay(400);
-      setCanvasPhase(1);
-
-      const res = await fetch('/api/signature/analyze-and-configure', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ metadata: form }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      return res.json();
-    },
-    onMutate: () => {
-      setPipeline({ scraping: pipeline.scraping, brain1: { status: 'running' }, brain2: idle, brain3: idle, svgGen: idle });
-    },
-    onSuccess: async (data) => {
-      setStep('brain1', { status: 'done', data: data.brief_creatif });
-      setCanvasPhase(2); await delay(300);
-      setStep('brain2', { status: 'done', data: data.scenario_narratif });
-      setCanvasPhase(4); await delay(300);
-      setStep('brain3', { status: 'done', data: data.configuration_technique });
-      setCanvasPhase(7); await delay(200);
-      setStep('svgGen', { status: 'running' });
-      setCanvasPhase(9);
-
-      const exportRes = await fetch('/api/signature/export', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ metadata: form, brief: data.brief_creatif, scenario: data.scenario_narratif, config: data.configuration_technique }),
-      });
-      if (!exportRes.ok) throw new Error('Erreur export SVG');
-      const exportData = await exportRes.json();
-
-      await delay(400);
-      setCanvasPhase(10);
-      setStep('svgGen', { status: 'done', data: { cycle_total: data.configuration_technique?.cycle_total } });
-      setSvgContent(exportData.svg_content);
-      setResult({ ...data, ...exportData });
-      toast({ title: "✅ Signature God Tier générée !", description: `Cycle ${data.configuration_technique?.cycle_total || 240}s — 4 variations` });
-    },
-    onError: (err: any) => {
-      setStep('brain1', { status: 'error' });
-      toast({ title: "Erreur pipeline", description: err.message, variant: "destructive" });
-    },
-  });
-
-  const handleReset = () => {
-    setCanvasPhase(-1); setSvgContent(''); setResult(null);
-    setPipeline({ scraping: idle, brain1: idle, brain2: idle, brain3: idle, svgGen: idle });
+        if (data.secteur) {
+          const res2 = await fetch("/api/signature/classify-sector", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ metadata: data }),
+          });
+          const classified = await res2.json();
+          if (classified.sectorId) {
+            const found = templates.find(t => t.id === classified.sectorId);
+            if (found) setSelectedSector(found);
+          }
+        }
+        toast({ title: "Import réussi", description: `Données de "${data.entreprise || data.nom}" importées.` });
+      }
+    } catch (e) {
+      toast({ title: "Erreur import", description: "Impossible d'importer l'URL GMB.", variant: "destructive" });
+    } finally {
+      setIsImporting(false);
+    }
   };
 
-  const downloadSVG = () => {
-    if (!svgContent) return;
-    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+  const handleCopy = async () => {
+    if (!previewHtml) return;
+    await navigator.clipboard.writeText(previewHtml);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({ title: "Copié !", description: "Le HTML de la signature est dans votre presse-papiers." });
+  };
+
+  const handleDownload = () => {
+    if (!previewHtml) return;
+    const blob = new Blob([previewHtml], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `signature_god_tier_${result?.signature_id || 'export'}.svg`; a.click();
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `signature-${selectedSector?.id ?? "email"}.html`;
+    a.click();
     URL.revokeObjectURL(url);
+    toast({ title: "Téléchargé !", description: "signature.html sauvegardé." });
   };
 
-  const openRealityPreview = () => {
-    if (!svgContent) return;
-    localStorage.setItem('reality_preview_svg', svgContent);
-    localStorage.setItem('reality_preview_meta', JSON.stringify({
-      nom: form.nom,
-      titre: form.titre,
-      entreprise: form.entreprise,
-      signature_id: result?.signature_id || '',
-      email: form.email,
-      telephone: form.telephone,
-    }));
-    navigate('/preview');
+  const selectSector = (sector: SectorConfig) => {
+    setSelectedSector(sector);
+    setFormData({});
+    setPreviewHtml("");
+    setStep(2);
   };
 
-  const isRunning = pipelineMutation.isPending;
-  const gmbDone = pipeline.scraping.status === 'done';
+  const goToStep3 = () => {
+    setStep(3);
+  };
+
+  const requiredFilled = selectedSector?.fields
+    .filter(f => f.required)
+    .every(f => (formData[f.key] ?? "").trim() !== "") ?? false;
 
   return (
-    <div className="space-y-5">
+    <div className="min-h-screen" data-testid="studio-page">
+
       {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300 text-sm font-medium mb-2">
-          <Brain className="w-4 h-4" />
-          Studio Signature — Pipeline 3 Cerveaux IA
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-[10px] font-bold tracking-widest text-[#FF006E] uppercase">
+            Générateur de Signatures
+          </span>
         </div>
-        <h1 className="text-3xl font-bold text-white">God Tier Studio</h1>
-        <p className="text-white/50 max-w-xl mx-auto text-sm">
-          3 IA en cascade analysent, narrent et optimisent votre signature vivante en temps réel
+        <h1 className="text-3xl font-bold text-white mb-1">
+          {selectedSector ? `${selectedSector.emoji} ${selectedSector.label}` : "Signature Email"}
+        </h1>
+        <p className="text-white/40 text-sm">
+          {selectedSector ? selectedSector.tone : "Choisissez votre secteur pour générer une signature professionnelle calibrée"}
         </p>
       </div>
 
-      {/* GMB Scraper */}
-      <div className="rounded-xl border border-white/10 bg-white/3 p-4">
-        <h3 className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-3 flex items-center gap-2">
-          <Link2 className="w-3.5 h-3.5 text-forge-cyan" />
-          Import automatique Google My Business
-        </h3>
-        <div className="flex gap-2">
-          <Input
-            value={gmbUrl}
-            onChange={e => setGmbUrl(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && gmbUrl && scrapeMutation.mutate(gmbUrl)}
-            placeholder="https://maps.app.goo.gl/... ou https://maps.google.com/maps/place/..."
-            className="bg-white/5 border-white/20 text-white text-sm flex-1"
-            data-testid="input-gmb-url"
-          />
-          <Button
-            onClick={() => scrapeMutation.mutate(gmbUrl)}
-            disabled={!gmbUrl || scrapeMutation.isPending}
-            className="bg-forge-cyan/20 border border-forge-cyan/40 text-forge-cyan hover:bg-forge-cyan/30 text-xs whitespace-nowrap"
-            data-testid="button-scrape-gmb"
-          >
-            {scrapeMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Importer GMB'}
-          </Button>
-        </div>
-
-        {/* Résumé GMB importé */}
-        {gmbDone && pipeline.scraping.data && (() => {
-          const d = pipeline.scraping.data;
-          const socialCount = Object.keys(d.reseaux_sociaux || {}).length;
+      {/* Step indicator */}
+      <div className="flex items-center gap-3 mb-8">
+        {STEP_LABELS.map((label, i) => {
+          const n = i + 1;
+          const isDone = step > n;
+          const isActive = step === n;
           return (
-            <div className="mt-3 rounded-xl border border-green-500/20 bg-green-500/5 p-3 space-y-2" data-testid="gmb-import-summary">
-              {/* Ligne 1 : logo + nom + secteur + ville + note */}
-              <div className="flex flex-wrap items-center gap-2 text-xs">
-                {(d.logo_base64 || d.logo_url) && (
-                  <img
-                    src={d.logo_base64 || d.logo_url}
-                    alt="logo"
-                    className="w-8 h-8 rounded-lg object-contain bg-white/5 border border-white/10 flex-shrink-0"
-                    data-testid="gmb-logo-preview"
-                  />
-                )}
-                <span className="text-green-400 font-semibold" data-testid="gmb-entreprise">{d.entreprise}</span>
-                {d.secteur && <span className="text-white/35 bg-white/5 px-2 py-0.5 rounded-full">{d.secteur}</span>}
-                {d.ville && <span className="text-white/40 flex items-center gap-1"><MapPin className="w-3 h-3" />{d.ville}</span>}
-                {d.note > 0 && (
-                  <span className="text-amber-400 flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-amber-400" />{d.note}
-                    {d.avis > 0 && <span className="text-white/30">({d.avis} avis)</span>}
-                  </span>
-                )}
-              </div>
-              {/* Ligne 2 : contact */}
-              <div className="flex flex-wrap gap-3 text-[11px] text-white/40">
-                {d.telephone && (
-                  <span className="flex items-center gap-1" data-testid="gmb-telephone">
-                    <Phone className="w-3 h-3 text-forge-cyan/60" />{d.telephone}
-                  </span>
-                )}
-                {d.email && (
-                  <span className="flex items-center gap-1" data-testid="gmb-email">
-                    <Mail className="w-3 h-3 text-forge-cyan/60" />{d.email}
-                  </span>
-                )}
-                {d.site && (
-                  <span className="flex items-center gap-1 truncate max-w-[160px]" data-testid="gmb-site">
-                    <Globe className="w-3 h-3 text-forge-cyan/60 flex-shrink-0" />{d.site.replace(/^https?:\/\//, '')}
-                  </span>
-                )}
-              </div>
-              {/* Ligne 3 : réseaux + champs auto */}
-              <div className="flex flex-wrap gap-2 text-[10px]">
-                {socialCount > 0 && (
-                  <span className="bg-violet-500/10 border border-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">
-                    🔗 {Object.keys(d.reseaux_sociaux).join(' · ')}
-                  </span>
-                )}
-                {d.cta && (
-                  <span className="bg-white/5 border border-white/10 text-white/40 px-2 py-0.5 rounded-full">
-                    CTA : {d.cta}
-                  </span>
-                )}
-                {!(d.logo_base64 || d.logo_url) && (
-                  <span className="bg-orange-500/10 border border-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">
-                    ⚠ Logo non trouvé
-                  </span>
-                )}
-              </div>
+            <div key={n} className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  if (isDone || (n === 2 && selectedSector)) setStep(n as 1 | 2 | 3);
+                }}
+                className="flex items-center gap-2 group"
+                disabled={n > step && !(n === 2 && selectedSector)}
+                data-testid={`step-btn-${n}`}
+              >
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all
+                  ${isDone ? "bg-[#FF006E] text-white" :
+                    isActive ? "bg-white text-black" :
+                    "bg-white/10 text-white/30"}`}>
+                  {isDone ? <Check className="w-3.5 h-3.5" /> : n}
+                </div>
+                <span className={`text-sm transition-colors hidden sm:block
+                  ${isActive ? "text-white font-medium" :
+                    isDone ? "text-[#FF006E]" : "text-white/30"}`}>
+                  {label}
+                </span>
+              </button>
+              {i < 2 && (
+                <div className={`hidden sm:block h-px w-10 transition-colors ${isDone ? "bg-[#FF006E]" : "bg-white/10"}`} />
+              )}
             </div>
           );
-        })()}
+        })}
       </div>
 
-      {/* 3 zones principales */}
-      <div className="grid grid-cols-12 gap-4">
-
-        {/* GAUCHE — Formulaire + Pipeline (3/12) */}
-        <div className="col-span-12 lg:col-span-3 space-y-3">
-          <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest">Pipeline Status</h3>
-          <StepIndicator icon={Link2} label="Scraping GMB" sublabel="Toutes données entreprise" status={pipeline.scraping} />
-          <StepIndicator icon={Brain} label="Cerveau 1 — GPT-4o" sublabel="Brief créatif & analyse logo" status={pipeline.brain1} />
-          <StepIndicator icon={Bot} label="Cerveau 2 — Claude Opus" sublabel="Scénario narratif 4 variations" status={pipeline.brain2} />
-          <StepIndicator icon={Zap} label="Cerveau 3 — Gemini Pro" sublabel="Config technique optimisée" status={pipeline.brain3} />
-          <StepIndicator icon={Sparkles} label="Génération SVG" sublabel="Assemblage final God Tier" status={pipeline.svgGen} />
-        </div>
-
-        {/* CENTRE — Canvas + Form (6/12) */}
-        <div className="col-span-12 lg:col-span-6 space-y-4">
-
-          {/* Canvas Live */}
-          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest">Canvas Live</h3>
-              {canvasPhase >= 10 && <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">Preview Final</span>}
+      {/* STEP 1 — Sélection du secteur */}
+      {step === 1 && (
+        <div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-[#FF006E]" />
             </div>
-            <LiveCanvas phase={canvasPhase} metadata={form} />
-            <div className="flex gap-1 mt-3 flex-wrap">
-              {CANVAS_PHASES.map((_, i) => (
-                <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= canvasPhase ? 'bg-forge-cyan' : 'bg-white/10'}`} />
-              ))}
-            </div>
-            <p className="text-xs text-white/30 mt-1.5">
-              {canvasPhase >= 0 && canvasPhase < CANVAS_PHASES.length ? CANVAS_PHASES[canvasPhase] :
-               canvasPhase >= 10 ? 'Cycle 4 variations actif' : 'En attente du lancement'}
-            </p>
-          </div>
-
-          {/* Formulaire de données */}
-          <div className="rounded-xl border border-white/10 bg-white/3 p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider">Données de la signature</h4>
-              <button
-                onClick={() => setShowFullForm(!showFullForm)}
-                className="flex items-center gap-1 text-xs text-white/30 hover:text-white/60 transition-colors"
-                data-testid="button-toggle-form"
-              >
-                {showFullForm ? <><EyeOff className="w-3.5 h-3.5" /> Réduire</> : <><Eye className="w-3.5 h-3.5" /> Voir tout</>}
-              </button>
-            </div>
-
-            {/* Indicateur GMB */}
-            {gmbFilledFields.size > 0 && (
-              <div className="flex items-center gap-2 text-[10px] text-green-400/80 bg-green-500/8 border border-green-500/20 rounded-lg px-2.5 py-1.5">
-                <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
-                <span>{gmbFilledFields.size} champ{gmbFilledFields.size > 1 ? 's' : ''} auto-rempli{gmbFilledFields.size > 1 ? 's' : ''} par GMB — les champs verts sont importés. Saisissez votre <strong>Prénom Nom</strong> et <strong>Titre</strong>.</span>
-              </div>
-            )}
-
-            {/* Section Identité */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
-                  <User className="w-3 h-3" /> Prénom Nom
-                  {gmbFilledFields.size > 0 && <span className="ml-1 text-[9px] text-orange-400/70 bg-orange-500/10 px-1 py-0.5 rounded-sm">à remplir</span>}
-                </Label>
-                <Input value={form.nom} onChange={e => updateForm({ nom: e.target.value })}
-                  placeholder={gmbFilledFields.size > 0 ? 'Votre prénom et nom…' : ''}
-                  className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-nom" />
-              </div>
-              <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
-                  <Briefcase className="w-3 h-3" /> Titre / Poste
-                  {gmbFilledFields.size > 0 && <span className="ml-1 text-[9px] text-orange-400/70 bg-orange-500/10 px-1 py-0.5 rounded-sm">à remplir</span>}
-                </Label>
-                <Input value={form.titre} onChange={e => updateForm({ titre: e.target.value })}
-                  placeholder={gmbFilledFields.size > 0 ? 'Votre titre / poste…' : ''}
-                  className="bg-white/5 border-white/10 text-white text-xs h-8" data-testid="input-titre" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
-                  <Building2 className="w-3 h-3" /> Entreprise<GmbBadge field="entreprise" />
-                </Label>
-                <Input value={form.entreprise} onChange={e => updateForm({ entreprise: e.target.value })}
-                  className={gmbCls('entreprise')} data-testid="input-entreprise" />
-              </div>
-              <div>
-                <Label className="text-white/40 text-xs mb-1 flex items-center">
-                  Secteur<GmbBadge field="secteur" />
-                </Label>
-                <Input value={form.secteur} onChange={e => updateForm({ secteur: e.target.value })}
-                  className={gmbCls('secteur')} data-testid="input-secteur" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
-                  <Mail className="w-3 h-3" /> Email<GmbBadge field="email" />
-                </Label>
-                <Input value={form.email} onChange={e => updateForm({ email: e.target.value })}
-                  className={gmbCls('email')} data-testid="input-email" />
-              </div>
-              <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
-                  <Phone className="w-3 h-3" /> Téléphone<GmbBadge field="telephone" />
-                </Label>
-                <Input value={form.telephone} onChange={e => updateForm({ telephone: e.target.value })}
-                  className={gmbCls('telephone')} data-testid="input-telephone" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
-                  <Globe className="w-3 h-3" /> Site web<GmbBadge field="site" />
-                </Label>
-                <Input value={form.site} onChange={e => updateForm({ site: e.target.value })}
-                  className={gmbCls('site')} data-testid="input-site" />
-              </div>
-              <div>
-                <Label className="text-white/40 text-xs mb-1 flex items-center">
-                  CTA (Bouton)<GmbBadge field="cta" />
-                </Label>
-                <Input value={form.cta} onChange={e => updateForm({ cta: e.target.value })}
-                  className={gmbCls('cta')} data-testid="input-cta" />
-              </div>
-            </div>
-
-            {/* Logo */}
-            <LogoSection form={form} onUpdate={updateForm} />
-
-            {/* Pré-rendu 3D par section */}
-            <Sections3DPanel form={form} onUpdate={updateForm} />
-
-            {/* Style visuel + IA */}
-            <StyleVisuelSection form={form} onUpdate={updateForm} />
-
-            {/* Champs étendus */}
-            {showFullForm && (
-              <div className="space-y-3 pt-3 border-t border-white/10">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-white/40 text-xs flex items-center gap-1.5 mb-1">
-                      <MapPin className="w-3 h-3" /> Adresse<GmbBadge field="adresse" />
-                    </Label>
-                    <Input value={form.adresse} onChange={e => updateForm({ adresse: e.target.value })}
-                      className={gmbCls('adresse')} data-testid="input-adresse" />
-                  </div>
-                  <div>
-                    <Label className="text-white/40 text-xs mb-1 flex items-center">
-                      Ville<GmbBadge field="ville" />
-                    </Label>
-                    <Input value={form.ville} onChange={e => updateForm({ ville: e.target.value })}
-                      className={gmbCls('ville')} data-testid="input-ville" />
-                  </div>
+          ) : (
+            <>
+              {/* GMB import */}
+              <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Link2 className="w-4 h-4 text-[#00D4FF]" />
+                  <span className="text-sm font-semibold text-white">Import Google My Business</span>
+                  <span className="text-[10px] px-2 py-0.5 bg-[#00D4FF]/10 text-[#00D4FF] rounded-full">Optionnel</span>
                 </div>
-
-                <div>
-                  <Label className="text-white/40 text-xs mb-1 flex items-center">
-                    Slogan / Tagline<GmbBadge field="slogan" />
-                  </Label>
-                  <Input value={form.slogan} onChange={e => updateForm({ slogan: e.target.value })}
-                    placeholder="Le slogan de l'entreprise…" className={gmbCls('slogan')} data-testid="input-slogan" />
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="https://maps.google.com/... ou URL courte maps.app.goo.gl/..."
+                    value={gmbUrl}
+                    onChange={e => setGmbUrl(e.target.value)}
+                    className="bg-white/[0.04] border-white/10 text-white placeholder:text-white/20 flex-1"
+                    data-testid="input-gmb-url"
+                  />
+                  <Button
+                    onClick={handleGmbImport}
+                    disabled={!gmbUrl.trim() || isImporting || !selectedSector}
+                    className="bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 hover:bg-[#00D4FF]/20"
+                    data-testid="btn-import-gmb"
+                  >
+                    {isImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Importer"}
+                  </Button>
                 </div>
-
-                <div>
-                  <Label className="text-white/40 text-xs mb-1 flex items-center">
-                    Description<GmbBadge field="description" />
-                  </Label>
-                  <Textarea value={form.description} onChange={e => updateForm({ description: e.target.value })}
-                    rows={2} placeholder="Description Google My Business…"
-                    className={`${gmbCls('description').replace('h-8', '')} resize-none`} data-testid="input-description" />
-                </div>
-
-
-                {/* Note GMB */}
-                {form.note > 0 && (
-                  <div className="flex items-center gap-2 text-xs text-white/40">
-                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                    <span>{form.note}/5 · {form.avis} avis Google</span>
-                  </div>
+                {!selectedSector && (
+                  <p className="text-xs text-white/30 mt-2">Sélectionnez d'abord un secteur ou importez pour auto-détecter</p>
                 )}
+              </div>
 
-                {/* Réseaux sociaux */}
-                {Object.keys(form.reseaux_sociaux).length > 0 && (
-                  <div>
-                    <Label className="text-white/40 text-xs mb-1 block">Réseaux détectés</Label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {Object.entries(form.reseaux_sociaux).map(([net]) => (
-                        <span key={net} className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-white/60 border border-white/10">{net}</span>
-                      ))}
+              {/* Sector grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                {templates.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => selectSector(t)}
+                    className="relative group p-4 rounded-xl border transition-all duration-200 text-left overflow-hidden hover:scale-[1.02] hover:shadow-lg"
+                    style={{
+                      background: `${t.palette.background}cc`,
+                      borderColor: `${t.palette.accent}44`,
+                    }}
+                    data-testid={`sector-card-${t.id}`}
+                  >
+                    <div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ background: `radial-gradient(circle at 50% 50%, ${t.palette.accent}18, transparent 70%)` }}
+                    />
+                    <div className="text-2xl mb-2">{t.emoji}</div>
+                    <div className="text-xs font-bold text-white mb-1 leading-tight">{t.label}</div>
+                    <div className="text-[10px] leading-relaxed" style={{ color: t.palette.muted }}>
+                      {t.description.split(',')[0].split('.')[0]}
                     </div>
+                    <div
+                      className="mt-3 flex items-center gap-1"
+                      style={{ color: t.palette.accent }}
+                    >
+                      <div className="w-4 h-0.5 rounded-full" style={{ background: t.palette.accent }} />
+                      <span className="text-[9px] font-semibold tracking-wider uppercase">{t.animation.name}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* STEP 2 — Formulaire */}
+      {step === 2 && selectedSector && (
+        <div className="max-w-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setStep(1)}
+              className="text-white/40 hover:text-white"
+              data-testid="btn-back-step1"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" /> Changer de secteur
+            </Button>
+          </div>
+
+          {/* Sector banner */}
+          <div
+            className="rounded-xl p-5 mb-6 border"
+            style={{
+              background: `linear-gradient(135deg, ${selectedSector.palette.background}, ${selectedSector.palette.muted}22)`,
+              borderColor: `${selectedSector.palette.accent}44`,
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{selectedSector.emoji}</span>
+              <div>
+                <div className="font-bold text-white">{selectedSector.label}</div>
+                <div className="text-xs" style={{ color: selectedSector.palette.accent }}>
+                  {selectedSector.tone} · Animation : {selectedSector.animation.name}
+                </div>
+              </div>
+              <div className="ml-auto">
+                <div className="w-8 h-8 rounded-full border" style={{ background: selectedSector.palette.accent, borderColor: `${selectedSector.palette.accent}66` }} />
+              </div>
+            </div>
+          </div>
+
+          {/* GMB import for step 2 */}
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Link2 className="w-3.5 h-3.5 text-[#00D4FF]" />
+              <span className="text-xs font-semibold text-white/70">Import Google My Business</span>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="URL Google Maps ou maps.app.goo.gl/..."
+                value={gmbUrl}
+                onChange={e => setGmbUrl(e.target.value)}
+                className="bg-white/[0.04] border-white/10 text-white placeholder:text-white/20 text-sm flex-1"
+                data-testid="input-gmb-url-step2"
+              />
+              <Button
+                onClick={handleGmbImport}
+                disabled={!gmbUrl.trim() || isImporting}
+                size="sm"
+                className="bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30 hover:bg-[#00D4FF]/20"
+                data-testid="btn-import-gmb-step2"
+              >
+                {isImporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Importer"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Fields */}
+          <div className="space-y-4">
+            {selectedSector.fields.map((field) => {
+              const IconComp = FIELD_ICONS[field.type] || User;
+              return (
+                <div key={field.key} data-testid={`field-${field.key}`}>
+                  <Label className="text-white/60 text-xs font-medium flex items-center gap-1.5 mb-1.5">
+                    <IconComp className="w-3.5 h-3.5" />
+                    {field.label}
+                    {field.required && <span style={{ color: selectedSector.palette.accent }}>*</span>}
+                  </Label>
+                  <Input
+                    placeholder={field.type === 'phone' ? '06 12 34 56 78' :
+                      field.type === 'email' ? 'contact@entreprise.fr' :
+                      field.type === 'url' ? 'https://...' :
+                      field.type === 'hours' ? 'Lun-Ven 9h-18h' :
+                      field.type === 'rating' ? '4.8' :
+                      field.label}
+                    type={field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'}
+                    value={formData[field.key] ?? ""}
+                    onChange={e => setFormData(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/20 focus:border-[#FF006E]/50"
+                    style={{ borderColor: formData[field.key] ? `${selectedSector.palette.accent}66` : undefined }}
+                    data-testid={`input-${field.key}`}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 flex gap-3">
+            <Button
+              onClick={goToStep3}
+              className="flex-1 text-black font-bold py-3"
+              style={{ background: selectedSector.palette.accent }}
+              data-testid="btn-preview"
+            >
+              Voir l'aperçu <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+            {!requiredFilled && (
+              <p className="self-center text-xs text-white/30">
+                Remplissez les champs obligatoires (*)
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* STEP 3 — Aperçu & Export */}
+      {step === 3 && selectedSector && (
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setStep(2)}
+              className="text-white/40 hover:text-white"
+              data-testid="btn-back-step2"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" /> Modifier les infos
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => renderPreview(selectedSector.id, formData)}
+              disabled={isRendering}
+              className="text-white/40 hover:text-white"
+              data-testid="btn-refresh-preview"
+            >
+              <RefreshCw className={`w-4 h-4 mr-1 ${isRendering ? "animate-spin" : ""}`} />
+              Actualiser
+            </Button>
+          </div>
+
+          <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+            {/* Preview */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-white/40 font-medium uppercase tracking-wider">
+                  Aperçu en direct
+                </span>
+                {isRendering && (
+                  <div className="flex items-center gap-1.5 text-xs text-white/30">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Rendu...
                   </div>
                 )}
               </div>
-            )}
-          </div>
 
-          {/* SVG Preview */}
-          {svgContent && (
-            <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-semibold text-green-400 uppercase tracking-widest">SVG God Tier Final</h3>
-                <span className="text-xs text-white/40 font-mono">{result?.signature_id}</span>
+              {/* White bg preview */}
+              <div className="rounded-xl overflow-hidden border border-white/10 mb-3">
+                <div className="px-3 py-2 bg-white/[0.04] border-b border-white/[0.06] flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                  <span className="text-[10px] text-white/20 ml-2">Fond blanc (Gmail, Outlook)</span>
+                </div>
+                <div className="bg-white p-6 overflow-x-auto">
+                  {previewHtml ? (
+                    <iframe
+                      srcDoc={previewHtml}
+                      className="w-full border-0"
+                      style={{ height: `${(selectedSector?.fieldCount ?? 6) * 30 + 120}px`, minHeight: "180px", maxHeight: "320px" }}
+                      title="Aperçu signature fond blanc"
+                      data-testid="preview-iframe-white"
+                    />
+                  ) : (
+                    <div className="h-40 flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="rounded-lg overflow-hidden border border-white/10" dangerouslySetInnerHTML={{ __html: svgContent }} />
-              <Button
-                onClick={openRealityPreview}
-                className="w-full h-10 bg-gradient-to-r from-forge-cyan/20 to-violet-600/20 border border-forge-cyan/50 text-forge-cyan hover:bg-forge-cyan/30 hover:border-forge-cyan/80 text-sm font-semibold rounded-xl transition-all"
-                data-testid="button-open-reality-preview"
+
+              {/* Dark bg preview */}
+              <div className="rounded-xl overflow-hidden border border-white/10">
+                <div className="px-3 py-2 bg-white/[0.04] border-b border-white/[0.06] flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                  <span className="text-[10px] text-white/20 ml-2">Fond sombre</span>
+                </div>
+                <div className="bg-[#111827] p-6 overflow-x-auto">
+                  {previewHtml ? (
+                    <iframe
+                      srcDoc={previewHtml}
+                      className="w-full border-0"
+                      style={{ height: `${(selectedSector?.fieldCount ?? 6) * 30 + 120}px`, minHeight: "180px", maxHeight: "320px" }}
+                      title="Aperçu signature fond sombre"
+                      data-testid="preview-iframe-dark"
+                    />
+                  ) : (
+                    <div className="h-40 flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Export panel */}
+            <div className="space-y-4">
+              <div
+                className="rounded-xl p-5 border"
+                style={{
+                  background: `${selectedSector.palette.background}dd`,
+                  borderColor: `${selectedSector.palette.accent}33`,
+                }}
               >
-                <Eye className="w-4 h-4 mr-2" />
-                Visualiser dans Reality Preview — Ajustements &amp; Validation
-              </Button>
-            </div>
-          )}
+                <div className="text-sm font-bold text-white mb-1">{selectedSector.emoji} {selectedSector.label}</div>
+                <div className="text-xs mb-4" style={{ color: selectedSector.palette.muted }}>
+                  {selectedSector.tone}
+                </div>
+                <div className="space-y-1 text-xs text-white/40 mb-4">
+                  {selectedSector.fields.map(f => (
+                    <div key={f.key} className="flex justify-between">
+                      <span>{f.label}</span>
+                      <span style={{ color: formData[f.key] ? selectedSector.palette.accent : undefined }}>
+                        {formData[f.key] ? "✓" : f.required ? "—" : "vide"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-          {/* Section Livraison */}
-          {svgContent && (
-            <DeliverySection
-              svgContent={svgContent}
-              form={form}
-              result={result}
-              onDelivered={(_dr) => {}}
-            />
-          )}
+              <div className="space-y-2">
+                <Button
+                  onClick={handleCopy}
+                  className="w-full font-semibold"
+                  style={{ background: selectedSector.palette.accent, color: selectedSector.palette.background }}
+                  disabled={!previewHtml}
+                  data-testid="btn-copy-html"
+                >
+                  {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                  {copied ? "Copié !" : "Copier le HTML"}
+                </Button>
 
-          {/* CTA principal */}
-          <div className="flex gap-3">
-            <Button
-              onClick={() => pipelineMutation.mutate()}
-              disabled={isRunning || !form.nom}
-              className="flex-1 h-12 bg-gradient-to-r from-violet-600 to-forge-cyan text-white font-semibold text-sm rounded-xl hover:opacity-90"
-              data-testid="button-launch-pipeline"
-            >
-              {isRunning ? (
-                <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Pipeline IA en cours…</span>
-              ) : (
-                <span className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> Lancer la Pipeline 3 Cerveaux</span>
-              )}
-            </Button>
-            {result && (
-              <Button onClick={handleReset} variant="outline"
-                className="border-white/20 text-white/60 hover:text-white h-12"
-                data-testid="button-reset-pipeline">
-                <RefreshCw className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-        </div>
+                <Button
+                  onClick={handleDownload}
+                  variant="outline"
+                  className="w-full border-white/10 text-white/70 hover:text-white hover:border-white/20"
+                  disabled={!previewHtml}
+                  data-testid="btn-download-html"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Télécharger .html
+                </Button>
 
-        {/* DROITE — Méta créative + Exports (3/12) */}
-        <div className="col-span-12 lg:col-span-3 space-y-4">
-          <MetaPanel pipeline={pipeline} />
-
-          {result && (
-            <div className="rounded-xl border border-white/10 bg-white/3 p-4 space-y-3">
-              <h4 className="text-xs font-semibold text-white/50 uppercase tracking-widest">Exports</h4>
-              <Button onClick={openRealityPreview}
-                className="w-full h-9 bg-gradient-to-r from-forge-cyan/20 to-violet-600/20 border border-forge-cyan/50 text-forge-cyan hover:bg-forge-cyan/30 text-xs font-semibold"
-                data-testid="button-reality-preview-panel">
-                <Eye className="w-3.5 h-3.5 mr-2" /> Reality Preview &amp; Ajustements
-              </Button>
-              <Button onClick={downloadSVG}
-                className="w-full h-9 bg-violet-600/30 border border-violet-500/50 text-violet-300 hover:bg-violet-600/40 text-xs"
-                data-testid="button-download-svg">
-                <Download className="w-3.5 h-3.5 mr-2" /> Télécharger SVG God Tier
-              </Button>
-              {result.pdf_instructions_url && (
-                <a href={result.pdf_instructions_url} target="_blank" rel="noopener noreferrer" className="block">
-                  <Button variant="outline" className="w-full h-9 border-white/20 text-white/60 hover:text-white text-xs"
-                    data-testid="button-download-guide">
-                    <Download className="w-3.5 h-3.5 mr-2" /> Guide installation
+                <a
+                  href={`/api/signature/preview-sector/${selectedSector.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    variant="ghost"
+                    className="w-full text-white/40 hover:text-white text-xs"
+                    data-testid="btn-open-preview"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
+                    Ouvrir dans un nouvel onglet
                   </Button>
                 </a>
-              )}
-              {result.config_json_url && (
-                <a href={result.config_json_url} target="_blank" rel="noopener noreferrer" className="block">
-                  <Button variant="outline" className="w-full h-9 border-white/20 text-white/60 hover:text-white text-xs"
-                    data-testid="button-download-config">
-                    <Cpu className="w-3.5 h-3.5 mr-2" /> Config JSON
-                  </Button>
-                </a>
-              )}
-              <div className="rounded-lg bg-black/30 p-3">
-                <p className="text-xs text-white/30">Signature ID</p>
-                <p className="text-xs text-white/70 font-mono break-all">{result.signature_id}</p>
+              </div>
+
+              <div className="rounded-xl p-4 bg-white/[0.02] border border-white/[0.06]">
+                <div className="text-xs font-semibold text-white/60 mb-2">Instructions d'installation</div>
+                <ol className="text-xs text-white/30 space-y-1.5 list-decimal list-inside">
+                  <li>Copiez le HTML de la signature</li>
+                  <li>Ouvrez Gmail → Paramètres → Signature</li>
+                  <li>Collez dans l'éditeur HTML (mode source)</li>
+                  <li>Enregistrez et testez un envoi</li>
+                </ol>
               </div>
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
-
-function delay(ms: number) { return new Promise(res => setTimeout(res, ms)); }

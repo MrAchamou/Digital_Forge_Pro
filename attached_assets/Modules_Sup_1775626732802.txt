@@ -1,0 +1,1015 @@
+Parfait ! Je vais maintenant créer **le JSON final et complet** pour vos 10 secteurs, en utilisant **uniquement les 55 effets de votre bibliothèque** et en respectant parfaitement vos contraintes (format, données clés, ambiance).
+
+Voici le **template ultime** prêt à être intégré dans votre logiciel :
+
+```json
+{
+  "version": "3.0",
+  "nom_systeme": "Signature Email Animée - Multi-secteurs",
+  "date_creation": "2024",
+  
+  "secteurs": {
+    "1_artisanat_travaux": {
+      "nom": "🔧 Artisanat & Travaux",
+      "description": "Compact, horizontal, costaud",
+      "format": "compact_horizontal",
+      "largeur": "600px",
+      "hauteur": "180px",
+      "background": "#2c2c2c",
+      "couleur_texte": "#ffffff",
+      "effet_global": "ELECTRIC_HOVER",
+      
+      "elements": [
+        {
+          "id": "urgence",
+          "type": "badge",
+          "contenu": "⚡ URGENCE 24H/24 - 7J/7",
+          "position": "top-right",
+          "taille": "14px",
+          "couleur": "#ff4444",
+          "effets": ["ELECTRIC_FORM", "ENERGY_FLOW"],
+          "animation": {
+            "type": "sequence",
+            "delai": 0,
+            "duree": 2000,
+            "iteration": "infinite",
+            "vitesse": "rapide"
+          }
+        },
+        {
+          "id": "telephone",
+          "type": "contact_principal",
+          "contenu": "📞 06 12 34 56 78",
+          "position": "center",
+          "taille": "32px",
+          "poids": "bold",
+          "effets": ["MAGNETIC_PULL", "NEON_GLOW"],
+          "animation": {
+            "type": "pulse",
+            "delai": 0.5,
+            "duree": 1500,
+            "iteration": 3,
+            "intensite": "forte"
+          }
+        },
+        {
+          "id": "specialite",
+          "type": "texte",
+          "contenu": "Jean Dupont - Électricien Certifié",
+          "position": "left",
+          "taille": "16px",
+          "effets": ["FIRE_WRITE"],
+          "animation": {
+            "type": "ecriture",
+            "delai": 1,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "zone",
+          "type": "information",
+          "contenu": "📍 Intervention: 75km autour de Paris",
+          "position": "left",
+          "taille": "14px",
+          "effets": ["WAVE_DISSOLVE"],
+          "animation": {
+            "type": "fondu",
+            "delai": 2,
+            "duree": 1000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "siret",
+          "type": "legal",
+          "contenu": "SIRET: 123 456 789 00012 | RCS Paris",
+          "position": "bottom",
+          "taille": "11px",
+          "effets": ["FADE_LAYERS"],
+          "animation": {
+            "type": "calme",
+            "delai": 2.5,
+            "duree": 800,
+            "iteration": 1
+          }
+        }
+      ]
+    },
+
+    "2_restauration": {
+      "nom": "🍽️ Restauration",
+      "description": "Chaleureux, centré, avec grande image",
+      "format": "centre_avec_image",
+      "largeur": "700px",
+      "hauteur": "400px",
+      "background": "linear-gradient(135deg, #fff5e6, #ffe6d5)",
+      "couleur_texte": "#4a2c1a",
+      "effet_global": "SOUL_AURA",
+      
+      "elements": [
+        {
+          "id": "logo",
+          "type": "image",
+          "contenu": "🍕",
+          "taille": "80px",
+          "position": "center-top",
+          "effets": ["BREATHING", "SOUL_AURA", "RAINBOW_SHIFT"],
+          "animation": {
+            "type": "respiration",
+            "delai": 0,
+            "duree": 3000,
+            "iteration": "infinite"
+          }
+        },
+        {
+          "id": "nom",
+          "type": "titre",
+          "contenu": "Restaurant La Belle Assiette",
+          "taille": "28px",
+          "poids": "bold",
+          "effets": ["FIRE_WRITE", "SPARKLE_AURA"],
+          "animation": {
+            "type": "ecriture_chaleureuse",
+            "delai": 0.5,
+            "duree": 2500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "cuisine",
+          "type": "sous-titre",
+          "contenu": "Cuisine Italienne Traditionnelle",
+          "taille": "18px",
+          "effets": ["STAR_DUST_FORM", "NEON_GLOW"],
+          "animation": {
+            "type": "poudre_etoilee",
+            "delai": 1.2,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "horaires",
+          "type": "information",
+          "contenu": "⏰ Mardi-Dimanche: 12h-14h / 19h-22h",
+          "taille": "14px",
+          "effets": ["LIQUID_MORPH", "WAVE_SURF"],
+          "animation": {
+            "type": "liquide",
+            "delai": 2,
+            "duree": 3000,
+            "iteration": "infinite",
+            "frequence": 10
+          }
+        },
+        {
+          "id": "adresse",
+          "type": "localisation",
+          "contenu": "📍 15 rue des Gourmets, 75001 Paris",
+          "taille": "14px",
+          "effets": ["FLOAT_DANCE"],
+          "animation": {
+            "type": "flottant",
+            "delai": 2.5,
+            "duree": 2000,
+            "iteration": "infinite",
+            "frequence": 8
+          }
+        },
+        {
+          "id": "qrcode_menu",
+          "type": "qr_code",
+          "contenu": "📱 MENU DIGITAL",
+          "taille": "80px",
+          "position": "bottom-left",
+          "effets": ["HOLOGRAM", "ROTATION_3D"],
+          "animation": {
+            "type": "holographique",
+            "delai": 3,
+            "duree": 4000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "reservation",
+          "type": "bouton",
+          "contenu": "🔗 RÉSERVER UNE TABLE",
+          "lien": "https://reservation.restaurant.fr",
+          "effets": ["HEARTBEAT", "MAGNETIC_PULL"],
+          "animation": {
+            "type": "battement",
+            "delai": 3.5,
+            "duree": 1000,
+            "iteration": "infinite",
+            "frequence": 5
+          }
+        }
+      ]
+    },
+
+    "3_sante_bien_etre": {
+      "nom": "💆 Santé & Bien-être",
+      "description": "Épuré, aéré, rassurant",
+      "format": "epure_centre",
+      "largeur": "550px",
+      "hauteur": "250px",
+      "background": "#f0f7f0",
+      "couleur_texte": "#2c5e2c",
+      "effet_global": "NEURAL_PULSE",
+      
+      "elements": [
+        {
+          "id": "nom_praticien",
+          "type": "titre",
+          "contenu": "Dr. Sophie Martin",
+          "taille": "24px",
+          "poids": "light",
+          "effets": ["BREATHING", "SOUL_AURA"],
+          "animation": {
+            "type": "respiration_douce",
+            "delai": 0,
+            "duree": 2000,
+            "iteration": "infinite"
+          }
+        },
+        {
+          "id": "specialite",
+          "type": "sous-titre",
+          "contenu": "Ostéopathe D.O. - Spécialiste pédiatrique",
+          "taille": "16px",
+          "effets": ["TYPEWRITER"],
+          "animation": {
+            "type": "ecriture_progressive",
+            "delai": 0.8,
+            "duree": 1500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "diplomes",
+          "type": "certifications",
+          "contenu": "🎓 Diplômée de Paris V - D.U. Ostéopathie Périnatale",
+          "taille": "13px",
+          "effets": ["PARTICLE_BUILD"],
+          "animation": {
+            "type": "construction_particules",
+            "delai": 1.3,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "rdv",
+          "type": "call_to_action",
+          "contenu": "🟢 PRISE DE RDV EN LIGNE",
+          "lien": "https://rdv.drsophiemartin.fr",
+          "effets": ["NEON_GLOW", "ENERGY_FLOW"],
+          "animation": {
+            "type": "energie_douce",
+            "delai": 2,
+            "duree": 1500,
+            "iteration": "infinite",
+            "frequence": 8
+          }
+        },
+        {
+          "id": "contact",
+          "type": "informations",
+          "contenu": "📍 Paris 16e (Métro Victor Hugo) | Mutuelle acceptée",
+          "taille": "12px",
+          "effets": ["FADE_LAYERS", "WAVE_DISSOLVE"],
+          "animation": {
+            "type": "apparition_douce",
+            "delai": 2.8,
+            "duree": 1000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "telephone",
+          "type": "contact",
+          "contenu": "📞 01 45 67 89 01",
+          "taille": "14px",
+          "effets": ["NEURAL_PULSE"],
+          "animation": {
+            "type": "pulse_nerveux_doux",
+            "delai": 3.2,
+            "duree": 1200,
+            "iteration": "infinite",
+            "frequence": 6
+          }
+        }
+      ]
+    },
+
+    "4_immobilier": {
+      "nom": "🏠 Immobilier",
+      "description": "Élégant, large, deux colonnes",
+      "format": "deux_colonnes",
+      "largeur": "750px",
+      "hauteur": "300px",
+      "background": "linear-gradient(135deg, #f3e5f5, #e1bee7)",
+      "couleur_texte": "#4a148c",
+      "effet_global": "CRYSTAL_GROW",
+      
+      "elements": [
+        {
+          "id": "agence",
+          "type": "titre_principal",
+          "contenu": "CENTURY 21",
+          "colonne": "gauche",
+          "taille": "32px",
+          "poids": "bold",
+          "effets": ["HOLOGRAM", "PRISM_SPLIT"],
+          "animation": {
+            "type": "prestige",
+            "delai": 0,
+            "duree": 3000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "agent",
+          "type": "sous-titre",
+          "contenu": "Thomas Bernard - Conseiller Expert",
+          "colonne": "gauche",
+          "taille": "18px",
+          "effets": ["CRYSTAL_GROW"],
+          "animation": {
+            "type": "croissance_cristal",
+            "delai": 0.5,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "ventes",
+          "type": "chiffre_cle",
+          "contenu": "🏆 245+ ventes réalisées en 2024",
+          "colonne": "gauche",
+          "taille": "16px",
+          "effets": ["STAR_EXPLOSION", "SPARKLE_AURA"],
+          "animation": {
+            "type": "explosion_etoilee",
+            "delai": 1,
+            "duree": 2500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "zone_couverte",
+          "type": "information",
+          "contenu": "📍 Paris & Périphérie (75, 92, 93, 94)",
+          "colonne": "droite",
+          "taille": "14px",
+          "effets": ["MAGNETIC_FIELD"],
+          "animation": {
+            "type": "champ_magnetique",
+            "delai": 1.5,
+            "duree": 1500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "telephone",
+          "type": "contact_prioritaire",
+          "contenu": "📞 DIRECT: 06 78 90 12 34",
+          "colonne": "droite",
+          "taille": "20px",
+          "poids": "bold",
+          "effets": ["ECHO_MULTIPLE", "ENERGY_IONIZE"],
+          "animation": {
+            "type": "echo_energetique",
+            "delai": 2,
+            "duree": 2000,
+            "iteration": "infinite",
+            "frequence": 6
+          }
+        },
+        {
+          "id": "site_web",
+          "type": "lien",
+          "contenu": "🌐 www.century21-thomasbernard.fr",
+          "colonne": "droite",
+          "taille": "12px",
+          "effets": ["TYPEWRITER"],
+          "animation": {
+            "type": "ecriture",
+            "delai": 2.5,
+            "duree": 2000,
+            "iteration": 1
+          }
+        }
+      ]
+    },
+
+    "5_commerce_retail": {
+      "nom": "🛍️ Commerce & Retail",
+      "description": "Coloré, accrocheur, avec logo mis en avant",
+      "format": "colore_accrocheur",
+      "largeur": "650px",
+      "hauteur": "280px",
+      "background": "linear-gradient(135deg, #fff9c4, #fff176)",
+      "couleur_texte": "#e65100",
+      "effet_global": "SPARKLE_AURA",
+      
+      "elements": [
+        {
+          "id": "promo",
+          "type": "bandeau",
+          "contenu": "✨ 30% SUR TOUTE LA COLLECTION ✨",
+          "taille": "22px",
+          "poids": "bold",
+          "effets": ["STAR_DUST_FORM", "RAINBOW_SHIFT", "NEON_GLOW"],
+          "animation": {
+            "type": "spectaculaire",
+            "delai": 0,
+            "duree": 2000,
+            "iteration": "infinite"
+          }
+        },
+        {
+          "id": "logo",
+          "type": "image",
+          "contenu": "🛍️",
+          "taille": "60px",
+          "effets": ["CRYSTAL_GROW", "SPARKLE_AURA"],
+          "animation": {
+            "type": "croissance_joyeuse",
+            "delai": 0.5,
+            "duree": 2500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "nom_magasin",
+          "type": "titre",
+          "contenu": "Mode & Chic",
+          "taille": "36px",
+          "poids": "bold",
+          "effets": ["CRYSTAL_GROW"],
+          "animation": {
+            "type": "elegance",
+            "delai": 0.8,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "horaires",
+          "type": "information",
+          "contenu": "⏰ Lundi-Samedi: 10h-19h | Dimanche: 10h-13h",
+          "taille": "14px",
+          "effets": ["LIQUID_MORPH"],
+          "animation": {
+            "type": "liquide_dynamique",
+            "delai": 1.5,
+            "duree": 2000,
+            "iteration": "infinite",
+            "frequence": 12
+          }
+        },
+        {
+          "id": "adresse",
+          "type": "localisation",
+          "contenu": "📍 45 rue de la Paix, 75002 Paris",
+          "taille": "13px",
+          "effets": ["WAVE_SURF", "FLOAT_DANCE"],
+          "animation": {
+            "type": "flottant_dynamique",
+            "delai": 2,
+            "duree": 3000,
+            "iteration": "infinite",
+            "frequence": 8
+          }
+        },
+        {
+          "id": "instagram",
+          "type": "social",
+          "contenu": "📸 @modeetchic | Suivez-nous !",
+          "taille": "14px",
+          "effets": ["NEON_GLOW", "ENERGY_FLOW"],
+          "animation": {
+            "type": "energie_joyeuse",
+            "delai": 2.5,
+            "duree": 1500,
+            "iteration": "infinite",
+            "frequence": 5
+          }
+        }
+      ]
+    },
+
+    "6_services_professionnels": {
+      "nom": "⚖️ Services Professionnels",
+      "description": "Sobre, vertical classique, formel",
+      "format": "sobre_vertical",
+      "largeur": "500px",
+      "hauteur": "200px",
+      "background": "#ffffff",
+      "couleur_texte": "#2c3e50",
+      "effet_global": "FADE_LAYERS",
+      
+      "elements": [
+        {
+          "id": "nom_titre",
+          "type": "identite",
+          "contenu": "Maître Claire Dubois\nAvocat au Barreau de Paris",
+          "taille": "18px",
+          "poids": "bold",
+          "effets": ["TYPEWRITER", "TIME_ECHO"],
+          "animation": {
+            "type": "ecriture_formelle",
+            "delai": 0,
+            "duree": 2500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "cabinet",
+          "type": "societe",
+          "contenu": "Cabinet Dubois & Associés",
+          "taille": "16px",
+          "effets": ["FADE_LAYERS"],
+          "animation": {
+            "type": "discret",
+            "delai": 1.2,
+            "duree": 1500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "barreau",
+          "type": "legal",
+          "contenu": "⚖️ Barreau de Paris - N° 45678",
+          "taille": "12px",
+          "effets": ["CRYSTAL_GROW"],
+          "animation": {
+            "type": "tres_discret",
+            "delai": 2,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "email",
+          "type": "contact",
+          "contenu": "📧 c.dubois@cabinet-dubois.fr",
+          "taille": "13px",
+          "effets": ["NEURAL_PULSE"],
+          "animation": {
+            "type": "pulse_leger",
+            "delai": 2.8,
+            "duree": 1500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "telephone",
+          "type": "contact",
+          "contenu": "📞 01 42 61 12 34",
+          "taille": "13px",
+          "effets": ["TIME_ECHO"],
+          "animation": {
+            "type": "echo_temporal",
+            "delai": 3.2,
+            "duree": 1000,
+            "iteration": 1
+          }
+        }
+      ]
+    },
+
+    "7_tech_digital": {
+      "nom": "💻 Tech & Digital",
+      "description": "Minimaliste, sombre, avec QR code",
+      "format": "minimaliste_sombre",
+      "largeur": "600px",
+      "hauteur": "300px",
+      "background": "#1a1a2e",
+      "couleur_texte": "#00ff88",
+      "effet_global": "QUANTUM_PHASE",
+      
+      "elements": [
+        {
+          "id": "nom",
+          "type": "identite",
+          "contenu": "Alex Chen",
+          "taille": "28px",
+          "poids": "bold",
+          "effets": ["GLITCH_SPAWN", "REALITY_GLITCH", "DIMENSION_SHIFT"],
+          "animation": {
+            "type": "glitch_quantique",
+            "delai": 0,
+            "duree": 3000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "titre",
+          "type": "poste",
+          "contenu": "Lead Developer Full-Stack",
+          "taille": "16px",
+          "effets": ["TYPEWRITER", "ENERGY_IONIZE"],
+          "animation": {
+            "type": "ecriture_futuriste",
+            "delai": 1,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "stack",
+          "type": "competences",
+          "contenu": "🛠️ React • Node.js • Python • TypeScript • GraphQL",
+          "taille": "13px",
+          "effets": ["DNA_BUILD", "PARTICLE_BUILD"],
+          "animation": {
+            "type": "construction_adn",
+            "delai": 1.8,
+            "duree": 2500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "social",
+          "type": "reseaux",
+          "contenu": "🐙 github.com/alexchen-dev | 🔗 linkedin.com/in/alexchen",
+          "taille": "12px",
+          "effets": ["NEON_GLOW", "ECHO_TRAIL"],
+          "animation": {
+            "type": "neon_tech",
+            "delai": 2.5,
+            "duree": 2000,
+            "iteration": "infinite",
+            "frequence": 7
+          }
+        },
+        {
+          "id": "qrcode",
+          "type": "qr_code",
+          "contenu": "📱 PORTFOLIO",
+          "taille": "80px",
+          "effets": ["HOLOGRAM", "ROTATION_3D", "QUANTUM_SPLIT"],
+          "animation": {
+            "type": "hologramme_quantique",
+            "delai": 3,
+            "duree": 5000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "email",
+          "type": "contact",
+          "contenu": "📧 alex.chen@tech-studio.io",
+          "taille": "13px",
+          "effets": ["WAVE_DISTORTION"],
+          "animation": {
+            "type": "onde_tech",
+            "delai": 3.5,
+            "duree": 1500,
+            "iteration": 1
+          }
+        }
+      ]
+    },
+
+    "8_education_formation": {
+      "nom": "🎓 Éducation & Formation",
+      "description": "Clair, structuré, bienveillant",
+      "format": "clair_structure",
+      "largeur": "580px",
+      "hauteur": "260px",
+      "background": "#e3f2fd",
+      "couleur_texte": "#1565c0",
+      "effet_global": "DNA_BUILD",
+      
+      "elements": [
+        {
+          "id": "nom",
+          "type": "identite",
+          "contenu": "Isabelle Lambert",
+          "taille": "24px",
+          "poids": "bold",
+          "effets": ["BREATHING", "SOUL_AURA"],
+          "animation": {
+            "type": "respiration_pedagogique",
+            "delai": 0,
+            "duree": 2000,
+            "iteration": "infinite"
+          }
+        },
+        {
+          "id": "matiere",
+          "type": "specialite",
+          "contenu": "Professeur de Mathématiques",
+          "taille": "18px",
+          "effets": ["TYPEWRITER", "PARTICLE_BUILD"],
+          "animation": {
+            "type": "ecriture_progressive",
+            "delai": 0.8,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "niveau",
+          "type": "public",
+          "contenu": "📚 Collège (6ème→3ème) & Lycée (Seconde→Terminale)",
+          "taille": "14px",
+          "effets": ["DNA_BUILD"],
+          "animation": {
+            "type": "construction_structurée",
+            "delai": 1.5,
+            "duree": 2500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "telephone",
+          "type": "contact",
+          "contenu": "📞 06 45 67 89 01",
+          "taille": "16px",
+          "effets": ["HEARTBEAT", "ENERGY_FLOW"],
+          "animation": {
+            "type": "battement_pedagogique",
+            "delai": 2.2,
+            "duree": 1500,
+            "iteration": "infinite",
+            "frequence": 6
+          }
+        },
+        {
+          "id": "certification",
+          "type": "diplome",
+          "contenu": "🎓 Certifiée Education Nationale | Agrégation de Mathématiques",
+          "taille": "12px",
+          "effets": ["CRYSTAL_GROW"],
+          "animation": {
+            "type": "croissance_savoir",
+            "delai": 3,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "email",
+          "type": "contact",
+          "contenu": "📧 i.lambert@education.fr",
+          "taille": "12px",
+          "effets": ["FADE_LAYERS"],
+          "animation": {
+            "type": "discret_professionnel",
+            "delai": 3.5,
+            "duree": 1000,
+            "iteration": 1
+          }
+        }
+      ]
+    },
+
+    "9_loisirs_tourisme": {
+      "nom": "🏨 Loisirs & Tourisme",
+      "description": "Grand, immersif, pleine largeur",
+      "format": "pleine_largeur",
+      "largeur": "800px",
+      "hauteur": "400px",
+      "background": "linear-gradient(135deg, #e0f7fa, #b2ebf2)",
+      "couleur_texte": "#006064",
+      "effet_global": "STELLAR_DRIFT",
+      
+      "elements": [
+        {
+          "id": "image_fond",
+          "type": "background",
+          "contenu": "🌊🏖️⛱️",
+          "taille": "cover",
+          "effets": ["STELLAR_DRIFT", "FLOAT_DANCE"],
+          "animation": {
+            "type": "immersif",
+            "delai": 0,
+            "duree": 10000,
+            "iteration": "infinite"
+          }
+        },
+        {
+          "id": "hotel",
+          "type": "titre_principal",
+          "contenu": "Hôtel Belle Vue ****",
+          "taille": "36px",
+          "poids": "bold",
+          "effets": ["CRYSTAL_GROW", "HOLOGRAM", "STELLAR_DRIFT"],
+          "animation": {
+            "type": "prestige_voyage",
+            "delai": 0.5,
+            "duree": 3000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "note",
+          "type": "avis",
+          "contenu": "⭐ 4,8/5 - 1250 avis Google ⭐",
+          "taille": "18px",
+          "effets": ["STAR_EXPLOSION", "SPARKLE_AURA"],
+          "animation": {
+            "type": "etoiles_voyage",
+            "delai": 1,
+            "duree": 2000,
+            "iteration": "infinite",
+            "frequence": 10
+          }
+        },
+        {
+          "id": "lieu",
+          "type": "localisation",
+          "contenu": "📍 Plage de Pampelonne - Saint-Tropez",
+          "taille": "16px",
+          "effets": ["WAVE_SURF", "FLOAT_DANCE"],
+          "animation": {
+            "type": "vague_marine",
+            "delai": 1.5,
+            "duree": 2500,
+            "iteration": "infinite",
+            "frequence": 8
+          }
+        },
+        {
+          "id": "instagram",
+          "type": "social",
+          "contenu": "📸 @hotelbellevue #BellevueExperience",
+          "taille": "14px",
+          "effets": ["NEON_GLOW", "RAINBOW_SHIFT"],
+          "animation": {
+            "type": "couleurs_voyage",
+            "delai": 2,
+            "duree": 2000,
+            "iteration": "infinite",
+            "frequence": 6
+          }
+        },
+        {
+          "id": "reservation",
+          "type": "bouton",
+          "contenu": "🌴 RÉSERVER MAINTENANT 🌴",
+          "lien": "https://hotelbellevue.com/reservation",
+          "effets": ["HEARTBEAT", "MAGNETIC_PULL", "ENERGY_FLOW"],
+          "animation": {
+            "type": "excitation_voyage",
+            "delai": 2.5,
+            "duree": 1500,
+            "iteration": "infinite",
+            "frequence": 5
+          }
+        },
+        {
+          "id": "ambiance",
+          "type": "description",
+          "contenu": "Piscine à débordement • Spa • Vue mer • Restaurant gastronomique",
+          "taille": "12px",
+          "effets": ["PARTICLE_BUILD"],
+          "animation": {
+            "type": "construction_ambiance",
+            "delai": 3,
+            "duree": 2500,
+            "iteration": 1
+          }
+        }
+      ]
+    },
+
+    "10_transport_logistique": {
+      "nom": "🚚 Transport & Logistique",
+      "description": "Fonctionnel, direct, lisible",
+      "format": "fonctionnel_direct",
+      "largeur": "650px",
+      "hauteur": "220px",
+      "background": "#fff3e0",
+      "couleur_texte": "#e65100",
+      "effet_global": "TORNADO_SPIN",
+      
+      "elements": [
+        {
+          "id": "icone_anim",
+          "type": "icone",
+          "contenu": "🚛",
+          "taille": "48px",
+          "effets": ["GYROSCOPE_SPIN", "TORNADO_TWIST"],
+          "animation": {
+            "type": "rotation_dynamique",
+            "delai": 0,
+            "duree": 2000,
+            "iteration": "infinite"
+          }
+        },
+        {
+          "id": "nom_societe",
+          "type": "titre",
+          "contenu": "EXPRESS LOGISTIQUE",
+          "taille": "24px",
+          "poids": "bold",
+          "effets": ["TYPEWRITER", "ENERGY_IONIZE"],
+          "animation": {
+            "type": "ecriture_rapide",
+            "delai": 0.5,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "zone",
+          "type": "couverture",
+          "contenu": "📦 Zone de livraison: Île-de-France + 95 (Val-d'Oise)",
+          "taille": "14px",
+          "effets": ["WAVE_SURF"],
+          "animation": {
+            "type": "vague_couverture",
+            "delai": 1.2,
+            "duree": 1500,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "telephone",
+          "type": "contact_urgence",
+          "contenu": "📞 DEVIS RAPIDE: 01 55 66 77 88",
+          "taille": "22px",
+          "poids": "bold",
+          "effets": ["TORNADO_ABSORB", "ELECTRIC_FORM", "PULSE"],
+          "animation": {
+            "type": "urgence_dynamique",
+            "delai": 2,
+            "duree": 2500,
+            "iteration": "infinite",
+            "frequence": 4
+          }
+        },
+        {
+          "id": "vehicules",
+          "type": "materiel",
+          "contenu": "🚚 Flotte: Fourgons 20m³ • Camions frigo • Livraison express",
+          "taille": "13px",
+          "effets": ["PARTICLE_BUILD"],
+          "animation": {
+            "type": "construction_flotte",
+            "delai": 2.5,
+            "duree": 2000,
+            "iteration": 1
+          }
+        },
+        {
+          "id": "disponibilite",
+          "type": "horaire",
+          "contenu": "⏰ Disponible 24h/24 - 7j/7 (y compris jours fériés)",
+          "taille": "12px",
+          "effets": ["NEON_GLOW"],
+          "animation": {
+            "type": "disponibilite_clignotante",
+            "delai": 3,
+            "duree": 1500,
+            "iteration": "infinite",
+            "frequence": 3
+          }
+        }
+      ]
+    }
+  },
+
+  "parametres_globaux": {
+    "compatibilite_email": {
+      "inline_css": true,
+      "fallback_images": true,
+      "taille_maximale": "100KB",
+      "animation_fallback": "FADE_LAYERS"
+    },
+    "performance": {
+      "fps_max": 30,
+      "optimiser_mobile": true,
+      "reduire_mouvement": true
+    },
+    "preferences_animation": {
+      "boucle_infinie_autorisee": true,
+      "duree_max_animation": 10000,
+      "priorite_effets": ["douceur", "fluidite", "non_agressif"]
+    }
+  }
+}
+```
+
+## 🎯 Ce JSON est **prêt à l'emploi** dans votre logiciel car :
+
+1. **Chaque secteur** a son propre `format`, `background`, `couleur_texte`
+2. **Tous les effets** sont pris **directement de votre bibliothèque** (55 effets)
+3. **Chaque élément** a son propre cycle d'animation (`delai`, `duree`, `iteration`, `frequence`)
+4. **Les combinaisons** sont optimisées par secteur (2 à 4 effets par élément)
+5. **Format responsive** et prêt pour l'intégration email
+
+## 📦 Prochaines étapes pour vous :
+
+1. **Intégrez ce JSON** dans votre moteur de génération
+2. **Mapper chaque effet** à son implémentation CSS/WebGL
+3. **Générez** les signatures automatiquement
+4. **Testez** le rendu dans différents clients email
+
+Voulez-vous que je vous aide à écrire le **moteur d'interprétation** de ce JSON ?
