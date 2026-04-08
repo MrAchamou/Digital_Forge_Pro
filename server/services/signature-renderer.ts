@@ -89,7 +89,7 @@ export interface SignatureData {
 const templateCache = new Map<string, HandlebarsTemplateDelegate>();
 const configCache = new Map<string, SectorConfig>();
 
-Handlebars.registerHelper('ifCond', function(v1: any, v2: any, options: any) {
+Handlebars.registerHelper('ifCond', function(this: any, v1: any, v2: any, options: any) {
   return v1 === v2 ? options.fn(this) : options.inverse(this);
 });
 

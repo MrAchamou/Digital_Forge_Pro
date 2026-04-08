@@ -608,6 +608,28 @@ export function enforceAccessibility(palette: SignaturePalette): SignaturePalett
   };
 }
 
+/**
+ * Enrichit les couleurs de zone SVG à partir de deux couleurs de base.
+ * c1 = couleur primaire, c0 = couleur secondaire/fond, variationIndex = 0-3
+ */
+export function enrichZoneColors(
+  c1: string,
+  c0: string,
+  variationIndex = 0
+): { primary: string; secondary: string; accent: string; muted: string; text: string } {
+  const base = isValidHex(c1) ? c1 : '#6366f1';
+  const bg   = isValidHex(c0) ? c0 : '#0f172a';
+
+  const shifts = [0, 30, 60, 120];
+  const hsl    = hexToHSL(base);
+  const shifted = hslToHex({ ...hsl, h: (hsl.h + shifts[variationIndex % shifts.length]) % 360 });
+  const light   = hslToHex({ ...hexToHSL(base), l: Math.min(hexToHSL(base).l + 25, 90) });
+  const muted   = hslToHex({ ...hexToHSL(base), l: Math.max(hexToHSL(base).l - 15, 10), s: hexToHSL(base).s * 0.6 });
+  const text    = contrastRatio(bg, '#ffffff') >= 4.5 ? '#ffffff' : '#111111';
+
+  return { primary: base, secondary: shifted, accent: light, muted, text };
+}
+
 console.log(
   `🎨 ColorHarmonyEngine v${ENGINE_VERSION} chargé — 7 harmonies | SectorAdapter | WCAG AA/AAA | GradientEngine | CSS Injection`
 );

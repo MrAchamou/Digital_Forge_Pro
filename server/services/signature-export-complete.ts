@@ -271,33 +271,27 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
   // Encoder les frames en GIF animé via gif-encoder-2
   try {
     const GifEncoder = (await import('gif-encoder-2')).default;
-    const encoder = new GifEncoder(600, 180);
-    const chunks: Buffer[] = [];
-    encoder.on('data', (chunk: Buffer) => chunks.push(chunk));
+    const encoder = new GifEncoder(600, 180, 'neuquant', true, frames.length);
 
-    encoder.setRepeat(0);    // boucle infinie
+    encoder.setRepeat(0);      // boucle infinie
     encoder.setDelay(DELAY * 10); // delay en ms
-    encoder.setQuality(12);  // qualité (1=best, 20=fast)
+    encoder.setQuality(12);    // qualité (1=best, 20=fast)
     encoder.start();
 
     for (const framePng of frames) {
-      // Sharp → raw RGBA (600*180*4)
+      // Sharp → raw RGBA (600×180×4 bytes)
       const raw = await sharp(framePng)
         .resize(600, 180)
+        .ensureAlpha()
         .raw()
         .toBuffer();
       encoder.addFrame(raw);
     }
 
     encoder.finish();
+    const gifBuffer = encoder.out.getData();
 
-    await new Promise<void>((resolve) => {
-      encoder.once('end', () => resolve());
-      setTimeout(resolve, 3000); // safety timeout
-    });
-
-    const gifBuffer = Buffer.concat(chunks);
-    if (gifBuffer.length < 100) throw new Error('GIF vide');
+    if (!gifBuffer || gifBuffer.length < 100) throw new Error('GIF vide');
     log(`GIF animé généré: ${Math.round(gifBuffer.length / 1024)}KB, ${frames.length} frames`, 'export-complete');
     return gifBuffer;
   } catch (err: any) {
