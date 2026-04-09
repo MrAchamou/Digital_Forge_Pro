@@ -59,8 +59,8 @@ export interface OrchestratedSignature {
 // ─── AnimationMerger ─────────────────────────────────────────────────────────
 
 type AnimEntry = {
-  name: string; dur: string; timing: string;
-  delay: string; iter: string; fill: string;
+  name: string;
+  raw: string;
 };
 
 /**
