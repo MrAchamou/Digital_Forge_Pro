@@ -33,11 +33,13 @@ export class SignatureVariationsGenerator {
     style: StyleData,
     palette: string[],
     zoneCompositions?: { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition },
-    logoUrl?: string
+    logoUrl?: string,
+    userSeed?: string
   ): VariationsResult {
     // ── Chorégraphe : toujours actif — construit les couches riches par zone ──
+    // userSeed : empreinte déterministe de l'utilisateur pour des animations uniques
     const choreo = buildChoreographedCompositions(
-      { intensite: style.intensite, secteur: style.secteur },
+      { intensite: style.intensite, secteur: style.secteur, userSeed },
       palette
     );
 

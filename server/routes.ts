@@ -311,7 +311,7 @@ router.post('/signature/render', (req, res) => {
     if (!sectorId) return res.status(400).json({ error: 'sectorId requis' });
     if (!data)     return res.status(400).json({ error: 'data requis' });
 
-    const result = renderSignatureWithModules(sectorId, data, { tier: 'standard' });
+    const result = renderSignatureWithModules(sectorId, data, { tier: 'ultra' });
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(result.html);
   } catch (err: any) {
@@ -2170,8 +2170,10 @@ router.get('/test/choreo', async (req, res) => {
 
     const styleData = { palette, ambiance: 'moderne premium', intensite, secteur };
 
+    // Seed utilisateur : empreinte déterministe pour animations uniques par personne
+    const userSeed = [signatureData.nom, signatureData.titre, signatureData.entreprise].join('|');
     const baseResult       = signatureBaseGenerator.generate(signatureData, styleData);
-    const variationsResult = signatureVariationsGenerator.generate(styleData, baseResult.palette);
+    const variationsResult = signatureVariationsGenerator.generate(styleData, baseResult.palette, undefined, signatureData.logo_url, userSeed);
     const exportResult     = signatureSVGExporter.export(signatureData.nom, baseResult, variationsResult);
 
     const svgEncoded = encodeURIComponent(exportResult.svgContent);

@@ -128,16 +128,16 @@ const VARIANT_PROFILES: Record<VariantId, VariantProfile> = {
   B: {
     id: 'B',
     name: 'Intense',
-    description: 'Palette saturée, timing rapide (× φ⁻¹), effets amplifiés',
+    description: 'Palette saturée, timing rapide (× φ⁻¹), effets amplifiés au maximum',
     personality: 'Dynamique · Énergique · Impact fort',
     palette: {
-      bg_hue_shift: 5, bg_sat_mult: 1.25, bg_light_offset: -5,
-      accent_hue_shift: 15, accent_sat_mult: 1.4, accent_light_offset: 5,
-      text_light_offset: 8,
+      bg_hue_shift: 5, bg_sat_mult: 1.35, bg_light_offset: -6,
+      accent_hue_shift: 18, accent_sat_mult: 1.55, accent_light_offset: 8,
+      text_light_offset: 10,
     },
-    timing: { delay_mult: PHI_INV, duration_mult: 0.75, staccato: false, staccato_step: 0.3, jitter: 0.04 },
-    intensity: { scale_factor: 1.12, filter_boost: 1.35, shadow_alpha: 0.85, glow_radius: 14 },
-    fitness: 0.91,
+    timing: { delay_mult: PHI_INV, duration_mult: 0.68, staccato: false, staccato_step: 0.3, jitter: 0.05 },
+    intensity: { scale_factor: 1.18, filter_boost: 1.55, shadow_alpha: 1.0, glow_radius: 18 },
+    fitness: 0.95,
   },
 
   C: {
@@ -158,16 +158,16 @@ const VARIANT_PROFILES: Record<VariantId, VariantProfile> = {
   D: {
     id: 'D',
     name: 'Contrasté',
-    description: 'Accent complémentaire (hue +180°), timing en staccato régulier',
+    description: 'Accent complémentaire (hue +180°), staccato intense, effets maximaux',
     personality: 'Audacieux · Inattendu · Mémorable',
     palette: {
-      bg_hue_shift: 10, bg_sat_mult: 1.1, bg_light_offset: -8,
-      accent_hue_shift: 180, accent_sat_mult: 1.2, accent_light_offset: 0,
-      text_light_offset: 5,
+      bg_hue_shift: 12, bg_sat_mult: 1.22, bg_light_offset: -10,
+      accent_hue_shift: 180, accent_sat_mult: 1.45, accent_light_offset: 5,
+      text_light_offset: 8,
     },
-    timing: { delay_mult: 1, duration_mult: 0.9, staccato: true, staccato_step: 0.25, jitter: 0.02 },
-    intensity: { scale_factor: 1.05, filter_boost: 1.15, shadow_alpha: 0.75, glow_radius: 10 },
-    fitness: 0.88,
+    timing: { delay_mult: 1, duration_mult: 0.85, staccato: true, staccato_step: 0.22, jitter: 0.03 },
+    intensity: { scale_factor: 1.14, filter_boost: 1.30, shadow_alpha: 0.95, glow_radius: 15 },
+    fitness: 0.94,
   },
 };
 
@@ -466,8 +466,8 @@ export function generateVariants(sectorId: string, data: SignatureData): Variant
 
     const cssOverrides = buildVariantCssBlock(config, profile, timings);
 
-    // Rendu enrichi avec tous les modules (Lighting + Morphing + Physics + Particles + Timing)
-    const orchestrated = renderSignatureWithModules(sectorId, data, { tier: 'standard' });
+    // Rendu enrichi avec TOUS les modules à pleine puissance — tier ultra
+    const orchestrated = renderSignatureWithModules(sectorId, data, { tier: 'ultra' });
     const finalHtml = injectStyleIntoHtml(orchestrated.html, cssOverrides, vid);
 
     const mutations = describeMutations(profile);
@@ -509,7 +509,7 @@ export function generateSingleVariant(sectorId: string, data: SignatureData, var
 
   const t0 = Date.now();
   const cssOverrides = buildVariantCssBlock(config, profile, timings);
-  const orchestrated = renderSignatureWithModules(sectorId, data, { tier: 'standard' });
+  const orchestrated = renderSignatureWithModules(sectorId, data, { tier: 'ultra' });
   const finalHtml    = injectStyleIntoHtml(orchestrated.html, cssOverrides, variantId);
 
   return {

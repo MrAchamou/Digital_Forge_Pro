@@ -262,34 +262,88 @@ const ZONE_PRIMARY: Record<VariationKey, {
 // Construit les 4 ZoneCompositions chorégraphiées (A, B, C, D) avec couches riches.
 // Chaque zone reçoit un tableau `layers` ordonné du fond vers le premier plan.
 
+// ─── Seed déterministe par utilisateur ─────────────────────────────────────────
+// Produit une empreinte d'animation unique pour chaque utilisateur (même secteur,
+// animations légèrement différentes). Hash Jenkins one-at-a-time.
+
+function hashUserSeed(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash += str.charCodeAt(i);
+    hash += hash << 10;
+    hash ^= hash >> 6;
+    hash |= 0;
+  }
+  hash += hash << 3;
+  hash ^= hash >> 11;
+  hash += hash << 15;
+  return Math.abs(hash);
+}
+
+// Extrait un facteur normalisé [0,1] à partir d'un hash et d'un décalage de bits
+function seedFactor(hash: number, shift: number, range: number): number {
+  return ((hash >> shift) & 0xff) / 255 * range;
+}
+
 export function buildChoreographedCompositions(
-  style: { intensite?: string; secteur?: string },
+  style: { intensite?: string; secteur?: string; userSeed?: string },
   palette: string[]
 ): { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition } {
 
   const group      = sectorGroup(style.secteur || '');
   const intensite  = style.intensite || 'medium';
-  const iScale     = intensite === 'high' ? 1.00 : intensite === 'low' ? 0.55 : 0.78;
+
+  // iScale relevé : medium passe de 0.78 → 0.92 pour montrer la vraie puissance des effets
+  const iScale     = intensite === 'high' ? 1.00 : intensite === 'low' ? 0.72 : 0.92;
   const c1         = palette[1] ?? '#6366f1';
+
+  // Hash déterministe unique par utilisateur (0 si pas de seed → comportement standard)
+  const hash = style.userSeed ? hashUserSeed(style.userSeed) : 0;
+
+  // Perturbation d'intensité par variation — chaque variation utilise des bits différents
+  // Range ±0.12 centré sur 0 → chaque utilisateur a son empreinte d'animation unique
+  const varPerturbation: Record<VariationKey, number> = {
+    A: hash > 0 ? (seedFactor(hash,  0, 0.24) - 0.12) : 0,
+    B: hash > 0 ? (seedFactor(hash,  8, 0.20) - 0.10) : 0,
+    C: hash > 0 ? (seedFactor(hash, 16, 0.22) - 0.11) : 0,
+    D: hash > 0 ? (seedFactor(hash, 24, 0.18) - 0.09) : 0,
+  };
+
+  // Micro-variation de vitesse par utilisateur pour les variations B et D
+  const speedVariant = (varKey: VariationKey, base: 'slow' | 'medium'): 'slow' | 'medium' | 'fast' => {
+    if (hash === 0) return base;
+    if (varKey === 'B' || varKey === 'D') {
+      const bit = (hash >> (varKey === 'B' ? 4 : 12)) & 0x3;
+      if (bit === 3) return 'fast';
+    }
+    return base;
+  };
 
   const buildComposition = (varKey: VariationKey): ZoneComposition => {
 
-    const primary = ZONE_PRIMARY[varKey];
+    const primary     = ZONE_PRIMARY[varKey];
     const baseSpeed: 'slow' | 'medium' = (varKey === 'A' || varKey === 'C') ? 'slow' : 'medium';
+    const effectiveSpeed = speedVariant(varKey, baseSpeed);
+    const perturbation   = varPerturbation[varKey];
 
-    // Applique la couleur palette et le scale d'intensité à un tableau de couches
+    // Applique la couleur palette, le scale d'intensité et la perturbation unique par utilisateur
     const scaleLayers = (layers: LayerDecision[]): LayerDecision[] =>
-      layers.map(l => ({ ...l, color: l.color || c1, intensity: Math.min(1, l.intensity * iScale) }));
+      layers.map(l => ({
+        ...l,
+        color:     l.color || c1,
+        intensity: Math.min(1, Math.max(0.15, l.intensity * iScale + perturbation)),
+      }));
 
     // Construit une décision de zone avec couches (layers) et effet primaire
+    // intensityBase relevé de 0.80 → 0.92 pour un rendu plus affirmé
     const makeDecision = (
       effet_id: string,
       layers: LayerDecision[],
       intensityMult = 1.0
     ): ZoneEffectDecision => ({
       effet_id,
-      intensity: Math.min(1, 0.80 * iScale * intensityMult),
-      speed: baseSpeed,
+      intensity: Math.min(1, Math.max(0.15, (0.92 + perturbation) * iScale * intensityMult)),
+      speed: effectiveSpeed as any,
       color: c1,
       layers: scaleLayers(layers),
     });
@@ -298,20 +352,24 @@ export function buildChoreographedCompositions(
     const sectorLayer = LOGO_SECTOR_LAYER[group];
     const logoLayers: LayerDecision[] = [
       ...scaleLayers(LOGO_LAYERS[varKey]),
-      { ...sectorLayer, color: sectorLayer.color || c1, intensity: Math.min(1, sectorLayer.intensity * iScale) },
+      {
+        ...sectorLayer,
+        color:     sectorLayer.color || c1,
+        intensity: Math.min(1, Math.max(0.15, sectorLayer.intensity * iScale + perturbation)),
+      },
     ];
 
     return {
       logo:        { ...makeDecision(primary.logo,       logoLayers),       },
       nom:          makeDecision(primary.nom,        scaleLayers(NOM_LAYERS[varKey])),
-      titre:        makeDecision(primary.titre,      scaleLayers(TITRE_LAYERS[varKey]),  0.70),
-      contact:      makeDecision(primary.contact,    scaleLayers(CONTACT_LAYERS[varKey]), 0.80),
+      titre:        makeDecision(primary.titre,      scaleLayers(TITRE_LAYERS[varKey]),  0.88),
+      contact:      makeDecision(primary.contact,    scaleLayers(CONTACT_LAYERS[varKey]), 0.85),
       separateur:   makeDecision(primary.separateur, scaleLayers(SEP_LAYERS[varKey])),
-      fond:         makeDecision(primary.fond,       scaleLayers(FOND_LAYERS[varKey]),   0.50),
+      fond:         makeDecision(primary.fond,       scaleLayers(FOND_LAYERS[varKey]),   0.62),
       cta:          makeDecision(primary.cta,        scaleLayers(CTA_LAYERS[varKey])),
       compatibilityScore: 95,
       wcagCompliant:     true,
-      performanceTier:   varKey === 'D' ? 'ultra' : varKey === 'B' ? 'standard' : 'lite',
+      performanceTier:   varKey === 'D' ? 'ultra' : varKey === 'B' ? 'ultra' : 'standard',
     };
   };
 

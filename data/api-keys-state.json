@@ -1,10 +1,10 @@
 {
-  "lastSaved": "2026-04-09T08:16:28.195Z",
+  "lastSaved": "2026-04-09T08:25:53.670Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-09T08:14:14.779Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 1,
       "errorCount": 10,
       "successCount": 0,
@@ -13,12 +13,12 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-09T08:13:14.684Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "gemini_2": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-09T08:14:14.995Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 1,
       "errorCount": 11,
       "successCount": 0,
@@ -27,12 +27,12 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-09T08:13:14.900Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "gemini_3": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-09T08:14:14.899Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 1,
       "errorCount": 10,
       "successCount": 0,
@@ -41,12 +41,12 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-09T08:13:14.780Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "gemini_4": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-09T08:14:15.187Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 1,
       "errorCount": 10,
       "successCount": 0,
@@ -55,12 +55,12 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-09T08:13:14.996Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "gemini_5": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-09T08:14:14.681Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 1,
       "errorCount": 9,
       "successCount": 0,
@@ -69,7 +69,7 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-09T08:13:14.336Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "cerebras_1": {
       "usageToday": 0,
