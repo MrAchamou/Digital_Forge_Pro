@@ -21,7 +21,8 @@
  * @server-side      true   — Node.js uniquement (CSS pur généré)
  */
 
-import { renderSignature, getSectorConfig, SectorConfig, SignatureData } from '../services/signature-renderer.js';
+import { getSectorConfig, SectorConfig, SignatureData } from '../services/signature-renderer.js';
+import { renderSignatureWithModules } from '../services/signature-module-orchestrator.js';
 
 // ─── Constantes mathématiques ────────────────────────────────────────────────
 
@@ -465,8 +466,9 @@ export function generateVariants(sectorId: string, data: SignatureData): Variant
 
     const cssOverrides = buildVariantCssBlock(config, profile, timings);
 
-    const baseHtml  = renderSignature(sectorId, data);
-    const finalHtml = injectStyleIntoHtml(baseHtml, cssOverrides, vid);
+    // Rendu enrichi avec tous les modules (Lighting + Morphing + Physics + Particles + Timing)
+    const orchestrated = renderSignatureWithModules(sectorId, data, { tier: 'standard' });
+    const finalHtml = injectStyleIntoHtml(orchestrated.html, cssOverrides, vid);
 
     const mutations = describeMutations(profile);
 
@@ -507,8 +509,8 @@ export function generateSingleVariant(sectorId: string, data: SignatureData, var
 
   const t0 = Date.now();
   const cssOverrides = buildVariantCssBlock(config, profile, timings);
-  const baseHtml     = renderSignature(sectorId, data);
-  const finalHtml    = injectStyleIntoHtml(baseHtml, cssOverrides, variantId);
+  const orchestrated = renderSignatureWithModules(sectorId, data, { tier: 'standard' });
+  const finalHtml    = injectStyleIntoHtml(orchestrated.html, cssOverrides, variantId);
 
   return {
     id:           variantId,

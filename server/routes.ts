@@ -5,6 +5,7 @@ import path from 'path';
 import { storage } from './storage';
 import { buildEffectPreviewHTML, saveEffectPreview, getEffectPreviewHTML } from './services/effect-preview-generator';
 import { getAllSectorConfigs, getSectorConfig, renderSignature } from './services/signature-renderer';
+import { renderSignatureWithModules } from './services/signature-module-orchestrator';
 import { generateVariants, generateSingleVariant, getVariantProfiles, ENGINE_VERSION as VARIANCE_VERSION, VariantId } from './modules/variance-engine.module';
 import {
   getTimingProfile,
@@ -310,9 +311,9 @@ router.post('/signature/render', (req, res) => {
     if (!sectorId) return res.status(400).json({ error: 'sectorId requis' });
     if (!data)     return res.status(400).json({ error: 'data requis' });
 
-    const html = renderSignature(sectorId, data);
+    const result = renderSignatureWithModules(sectorId, data, { tier: 'standard' });
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.send(html);
+    res.send(result.html);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -883,10 +884,10 @@ router.get('/signature/preview-sector/:sectorId', (req, res) => {
       linkedin: 'https://linkedin.com/in/jeandupont',
     };
 
-    const html = renderSignature(sectorId, demoData);
+    const result = renderSignatureWithModules(sectorId, demoData, { tier: 'ultra' });
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
-    res.send(html);
+    res.send(result.html);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -968,10 +969,9 @@ router.post('/signature/full-export', async (req, res) => {
     if (!sectorId) return res.status(400).json({ error: 'sectorId requis' });
     if (!data)     return res.status(400).json({ error: 'data requis' });
 
-    const { renderSignature } = await import('./services/signature-renderer');
     const { generateCompleteExport } = await import('./services/signature-export-complete');
 
-    const signatureHtml = renderSignature(sectorId, data);
+    const signatureHtml = renderSignatureWithModules(sectorId, data, { tier: 'ultra' }).html;
 
     const meta = {
       nom:         data.nom         || '',
@@ -1030,7 +1030,7 @@ router.post('/signature/full-export-gmb', async (req, res) => {
 
     const { scrapeGMB } = await import('./services/gmb-scraper');
     const { classifySector } = await import('./services/sector-classifier');
-    const { getSectorConfig, renderSignature } = await import('./services/signature-renderer');
+    const { getSectorConfig } = await import('./services/signature-renderer');
     const { generateCompleteExport } = await import('./services/signature-export-complete');
 
     // 1. Scrape GMB
@@ -1061,8 +1061,8 @@ router.post('/signature/full-export-gmb', async (req, res) => {
       ...extra_data,
     };
 
-    // 4. Rendu HTML signature
-    const signatureHtml = renderSignature(sectorId, sigData);
+    // 4. Rendu HTML signature enrichi avec tous les modules
+    const signatureHtml = renderSignatureWithModules(sectorId, sigData, { tier: 'ultra' }).html;
 
     const meta = {
       nom:         sigData.nom,
