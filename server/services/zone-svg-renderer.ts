@@ -95,18 +95,41 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
     }
 
     case 'LOGO_VOLUME_BREATHE': {
-      const dur = d_fn(6, sp);
-      const sx  = 1 + 0.06 * i;
-      const sy  = 1 + 0.04 * i;
-      const animStyle = `animation:${pfx}-breathe-img ${dur} cubic-bezier(.4,0,.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center;`;
+      // Inspiré de BREATHING.js (695 lignes) : rythme vital, souffle organique, 3 halos en cascade
+      const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
+      const R = Math.max(LOGO_W, LOGO_H) / 2;
+      const breathDur = parseFloat(d_fn(6, sp));
+      // 3 halos respiratoires à phases décalées (souffle + inspiration + expiration)
+      const halos = [
+        { r: R + 5,  opPeak: i * 0.55, opBase: i * 0.15, scaleMax: 1 + 0.07*i, phaseD: 0 },
+        { r: R + 12, opPeak: i * 0.30, opBase: i * 0.08, scaleMax: 1 + 0.05*i, phaseD: breathDur / 3.5 },
+        { r: R + 20, opPeak: i * 0.14, opBase: i * 0.03, scaleMax: 1 + 0.03*i, phaseD: breathDur / 1.8 },
+      ];
+      const breathFilter = `<filter id="${pfx}-breathe-glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="${(2.5*i).toFixed(1)}" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>`;
+      const haloEls = halos.map((h, k) =>
+        `<circle cx="${CX}" cy="${CY}" r="${h.r.toFixed(1)}" fill="${col}" fill-opacity="${h.opBase.toFixed(3)}"
+          filter="url(#${pfx}-breathe-glow)"
+          style="animation:${pfx}-haloB${k} ${breathDur.toFixed(1)}s cubic-bezier(0.4,0,0.2,1) ${(delay + h.phaseD).toFixed(2)}s infinite; transform-origin:${CX}px ${CY}px; transform-box:fill-box;"/>`
+      ).join('\n');
+      const haloKFs = halos.map((h, k) => `@keyframes ${pfx}-haloB${k} {
+        0%,100% { transform: scale(1); opacity: ${h.opBase.toFixed(3)}; }
+        40%      { transform: scale(${h.scaleMax.toFixed(3)}); opacity: ${h.opPeak.toFixed(3)}; }
+        65%      { transform: scale(${(1 + (h.scaleMax - 1)*0.4).toFixed(3)}); opacity: ${(h.opPeak * 0.6).toFixed(3)}; }
+      }`).join('\n');
+      // Logo principal avec souffle asymétrique (sx ≠ sy comme une vraie respiration)
+      const sx = (1 + 0.05*i).toFixed(3), sy = (1 + 0.032*i).toFixed(3);
+      const imgStyle = `animation:${pfx}-breathe-img ${breathDur.toFixed(1)}s cubic-bezier(0.4,0,0.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center;`;
       return {
-        filterDefs: `<filter id="${pfx}-glow"><feGaussianBlur stdDeviation="${2*i}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
+        filterDefs: breathFilter,
         keyframes: `@keyframes ${pfx}-breathe-img {
           0%,100% { transform: scale(1,1); }
-          50%      { transform: scale(${sx.toFixed(3)},${sy.toFixed(3)}); }
-        }`,
-        elements: `${animLogoEl(animStyle, `${pfx}-glow`)}
-        <circle id="${pfx}-halo" cx="${LOGO_X + LOGO_W/2}" cy="${LOGO_Y + LOGO_H/2}" r="${Math.max(LOGO_W, LOGO_H)/2 + 8 + 6*i}" fill="${col}" fill-opacity="${i*0.12}" style="animation:${pfx}-breathe-img ${dur} cubic-bezier(.4,0,.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center;"/>`,
+          40%      { transform: scale(${sx},${sy}); }
+          65%      { transform: scale(${(1+(parseFloat(sx)-1)*0.5).toFixed(3)},${(1+(parseFloat(sy)-1)*0.5).toFixed(3)}); }
+        }\n${haloKFs}`,
+        elements: `${haloEls}\n${animLogoEl(imgStyle, '')}`,
       };
     }
 
@@ -127,18 +150,49 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
     }
 
     case 'LOGO_HALO_PULSE': {
-      const bpm = d_fn(0.83, sp);
+      // Inspiré du rythme cardiaque du SOUL AURA : 3 anneaux en cascade à 120° de déphasage
       const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
       const R = Math.max(LOGO_W, LOGO_H) / 2;
-      const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
+      const bpmSecs = parseFloat(d_fn(0.83, sp)); // ~0.83s ≈ 72 BPM
+      const cycleDur = bpmSecs * 2.4; // cycle complet : systole + diastole
+      // 3 ondes concentriques en cascade (comme des ondes de choc cardiaques)
+      const waves = [
+        { rBase: R + 2,  rMax: R + 18*i, opPeak: i * 0.9, sw: 2.0*i, phaseD: 0             },
+        { rBase: R + 6,  rMax: R + 26*i, opPeak: i * 0.6, sw: 1.2*i, phaseD: cycleDur / 3  },
+        { rBase: R + 10, rMax: R + 34*i, opPeak: i * 0.3, sw: 0.7*i, phaseD: cycleDur * 2/3 },
+      ];
+      const haloGradDef = `<radialGradient id="${pfx}-halo-fill" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="${col}" stop-opacity="0"/>
+        <stop offset="55%" stop-color="${col}" stop-opacity="${(i*0.25).toFixed(2)}"/>
+        <stop offset="100%" stop-color="${col}" stop-opacity="0"/>
+      </radialGradient>`;
+      const haloGlowFilter = `<filter id="${pfx}-halo-glow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="${(1.8*i).toFixed(1)}" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>`;
+      const waveEls = waves.map((w, k) =>
+        `<circle cx="${CX}" cy="${CY}" r="${w.rBase.toFixed(1)}" fill="none"
+          stroke="${col}" stroke-width="${w.sw.toFixed(1)}" stroke-opacity="${(w.opPeak * 0.3).toFixed(2)}"
+          filter="url(#${pfx}-halo-glow)"
+          style="animation:${pfx}-wave${k} ${cycleDur.toFixed(2)}s cubic-bezier(0.22,1,0.36,1) ${(delay + w.phaseD).toFixed(2)}s infinite;"/>`
+      ).join('\n');
+      const waveKFs = waves.map((w, k) => `@keyframes ${pfx}-wave${k} {
+        0%   { r: ${w.rBase.toFixed(1)}; opacity: ${w.opPeak.toFixed(2)}; stroke-width: ${w.sw.toFixed(1)}; }
+        18%  { r: ${w.rMax.toFixed(1)}; opacity: ${(w.opPeak * 0.4).toFixed(2)}; stroke-width: ${(w.sw * 0.4).toFixed(1)}; }
+        100% { r: ${(w.rMax + 8).toFixed(1)}; opacity: 0; stroke-width: 0; }
+      }`).join('\n');
+      // Glow fill intérieur qui pulse
+      const innerFill = `<circle cx="${CX}" cy="${CY}" r="${R}" fill="url(#${pfx}-halo-fill)"
+        style="animation:${pfx}-inner-pulse ${cycleDur.toFixed(2)}s ease-in-out ${delay}s infinite; transform-origin:${CX}px ${CY}px; transform-box:fill-box;"/>`;
+      const innerKF = `@keyframes ${pfx}-inner-pulse {
+        0%,100% { transform: scale(0.92); opacity: ${(i*0.4).toFixed(2)}; }
+        18%      { transform: scale(1.06); opacity: ${(i*0.8).toFixed(2)}; }
+        35%      { transform: scale(0.96); opacity: ${(i*0.3).toFixed(2)}; }
+      }`;
       return {
-        filterDefs: `<radialGradient id="${pfx}-halo-g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="${col}" stop-opacity="${i*0.8}"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient>`,
-        keyframes: `@keyframes ${pfx}-halo {
-          0%,100% { r: ${R+4*i}; opacity: ${i*0.5}; }
-          50%      { r: ${R+12*i}; opacity: ${i}; }
-        }`,
-        elements: `<circle id="${pfx}-halopulse" cx="${CX}" cy="${CY}" r="${R}" fill="url(#${pfx}-halo-g)" style="animation:${pfx}-halo ${bpm} ease-in-out ${delay}s infinite;"/>
-        ${logoEl}`,
+        filterDefs: haloGradDef + '\n' + haloGlowFilter,
+        keyframes: waveKFs + '\n' + innerKF,
+        elements: `${innerFill}\n${waveEls}\n${staticLogoEl()}`,
       };
     }
 
