@@ -1,6 +1,7 @@
 import type { ZoneEffectDecision, ZoneComposition } from './harmony-validator';
 import { getTimingProfile, buildDurationFn } from '../modules/timing-master.module';
 import { enrichZoneColors } from '../modules/color-harmony.module';
+import { effectMetricsRegistry } from './effect-metrics-registry';
 
 export interface SVGEffectCode {
   keyframes: string;
@@ -95,39 +96,52 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
     }
 
     case 'LOGO_VOLUME_BREATHE': {
-      // Inspiré de BREATHING.js (695 lignes) : rythme vital, souffle organique, 3 halos en cascade
+      // Exploite les vraies phases du BREATHING : inspiration, rétention, expiration, pause
       const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
       const R = Math.max(LOGO_W, LOGO_H) / 2;
-      const breathDur = parseFloat(d_fn(6, sp));
-      // 3 halos respiratoires à phases décalées (souffle + inspiration + expiration)
+      // Phases réelles extraites du BREATHING.js (retournées en secondes par phaseSecs)
+      const inspSecs  = effectMetricsRegistry.phaseSecs('BREATHING', 'inspiration', 1.8) * (SPEED_DURATION[sp] ?? 1);
+      const retSecs   = effectMetricsRegistry.phaseSecs('BREATHING', 'retention',  0.8)  * (SPEED_DURATION[sp] ?? 1);
+      const expirSecs = effectMetricsRegistry.phaseSecs('BREATHING', 'expiration', 2.2) * (SPEED_DURATION[sp] ?? 1);
+      const pauseSecs = effectMetricsRegistry.phaseSecs('BREATHING', 'pause',      0.6)  * (SPEED_DURATION[sp] ?? 1);
+      const totalSecs = Math.max(inspSecs + retSecs + expirSecs + pauseSecs, 3.0);
+      // Calcul des % de keyframe selon les durées réelles
+      const pInsp  = ((inspSecs / totalSecs) * 100).toFixed(1);
+      const pRet   = (((inspSecs + retSecs) / totalSecs) * 100).toFixed(1);
+      const pExpir = (((inspSecs + retSecs + expirSecs) / totalSecs) * 100).toFixed(1);
+      // 3 halos respiratoires avec déphasage naturel (1/3 de cycle chacun)
       const halos = [
-        { r: R + 5,  opPeak: i * 0.55, opBase: i * 0.15, scaleMax: 1 + 0.07*i, phaseD: 0 },
-        { r: R + 12, opPeak: i * 0.30, opBase: i * 0.08, scaleMax: 1 + 0.05*i, phaseD: breathDur / 3.5 },
-        { r: R + 20, opPeak: i * 0.14, opBase: i * 0.03, scaleMax: 1 + 0.03*i, phaseD: breathDur / 1.8 },
+        { r: R + 4,  opPeak: i * 0.60, opBase: i * 0.18, scaleMax: 1 + 0.08*i, phaseD: 0 },
+        { r: R + 11, opPeak: i * 0.35, opBase: i * 0.10, scaleMax: 1 + 0.055*i, phaseD: totalSecs / 3 },
+        { r: R + 20, opPeak: i * 0.18, opBase: i * 0.04, scaleMax: 1 + 0.03*i,  phaseD: (totalSecs / 3) * 2 },
       ];
       const breathFilter = `<filter id="${pfx}-breathe-glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="${(2.5*i).toFixed(1)}" result="b"/>
+        <feGaussianBlur stdDeviation="${(2.8*i).toFixed(1)}" result="b"/>
         <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>`;
       const haloEls = halos.map((h, k) =>
         `<circle cx="${CX}" cy="${CY}" r="${h.r.toFixed(1)}" fill="${col}" fill-opacity="${h.opBase.toFixed(3)}"
           filter="url(#${pfx}-breathe-glow)"
-          style="animation:${pfx}-haloB${k} ${breathDur.toFixed(1)}s cubic-bezier(0.4,0,0.2,1) ${(delay + h.phaseD).toFixed(2)}s infinite; transform-origin:${CX}px ${CY}px; transform-box:fill-box;"/>`
+          style="animation:${pfx}-haloB${k} ${totalSecs.toFixed(2)}s cubic-bezier(0.4,0,0.2,1) ${(delay + h.phaseD).toFixed(2)}s infinite; transform-origin:${CX}px ${CY}px; transform-box:fill-box;"/>`
       ).join('\n');
       const haloKFs = halos.map((h, k) => `@keyframes ${pfx}-haloB${k} {
-        0%,100% { transform: scale(1); opacity: ${h.opBase.toFixed(3)}; }
-        40%      { transform: scale(${h.scaleMax.toFixed(3)}); opacity: ${h.opPeak.toFixed(3)}; }
-        65%      { transform: scale(${(1 + (h.scaleMax - 1)*0.4).toFixed(3)}); opacity: ${(h.opPeak * 0.6).toFixed(3)}; }
+        0%         { transform: scale(1); opacity: ${h.opBase.toFixed(3)}; }
+        ${pInsp}%  { transform: scale(${h.scaleMax.toFixed(3)}); opacity: ${h.opPeak.toFixed(3)}; }
+        ${pRet}%   { transform: scale(${(h.scaleMax * 1.01).toFixed(3)}); opacity: ${h.opPeak.toFixed(3)}; }
+        ${pExpir}% { transform: scale(1); opacity: ${h.opBase.toFixed(3)}; }
+        100%       { transform: scale(${(1 - 0.01*i).toFixed(3)}); opacity: ${(h.opBase * 0.7).toFixed(3)}; }
       }`).join('\n');
-      // Logo principal avec souffle asymétrique (sx ≠ sy comme une vraie respiration)
-      const sx = (1 + 0.05*i).toFixed(3), sy = (1 + 0.032*i).toFixed(3);
-      const imgStyle = `animation:${pfx}-breathe-img ${breathDur.toFixed(1)}s cubic-bezier(0.4,0,0.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center;`;
+      // Respiration asymétrique du logo (sx ≠ sy = mouvement thoracique réel)
+      const sx = (1 + 0.055*i).toFixed(3), sy = (1 + 0.035*i).toFixed(3);
+      const imgStyle = `animation:${pfx}-breathe-img ${totalSecs.toFixed(2)}s cubic-bezier(0.4,0,0.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:center;`;
       return {
         filterDefs: breathFilter,
         keyframes: `@keyframes ${pfx}-breathe-img {
-          0%,100% { transform: scale(1,1); }
-          40%      { transform: scale(${sx},${sy}); }
-          65%      { transform: scale(${(1+(parseFloat(sx)-1)*0.5).toFixed(3)},${(1+(parseFloat(sy)-1)*0.5).toFixed(3)}); }
+          0%         { transform: scale(1,1); }
+          ${pInsp}%  { transform: scale(${sx},${sy}); }
+          ${pRet}%   { transform: scale(${sx},${sy}); }
+          ${pExpir}% { transform: scale(1,1); }
+          100%       { transform: scale(${(1-0.008*i).toFixed(3)},${(1-0.005*i).toFixed(3)}); }
         }\n${haloKFs}`,
         elements: `${haloEls}\n${animLogoEl(imgStyle, '')}`,
       };
@@ -197,54 +211,134 @@ function renderLogoEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
     }
 
     case 'LOGO_ORBITAL_PARTICLES': {
-      const dur = d_fn(6, sp);
+      // Exploite les métriques ORBIT DANCE : maxParticules, periodes orbitales, angles de déphasage
       const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
       const RX_BASE = LOGO_W/2 + 6, RY_BASE = LOGO_H/2 + 4;
-      const orbs = [
-        { rx: RX_BASE+10, ry: RY_BASE+4, delay:0 }, { rx: RX_BASE+18, ry: RY_BASE+8, delay:1.5 },
-        { rx: RX_BASE+4,  ry: RY_BASE+2, delay:3 }, { rx: RX_BASE+14, ry: RY_BASE+6, delay:4.5 },
-      ];
       const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
-      const orbEls = orbs.map((orb, idx) => `
-        <ellipse id="${pfx}-orb${idx}" cx="${CX}" cy="${CY}" rx="${orb.rx*i+RX_BASE}" ry="${orb.ry*i+RY_BASE}" fill="none" stroke="${col}" stroke-width="1" stroke-opacity="${i}" stroke-dasharray="3 8" style="animation:${pfx}-orbit${idx} ${(parseFloat(dur)*0.9+idx*0.4).toFixed(1)}s linear ${delay+orb.delay}s infinite;transform-box:fill-box;transform-origin:${CX}px ${CY}px;"/>`).join('');
-      const keyframes = orbs.map((_, idx) => `@keyframes ${pfx}-orbit${idx} { from{transform:rotate(${idx*90}deg)}to{transform:rotate(${idx*90+360}deg)} }`).join('\n');
-      return { filterDefs: '', keyframes, elements: `${logoEl}${orbEls}` };
+      // Nombre d'orbites basé sur les vraies métriques ORBIT DANCE
+      const totalParticles = effectMetricsRegistry.particles('ORBIT DANCE', 100);
+      const nOrbits = Math.max(3, Math.min(8, Math.round(Math.sqrt(totalParticles / 10))));
+      const rng = (seed: number) => { const x = Math.sin(seed * 127.1) * 43758.5453; return x - Math.floor(x); };
+      // Orbites déterministes : angles, dimensions, sens de rotation différenciés
+      const orbEls = Array.from({ length: nOrbits }, (_, k) => {
+        const orbitDur = d_fn(5 + k * 1.2, sp);
+        const rxOrb = RX_BASE + 4 + k * 5 + rng(k * 3) * 8 * i;
+        const ryOrb = RY_BASE + 2 + k * 3 + rng(k * 7) * 5 * i;
+        const dashLen = 2 + k * 0.5;
+        const gapLen = 6 + k * 2;
+        const rotDir = k % 2 === 0 ? 1 : -1;
+        const initAngle = k * 45;
+        const sw = (0.8 + (nOrbits - k) * 0.1 * i).toFixed(2);
+        const op = (i * (0.5 + rng(k) * 0.5)).toFixed(2);
+        // Point orbital brillant sur chaque orbite
+        const dotX = CX + rxOrb * Math.cos((initAngle * Math.PI) / 180);
+        const dotY = CY + ryOrb * Math.sin((initAngle * Math.PI) / 180);
+        return `<ellipse cx="${CX}" cy="${CY}" rx="${rxOrb.toFixed(1)}" ry="${ryOrb.toFixed(1)}"
+          fill="none" stroke="${col}" stroke-width="${sw}" stroke-opacity="${op}"
+          stroke-dasharray="${dashLen.toFixed(1)} ${gapLen.toFixed(1)}"
+          style="animation:${pfx}-orbit${k} ${orbitDur} linear ${(delay + k * 0.6).toFixed(1)}s infinite; transform-origin:${CX}px ${CY}px; transform-box:fill-box;"/>
+        <circle r="${(1.5 + (k === 0 ? 1 : 0)).toFixed(1)}" fill="${col}" fill-opacity="${(parseFloat(op) * 1.8).toFixed(2)}"
+          style="animation:${pfx}-dot${k} ${orbitDur} linear ${(delay + k * 0.6).toFixed(1)}s infinite; transform-origin:${CX}px ${CY}px; transform-box:fill-box; offset-path:ellipse(${rxOrb.toFixed(1)}px ${ryOrb.toFixed(1)}px at ${CX}px ${CY}px);" cx="${dotX.toFixed(1)}" cy="${dotY.toFixed(1)}"/>`;
+      }).join('');
+      const keyframes = Array.from({ length: nOrbits }, (_, k) => {
+        const rotDir = k % 2 === 0 ? 1 : -1;
+        const initAngle = k * 45;
+        return `@keyframes ${pfx}-orbit${k} { from{transform:rotate(${initAngle}deg)} to{transform:rotate(${initAngle + rotDir * 360}deg)} }
+        @keyframes ${pfx}-dot${k} { from{transform:rotate(${initAngle}deg)} to{transform:rotate(${initAngle + rotDir * 360}deg)} }`;
+      }).join('\n');
+      return { filterDefs: '', keyframes, elements: `${logoEl}\n${orbEls}` };
     }
 
     case 'LOGO_SOUL_AURA': {
-      const dur = d_fn(10, sp);
+      // Exploite les vraies métriques SOUL AURA : 7 couches auriques, harmoniques vibratoires, rythme vital
       const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
       const R = Math.max(LOGO_W, LOGO_H) / 2;
+      const rythme = effectMetricsRegistry.param('SOUL AURA', 'rythmeVital', 1.2);
+      const baseDurSecs = (1 / rythme) * 8;
+      const nLayers = effectMetricsRegistry.layers('SOUL AURA', 7);
+      const intensiteAura = effectMetricsRegistry.param('SOUL AURA', 'intensiteAura', 1.0) * i;
+      const sensib = effectMetricsRegistry.param('SOUL AURA', 'sensibiliteEmotionnelle', 0.6);
+      // Signatures chromatiques des 8 états émotionnels du SOUL AURA
+      const emotionalHues = [240, 45, 15, 210, 320, 270, 350, 180];
       const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
+      // Génère N couches auriques — chacune avec spacing, vitesse de rotation et opacité différenciés
+      const layerEls = Array.from({ length: nLayers }, (_, k) => {
+        const layerR = R + 5 + k * 12;
+        const opacity = (intensiteAura * (1 - (k / nLayers) * 0.7) * 0.6).toFixed(3);
+        const layerDur = (baseDurSecs * (1 + k * 0.12) * (SPEED_DURATION[sp] ?? 1)).toFixed(1);
+        const hShift = emotionalHues[k % emotionalHues.length];
+        const hue = (hShift * sensib) % 360;
+        const layerCol = k === 0 ? col : `hsl(${hue},${Math.round(60 + k * 3)}%,${Math.round(50 + k * 2)}%)`;
+        return `<circle cx="${CX}" cy="${CY}" r="${layerR.toFixed(1)}"
+          fill="${layerCol}" fill-opacity="${opacity}"
+          style="animation:${pfx}-aura${k} ${layerDur}s cubic-bezier(0.4,0,0.2,1) ${(delay + k * 0.3).toFixed(2)}s infinite; transform-origin:${CX}px ${CY}px; transform-box:fill-box;"/>`;
+      }).join('\n');
+      const filterGlow = `<filter id="${pfx}-aura-glow" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="${(3 * intensiteAura).toFixed(1)}" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <radialGradient id="${pfx}-aura-bg" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="${col}" stop-opacity="${(intensiteAura * 0.35).toFixed(2)}"/>
+        <stop offset="60%" stop-color="${col}" stop-opacity="${(intensiteAura * 0.12).toFixed(2)}"/>
+        <stop offset="100%" stop-color="${col}" stop-opacity="0"/>
+      </radialGradient>`;
+      const keyframes = Array.from({ length: nLayers }, (_, k) => {
+        const distortion = (0.04 + k * 0.015) * i;
+        const rot = (k % 2 === 0 ? 1 : -1) * (3 + k * 0.5);
+        return `@keyframes ${pfx}-aura${k} {
+          0%,100% { transform: scale(1) rotate(${-rot * 0.5}deg); opacity: ${(intensiteAura * (1 - k/nLayers * 0.6) * 0.5).toFixed(2)}; }
+          25%      { transform: scale(${(1 + distortion).toFixed(3)}) rotate(${rot * 0.3}deg); }
+          50%      { transform: scale(${(1 + distortion * 1.6).toFixed(3)}) rotate(${rot}deg); opacity: ${(intensiteAura * (1 - k/nLayers * 0.5) * 0.9).toFixed(2)}; }
+          75%      { transform: scale(${(1 + distortion * 0.8).toFixed(3)}) rotate(${rot * 0.6}deg); }
+        }`;
+      }).join('\n');
       return {
-        filterDefs: `<radialGradient id="${pfx}-aura1" cx="40%" cy="40%"><stop offset="0%" stop-color="${col}" stop-opacity="${i*0.4}"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient>
-          <radialGradient id="${pfx}-aura2" cx="60%" cy="60%"><stop offset="0%" stop-color="${lighten(col)}" stop-opacity="${i*0.3}"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient>`,
-        keyframes: `@keyframes ${pfx}-aura {
-          0%,100% { transform: scale(1) rotate(0deg); opacity: ${i*0.6}; }
-          33%      { transform: scale(${1+0.1*i}) rotate(3deg); }
-          66%      { transform: scale(${1+0.05*i}) rotate(-3deg); }
-        }`,
-        elements: `<circle cx="${CX}" cy="${CY}" r="${R+14}" fill="url(#${pfx}-aura1)" style="animation:${pfx}-aura ${dur} ease-in-out ${delay}s infinite;transform-box:fill-box;transform-origin:${CX}px ${CY}px;"/>
-          <circle cx="${CX}" cy="${CY}" r="${R+6}" fill="url(#${pfx}-aura2)" style="animation:${pfx}-aura ${(parseFloat(dur)*1.3).toFixed(1)}s ease-in-out ${delay+1}s infinite alternate;transform-box:fill-box;transform-origin:${CX}px ${CY}px;"/>
+        filterDefs: filterGlow,
+        keyframes,
+        elements: `<circle cx="${CX}" cy="${CY}" r="${R + nLayers * 12 + 8}" fill="url(#${pfx}-aura-bg)" filter="url(#${pfx}-aura-glow)"/>
+          ${layerEls}
           ${logoEl}`,
       };
     }
 
     case 'LOGO_ELECTRIC_CORONA': {
-      const dur = d_fn(3, sp);
-      const dash = Math.round(12 * i);
+      // Exploite les métriques ELECTRIC FORM : intensiteElectrique, couleurA/B, nombreArcs
       const CX = LOGO_X + LOGO_W/2, CY = LOGO_Y + LOGO_H/2;
-      const R = Math.max(LOGO_W, LOGO_H) / 2;
       const logoEl = hasLogo ? `<image id="${pfx}-img-anim" href="${logoUrl!.replace(/"/g, '&quot;')}" x="${LOGO_X}" y="${LOGO_Y}" width="${LOGO_W}" height="${LOGO_H}" preserveAspectRatio="xMidYMid meet"/>` : '';
+      const intensElec = effectMetricsRegistry.param('ELECTRIC FORM', 'intensiteElectrique', 0.8) * i;
+      const colorB = effectMetricsRegistry.baseColor('ELECTRIC FORM', lighten(col, 60));
+      const nArcs = Math.min(Math.round(effectMetricsRegistry.param('ELECTRIC FORM', 'nombreArcs', 5)), 7);
+      const glowBlur = (3 * intensElec).toFixed(1);
+      // Génère nArcs arcs électriques à des angles et rayons différents
+      const arcEls = Array.from({ length: nArcs }, (_, k) => {
+        const arcDur = d_fn(2.0 + k * 0.3, sp);
+        const rxArc = LOGO_W/2 + 6 + k * 4 + 5 * i;
+        const ryArc = LOGO_H/2 + 4 + k * 3 + 4 * i;
+        const dash = Math.round((8 + k * 3) * i);
+        const arcCol = k % 2 === 0 ? col : colorB;
+        return `<ellipse cx="${CX}" cy="${CY}" rx="${rxArc}" ry="${ryArc}" fill="none"
+          stroke="${arcCol}" stroke-width="${(1.5 + (nArcs - k) * 0.2).toFixed(1)}"
+          stroke-dasharray="${dash} ${dash * 2}"
+          filter="url(#${pfx}-glow-elec)"
+          style="animation:${pfx}-arc${k} ${arcDur} linear ${(delay + k * 0.25).toFixed(2)}s infinite;
+            transform-origin:${CX}px ${CY}px; transform-box:fill-box; transform:rotate(${k * 40}deg);"/>`;
+      }).join('\n');
+      const arcKFs = Array.from({ length: nArcs }, (_, k) => {
+        const totalDash = Math.round((8 + k * 3) * i) * 3;
+        return `@keyframes ${pfx}-arc${k} {
+          0%   { stroke-dashoffset: 0; opacity: ${(intensElec * 0.7).toFixed(2)}; }
+          50%  { opacity: ${intensElec.toFixed(2)}; stroke-dashoffset: ${-totalDash}; }
+          100% { stroke-dashoffset: ${-totalDash * 2}; opacity: ${(intensElec * 0.7).toFixed(2)}; }
+        }`;
+      }).join('\n');
       return {
-        filterDefs: `<filter id="${pfx}-glow-elec"><feGaussianBlur stdDeviation="${3*i}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
-        keyframes: `@keyframes ${pfx}-corona {
-          0%   { stroke-dashoffset: 0; opacity: ${i*0.8}; }
-          50%  { opacity: ${i}; }
-          100% { stroke-dashoffset: ${-dash*4}; opacity: ${i*0.8}; }
-        }`,
-        elements: `<ellipse cx="${CX}" cy="${CY}" rx="${LOGO_W/2+8+6*i}" ry="${LOGO_H/2+6+4*i}" fill="none" stroke="${col}" stroke-width="2" stroke-dasharray="${dash} ${dash/2}" filter="url(#${pfx}-glow-elec)" style="animation:${pfx}-corona ${dur} linear ${delay}s infinite;"/>
-        ${logoEl}`,
+        filterDefs: `<filter id="${pfx}-glow-elec" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="${glowBlur}" result="b"/>
+          <feColorMatrix type="matrix" in="b" values="1 0.5 0 0 0  0.5 1 0 0 0  0 0.5 1 0 0  0 0 0 0.8 0" result="colored"/>
+          <feMerge><feMergeNode in="colored"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>`,
+        keyframes: arcKFs,
+        elements: `${arcEls}\n${logoEl}`,
       };
     }
 
@@ -477,14 +571,26 @@ function renderNomEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, d
     }
 
     case 'NOM_CLEAN_BREATHE': {
-      const dur = d_fn(10, sp);
+      // Utilise les vraies phases respiratoires du BREATHING pour le rythme exact
+      const inspSecs  = effectMetricsRegistry.phaseSecs('BREATHING', 'inspiration', 1.8) * (SPEED_DURATION[sp] ?? 1);
+      const retSecs   = effectMetricsRegistry.phaseSecs('BREATHING', 'retention',  0.8)  * (SPEED_DURATION[sp] ?? 1);
+      const expirSecs = effectMetricsRegistry.phaseSecs('BREATHING', 'expiration', 2.2) * (SPEED_DURATION[sp] ?? 1);
+      const pauseSecs = effectMetricsRegistry.phaseSecs('BREATHING', 'pause',      0.6)  * (SPEED_DURATION[sp] ?? 1);
+      const totalSecs = Math.max(inspSecs + retSecs + expirSecs + pauseSecs, 3.5);
+      const pInsp = ((inspSecs / totalSecs) * 100).toFixed(1);
+      const pRet  = (((inspSecs + retSecs) / totalSecs) * 100).toFixed(1);
+      const pExp  = (((inspSecs + retSecs + expirSecs) / totalSecs) * 100).toFixed(1);
       return {
         filterDefs: '',
         keyframes: `@keyframes ${pfx}-breathe {
-          0%,100% { opacity: 1; }
-          50%      { opacity: ${1 - i * 0.15}; }
+          0%         { opacity: ${(0.85 + i * 0.05).toFixed(2)}; transform: scaleX(1); }
+          ${pInsp}%  { opacity: 1; transform: scaleX(${(1 + 0.008*i).toFixed(3)}); }
+          ${pRet}%   { opacity: 1; transform: scaleX(${(1 + 0.008*i).toFixed(3)}); }
+          ${pExp}%   { opacity: ${(0.85 + i * 0.05).toFixed(2)}; transform: scaleX(1); }
+          100%       { opacity: ${(0.82 + i * 0.05).toFixed(2)}; transform: scaleX(${(1 - 0.003*i).toFixed(3)}); }
         }`,
-        elements: `<rect x="${nomX}" y="${nomY-2}" width="${nomW}" height="28" fill="${col}" fill-opacity="${i*0.06}" rx="2" style="animation:${pfx}-breathe ${dur} ease-in-out ${delay}s infinite;"/>`,
+        elements: `<rect x="${nomX}" y="${nomY-2}" width="${nomW}" height="28" fill="${col}" fill-opacity="${(i*0.06).toFixed(3)}" rx="2"
+          style="animation:${pfx}-breathe ${totalSecs.toFixed(2)}s cubic-bezier(0.4,0,0.2,1) ${delay}s infinite; transform-box:fill-box; transform-origin:left center;"/>`,
       };
     }
 
@@ -688,20 +794,38 @@ function renderFondEffect(d_fn: Function, e: ZoneEffectDecision, varId: string, 
   switch (e.effet_id) {
 
     case 'FOND_STELLAR_DRIFT': {
+      // Exploite les vraies métriques STELLAR DRIFT : nombre d'étoiles, vitesse de dérive cosmique
       const dur = d_fn(30, sp);
-      const rng = (seed: number) => { const x = Math.sin(seed + 1) * 10000; return x - Math.floor(x); };
-      const stars = Array.from({ length: 28 }, (_, idx) => {
-        const cx = Math.round(rng(idx * 3.1) * w);
-        const cy = Math.round(rng(idx * 7.3) * h);
-        const r  = (0.5 + rng(idx * 5.7) * 1.5).toFixed(1);
-        const d2  = (rng(idx * 2.9) * parseFloat(dur)).toFixed(1);
-        return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" fill-opacity="${i * rng(idx)}" style="animation:${pfx}-star ${dur} linear ${d2}s infinite;"/>`;
+      const rng = (seed: number) => { const x = Math.sin(seed * 127.1 + 1.9) * 43758.5453; return x - Math.floor(x); };
+      // Compte d'étoiles basé sur les métriques réelles + pools de particules
+      const nStars = Math.max(20, Math.min(45, effectMetricsRegistry.particles('STELLAR DRIFT', 28)));
+      // Vitesse de dérive depuis les paramètres réels
+      const vitesse = effectMetricsRegistry.param('STELLAR DRIFT', 'vitesseDeriveCosmique', 0.3) * i;
+      const driftX = Math.round(vitesse * 40);
+      const driftY = Math.round(vitesse * 25);
+      const stars = Array.from({ length: nStars }, (_, idx) => {
+        const cx = Math.round(rng(idx * 3.14) * w);
+        const cy = Math.round(rng(idx * 7.39) * h);
+        const r   = (0.5 + rng(idx * 5.71) * 2.0).toFixed(1);
+        const d2  = (rng(idx * 2.97) * parseFloat(dur)).toFixed(1);
+        const brightness = (i * (0.3 + rng(idx * 11.3) * 0.7)).toFixed(2);
+        // Étoiles plus grandes clignotent aussi
+        const r2 = parseFloat(r);
+        const twinkle = r2 > 1.5
+          ? ` style="animation:${pfx}-star ${dur} linear ${d2}s infinite, ${pfx}-twinkle ${(2 + rng(idx) * 4).toFixed(1)}s ease-in-out ${rng(idx * 3.7).toFixed(1)}s infinite;"`
+          : ` style="animation:${pfx}-star ${dur} linear ${d2}s infinite;"`;
+        return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" fill-opacity="${brightness}"${twinkle}/>`;
       }).join('');
       return {
         filterDefs: '',
         keyframes: `@keyframes ${pfx}-star {
           0%   { transform: translate(0,0); }
-          100% { transform: translate(${Math.round(10*i)}px,${Math.round(6*i)}px); }
+          50%  { transform: translate(${driftX}px,${driftY}px); }
+          100% { transform: translate(${driftX * 2}px,${driftY}px); }
+        }
+        @keyframes ${pfx}-twinkle {
+          0%,100% { opacity: 1; }
+          50%      { opacity: ${(0.2 + i * 0.3).toFixed(2)}; }
         }`,
         elements: `<g id="${pfx}-stars">${stars}</g>`,
       };

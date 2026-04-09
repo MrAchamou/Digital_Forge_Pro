@@ -3,6 +3,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { registerRoutes } from "./routes";
 import { loadPremiumEffects } from './utils/premium-effects-loader';
 import { cleanOldExports } from './services/exports-cleaner';
+import { effectMetricsRegistry } from './services/effect-metrics-registry';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -103,5 +104,11 @@ app.use((req, res, next) => {
     }).catch(err => {
       console.warn('⚠️ Chargement des effets premium échoué:', err.message);
     });
+
+    // Initialise le registry in-memory des métriques premium (pour le renderer SVG)
+    console.log('🔬 Initialisation du EffectMetricsRegistry...');
+    effectMetricsRegistry.init().catch(err =>
+      console.warn('⚠️ EffectMetricsRegistry init échouée:', err.message)
+    );
   });
 })();
