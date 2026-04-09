@@ -2142,6 +2142,147 @@ router.delete('/preferences/reset', async (req, res) => {
   res.json({ success: true, message: 'Préférences réinitialisées' });
 });
 
+// ── TEST CHORÉGRAPHE : génère les 4 variations et les affiche en HTML ─────────
+router.get('/test/choreo', async (req, res) => {
+  try {
+    const { signatureBaseGenerator }    = await import('./generator/signature-base-generator');
+    const { signatureVariationsGenerator } = await import('./generator/signature-variations-generator');
+    const { signatureSVGExporter }      = await import('./generator/signature-svg-exporter');
+
+    const secteur   = (req.query.secteur as string)   || 'tech';
+    const intensite = ((req.query.intensite as string) || 'medium') as 'low' | 'medium' | 'high';
+    const palette   = ['#0f0f23', '#6366f1', '#e2e8ff'];
+
+    const signatureData = {
+      nom:        'Sophie Martin',
+      titre:      'Directrice Créative',
+      entreprise: 'Studio Nova',
+      email:      'sophie@studionova.fr',
+      telephone:  '+33 6 12 34 56 78',
+      site:       'studionova.fr',
+      reseaux:    ['linkedin', 'instagram'],
+      cta:        'Voir le portfolio →',
+      logo_url:   undefined,
+      photo_url:  undefined,
+      logo3d:     false,
+      sections3d: {},
+    };
+
+    const styleData = { palette, ambiance: 'moderne premium', intensite, secteur };
+
+    const baseResult       = signatureBaseGenerator.generate(signatureData, styleData);
+    const variationsResult = signatureVariationsGenerator.generate(styleData, baseResult.palette);
+    const exportResult     = signatureSVGExporter.export(signatureData.nom, baseResult, variationsResult);
+
+    const svgEncoded = encodeURIComponent(exportResult.svgContent);
+    const svgB64     = Buffer.from(exportResult.svgContent).toString('base64');
+
+    const sectorOptions = ['tech', 'luxe', 'sante', 'creation', 'sport', 'default']
+      .map(s => `<option value="${s}" ${s === secteur ? 'selected' : ''}>${s}</option>`)
+      .join('');
+    const intensiteOptions = ['low', 'medium', 'high']
+      .map(v => `<option value="${v}" ${v === intensite ? 'selected' : ''}>${v}</option>`)
+      .join('');
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Chorégraphe — EffectForge</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0f; color: #e2e8ff; font-family: system-ui, sans-serif; padding: 24px; }
+    h1 { font-size: 22px; color: #6366f1; margin-bottom: 6px; }
+    p  { font-size: 13px; color: #888; margin-bottom: 20px; }
+    .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 28px; flex-wrap: wrap; }
+    select, button {
+      background: #1a1a2e; border: 1px solid #6366f1; color: #e2e8ff;
+      padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+    }
+    button { background: #6366f1; border-color: #818cf8; font-weight: 600; }
+    button:hover { background: #818cf8; }
+    label { font-size: 13px; color: #9ca3af; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .card {
+      background: #111128; border: 1px solid #2a2a4a; border-radius: 14px;
+      padding: 16px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .card-title { font-size: 12px; font-weight: 700; color: #6366f1; letter-spacing: 1px; text-transform: uppercase; }
+    .card-desc  { font-size: 11px; color: #6b7280; }
+    img { width: 100%; border-radius: 8px; background: #fff; }
+    .layers-info {
+      font-size: 11px; color: #4b5563; margin-top: 4px; line-height: 1.6;
+      background: #0d0d20; border-radius: 6px; padding: 8px; font-family: monospace;
+    }
+    .raw { margin-top: 28px; }
+    .raw summary { font-size: 13px; color: #6366f1; cursor: pointer; padding: 8px; }
+    details { background: #111128; border: 1px solid #2a2a4a; border-radius: 10px; margin-top: 10px; }
+    textarea { width: 100%; height: 200px; background: #0d0d20; color: #a5b4fc; border: none;
+               font-family: monospace; font-size: 11px; padding: 12px; border-radius: 0 0 10px 10px; resize: vertical; }
+    .badge { display:inline-block; background:#6366f1; color:#fff; font-size:10px; border-radius:4px; padding:2px 6px; margin-left:4px; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<h1>🎬 Test Chorégraphe d'Effets</h1>
+<p>4 variations générées par le chorégraphe — chaque zone reçoit jusqu'à 5 couches d'effets empilées</p>
+
+<form class="controls" method="GET" action="/api/test/choreo">
+  <label>Secteur :
+    <select name="secteur">${sectorOptions}</select>
+  </label>
+  <label>Intensité :
+    <select name="intensite">${intensiteOptions}</select>
+  </label>
+  <button type="submit">Régénérer</button>
+</form>
+
+<div class="grid">
+  ${['A','B','C','D'].map((v, idx) => {
+    const labels: Record<string,string> = {
+      A: 'Stable et Rassurant',
+      B: 'Précis et Dynamique',
+      C: 'Profond et Atmosphérique',
+      D: 'Puissant et Mémorable',
+    };
+    const layers: Record<string, number> = { A: 4, B: 4, C: 4, D: 5 };
+    const logoLayers: Record<string, string[]> = {
+      A: ['SOUL_AURA','VOLUME_BREATHE','HALO_PULSE','METAL_BRUSH'],
+      B: ['ELECTRIC_CORONA','METAL_BRUSH','ORBITAL_PARTICLES','3D_FLOAT'],
+      C: ['HALO_PULSE','LIQUID_EDGE','PRISM_REFRACT','GYRO_TILT'],
+      D: ['SOUL_AURA','GLASS_IRIS','CRYSTAL_FRAGMENT','3D_FLOAT','+ secteur'],
+    };
+    return `
+    <div class="card">
+      <div class="card-title">Variation ${v} — ${labels[v]} <span class="badge">Logo: ${layers[v]} couches</span></div>
+      <img src="data:image/svg+xml;base64,${svgB64}" alt="Variation ${v}" loading="lazy"/>
+      <div class="card-desc">Logo layers : ${logoLayers[v].join(' + ')}</div>
+      <div class="layers-info">
+        logo → energie · matiere · dimension · transformation · [secteur: ${secteur}]<br>
+        nom  → lumiere · mouvement<br>
+        titre → rythme · texture${v === 'D' ? ' · apparition' : ''}<br>
+        sep  → rythme · flux${v === 'D' ? ' · eclat' : ''}<br>
+        cta  → invitation · brillance${v !== 'A' && v !== 'C' ? ' · attraction' : ''}
+      </div>
+    </div>`;
+  }).join('')}
+</div>
+
+<div class="raw">
+  <details>
+    <summary>🔍 SVG brut complet</summary>
+    <textarea readonly>${exportResult.svgContent.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+  </details>
+</div>
+
+</body>
+</html>`);
+  } catch (err: any) {
+    res.status(500).send(`<pre style="color:red;background:#111;padding:20px">${err.stack}</pre>`);
+  }
+});
+
 export function registerRoutes(app: express.Application) {
   app.use(cors());
   app.use('/api', router);
