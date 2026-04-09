@@ -2186,6 +2186,9 @@ router.get('/test/choreo', async (req, res) => {
       .map(v => `<option value="${v}" ${v === intensite ? 'selected' : ''}>${v}</option>`)
       .join('');
 
+    const svgWidth  = exportResult.svgContent.match(/width="(\d+)"/)?.[1] ?? '600';
+    const svgHeight = exportResult.svgContent.match(/height="(\d+)"/)?.[1] ?? '180';
+
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(`<!DOCTYPE html>
 <html lang="fr">
@@ -2196,7 +2199,9 @@ router.get('/test/choreo', async (req, res) => {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #0a0a0f; color: #e2e8ff; font-family: system-ui, sans-serif; padding: 24px; }
     h1 { font-size: 22px; color: #6366f1; margin-bottom: 6px; }
-    p  { font-size: 13px; color: #888; margin-bottom: 20px; }
+    p  { font-size: 13px; color: #888; margin-bottom: 12px; }
+    .info-bar { font-size: 12px; color: #4ade80; background: #0a2010; border: 1px solid #166534;
+                padding: 8px 14px; border-radius: 8px; margin-bottom: 20px; }
     .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 28px; flex-wrap: wrap; }
     select, button {
       background: #1a1a2e; border: 1px solid #6366f1; color: #e2e8ff;
@@ -2212,7 +2217,19 @@ router.get('/test/choreo', async (req, res) => {
     }
     .card-title { font-size: 12px; font-weight: 700; color: #6366f1; letter-spacing: 1px; text-transform: uppercase; }
     .card-desc  { font-size: 11px; color: #6b7280; }
-    img { width: 100%; border-radius: 8px; background: #fff; }
+    .svg-wrap {
+      width: 100%; background: #fff; border-radius: 8px; overflow: hidden;
+      aspect-ratio: ${svgWidth} / ${svgHeight};
+    }
+    .svg-wrap object {
+      width: 100%; height: 100%; display: block;
+    }
+    .inline-preview {
+      width: 100%; background: #fff; border-radius: 8px; overflow: hidden;
+    }
+    .inline-preview svg {
+      display: block; width: 100%; height: auto;
+    }
     .layers-info {
       font-size: 11px; color: #4b5563; margin-top: 4px; line-height: 1.6;
       background: #0d0d20; border-radius: 6px; padding: 8px; font-family: monospace;
@@ -2223,12 +2240,16 @@ router.get('/test/choreo', async (req, res) => {
     textarea { width: 100%; height: 200px; background: #0d0d20; color: #a5b4fc; border: none;
                font-family: monospace; font-size: 11px; padding: 12px; border-radius: 0 0 10px 10px; resize: vertical; }
     .badge { display:inline-block; background:#6366f1; color:#fff; font-size:10px; border-radius:4px; padding:2px 6px; margin-left:4px; }
+    .badge-green { background: #166534; color: #4ade80; }
     @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 <h1>🎬 Test Chorégraphe d'Effets</h1>
-<p>4 variations générées par le chorégraphe — chaque zone reçoit jusqu'à 5 couches d'effets empilées</p>
+<p>SVG animé : 4 variations en cycle 16s (A→4s→B→4s→C→4s→D→4s→A...) — animations CSS continues, infinite</p>
+<div class="info-bar">
+  ✅ Rendu via &lt;object&gt; : animations CSS actives · Cycle 16s · Layer A visible immédiatement · AnimationMerger v2 actif
+</div>
 
 <form class="controls" method="GET" action="/api/test/choreo">
   <label>Secteur :
@@ -2248,6 +2269,12 @@ router.get('/test/choreo', async (req, res) => {
       C: 'Profond et Atmosphérique',
       D: 'Puissant et Mémorable',
     };
+    const offsets: Record<string,string> = {
+      A: '0s (immédiat)',
+      B: 'visible à 4s',
+      C: 'visible à 8s',
+      D: 'visible à 12s',
+    };
     const layers: Record<string, number> = { A: 4, B: 4, C: 4, D: 5 };
     const logoLayers: Record<string, string[]> = {
       A: ['SOUL_AURA','VOLUME_BREATHE','HALO_PULSE','METAL_BRUSH'],
@@ -2257,12 +2284,18 @@ router.get('/test/choreo', async (req, res) => {
     };
     return `
     <div class="card">
-      <div class="card-title">Variation ${v} — ${labels[v]} <span class="badge">Logo: ${layers[v]} couches</span></div>
-      <img src="data:image/svg+xml;base64,${svgB64}" alt="Variation ${v}" loading="lazy"/>
+      <div class="card-title">
+        Variation ${v} — ${labels[v]}
+        <span class="badge">Logo: ${layers[v]} couches</span>
+        <span class="badge badge-green">${offsets[v]}</span>
+      </div>
+      <div class="svg-wrap">
+        <object type="image/svg+xml" data="data:image/svg+xml;base64,${svgB64}" aria-label="Variation ${v}"></object>
+      </div>
       <div class="card-desc">Logo layers : ${logoLayers[v].join(' + ')}</div>
       <div class="layers-info">
         logo → energie · matiere · dimension · transformation · [secteur: ${secteur}]<br>
-        nom  → lumiere · mouvement<br>
+        nom  → lumiere · mouvement · glow · flicker (AnimationMerger)<br>
         titre → rythme · texture${v === 'D' ? ' · apparition' : ''}<br>
         sep  → rythme · flux${v === 'D' ? ' · eclat' : ''}<br>
         cta  → invitation · brillance${v !== 'A' && v !== 'C' ? ' · attraction' : ''}
@@ -2273,7 +2306,7 @@ router.get('/test/choreo', async (req, res) => {
 
 <div class="raw">
   <details>
-    <summary>🔍 SVG brut complet</summary>
+    <summary>🔍 SVG brut complet (${exportResult.svgContent.length} octets)</summary>
     <textarea readonly>${exportResult.svgContent.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
   </details>
 </div>

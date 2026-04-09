@@ -32,7 +32,7 @@ export class SignatureSVGExporter {
       svgContent,
       filename,
       metadata: {
-        cycle_total: 80,
+        cycle_total: 16,
         variations_count: 4,
         dimensions: `${width}px x ${height}px`,
         compatible_clients: ['gmail', 'outlook', 'apple_mail'],
@@ -108,55 +108,55 @@ ${logoHideCSS}
       }
 
       /* ================================================================
-         TIMING ORCHESTRATION — 80s cycle | CROSSFADE CONTINU (no gap)
+         TIMING ORCHESTRATION — 16s cycle | CROSSFADE CONTINU (no gap)
          Principe : chaque variation se CHEVAUCHE avec la suivante.
          A s'éteint pendant que B s'allume → zéro zone morte.
-         Chaque variation visible ~20s | Transition crossfade 2s
+         Chaque variation visible ~4s | Transition crossfade 0.5s
+         Layer A démarre IMMÉDIATEMENT visible (opacity:1 à 0%)
          ================================================================ */
 
-      /* Cycle 80s : A→B→C→D→A en boucle parfaite sans blanc */
-      #layer-var-a { animation: layer-fade-a 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
-      #layer-var-b { animation: layer-fade-b 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
-      #layer-var-c { animation: layer-fade-c 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
-      #layer-var-d { animation: layer-fade-d 80s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      /* Cycle 16s : A→B→C→D→A en boucle parfaite sans blanc */
+      #layer-var-a { animation: layer-fade-a 16s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-b { animation: layer-fade-b 16s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-c { animation: layer-fade-c 16s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
+      #layer-var-d { animation: layer-fade-d 16s cubic-bezier(0.4,0,0.2,1) 0s infinite; }
 
-      /* A : 0%→2.5% montée | 2.5%→22.5% présent | 22.5%→25% descente  */
+      /* A : démarre IMMÉDIATEMENT visible | présent 0%→25% | descente 25%→28.125% | retour à 100% */
       @keyframes layer-fade-a {
-        0%      { opacity: 0; }
-        2.5%    { opacity: 1; }
-        22.5%   { opacity: 1; }
-        25%     { opacity: 0; }
-        98%     { opacity: 0; }
-        100%    { opacity: 0; }
+        0%       { opacity: 1; }
+        25%      { opacity: 1; }
+        28.125%  { opacity: 0; }
+        96.875%  { opacity: 0; }
+        100%     { opacity: 1; }
       }
 
-      /* B : 22.5%→25% montée (chevauche la descente de A) | 25%→47.5% présent | 47.5%→50% descente */
+      /* B : 21.875%→25% montée (chevauche A) | 25%→50% présent | 50%→53.125% descente */
       @keyframes layer-fade-b {
-        0%      { opacity: 0; }
-        22.5%   { opacity: 0; }
-        25%     { opacity: 1; }
-        47.5%   { opacity: 1; }
-        50%     { opacity: 0; }
-        100%    { opacity: 0; }
+        0%       { opacity: 0; }
+        21.875%  { opacity: 0; }
+        25%      { opacity: 1; }
+        50%      { opacity: 1; }
+        53.125%  { opacity: 0; }
+        100%     { opacity: 0; }
       }
 
-      /* C : 47.5%→50% montée | 50%→72.5% présent | 72.5%→75% descente */
+      /* C : 46.875%→50% montée | 50%→75% présent | 75%→78.125% descente */
       @keyframes layer-fade-c {
-        0%      { opacity: 0; }
-        47.5%   { opacity: 0; }
-        50%     { opacity: 1; }
-        72.5%   { opacity: 1; }
-        75%     { opacity: 0; }
-        100%    { opacity: 0; }
+        0%       { opacity: 0; }
+        46.875%  { opacity: 0; }
+        50%      { opacity: 1; }
+        75%      { opacity: 1; }
+        78.125%  { opacity: 0; }
+        100%     { opacity: 0; }
       }
 
-      /* D : 72.5%→75% montée | 75%→97.5% présent | 97.5%→100% descente → retour à A */
+      /* D : 71.875%→75% montée | 75%→96.875% présent | 96.875%→100% descente → A reprend à 1 */
       @keyframes layer-fade-d {
-        0%      { opacity: 0; }
-        72.5%   { opacity: 0; }
-        75%     { opacity: 1; }
-        97.5%   { opacity: 1; }
-        100%    { opacity: 0; }
+        0%       { opacity: 0; }
+        71.875%  { opacity: 0; }
+        75%      { opacity: 1; }
+        96.875%  { opacity: 1; }
+        100%     { opacity: 0; }
       }
 
       /* Couche de base — toujours visible, fond de scène permanent */
@@ -232,8 +232,8 @@ ${logoHideCSS}
   private buildTimingCSS(): string {
     return `      /* Timing custom properties */
       :root {
-        --cycle: 80s;
-        --fade-dur: 2s;
+        --cycle: 16s;
+        --fade-dur: 0.5s;
         --mouse-x: 0.5;
         --mouse-y: 0.5;
         --energy: 1;

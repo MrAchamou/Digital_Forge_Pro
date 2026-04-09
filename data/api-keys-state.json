@@ -1,5 +1,5 @@
 {
-  "lastSaved": "2026-04-09T08:25:53.670Z",
+  "lastSaved": "2026-04-09T08:43:54.571Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
@@ -142,17 +142,17 @@
       "lastError": null
     },
     "serper_1": {
-      "usageToday": 0,
+      "usageToday": 1,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 12,
+      "successCount": 13,
       "avgResponseTime": 918,
       "healthScore": 90,
-      "callsLastHour": 0,
-      "hourWindowStart": "2026-04-08T23:46:24.837Z",
-      "lastUsed": "2026-04-08T23:46:24.837Z",
+      "callsLastHour": 1,
+      "hourWindowStart": "2026-04-09T08:43:54.328Z",
+      "lastUsed": "2026-04-09T08:43:54.328Z",
       "lastError": null
     },
     "serper_2": {
@@ -170,17 +170,17 @@
       "lastError": null
     },
     "serper_3": {
-      "usageToday": 0,
+      "usageToday": 1,
       "status": "active",
       "cooldownUntil": null,
       "cooldownCount": 0,
       "errorCount": 0,
-      "successCount": 12,
-      "avgResponseTime": 1176,
+      "successCount": 13,
+      "avgResponseTime": 1148,
       "healthScore": 90,
-      "callsLastHour": 0,
-      "hourWindowStart": "2026-04-08T23:41:31.174Z",
-      "lastUsed": "2026-04-08T23:41:31.174Z",
+      "callsLastHour": 1,
+      "hourWindowStart": "2026-04-09T08:43:54.227Z",
+      "lastUsed": "2026-04-09T08:43:54.227Z",
       "lastError": null
     },
     "serper_4": {
@@ -213,7 +213,6 @@
     }
   },
   "monthlyUsage": {
-    "serper_2026-04": 2,
-    "cerebras_2026-04": 1
+    "serper_2026-04": 2
   }
 }
