@@ -1,6 +1,7 @@
 import type { StyleData } from './signature-base-generator';
 import { renderZoneComposition, assembleSVGEffects } from '../services/zone-svg-renderer';
 import type { ZoneComposition } from '../services/harmony-validator';
+import { buildChoreographedCompositions, mergeWithChoreography } from '../services/effect-choreographer';
 
 export interface VariationEffect {
   id: string;
@@ -34,20 +35,19 @@ export class SignatureVariationsGenerator {
     zoneCompositions?: { A: ZoneComposition; B: ZoneComposition; C: ZoneComposition; D: ZoneComposition },
     logoUrl?: string
   ): VariationsResult {
-    const [c0, c1, c2] = palette;
-    const cfg = INTENSITY_MAP[style.intensite] || INTENSITY_MAP.medium;
+    // ── Chorégraphe : toujours actif — construit les couches riches par zone ──
+    const choreo = buildChoreographedCompositions(
+      { intensite: style.intensite, secteur: style.secteur },
+      palette
+    );
 
-    if (zoneCompositions) {
-      return this.buildZoneVariations(palette, zoneCompositions, logoUrl);
-    }
+    // Si l'AI a fourni des compositions → merge (AI pilote QUOI, chorégraphe pilote COMMENT)
+    // Sinon → le chorégraphe fournit les 4 variations complètes
+    const finalCompositions = zoneCompositions
+      ? mergeWithChoreography(zoneCompositions, choreo)
+      : choreo;
 
-    const varA = this.buildVariationA(c0, c1, c2, cfg, style);
-    const varB = this.buildVariationB(c0, c1, c2, cfg, style);
-    const varC = this.buildVariationC(c0, c1, c2, cfg, style);
-    const varD = this.buildVariationD(c0, c1, c2, cfg, style);
-    const globalDefs = this.buildGlobalDefs(c0, c1, c2, cfg);
-
-    return { variations: [varA, varB, varC, varD], globalDefs };
+    return this.buildZoneVariations(palette, finalCompositions, logoUrl);
   }
 
   private buildZoneVariations(
