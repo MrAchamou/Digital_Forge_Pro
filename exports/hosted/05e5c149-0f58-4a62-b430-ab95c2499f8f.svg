@@ -1,0 +1,842 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 600 190" width="600" height="190">
+  <defs>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#9fa2ff"/>
+    </linearGradient>
+    
+    <linearGradient id="sg-corp-grad" x1="100" y1="0" x2="700" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#9fa2ff"/>
+      <stop offset="20%"  stop-color="#6366f1"/>
+      <stop offset="40%"  stop-color="hsl(319,84%,85%)"/>
+      <stop offset="65%"  stop-color="hsl(39,84%,67%)"/>
+      <stop offset="85%"  stop-color="hsl(119,84%,82%)"/>
+      <stop offset="100%" stop-color="#9fa2ff"/>
+      <animateTransform attributeName="gradientTransform" type="translate" from="-400 0" to="400 0" dur="4s" repeatCount="indefinite"/>
+    </linearGradient>
+    
+    <!-- Corp Name Living System — Filtres & Gradients -->
+
+    <!-- NEON GLOW / gradient cyclique variant-aware -->
+    <linearGradient id="cnls-grad" x1="0" y1="0" x2="494" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#9ea1ff"/>
+      <stop offset="18%"  stop-color="#6467f2"/>
+      <stop offset="36%"  stop-color="hsl(319,84%,85%)"/>
+      <stop offset="54%"  stop-color="hsl(39,84%,67%)"/>
+      <stop offset="72%"  stop-color="hsl(119,84%,79%)"/>
+      <stop offset="90%"  stop-color="hsl(319,84%,85%)"/>
+      <stop offset="100%" stop-color="#9ea1ff"/>
+      <animateTransform attributeName="gradientTransform" type="translate"
+        from="-194 0" to="344 0" dur="6.00s" repeatCount="indefinite"/>
+    </linearGradient>
+
+    <!-- SOUL AURA — gradient radial pour halo périodique -->
+    <radialGradient id="cnls-halo-rg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#6467f2" stop-opacity="0.35"/>
+      <stop offset="50%"  stop-color="hsl(319,84%,85%)" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="hsl(39,84%,67%)" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- SHIMMER — gradient linéaire pour scanner lumineux -->
+    <linearGradient id="cnls-shimmer" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+      <stop offset="40%"  stop-color="white" stop-opacity="0.34"/>
+      <stop offset="55%"  stop-color="#9ea1ff" stop-opacity="0.51"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- NEON GLOW filter — blur + merge -->
+    <filter id="cnls-glow-f" x="-8%" y="-40%" width="116%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- HALO filter — très doux -->
+    <filter id="cnls-halo-f" x="-15%" y="-80%" width="130%" height="260%">
+      <feGaussianBlur stdDeviation="6.0"/>
+    </filter>
+
+    <!-- GLITCH filter — décalage chromatique -->
+    <filter id="cnls-glitch-f" x="-2%" y="-10%" width="104%" height="120%" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix"
+        values="1 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 1 0" result="r"/>
+      <feColorMatrix type="matrix"
+        values="0 0 0 0 0   0 1 0 0 0   0 0 1 0 0   0 0 0 1 0" in="SourceGraphic" result="gb"/>
+      <feOffset dx="2" dy="0" in="r" result="r-off"/>
+      <feBlend in="r-off" in2="gb" mode="screen"/>
+    </filter>
+
+    <!-- Clip TYPEWRITER — révélation gauche→droite -->
+    <clipPath id="cnls-type-clip">
+      <rect x="-4" y="-30" width="0" height="36">
+        <animate attributeName="width"
+          from="0" to="214"
+          dur="3.00s"
+          begin="0.2s" fill="freeze"
+          calcMode="linear"
+          keyTimes="0;1"
+          keySplines="cubic-bezier(.25,.46,.45,.94)"/>
+      </rect>
+    </clipPath>
+    
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    
+      <filter id="lls-neon-f" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="4" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <filter id="lls-soul-f" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <filter id="lls-orbit-f" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="2" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <filter id="lls-hb-f" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <filter id="lls-elec-f" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.5" result="b"/>
+        <feColorMatrix type="matrix" in="b"
+          values="1 0.5 0 0 0  0.5 1 0 0 0  0 0.5 1 0 0  0 0 0 0.9 0" result="c"/>
+        <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <filter id="lls-prism-f" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="2" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <filter id="lls-qph-f" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3" result="b"/>
+        <feColorMatrix type="matrix" in="b"
+          values="0 0 1 0 0  0 1 1 0 0  1 0 1 0 0  0 0 0 1 0" result="c"/>
+        <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <radialGradient id="lls-qph-rg" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#6366f1" stop-opacity="0.5"/>
+        <stop offset="60%" stop-color="hsl(79,84%,72%)" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="hsl(159,84%,67%)" stop-opacity="0"/>
+      </radialGradient>
+
+      <filter id="lls-spk-f" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+    <filter id="lmb-glow-filter" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="b1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="7.6" result="b2"/>
+      <feBlend in="b1" in2="b2" mode="screen" result="merged"/>
+      <feMerge><feMergeNode in="merged"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="lmb-glow-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#6467f2" stop-opacity="0.59"/>
+      <stop offset="55%" stop-color="#6467f2" stop-opacity="0.21"/>
+      <stop offset="100%" stop-color="#6467f2" stop-opacity="0"/>
+    </radialGradient>
+    <style>@keyframes lls-neon-slot {
+      0%           { opacity: 1; }
+      11.39%  { opacity: 1; }
+      12.50%  { opacity: 0; }
+      98.89% { opacity: 0; }
+      100%         { opacity: 1; }
+    }
+
+      @keyframes lls-neon-ring {
+        0%   { stroke: #6366f1; stroke-width: 2.5; r: 56;   opacity: 0.9; }
+        16%  { stroke: hsl(299,84%,77%); stroke-width: 3.5; r: 59; opacity: 1;   }
+        33%  { stroke: hsl(359,84%,67%); stroke-width: 2;   r: 56;   opacity: 0.7; }
+        50%  { stroke: hsl(79,84%,72%); stroke-width: 3.5; r: 60; opacity: 1;   }
+        66%  { stroke: hsl(159,84%,67%); stroke-width: 2;   r: 56;   opacity: 0.8; }
+        83%  { stroke: #9598ff; stroke-width: 3;   r: 58; opacity: 1;   }
+        100% { stroke: #6366f1; stroke-width: 2.5; r: 56;   opacity: 0.9; }
+      }
+      @keyframes lls-neon-ring2 {
+        0%,100% { r: 66; opacity: 0.35; stroke-width: 1.5; }
+        50%     { r: 72; opacity: 0.6;  stroke-width: 0.8; }
+      }
+      @keyframes lls-neon-ring3 {
+        0%,100% { r: 74; opacity: 0.15; }
+        50%     { r: 84; opacity: 0.35; }
+      }
+@keyframes lls-soul-slot {
+    0%           { opacity: 0; }
+    12.50%  { opacity: 0; }
+    13.61%  { opacity: 1; }
+    23.89%  { opacity: 1; }
+    25.00%  { opacity: 0; }
+    100%         { opacity: 0; }
+  }
+@keyframes lls-soul-l0 {
+        0%,100% { transform: scale(1) rotate(0deg); opacity: 0.55; }
+        30%     { transform: scale(1.07) rotate(8deg); opacity: 0.85; }
+        60%     { transform: scale(1.04) rotate(14deg); opacity: 0.65; }
+        80%     { transform: scale(1.09) rotate(18deg); opacity: 0.90; }
+      }
+@keyframes lls-soul-l1 {
+        0%,100% { transform: scale(1) rotate(0deg); opacity: 0.47; }
+        30%     { transform: scale(1.09) rotate(-8deg); opacity: 0.77; }
+        60%     { transform: scale(1.04) rotate(-14deg); opacity: 0.58; }
+        80%     { transform: scale(1.09) rotate(-18deg); opacity: 0.80; }
+      }
+@keyframes lls-soul-l2 {
+        0%,100% { transform: scale(1) rotate(0deg); opacity: 0.39; }
+        30%     { transform: scale(1.11) rotate(8deg); opacity: 0.69; }
+        60%     { transform: scale(1.04) rotate(14deg); opacity: 0.51; }
+        80%     { transform: scale(1.09) rotate(18deg); opacity: 0.70; }
+      }
+@keyframes lls-soul-l3 {
+        0%,100% { transform: scale(1) rotate(0deg); opacity: 0.31; }
+        30%     { transform: scale(1.1300000000000001) rotate(-8deg); opacity: 0.61; }
+        60%     { transform: scale(1.04) rotate(-14deg); opacity: 0.44; }
+        80%     { transform: scale(1.09) rotate(-18deg); opacity: 0.60; }
+      }
+@keyframes lls-orbit-slot {
+    0%           { opacity: 0; }
+    25.00%  { opacity: 0; }
+    26.11%  { opacity: 1; }
+    36.39%  { opacity: 1; }
+    37.50%  { opacity: 0; }
+    100%         { opacity: 0; }
+  }
+@keyframes lls-orbit-rot0 { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes lls-orbit-rot1 { from { transform:rotate(40deg); } to { transform:rotate(-320deg); } }
+@keyframes lls-orbit-rot2 { from { transform:rotate(80deg); } to { transform:rotate(440deg); } }
+@keyframes lls-orbit-rot3 { from { transform:rotate(120deg); } to { transform:rotate(-240deg); } }
+@keyframes lls-hb-slot {
+    0%           { opacity: 0; }
+    37.50%  { opacity: 0; }
+    38.61%  { opacity: 1; }
+    48.89%  { opacity: 1; }
+    50.00%  { opacity: 0; }
+    100%         { opacity: 0; }
+  }
+@keyframes lls-hb-core {
+      0%,100% { transform: scale(1);    opacity: 0.8; }
+      10%     { transform: scale(1.08); opacity: 1;   }
+      20%     { transform: scale(0.97); opacity: 0.85;}
+      30%     { transform: scale(1.04); opacity: 0.95;}
+      40%     { transform: scale(1);    opacity: 0.8; }
+    }
+@keyframes lls-hb-w0 {
+        0%   { r: 52; opacity: 0.9; stroke-width: 2.5; }
+        18%  { r: 72;  opacity: 0.36; stroke-width: 0.8; }
+        100% { r: 80; opacity: 0; stroke-width: 0; }
+      }
+@keyframes lls-hb-w1 {
+        0%   { r: 54; opacity: 0.6; stroke-width: 1.5; }
+        18%  { r: 80;  opacity: 0.24; stroke-width: 0.4; }
+        100% { r: 88; opacity: 0; stroke-width: 0; }
+      }
+@keyframes lls-hb-w2 {
+        0%   { r: 56; opacity: 0.3; stroke-width: 0.8; }
+        18%  { r: 88;  opacity: 0.12; stroke-width: 0.2; }
+        100% { r: 96; opacity: 0; stroke-width: 0; }
+      }
+@keyframes lls-elec-slot {
+    0%           { opacity: 0; }
+    50.00%  { opacity: 0; }
+    51.11%  { opacity: 1; }
+    61.39%  { opacity: 1; }
+    62.50%  { opacity: 0; }
+    100%         { opacity: 0; }
+  }
+@keyframes lls-elec-arc0 {
+        0%   { stroke-dashoffset: 0;            opacity: 0.8; }
+        50%  { stroke-dashoffset: -18; opacity: 1;   }
+        100% { stroke-dashoffset: -36; opacity: 0.8; }
+      }
+@keyframes lls-elec-rot0 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes lls-elec-arc1 {
+        0%   { stroke-dashoffset: 0;            opacity: 0.8; }
+        50%  { stroke-dashoffset: -30; opacity: 1;   }
+        100% { stroke-dashoffset: -60; opacity: 0.8; }
+      }
+@keyframes lls-elec-rot1 { from { transform: rotate(36deg); } to { transform: rotate(-324deg); } }
+@keyframes lls-elec-arc2 {
+        0%   { stroke-dashoffset: 0;            opacity: 0.8; }
+        50%  { stroke-dashoffset: -42; opacity: 1;   }
+        100% { stroke-dashoffset: -84; opacity: 0.8; }
+      }
+@keyframes lls-elec-rot2 { from { transform: rotate(72deg); } to { transform: rotate(432deg); } }
+@keyframes lls-elec-arc3 {
+        0%   { stroke-dashoffset: 0;            opacity: 0.8; }
+        50%  { stroke-dashoffset: -54; opacity: 1;   }
+        100% { stroke-dashoffset: -108; opacity: 0.8; }
+      }
+@keyframes lls-elec-rot3 { from { transform: rotate(108deg); } to { transform: rotate(-252deg); } }
+@keyframes lls-elec-arc4 {
+        0%   { stroke-dashoffset: 0;            opacity: 0.8; }
+        50%  { stroke-dashoffset: -66; opacity: 1;   }
+        100% { stroke-dashoffset: -132; opacity: 0.8; }
+      }
+@keyframes lls-elec-rot4 { from { transform: rotate(144deg); } to { transform: rotate(504deg); } }
+@keyframes lls-prism-slot {
+    0%           { opacity: 0; }
+    62.50%  { opacity: 0; }
+    63.61%  { opacity: 1; }
+    73.89%  { opacity: 1; }
+    75.00%  { opacity: 0; }
+    100%         { opacity: 0; }
+  }
+@keyframes lls-prism-rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes lls-prism-rot-rev { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+@keyframes lls-prism-ray-pulse {
+      0%,100% { opacity: 0.7; stroke-width: 1.5; }
+      50%     { opacity: 1;   stroke-width: 2.5; }
+    }
+@keyframes lls-prism-halo {
+      0%,100% { transform: scale(1); opacity: 0.4; }
+      50%     { transform: scale(1.15); opacity: 0.6; }
+    }
+@keyframes lls-qph-slot {
+    0%           { opacity: 0; }
+    75.00%  { opacity: 0; }
+    76.11%  { opacity: 1; }
+    86.39%  { opacity: 1; }
+    87.50%  { opacity: 0; }
+    100%         { opacity: 0; }
+  }
+
+      @keyframes lls-qph-phase {
+        0%,100% { transform: scale(1);    opacity: 1;   filter: none; }
+        15%     { transform: scale(1.02); opacity: 0.6; filter: hue-rotate(60deg); }
+        30%     { transform: scale(0.97); opacity: 0.9; filter: hue-rotate(120deg); }
+        50%     { transform: scale(1.04); opacity: 0.4; filter: hue-rotate(220deg) brightness(1.5); }
+        70%     { transform: scale(0.98); opacity: 0.85; filter: hue-rotate(300deg); }
+        85%     { transform: scale(1.01); opacity: 1; filter: hue-rotate(360deg); }
+      }
+      @keyframes lls-qph-ring1 {
+        0%,100% { r: 55;  opacity: 0.8; stroke-width: 2; }
+        40%     { r: 68; opacity: 0.2; stroke-width: 0.5; }
+        41%     { r: 55;  opacity: 0; }
+        42%     { r: 55;  opacity: 0.8; stroke-width: 2; }
+      }
+      @keyframes lls-qph-ring2 {
+        0%,100% { r: 62; opacity: 0.5; }
+        50%     { r: 78; opacity: 0; }
+        51%     { r: 62; opacity: 0.5; }
+      }
+      @keyframes lls-qph-bg {
+        0%,100% { opacity: 0.3; transform: scale(1); }
+        50%     { opacity: 0.6; transform: scale(1.2); }
+      }
+@keyframes lls-spk-slot {
+    0%           { opacity: 0; }
+    87.50%  { opacity: 0; }
+    88.61%  { opacity: 1; }
+    98.89%  { opacity: 1; }
+    100.00%  { opacity: 0; }
+    100%         { opacity: 0; }
+  }
+@keyframes lls-spk-bg {
+      0%,100% { opacity: 0.12; transform: scale(1); }
+      50%     { opacity: 0.25; transform: scale(1.1); }
+    }
+@keyframes lls-spk-rot0 {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+      @keyframes lls-spk-blink0 {
+        0%,100% { opacity: 0.40; r: 0.8; }
+        50%     { opacity: 1; r: 1.4; }
+      }
+@keyframes lls-spk-rot1 {
+        from { transform: rotate(41.43330193783186deg); }
+        to   { transform: rotate(-318.56669806216814deg); }
+      }
+      @keyframes lls-spk-blink1 {
+        0%,100% { opacity: 0.60; r: 1.7; }
+        50%     { opacity: 1; r: 3.1; }
+      }
+@keyframes lls-spk-rot2 {
+        from { transform: rotate(82.4687224758236deg); }
+        to   { transform: rotate(442.4687224758236deg); }
+      }
+      @keyframes lls-spk-blink2 {
+        0%,100% { opacity: 0.89; r: 2.1; }
+        50%     { opacity: 1; r: 3.8; }
+      }
+@keyframes lls-spk-rot3 {
+        from { transform: rotate(98.61706546318601deg); }
+        to   { transform: rotate(-261.382934536814deg); }
+      }
+      @keyframes lls-spk-blink3 {
+        0%,100% { opacity: 0.84; r: 2.2; }
+        50%     { opacity: 1; r: 4.0; }
+      }
+@keyframes lls-spk-rot4 {
+        from { transform: rotate(132.76229418821458deg); }
+        to   { transform: rotate(492.7622941882146deg); }
+      }
+      @keyframes lls-spk-blink4 {
+        0%,100% { opacity: 0.94; r: 1.7; }
+        50%     { opacity: 1; r: 3.1; }
+      }
+@keyframes lls-spk-rot5 {
+        from { transform: rotate(154.5103029047081deg); }
+        to   { transform: rotate(-205.4896970952919deg); }
+      }
+      @keyframes lls-spk-blink5 {
+        0%,100% { opacity: 0.71; r: 2.7; }
+        50%     { opacity: 1; r: 4.9; }
+      }
+@keyframes lls-spk-rot6 {
+        from { transform: rotate(203.4491293694009deg); }
+        to   { transform: rotate(563.4491293694009deg); }
+      }
+      @keyframes lls-spk-blink6 {
+        0%,100% { opacity: 0.73; r: 2.0; }
+        50%     { opacity: 1; r: 3.6; }
+      }
+@keyframes lls-spk-rot7 {
+        from { transform: rotate(234.74090490832168deg); }
+        to   { transform: rotate(-125.25909509167832deg); }
+      }
+      @keyframes lls-spk-blink7 {
+        0%,100% { opacity: 0.63; r: 1.3; }
+        50%     { opacity: 1; r: 2.3; }
+      }
+@keyframes lls-spk-rot8 {
+        from { transform: rotate(248.47145872998226deg); }
+        to   { transform: rotate(608.4714587299823deg); }
+      }
+      @keyframes lls-spk-blink8 {
+        0%,100% { opacity: 0.52; r: 2.4; }
+        50%     { opacity: 1; r: 4.3; }
+      }
+@keyframes lls-spk-rot9 {
+        from { transform: rotate(289.2554197946811deg); }
+        to   { transform: rotate(-70.74458020531893deg); }
+      }
+      @keyframes lls-spk-blink9 {
+        0%,100% { opacity: 0.54; r: 2.2; }
+        50%     { opacity: 1; r: 4.0; }
+      }
+@keyframes lls-spk-rot10 {
+        from { transform: rotate(308.87519780334515deg); }
+        to   { transform: rotate(668.8751978033451deg); }
+      }
+      @keyframes lls-spk-blink10 {
+        0%,100% { opacity: 0.42; r: 2.3; }
+        50%     { opacity: 1; r: 4.1; }
+      }
+@keyframes lls-spk-rot11 {
+        from { transform: rotate(353.4025390840543deg); }
+        to   { transform: rotate(-6.597460915945703deg); }
+      }
+      @keyframes lls-spk-blink11 {
+        0%,100% { opacity: 0.84; r: 1.0; }
+        50%     { opacity: 1; r: 1.8; }
+      }
+@keyframes lls-spk-ring-rot { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+@keyframes lmb-morph {
+        0%   { transform: rotate(0deg)        scale(1); }
+        25%  { transform: rotate(36deg)  scale(1.04); }
+        50%  { transform: rotate(72deg) scale(0.98); }
+        75%  { transform: rotate(108deg) scale(1.04); }
+        100% { transform: rotate(360deg)       scale(1); }
+      }
+@keyframes lmb-light-glow {
+        0%,100% { opacity: 0.21; transform: scale(1); }
+        48%     { opacity: 0.59; transform: scale(1.1); }
+        50%     { opacity: 0.7; transform: scale(1.08); }
+        52%     { opacity: 0.59; transform: scale(1.1); }
+      }
+      @keyframes lmb-elec-flicker {
+        0%,85%,100% { opacity: 1; }
+        86% { opacity: 0.7; }
+        87% { opacity: 1; }
+        88% { opacity: 0.8; }
+        94% { opacity: 0.6; }
+        95% { opacity: 1; }
+      }
+@keyframes lmb-physics {
+        0%   { transform: translateY(0px); }
+        15%  { transform: translateY(-3.0px); }
+        30%  { transform: translateY(-2.7px); }
+        45%  { transform: translateY(-1.2px); }
+        60%  { transform: translateY(-0.4px); }
+        100% { transform: translateY(0px); }
+      }
+    /* CNLS — Corp Name Living System */
+
+    /* SOUL AURA — halo périodique */
+    @keyframes cnls-halo {
+      0%,57.1%,100% { opacity: 0; transform: scaleX(1) scaleY(1); }
+      64.3% { opacity: 1; transform: scaleX(1.04) scaleY(1.3); }
+      78.6% { opacity: 0.6; transform: scaleX(1.02) scaleY(1.15); }
+    }
+
+    /* BREATHING — micro-respiration du groupe texte */
+    @keyframes cnls-breathe {
+      0%,100% { transform: scaleX(1) scaleY(1); }
+      50%     { transform: scaleX(1.0034) scaleY(1.0051); }
+    }
+
+    /* ELECTRIC FORM — scanner lumineux */
+    @keyframes cnls-shimmer-move {
+      0%   { transform: translateX(-254px); opacity: 0; }
+      5%   { opacity: 1; }
+      95%  { opacity: 1; }
+      100% { transform: translateX(254px); opacity: 0; }
+    }
+
+    /* NEON GLOW — pulsation lumineuse douce */
+    @keyframes cnls-glow-pulse {
+      0%,100% { opacity: 0.00; transform: scaleY(1); }
+      50%     { opacity: 0.19; transform: scaleY(1.1); }
+    }
+
+    /* Cursor clignotant (typewriter) */
+    @keyframes cnls-cursor {
+      0%,49%  { opacity: 1; }
+      50%,100%{ opacity: 0; }
+    }
+
+    /* Fade-in global du groupe */
+    @keyframes cnls-fadein {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    
+    @keyframes cnls-glitch {
+      0%,89.0%,100% {
+        transform: translateX(0) skewX(0deg); opacity: 1; filter: none;
+      }
+      89.8% {
+        transform: translateX(-2px) skewX(-0.8deg); opacity: 0.85;
+        filter: url(#cnls-glitch-f);
+      }
+      90.6% {
+        transform: translateX(2px) skewX(0.5deg); opacity: 0.92;
+        filter: url(#cnls-glitch-f);
+      }
+      91.4% {
+        transform: translateX(-1px); opacity: 0.96; filter: none;
+      }
+    }</style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="190" fill="#0f172a" rx="10"/>
+
+  <!-- Glow de fond (barre accent) -->
+  <rect x="0" y="0" width="4" height="190" fill="url(#accentGrad)" rx="2"><animate attributeName="opacity" values="0.35;0.75;0.35" dur="2.8s" repeatCount="indefinite"/></rect>
+
+  <!-- Avatar cercle + Logo Living System -->
+  <g transform="translate(24,95)">
+    <!-- Effets logo derrière le cercle (Lighting + Morphing + cycle LLS) -->
+    <!-- ── Couche permanente : Lighting + Morphing (tech) ── -->
+
+      <!-- ── LightingEngine — glow ambiant sectoriel ── -->
+      <circle r="71.25" fill="url(#lmb-glow-grad)"
+          style="animation:lmb-light-glow 2.67s ease-in-out 0s infinite, lmb-elec-flicker 3s linear 1s infinite; transform-origin:0px 0px;"/><circle r="54" fill="none" stroke="rgba(100,103,242,0.7)" stroke-width="0.8"
+          stroke-dasharray="2 16"
+          style="animation:lmb-elec-flicker 2s linear 0s infinite; transform-origin:0px 0px;"/>
+      <!-- ── MorphingEngine — morphing anneau sectoriel ── -->
+      <circle r="53" fill="none" stroke="#6467f2"
+        stroke-width="1.6" stroke-dasharray="42 13"
+        opacity="0.65"
+        style="animation:lmb-morph 2.92s ease-in-out 0s infinite; transform-origin:0px 0px;"/>
+<!-- ── Cycle 8 effets LLS ── -->
+<g id="lls-neon" style="opacity:1; animation:lls-neon-slot 36s linear 0s infinite;">
+      <circle r="56" fill="none" stroke="#6366f1" stroke-width="2.5"
+        filter="url(#lls-neon-f)"
+        style="animation:lls-neon-ring 3s ease-in-out 0s infinite; transform-origin:0px 0px;"/>
+      <circle r="66" fill="none" stroke="#9598ff" stroke-width="1.5"
+        style="animation:lls-neon-ring2 3s ease-in-out 0.5s infinite; transform-origin:0px 0px;"/>
+      <circle r="74" fill="none" stroke="hsl(299,84%,77%)" stroke-width="0.8"
+        style="animation:lls-neon-ring3 3.5s ease-in-out 1s infinite; transform-origin:0px 0px;"/>
+    </g>
+<g id="lls-soul" style="opacity:0; animation:lls-soul-slot 36s linear 0s infinite;"><circle r="58" fill="hsl(239,84%,67%)" fill-opacity="0.30"
+        filter="url(#lls-soul-f)"
+        style="animation:lls-soul-l0 3.0s cubic-bezier(.4,0,.2,1) 0.00s infinite; transform-origin:0px 0px;"/>
+<circle r="68" fill="hsl(299,84%,72%)" fill-opacity="0.25"
+        filter="url(#lls-soul-f)"
+        style="animation:lls-soul-l1 3.4s cubic-bezier(.4,0,.2,1) 0.35s infinite; transform-origin:0px 0px;"/>
+<circle r="78" fill="hsl(359,84%,77%)" fill-opacity="0.20"
+        filter="url(#lls-soul-f)"
+        style="animation:lls-soul-l2 3.8s cubic-bezier(.4,0,.2,1) 0.70s infinite; transform-origin:0px 0px;"/>
+<circle r="88" fill="hsl(79,84%,82%)" fill-opacity="0.15"
+        filter="url(#lls-soul-f)"
+        style="animation:lls-soul-l3 4.2s cubic-bezier(.4,0,.2,1) 1.05s infinite; transform-origin:0px 0px;"/></g>
+<g id="lls-orbit" style="opacity:0; animation:lls-orbit-slot 36s linear 0s infinite;"><ellipse rx="60" ry="56" fill="none"
+          stroke="#6366f1" stroke-width="1.2" stroke-dasharray="3 8" stroke-opacity="0.7"
+          style="animation:lls-orbit-rot0 4s linear 0.0s infinite; transform-origin:0px 0px;"/>
+        <circle r="2.5" fill="#6366f1" fill-opacity="0.95" cx="60" cy="0"
+          filter="url(#lls-orbit-f)"
+          style="animation:lls-orbit-rot0 4s linear 0.0s infinite; transform-origin:0px 0px;"/>
+<ellipse rx="68" ry="61" fill="none"
+          stroke="hsl(299,84%,77%)" stroke-width="0.9" stroke-dasharray="2 12" stroke-opacity="0.7"
+          style="animation:lls-orbit-rot1 6s linear 0.5s infinite; transform-origin:0px 0px;"/>
+        <circle r="2" fill="hsl(299,84%,77%)" fill-opacity="0.95" cx="68" cy="0"
+          filter="url(#lls-orbit-f)"
+          style="animation:lls-orbit-rot1 6s linear 0.5s infinite; transform-origin:0px 0px;"/>
+<ellipse rx="76" ry="65" fill="none"
+          stroke="hsl(79,84%,72%)" stroke-width="0.7" stroke-dasharray="5 15" stroke-opacity="0.7"
+          style="animation:lls-orbit-rot2 8.5s linear 1.0s infinite; transform-origin:0px 0px;"/>
+        <circle r="1.5" fill="hsl(79,84%,72%)" fill-opacity="0.95" cx="76" cy="0"
+          filter="url(#lls-orbit-f)"
+          style="animation:lls-orbit-rot2 8.5s linear 1.0s infinite; transform-origin:0px 0px;"/>
+<ellipse rx="86" ry="70" fill="none"
+          stroke="#9598ff" stroke-width="0.5" stroke-dasharray="2 20" stroke-opacity="0.7"
+          style="animation:lls-orbit-rot3 11s linear 1.5s infinite; transform-origin:0px 0px;"/>
+        <circle r="1.2" fill="#9598ff" fill-opacity="0.95" cx="86" cy="0"
+          filter="url(#lls-orbit-f)"
+          style="animation:lls-orbit-rot3 11s linear 1.5s infinite; transform-origin:0px 0px;"/></g>
+<g id="lls-hb" style="opacity:0; animation:lls-hb-slot 36s linear 0s infinite;">
+      <circle r="50" fill="#6366f1" fill-opacity="0.06"
+        style="animation:lls-hb-core 1.9919999999999998s ease-in-out 0s infinite; transform-origin:0px 0px;"/>
+      <circle r="52" fill="none" stroke="#6366f1" stroke-width="2.5"
+        filter="url(#lls-hb-f)"
+        style="animation:lls-hb-w0 1.99s cubic-bezier(.22,1,.36,1) 0.00s infinite; transform-origin:0px 0px;"/>
+<circle r="54" fill="none" stroke="#6366f1" stroke-width="1.5"
+        filter="url(#lls-hb-f)"
+        style="animation:lls-hb-w1 1.99s cubic-bezier(.22,1,.36,1) 0.28s infinite; transform-origin:0px 0px;"/>
+<circle r="56" fill="none" stroke="#6366f1" stroke-width="0.8"
+        filter="url(#lls-hb-f)"
+        style="animation:lls-hb-w2 1.99s cubic-bezier(.22,1,.36,1) 0.55s infinite; transform-origin:0px 0px;"/>
+    </g>
+<g id="lls-elec" style="opacity:0; animation:lls-elec-slot 36s linear 0s infinite;"><ellipse rx="56" ry="54" fill="none"
+          stroke="#6366f1" stroke-width="1.8"
+          stroke-dasharray="6 12"
+          filter="url(#lls-elec-f)"
+          style="animation:lls-elec-rot0 3.0s linear 0.0s infinite, lls-elec-arc0 1.80s linear 0.0s infinite; transform-origin:0px 0px;"/>
+<ellipse rx="61" ry="57" fill="none"
+          stroke="#9598ff" stroke-width="1.6"
+          stroke-dasharray="10 20"
+          filter="url(#lls-elec-f)"
+          style="animation:lls-elec-rot1 3.8s linear 0.2s infinite, lls-elec-arc1 2.15s linear 0.3s infinite; transform-origin:0px 0px;"/>
+<ellipse rx="66" ry="60" fill="none"
+          stroke="#6366f1" stroke-width="1.4"
+          stroke-dasharray="14 28"
+          filter="url(#lls-elec-f)"
+          style="animation:lls-elec-rot2 4.6s linear 0.4s infinite, lls-elec-arc2 2.50s linear 0.6s infinite; transform-origin:0px 0px;"/>
+<ellipse rx="71" ry="63" fill="none"
+          stroke="#9598ff" stroke-width="1.2"
+          stroke-dasharray="18 36"
+          filter="url(#lls-elec-f)"
+          style="animation:lls-elec-rot3 5.4s linear 0.6s infinite, lls-elec-arc3 2.85s linear 0.9s infinite; transform-origin:0px 0px;"/>
+<ellipse rx="76" ry="66" fill="none"
+          stroke="#6366f1" stroke-width="1.0"
+          stroke-dasharray="22 44"
+          filter="url(#lls-elec-f)"
+          style="animation:lls-elec-rot4 6.2s linear 0.8s infinite, lls-elec-arc4 3.20s linear 1.2s infinite; transform-origin:0px 0px;"/></g>
+<g id="lls-prism" style="opacity:0; animation:lls-prism-slot 36s linear 0s infinite;">
+      <g style="animation:lls-prism-rot 7s linear 0s infinite; transform-origin:0px 0px;">
+        <line x1="54.0" y1="0.0" x2="72.0" y2="0.0"
+          stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" opacity="0.8"
+          filter="url(#lls-prism-f)"
+          style="animation:lls-prism-ray-pulse 2.0s ease-in-out 0.0s infinite;"/>
+<line x1="27.0" y1="46.8" x2="40.0" y2="69.3"
+          stroke="hsl(299,84%,77%)" stroke-width="1.5" stroke-linecap="round" opacity="0.8"
+          filter="url(#lls-prism-f)"
+          style="animation:lls-prism-ray-pulse 2.3s ease-in-out 0.2s infinite;"/>
+<line x1="-27.0" y1="46.8" x2="-44.0" y2="76.2"
+          stroke="hsl(359,84%,67%)" stroke-width="1.5" stroke-linecap="round" opacity="0.8"
+          filter="url(#lls-prism-f)"
+          style="animation:lls-prism-ray-pulse 2.6s ease-in-out 0.4s infinite;"/>
+<line x1="-54.0" y1="0.0" x2="-72.0" y2="0.0"
+          stroke="hsl(79,84%,72%)" stroke-width="1.5" stroke-linecap="round" opacity="0.8"
+          filter="url(#lls-prism-f)"
+          style="animation:lls-prism-ray-pulse 2.9s ease-in-out 0.6s infinite;"/>
+<line x1="-27.0" y1="-46.8" x2="-40.0" y2="-69.3"
+          stroke="hsl(159,84%,67%)" stroke-width="1.5" stroke-linecap="round" opacity="0.8"
+          filter="url(#lls-prism-f)"
+          style="animation:lls-prism-ray-pulse 3.2s ease-in-out 0.8s infinite;"/>
+<line x1="27.0" y1="-46.8" x2="44.0" y2="-76.2"
+          stroke="#9598ff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"
+          filter="url(#lls-prism-f)"
+          style="animation:lls-prism-ray-pulse 3.5s ease-in-out 1.0s infinite;"/>
+      </g>
+      <g style="animation:lls-prism-rot-rev 11s linear 0s infinite; transform-origin:0px 0px;">
+        <line x1="48.5" y1="28.0" x2="57.2" y2="33.0" stroke="#6366f1" stroke-width="1" opacity="0.5"/><line x1="0.0" y1="56.0" x2="0.0" y2="66.0" stroke="hsl(299,84%,77%)" stroke-width="1" opacity="0.5"/><line x1="-48.5" y1="28.0" x2="-57.2" y2="33.0" stroke="hsl(359,84%,67%)" stroke-width="1" opacity="0.5"/><line x1="-48.5" y1="-28.0" x2="-57.2" y2="-33.0" stroke="hsl(79,84%,72%)" stroke-width="1" opacity="0.5"/><line x1="-0.0" y1="-56.0" x2="-0.0" y2="-66.0" stroke="hsl(159,84%,67%)" stroke-width="1" opacity="0.5"/><line x1="48.5" y1="-28.0" x2="57.2" y2="-33.0" stroke="#9598ff" stroke-width="1" opacity="0.5"/>
+      </g>
+      <circle r="78" fill="none" stroke="#9598ff" stroke-width="0.8" stroke-dasharray="4 8"
+        style="animation:lls-prism-halo 4s ease-in-out 0s infinite, lls-prism-rot 15s linear 0s infinite; transform-origin:0px 0px;"/>
+    </g>
+<g id="lls-qph" style="opacity:0; animation:lls-qph-slot 36s linear 0s infinite;">
+      <circle r="80" fill="url(#lls-qph-rg)"
+        style="animation:lls-qph-bg 2s ease-in-out 0s infinite; transform-origin:0px 0px;"/>
+      <circle r="55" fill="none" stroke="hsl(359,84%,67%)" stroke-width="2"
+        filter="url(#lls-qph-f)"
+        style="animation:lls-qph-ring1 2s cubic-bezier(.25,0,.75,1) 0s infinite; transform-origin:0px 0px;"/>
+      <circle r="62" fill="none" stroke="hsl(79,84%,72%)" stroke-width="1"
+        style="animation:lls-qph-ring2 2s cubic-bezier(.25,0,.75,1) 0.3s infinite; transform-origin:0px 0px;"/>
+    </g>
+<g id="lls-spk" style="opacity:0; animation:lls-spk-slot 36s linear 0s infinite;">
+      <circle r="72" fill="#6366f1" fill-opacity="0.08"
+        style="animation:lls-spk-bg 3s ease-in-out 0s infinite; transform-origin:0px 0px;"/>
+      <circle r="72" fill="none" stroke="#9598ff" stroke-width="0.6"
+        stroke-dasharray="1 8"
+        style="animation:lls-spk-ring-rot 20s linear 0s infinite; transform-origin:0px 0px;"/>
+      <circle r="0.8" fill="#6366f1"
+          cx="60.0" cy="0.0"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot0 3.0s linear 0.0s infinite, lls-spk-blink0 0.6s ease-in-out 0.0s infinite; transform-origin:0px 0px;"/>
+<circle r="1.7" fill="#9598ff"
+          cx="55.9" cy="49.3"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot1 5.9s linear 0.3s infinite, lls-spk-blink1 1.3s ease-in-out 0.7s infinite; transform-origin:0px 0px;"/>
+<circle r="2.1" fill="hsl(299,84%,77%)"
+          cx="9.3" cy="70.3"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot2 4.3s linear 0.6s infinite, lls-spk-blink2 0.6s ease-in-out 1.6s infinite; transform-origin:0px 0px;"/>
+<circle r="2.2" fill="hsl(359,84%,67%)"
+          cx="-9.7" cy="63.9"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot3 5.9s linear 0.9s infinite, lls-spk-blink3 1.9s ease-in-out 1.5s infinite; transform-origin:0px 0px;"/>
+<circle r="1.7" fill="hsl(79,84%,72%)"
+          cx="-45.4" cy="49.1"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot4 5.9s linear 1.2s infinite, lls-spk-blink4 1.7s ease-in-out 1.8s infinite; transform-origin:0px 0px;"/>
+<circle r="2.7" fill="hsl(159,84%,67%)"
+          cx="-71.0" cy="33.9"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot5 6.6s linear 1.5s infinite, lls-spk-blink5 1.2s ease-in-out 1.0s infinite; transform-origin:0px 0px;"/>
+<circle r="2.0" fill="#6366f1"
+          cx="-68.7" cy="-29.8"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot6 7.0s linear 1.8s infinite, lls-spk-blink6 1.7s ease-in-out 1.1s infinite; transform-origin:0px 0px;"/>
+<circle r="1.3" fill="#9598ff"
+          cx="-38.0" cy="-53.7"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot7 6.1s linear 2.1s infinite, lls-spk-blink7 0.8s ease-in-out 0.8s infinite; transform-origin:0px 0px;"/>
+<circle r="2.4" fill="hsl(299,84%,77%)"
+          cx="-28.9" cy="-73.3"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot8 4.0s linear 2.4s infinite, lls-spk-blink8 0.7s ease-in-out 0.4s infinite; transform-origin:0px 0px;"/>
+<circle r="2.2" fill="hsl(359,84%,67%)"
+          cx="20.7" cy="-59.2"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot9 5.8s linear 2.7s infinite, lls-spk-blink9 1.3s ease-in-out 0.5s infinite; transform-origin:0px 0px;"/>
+<circle r="2.3" fill="hsl(79,84%,72%)"
+          cx="47.6" cy="-59.0"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot10 5.8s linear 3.0s infinite, lls-spk-blink10 0.9s ease-in-out 0.1s infinite; transform-origin:0px 0px;"/>
+<circle r="1.0" fill="hsl(159,84%,67%)"
+          cx="74.2" cy="-8.6"
+          filter="url(#lls-spk-f)"
+          style="animation:lls-spk-rot11 3.4s linear 3.3s infinite, lls-spk-blink11 1.8s ease-in-out 1.5s infinite; transform-origin:0px 0px;"/>
+    </g>
+    <!-- PhysicsEngine wrapper (float / bounce / pendulum selon secteur) -->
+    <g style="animation:lmb-physics 1.20s cubic-bezier(.22,1,.36,1) 0s infinite;">
+    <!-- Cercle avatar principal -->
+    <circle r="50" fill="#6366f118" stroke="#6366f1" stroke-width="1.5"><animateTransform attributeName="transform" type="scale" values="1;1.025;1" dur="2.8s" repeatCount="indefinite" additive="sum"/></circle>
+    <!-- Logo ou initiales -->
+    <text text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#6366f1">SM</text>
+    </g>
+  </g>
+
+  <!-- Séparateur vertical -->
+  <rect x="96" y="16" width="1.5" height="158" fill="#6366f1" opacity="0.3" rx="1"/>
+
+  <!-- ENTREPRISE — Corp Name Living System (gradient + halo + typewriter + glitch) -->
+  <g transform="translate(112, 36)">
+    <!-- ═══ Corp Name Living System ═══════════════════════════════════════ -->
+    <!-- Sector: tech | Variant: A | BPM: 72 | Glow: 85% -->
+    <g style="animation: cnls-fadein 0.4s ease-out 0s forwards; opacity:0; transform-origin: 0px 0px;">
+
+      
+    <!-- SOUL AURA — halo périodique -->
+    <rect x="-8" y="-28" width="210" height="32" rx="4"
+      fill="url(#cnls-halo-rg)"
+      filter="url(#cnls-halo-f)"
+      style="opacity:0; animation: cnls-halo 7.00s ease-in-out 3.50s infinite; transform-origin: 97px -13px;"/>
+      
+    <!-- NEON GLOW — aura douce permanente -->
+    <rect x="-8" y="-28" width="210" height="32" rx="4"
+      fill="#6467f2" fill-opacity="0.07"
+      filter="url(#cnls-halo-f)"
+      style="animation: cnls-glow-pulse 8.00s ease-in-out 0s infinite; transform-origin: 97px -13px;"/>
+
+      <g style="animation: cnls-glitch 9.10s linear 3.00s infinite; transform-origin: 0px 0px;">
+        
+    <!-- Ghost text — ombre colorée en décalage (ECHO TRAIL) -->
+    <text x="1" y="1"
+      font-family="Arial,sans-serif" font-size="21" font-weight="900"
+      fill="hsl(59,100%,90%)" fill-opacity="0.10" letter-spacing="1"
+      filter="url(#cnls-glow-f)"
+      aria-hidden="true">
+      EFFECTFORGE AI
+    </text>
+        
+    <!-- Texte principal — révélation typewriter + gradient cyclique -->
+    <g clip-path="url(#cnls-type-clip)">
+      <text x="0" y="0"
+        font-family="Arial,sans-serif" font-size="21" font-weight="900"
+        fill="url(#cnls-grad)" letter-spacing="1"
+        style="">
+        EFFECTFORGE AI
+      </text>
+    </g>
+        
+    <rect x="197" y="-24" width="2" height="22"
+      fill="#6467f2" rx="1"
+      style="animation: cnls-cursor 0.65s step-end 3.00s 6; transform-origin:0px 0px; opacity:0;">
+      <animate attributeName="opacity" values="0" dur="3.00s" fill="freeze"/>
+    </rect>
+      </g>
+
+      
+    <!-- ELECTRIC FORM — scanner lumineux -->
+    <g clip-path="url(#cnls-type-clip)" style="opacity:0; animation: cnls-fadein 0.1s linear 3.10s forwards;">
+      <rect x="-30" y="-28" width="90" height="32"
+        fill="url(#cnls-shimmer)"
+        style="animation: cnls-shimmer-move 5.00s cubic-bezier(.25,.46,.45,.94) 4.00s infinite; transform-origin:0px 0px;"/>
+    </g>
+
+    </g>
+    <!-- ═══════════════════════════════════════════════════════════════════ --></g>
+
+  <!-- NOM -->
+  <text x="112" y="56" font-family="Arial,sans-serif" font-size="14" font-weight="700"
+    fill="#a5b4fc" opacity="0">
+    Sophie Martin<animate attributeName="opacity" values="0;1" dur="0.8s" fill="freeze"/>
+  </text>
+
+  <!-- TITRE -->
+  <text x="112" y="71" font-family="Arial,sans-serif" font-size="10" font-weight="600"
+    fill="#6366f1" letter-spacing="1.5"
+    style="clip-path:inset(0 100% 0 0)">
+    CTO
+    <animate attributeName="clip-path" from="inset(0 100% 0 0)" to="inset(0 0% 0 0)" dur="1.4s" begin="0.5s" fill="freeze"/>
+  </text>
+
+  <!-- Ligne séparatrice -->
+  <line x1="112" y1="82" x2="568" y2="82" stroke="#6366f1" stroke-width="0.8" opacity="0.25"/>
+
+  <!-- Téléphone -->
+  <text x="112" y="99" font-family="Arial,sans-serif" font-size="11" fill="#a5b4fc" opacity="0.8">☎ 06 12 34 56 78</text>
+
+  <!-- Email -->
+  <text x="112" y="116" font-family="Arial,sans-serif" font-size="11" fill="#a5b4fc" opacity="0.8">✉ sophie@effectforge.io</text>
+
+  <!-- Adresse -->
+  
+
+  <!-- Note -->
+  
+
+  <!-- CTA bouton — aligné à droite de la colonne info -->
+  <g transform="translate(380, 140)">
+    <rect width="148" height="32" rx="6" fill="#6366f1" opacity="0.92"/>
+    <text x="74" y="21" text-anchor="middle" font-family="Arial,sans-serif" font-size="11"
+      font-weight="700" fill="#ffffff"></text>
+  </g>
+
+  <!-- Site -->
+  
+</svg>

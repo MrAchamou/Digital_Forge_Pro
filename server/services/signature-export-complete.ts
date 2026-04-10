@@ -7,6 +7,7 @@ import { log } from '../vite';
 import type { SectorConfig } from './signature-renderer';
 import { selectEffectsForSector, renderEffectLayer, buildEffectCtx } from './gif-effect-engine';
 import { buildLogoLivingSystem, buildLogoGifFrame } from './logo-living-system';
+import { buildCorpNameLivingSystem } from './corp-name-living-system';
 
 // ── Dossier de stockage des assets hébergés ───────────────────────────────────
 const SIG_ASSETS_DIR = path.join(process.cwd(), 'exports', 'hosted');
@@ -139,7 +140,12 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     ? buildLogoLivingSystem(50, accent, accentLight, palette, meta.secteur ?? 'default', 'A')
     : { defsHtml: '', stylesCSS: '', elements: '', innerWrap: { openTag: '<g>', closeTag: '</g>' } };
 
-  // ── Gradient cyclique pour le nom de l'entreprise (effet NEXUS COMMAND) ────
+  // ── Corp Name Living System — effets orchestrés sur le nom d'entreprise ───
+  const cnls = buildCorpNameLivingSystem(
+    entreprise, accent, accentLight, meta.secteur ?? 'default', 'A', animated
+  );
+
+  // ── Gradient cyclique pour le nom de l'entreprise (fallback statique) ─────
   const corpGradDef = `
     <linearGradient id="sg-corp-grad" x1="100" y1="0" x2="700" y2="0" gradientUnits="userSpaceOnUse">
       <stop offset="0%"   stop-color="${gradCol1}"/>
@@ -159,12 +165,13 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       <stop offset="100%" stop-color="${accentLight}"/>
     </linearGradient>
     ${corpGradDef}
+    ${cnls.filterDefs}
     ${logo_url ? `<clipPath id="avatarLogoClip"><circle cx="0" cy="0" r="44"/></clipPath>` : ''}
     <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     ${lls.defsHtml}
-    ${animated ? `<style>${lls.stylesCSS}</style>` : ''}
+    ${animated ? `<style>${lls.stylesCSS}${cnls.stylesCSS}</style>` : ''}
   </defs>
 
   <!-- Background -->
@@ -192,12 +199,12 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   <!-- Séparateur vertical -->
   <rect x="96" y="16" width="1.5" height="158" fill="${accent}" opacity="0.3" rx="1"/>
 
-  <!-- ENTREPRISE — headline gradient cyclique (effet NEXUS COMMAND) -->
-  <text x="112" y="36" font-family="Arial,sans-serif" font-size="21" font-weight="900"
-    fill="url(#sg-corp-grad)" letter-spacing="1">
-    ${escXml(entreprise.toUpperCase())}
-    ${animated ? `<animate attributeName="opacity" values="0;1" dur="0.4s" fill="freeze"/>` : ''}
-  </text>
+  <!-- ENTREPRISE — Corp Name Living System (gradient + halo + typewriter + glitch) -->
+  ${animated
+    ? `<g transform="translate(112, 36)">${cnls.groupSVG}</g>`
+    : `<text x="112" y="36" font-family="Arial,sans-serif" font-size="21" font-weight="900"
+         fill="url(#sg-corp-grad)" letter-spacing="1">${escXml(entreprise.toUpperCase())}</text>`
+  }
 
   <!-- NOM -->
   <text x="112" y="56" font-family="Arial,sans-serif" font-size="14" font-weight="700"
