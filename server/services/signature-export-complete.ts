@@ -114,8 +114,8 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
 
   // ── Logo Living System — 8 effets avec transitions fluides ────────────────
   const lls = animated
-    ? buildLogoLivingSystem(50, accent, accentLight, palette)
-    : { defsHtml: '', stylesCSS: '', elements: '' };
+    ? buildLogoLivingSystem(50, accent, accentLight, palette, meta.secteur ?? 'default', 'A')
+    : { defsHtml: '', stylesCSS: '', elements: '', innerWrap: { openTag: '<g>', closeTag: '</g>' } };
 
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   viewBox="0 0 600 180" width="600" height="180">
@@ -140,8 +140,10 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
 
   <!-- Avatar cercle + Logo Living System -->
   <g transform="translate(24,90)">
-    <!-- Effets logo derrière le cercle -->
+    <!-- Effets logo derrière le cercle (Lighting + Morphing + cycle LLS) -->
     ${lls.elements}
+    <!-- PhysicsEngine wrapper (float / bounce / pendulum selon secteur) -->
+    ${lls.innerWrap?.openTag ?? '<g>'}
     <!-- Cercle avatar principal -->
     <circle r="50" fill="${accent}18" stroke="${accent}" stroke-width="1.5">${breatheAttr}</circle>
     <!-- Logo ou initiales -->
@@ -149,6 +151,7 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       ? `<image href="${escXml(logo_url)}" x="-44" y="-44" width="88" height="88" clip-path="url(#avatarLogoClip)" preserveAspectRatio="xMidYMid meet"/>`
       : `<text text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="${accent}">${escXml(initials)}</text>`
     }
+    ${lls.innerWrap?.closeTag ?? '</g>'}
   </g>
 
   <!-- Séparateur vertical -->

@@ -88,6 +88,46 @@ function getSector(sectorId: string): string {
   return (sectorId || '').toLowerCase().split(/[_\s-]/)[0] || 'default';
 }
 
+// ── VarianceEngine : applique hueShift / satMult / lightOffset sur une couleur hex ──
+
+function hexToHsl(hex: string): [number, number, number] {
+  if (!hex || hex.length < 7) return [0, 0, 50];
+  const r = parseInt(hex.slice(1,3),16)/255;
+  const g = parseInt(hex.slice(3,5),16)/255;
+  const b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  const l = (max+min)/2;
+  if (max === min) return [0, 0, Math.round(l*100)];
+  const d = max - min;
+  const s2 = l > 0.5 ? d/(2-max-min) : d/(max+min);
+  let h = max===r ? (g-b)/d+(g<b?6:0) : max===g ? (b-r)/d+2 : (r-g)/d+4;
+  return [Math.round(h*60), Math.round(s2*100), Math.round(l*100)];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  h = ((h % 360) + 360) % 360;
+  s = Math.max(0, Math.min(100, s)) / 100;
+  l = Math.max(0, Math.min(100, l)) / 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const v = l - a * Math.max(-1, Math.min(k-3, 9-k, 1));
+    return Math.round(255 * v).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+export function applyVarianceToColor(
+  hex: string,
+  hueShift: number,
+  satMult: number,
+  lightOffset: number,
+): string {
+  if (!hex || hex.length < 7) return hex;
+  const [h, s, l] = hexToHsl(hex);
+  return hslToHex(h + hueShift, s * satMult, l + lightOffset);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // RÉSULTAT DU PONT
 // ─────────────────────────────────────────────────────────────────────────────
@@ -474,13 +514,17 @@ export function buildLogoModuleBridge(
   }
 
   const variance   = getVarianceParams(variantId);
-  const timingMult = variance.timingMult;
+  const { timingMult, hueShift, satMult, lightOffset } = variance;
 
-  // ── 1. MorphingEngine ────────────────────────────────────────────────────
-  const morph = buildMorphingSVG(sectorId, r, accent, accentLight, timingMult);
+  // ── VarianceEngine → couleurs mutées selon la variante A/B/C/D ───────────
+  const variantAccent      = applyVarianceToColor(accent,      hueShift, satMult, lightOffset);
+  const variantAccentLight = applyVarianceToColor(accentLight, hueShift, satMult, lightOffset);
 
-  // ── 2. LightingEngine ────────────────────────────────────────────────────
-  const light = buildLightingSVG(sectorId, r, accent, accentLight, timingMult);
+  // ── 1. MorphingEngine (couleurs variant-aware) ────────────────────────────
+  const morph = buildMorphingSVG(sectorId, r, variantAccent, variantAccentLight, timingMult);
+
+  // ── 2. LightingEngine (couleurs variant-aware) ────────────────────────────
+  const light = buildLightingSVG(sectorId, r, variantAccent, variantAccentLight, timingMult);
 
   // ── 3. PhysicsEngine ─────────────────────────────────────────────────────
   const phys  = buildPhysicsSVG(sectorId, timingMult);
