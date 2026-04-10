@@ -1279,13 +1279,14 @@ export function buildStandalonePreviewHtml(params: {
   .sidebar-compose{background:${accent};color:#fff;border:none;border-radius:16px;padding:16px 24px;font-size:15px;font-weight:500;display:flex;align-items:center;gap:10px;cursor:pointer;margin:8px 8px 16px;box-shadow:0 1px 3px rgba(0,0,0,.2);}
 
   /* ── Fil de discussion (email ouvert) ── */
-  .gmail-content{flex:1;overflow:auto;padding:24px 40px 60px;}
-  @media(max-width:700px){.gmail-content{padding:16px 12px 40px;}}
+  /* max-width:700px → carte email = ~620px → SVG 600px s'intègre sans débordement */
+  .gmail-content{flex:1;overflow:auto;padding:24px 40px 60px;max-width:700px;}
+  @media(max-width:700px){.gmail-content{padding:16px 12px 40px;max-width:100%;}}
   .thread-subject{font-size:22px;font-weight:400;color:#202124;margin-bottom:24px;line-height:1.3;}
   .thread-subject .tag{display:inline-block;background:${accent}22;color:${accent};border-radius:4px;font-size:12px;padding:2px 8px;margin-left:10px;font-weight:500;vertical-align:middle;}
 
-  /* ── Message card ── */
-  .message-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  /* ── Message card — pas d'overflow:hidden pour ne pas clipper la signature ── */
+  .message-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:12px;overflow:visible;box-shadow:0 1px 3px rgba(0,0,0,.06);}
   .message-header{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 16px;cursor:pointer;gap:12px;}
   .avatar{width:40px;height:40px;border-radius:50%;background:${accent};display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;flex-shrink:0;}
   .sender-info{flex:1;}
@@ -1293,20 +1294,21 @@ export function buildStandalonePreviewHtml(params: {
   .sender-detail{font-size:12px;color:#5f6368;}
   .sender-detail a{color:#1a73e8;text-decoration:none;}
   .msg-date{font-size:12px;color:#5f6368;white-space:nowrap;padding-top:2px;}
-  .message-body{padding:0 24px 28px;}
+  .message-body{padding:0 24px 20px;}
   .msg-text{font-size:14px;line-height:1.7;color:#202124;margin-bottom:20px;}
   .msg-text p{margin-bottom:12px;}
   .msg-text strong{color:${accent};}
-  .msg-cta{display:inline-block;background:${accent};color:#fff;padding:10px 24px;border-radius:4px;font-size:14px;font-weight:500;text-decoration:none;margin-bottom:24px;}
-  .sig-divider{border:none;border-top:1px solid #e0e0e0;margin:20px 0;}
+  .msg-cta{display:inline-block;background:${accent};color:#fff;padding:10px 24px;border-radius:4px;font-size:14px;font-weight:500;text-decoration:none;margin-bottom:20px;}
+  .sig-divider{border:none;border-top:1px solid #e0e0e0;margin:16px 0;}
   .sig-label{font-size:11px;color:#9aa0a6;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
 
-  /* ── Signature SVG — rendu pixel-perfect à ses dimensions natives 600×190 ── */
-  .sig-container{width:100%;overflow-x:auto;overflow-y:visible;line-height:0;}
+  /* ── Signature SVG — en dehors du padding du corps, collée aux bords de la carte ── */
+  /* Reproduit exactement ce que le client verra dans son email (600px natif) */
+  .sig-container{width:100%;overflow-x:auto;overflow-y:visible;line-height:0;border-radius:0 0 8px 8px;}
   .sig-container svg{display:block;}
 
   /* ── Barre d'actions reply ── */
-  .reply-bar{border-top:1px solid #e0e0e0;padding:16px 24px;display:flex;gap:12px;}
+  .reply-bar{border-top:1px solid #e0e0e0;padding:16px 24px;display:flex;gap:12px;background:#fff;border-radius:0 0 8px 8px;}
   .reply-btn{border:1px solid #dadce0;background:#fff;border-radius:4px;padding:9px 20px;font-size:14px;cursor:pointer;color:#202124;display:flex;align-items:center;gap:6px;}
   .reply-btn:hover{background:#f6f8fc;}
 
@@ -1382,11 +1384,12 @@ export function buildStandalonePreviewHtml(params: {
 
         <hr class="sig-divider" />
         <p class="sig-label">— Votre signature, telle qu'elle apparaîtra dans vos emails —</p>
+      </div>
 
-        <!-- Signature animée — affichée sans coupure -->
-        <div class="sig-container">
-          ${responsiveSvg}
-        </div>
+      <!-- Signature directement dans la carte, hors du padding message-body -->
+      <!-- La carte email fait ~620px, la signature 600px → rendu fidèle à l'email réel -->
+      <div class="sig-container">
+        ${responsiveSvg}
       </div>
 
       <div class="reply-bar">
