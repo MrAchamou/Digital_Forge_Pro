@@ -8,6 +8,7 @@ import type { SectorConfig } from './signature-renderer';
 import { selectEffectsForSector, renderEffectLayer, buildEffectCtx } from './gif-effect-engine';
 import { buildLogoLivingSystem, buildLogoGifFrame } from './logo-living-system';
 import { buildCorpNameLivingSystem } from './corp-name-living-system';
+import { buildCTALivingSystem } from './cta-living-system';
 
 // ── Dossier de stockage des assets hébergés ───────────────────────────────────
 const SIG_ASSETS_DIR = path.join(process.cwd(), 'exports', 'hosted');
