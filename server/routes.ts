@@ -993,9 +993,66 @@ router.post('/signature/full-export', async (req, res) => {
     const hostedBaseUrl = getPublicBaseUrl(req);
     const result = await generateCompleteExport(sectorId, signatureHtml, meta, hostedBaseUrl);
 
+    const EXPORTS_DIR = path.join(process.cwd(), 'exports');
+    const PREVIEW_DIR = path.join(EXPORTS_DIR, 'preview');
+    const id = result.signatureId;
+
+    // Sauvegarde des fichiers sur disque pour les routes download/preview/export-file
+    const previewPageHtml = `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Preview — ${meta.nom} · EffectForge AI</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#0f172a;color:#e8e8ff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:32px;}
+  .badge{font-size:11px;text-transform:uppercase;letter-spacing:3px;opacity:.35;}
+  h1{font-size:clamp(18px,3vw,28px);font-weight:700;}
+  h1 span{color:#6366f1;}
+  .sig-wrap{background:#1e293b;border:1px solid rgba(99,102,241,.2);border-radius:16px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+  .sig-wrap img{display:block;max-width:600px;width:100%;border-radius:8px;}
+  .formats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .btn{display:inline-block;padding:10px 20px;border-radius:8px;background:#6366f1;color:#fff;text-decoration:none;font-size:13px;font-weight:600;transition:opacity .2s;}
+  .btn:hover{opacity:.8;}
+  .btn.sec{background:#1e293b;border:1px solid rgba(99,102,241,.4);}
+  footer{font-size:11px;opacity:.2;}
+</style>
+</head>
+<body>
+  <p class="badge">EffectForge AI · Signature Preview</p>
+  <h1>${meta.nom} · <span>${meta.entreprise}</span></h1>
+  <div class="sig-wrap">
+    <img src="/api/sig/${id}.gif" alt="Signature animée de ${meta.nom}" onerror="this.src='/api/sig/${id}.png'"/>
+  </div>
+  <div class="formats">
+    <a href="/api/signature/export-file/${id}/gmail" class="btn" download>Gmail HTML</a>
+    <a href="/api/signature/export-file/${id}/outlook" class="btn" download>Outlook HTM</a>
+    <a href="/api/signature/export-file/${id}/svg" class="btn" download>SVG Animé</a>
+    <a href="/api/signature/export-file/${id}/png" class="btn sec" download>PNG Statique</a>
+    <a href="/api/signature/download/${id}" class="btn sec" download>Télécharger ZIP</a>
+  </div>
+  <footer>ID: ${id} · Généré le ${new Date().toLocaleString('fr-FR')}</footer>
+</body>
+</html>`;
+
+    const zipFilename = result.zip.filename;
+
+    await fs.promises.mkdir(PREVIEW_DIR, { recursive: true });
+    await Promise.all([
+      fs.promises.writeFile(path.join(EXPORTS_DIR, `${id}.svg`),           result.formats.animatedSvg.svg, 'utf-8'),
+      fs.promises.writeFile(path.join(EXPORTS_DIR, `${id}-gmail.html`),    result.formats.gmail.html,      'utf-8'),
+      fs.promises.writeFile(path.join(EXPORTS_DIR, `${id}-outlook.htm`),   result.formats.outlook.html,    'utf-8'),
+      fs.promises.writeFile(path.join(EXPORTS_DIR, `${id}-fallback.png`),  result.formats.staticPng.buffer),
+      fs.promises.writeFile(path.join(EXPORTS_DIR, `${id}-config.json`),   JSON.stringify(meta, null, 2),  'utf-8'),
+      fs.promises.writeFile(path.join(EXPORTS_DIR, zipFilename),            result.zip.buffer),
+      fs.promises.writeFile(path.join(EXPORTS_DIR, `${id}.zipref`),        zipFilename, 'utf-8'),
+      fs.promises.writeFile(path.join(PREVIEW_DIR, `${id}.html`),          previewPageHtml, 'utf-8'),
+    ]);
+
     return res.json({
-      signatureId: result.signatureId,
-      hostedGifUrl: `${hostedBaseUrl}/api/sig/${result.signatureId}.gif`,
+      signatureId: id,
+      hostedGifUrl: `${hostedBaseUrl}/api/sig/${id}.gif`,
+      previewUrl:   `${hostedBaseUrl}/api/signature/preview/${id}`,
+      downloadUrl:  `${hostedBaseUrl}/api/signature/download/${id}`,
       formats: {
         gmail:       { filename: result.formats.gmail.filename },
         outlook:     { filename: result.formats.outlook.filename },
@@ -1005,7 +1062,7 @@ router.post('/signature/full-export', async (req, res) => {
         staticPng:   { filename: result.formats.staticPng.filename },
         animatedGif: { filename: result.formats.animatedGif.filename },
       },
-      zip: { filename: result.zip.filename },
+      zip: { filename: zipFilename },
       // Contenu inline pour le frontend
       preview: {
         gmailHtml:    result.formats.gmail.html,

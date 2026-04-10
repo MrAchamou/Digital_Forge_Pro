@@ -1,10 +1,10 @@
 {
-  "lastSaved": "2026-04-10T14:00:37.812Z",
+  "lastSaved": "2026-04-10T14:08:21.404Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-10T13:06:10.255Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 4,
       "errorCount": 15,
       "successCount": 0,
@@ -13,7 +13,7 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-10T12:56:10.018Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "gemini_2": {
       "usageToday": 0,
@@ -27,12 +27,12 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-10T12:47:36.580Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "gemini_3": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-10T13:13:52.750Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 4,
       "errorCount": 15,
       "successCount": 0,
@@ -41,7 +41,7 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-10T13:03:52.514Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "gemini_4": {
       "usageToday": 0,
@@ -55,7 +55,7 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-10T12:47:36.699Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "gemini_5": {
       "usageToday": 0,
@@ -69,7 +69,7 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-07T09:35:20.673Z",
       "lastUsed": "2026-04-10T12:47:36.833Z",
-      "lastError": "429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a"
+      "lastError": null
     },
     "cerebras_1": {
       "usageToday": 0,
@@ -83,7 +83,7 @@
       "callsLastHour": 0,
       "hourWindowStart": "2026-04-08T23:46:27.152Z",
       "lastUsed": "2026-04-10T12:47:36.928Z",
-      "lastError": "429: {\"message\":\"We're experiencing high traffic right now! Please try again soon.\",\"type\":\"too_many_requests_error\",\"param\":\"queue\",\"code\":\"queue_exceeded\"}"
+      "lastError": null
     },
     "cerebras_2": {
       "usageToday": 1,

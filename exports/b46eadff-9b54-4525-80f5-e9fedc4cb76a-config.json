@@ -1,0 +1,16 @@
+{
+  "nom": "Jean Dupont",
+  "titre": "Directeur Commercial",
+  "entreprise": "TechCorp France",
+  "email": "jean.dupont@techcorp.fr",
+  "telephone": "+33 6 12 34 56 78",
+  "site": "https://techcorp.fr",
+  "adresse": "",
+  "ville": "",
+  "code_postal": "",
+  "note": 0,
+  "logo_url": "",
+  "secteur": "tech",
+  "palette": [],
+  "cta": ""
+}
