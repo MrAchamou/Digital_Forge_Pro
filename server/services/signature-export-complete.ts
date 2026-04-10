@@ -152,12 +152,14 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     cta, accent, accentLight, meta.secteur ?? 'default', 'A', animated
   );
 
-  // ── Positions Y dynamiques (partagées CILS + fallback statique) ────────────
-  const yPhone = 99;
-  const yEmail = telephone ? 116 : 99;
-  const yAddr  = (telephone && email) ? 133 : (telephone || email) ? 130 : 113;
-  const ySite  = (telephone || email || addressLine || noteStars) ? 170 : 153;
-  const yNote  = 175;
+  // ── Positions Y séquentielles — chaque champ présent occupe sa propre ligne ──
+  // Espacement fixe 17px, aucun chevauchement possible quelle que soit la combinaison.
+  const _DY = 17, _Y0 = 99;
+  const yPhone = _Y0;
+  const yEmail = _Y0 + (telephone    ? 1 : 0) * _DY;
+  const yAddr  = _Y0 + (telephone    ? 1 : 0) * _DY + (email       ? 1 : 0) * _DY;
+  const ySite  = _Y0 + (telephone    ? 1 : 0) * _DY + (email       ? 1 : 0) * _DY + (addressLine ? 1 : 0) * _DY;
+  const yNote  = _Y0 + (telephone    ? 1 : 0) * _DY + (email       ? 1 : 0) * _DY + (addressLine ? 1 : 0) * _DY + (site ? 1 : 0) * _DY;
 
   // ── Contact Info Living System — Titre + Séparateurs + Contacts animés ────
   const cils = buildContactInfoLivingSystem(
@@ -199,11 +201,41 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     ${lls.defsHtml}
-    ${animated ? `<style>${lls.stylesCSS}${cnls.stylesCSS}${ctals.stylesCSS}${cils.stylesCSS}</style>` : ''}
+    ${animated ? `<style>${lls.stylesCSS}${cnls.stylesCSS}${ctals.stylesCSS}${cils.stylesCSS}
+    /* ── VarianceEngine Background — particules stellaires + scan diagonal ── */
+    @keyframes vbg-twinkle { 0%,100%{opacity:0;transform:scale(0.4)} 50%{opacity:1;transform:scale(1)} }
+    @keyframes vbg-drift   { 0%{transform:translate(0,0)} 50%{transform:translate(4px,-3px)} 100%{transform:translate(0,0)} }
+    @keyframes vbg-scan    { 0%{transform:translateX(-80px) skewX(-12deg);opacity:0} 8%{opacity:1} 92%{opacity:1} 100%{transform:translateX(680px) skewX(-12deg);opacity:0} }
+    </style>` : ''}
   </defs>
 
   <!-- Background -->
   <rect width="600" height="190" fill="${bg}" rx="10"/>
+
+  <!-- VarianceEngine — Fond stellaire spectaculaire (seed déterministe, 24 particules) -->
+  ${animated ? (() => {
+    const rng = (s: number) => { const x = Math.sin(s * 127.1 + 1.9) * 43758.5453; return x - Math.floor(x); };
+    const ar2 = parseInt(accentLight.slice(1,3)||'99',16);
+    const ag3 = parseInt(accentLight.slice(3,5)||'99',16);
+    const ab2 = parseInt(accentLight.slice(5,7)||'ff',16);
+    const aLight = `rgba(${ar2},${ag3},${ab2}`;
+    const particles = Array.from({ length: 24 }, (_, i) => {
+      const cx  = Math.round(80 + rng(i * 3.71) * 510);
+      const cy  = Math.round(8  + rng(i * 7.33) * 174);
+      const r   = (0.5 + rng(i * 5.11) * 2.2).toFixed(1);
+      const dur = (2.8 + rng(i * 2.97) * 5.5).toFixed(1);
+      const del = (rng(i * 11.3) * 5.0).toFixed(1);
+      const op  = (0.12 + rng(i * 4.73) * 0.28).toFixed(2);
+      const driftDur = (4.0 + rng(i * 1.77) * 6.0).toFixed(1);
+      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${aLight},${op})" style="animation:vbg-twinkle ${dur}s ease-in-out ${del}s infinite,vbg-drift ${driftDur}s ease-in-out ${del}s infinite;"/>`;
+    }).join('');
+    const scanDelay1 = '0s', scanDelay2 = '6s', scanDelay3 = '12s';
+    const scanDur = '18s';
+    return `<g id="variance-bg-particles">${particles}</g>
+  <rect x="-80" y="0" width="60" height="190" fill="url(#accentGrad)" opacity="0.06" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay1} infinite;"/>
+  <rect x="-80" y="0" width="40" height="190" fill="url(#accentGrad)" opacity="0.04" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay2} infinite;"/>
+  <rect x="-80" y="0" width="25" height="190" fill="url(#accentGrad)" opacity="0.03" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay3} infinite;"/>`;
+  })() : ''}
 
   <!-- Glow de fond (barre accent) -->
   <rect x="0" y="0" width="4" height="190" fill="url(#accentGrad)" rx="2">${glowAttr}</rect>
@@ -226,13 +258,13 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
 
   <!-- ENTREPRISE — Corp Name Living System (gradient + halo + typewriter + glitch) -->
   ${animated
-    ? `<g transform="translate(112, 36)">${cnls.groupSVG}</g>`
-    : `<text x="112" y="36" font-family="Arial,sans-serif" font-size="21" font-weight="900"
+    ? `<g transform="translate(124, 36)">${cnls.groupSVG}</g>`
+    : `<text x="124" y="36" font-family="Arial,sans-serif" font-size="21" font-weight="900"
          fill="url(#sg-corp-grad)" letter-spacing="1">${escXml(entreprise.toUpperCase())}</text>`
   }
 
   <!-- NOM -->
-  <text x="112" y="56" font-family="Arial,sans-serif" font-size="14" font-weight="700"
+  <text x="124" y="56" font-family="Arial,sans-serif" font-size="14" font-weight="700"
     fill="${textColor}" opacity="0">
     ${escXml(nom)}${fadeInName}
   </text>
@@ -240,23 +272,23 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   ${animated && cils.groupSVG
     ? /* Contact Info Living System — Titre + Séps + Contacts + Site + Étoiles animés */ cils.groupSVG
     : /* ── Fallback statique ─────────────────────────────────────────────────────── */ `
-  <!-- Séparateur vertical (statique) -->
-  <rect x="96" y="16" width="1.5" height="158" fill="${accent}" opacity="0.3" rx="1"/>
+  <!-- Séparateur vertical (statique) — x=108 : 34px de marge depuis le bord droit de l'avatar (r=50,cx=24→74) -->
+  <rect x="108" y="16" width="1.5" height="158" fill="${accent}" opacity="0.3" rx="1"/>
 
   <!-- TITRE (statique) -->
-  <text x="112" y="71" font-family="Arial,sans-serif" font-size="10" font-weight="600"
+  <text x="124" y="71" font-family="Arial,sans-serif" font-size="10" font-weight="600"
     fill="${accent}" letter-spacing="1.5">
     ${escXml(titre.toUpperCase())}
   </text>
 
   <!-- Ligne séparatrice (statique) -->
-  <line x1="112" y1="82" x2="568" y2="82" stroke="${accent}" stroke-width="0.8" opacity="0.25"/>
+  <line x1="124" y1="82" x2="568" y2="82" stroke="${accent}" stroke-width="0.8" opacity="0.25"/>
 
-  ${telephone ? `<text x="112" y="${yPhone}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">☎ ${escXml(telephone)}</text>` : ''}
-  ${email     ? `<text x="112" y="${yEmail}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">✉ ${escXml(email)}</text>` : ''}
-  ${addressLine ? `<text x="112" y="${yAddr}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">📍 ${escXml(addressLine)}</text>` : ''}
-  ${site      ? `<text x="112" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
-  ${noteStars ? `<text x="112" y="${yNote}" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}`
+  ${telephone ? `<text x="124" y="${yPhone}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">☎ ${escXml(telephone)}</text>` : ''}
+  ${email     ? `<text x="124" y="${yEmail}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">✉ ${escXml(email)}</text>` : ''}
+  ${addressLine ? `<text x="124" y="${yAddr}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">📍 ${escXml(addressLine)}</text>` : ''}
+  ${site      ? `<text x="124" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
+  ${noteStars ? `<text x="124" y="${yNote}" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}`
   }
 
   <!-- CTA bouton — CTA Living System (9 effets) ou fallback statique -->
@@ -325,12 +357,13 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
   const activeEffects = selectEffectsForSector(meta.secteur || '');
   log(`GIF Effects actifs: ${activeEffects.length} effets pour secteur "${meta.secteur}"`, 'export-complete');
 
-  // ─ Positions fixes des lignes de contact
-  const yPhone   = 113;
-  const yEmail   = telephone ? 130 : 113;
-  const yAddr    = (telephone && email) ? 147 : (telephone || email) ? 130 : 113;
-  const ySite    = (telephone || email || addressLine || noteStars) ? 165 : 148;
-  const yNote    = 168;
+  // ─ Positions Y séquentielles (GIF) — espacement 17px, zéro chevauchement
+  const _DGIF = 17, _Y0GIF = 113;
+  const yPhone = _Y0GIF;
+  const yEmail = _Y0GIF + (telephone    ? 1 : 0) * _DGIF;
+  const yAddr  = _Y0GIF + (telephone    ? 1 : 0) * _DGIF + (email       ? 1 : 0) * _DGIF;
+  const ySite  = _Y0GIF + (telephone    ? 1 : 0) * _DGIF + (email       ? 1 : 0) * _DGIF + (addressLine ? 1 : 0) * _DGIF;
+  const yNote  = _Y0GIF + (telephone    ? 1 : 0) * _DGIF + (email       ? 1 : 0) * _DGIF + (addressLine ? 1 : 0) * _DGIF + (site ? 1 : 0) * _DGIF;
 
   // ─ Particules fixes (seed déterministe)
   const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
@@ -509,32 +542,32 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
             fill="${accent}" opacity="${initialsOp.toFixed(2)}">${escXml(initials)}</text>`
       }
 
-      <!-- Séparateur vertical -->
-      <rect x="96" y="${(24 + (132 - sepH)).toFixed(1)}" width="1.5" height="${sepH.toFixed(1)}"
+      <!-- Séparateur vertical — x=108 pour donner plus d'espace au logo -->
+      <rect x="108" y="${(24 + (132 - sepH)).toFixed(1)}" width="1.5" height="${sepH.toFixed(1)}"
         fill="${accent}" opacity="${sepOp.toFixed(2)}" rx="1"/>
 
       <!-- NOM -->
-      <text x="112" y="48" font-family="Arial,sans-serif" font-size="18" font-weight="700"
+      <text x="124" y="48" font-family="Arial,sans-serif" font-size="18" font-weight="700"
         fill="${textColor}" opacity="${nomOp.toFixed(2)}">${escXml(nom)}</text>
 
       <!-- TITRE -->
-      <text x="112" y="68" font-family="Arial,sans-serif" font-size="11" font-weight="600"
+      <text x="124" y="68" font-family="Arial,sans-serif" font-size="11" font-weight="600"
         fill="${accent}" letter-spacing="1.5" opacity="${titreOp.toFixed(2)}">${escXml(titre.toUpperCase())}</text>
 
       <!-- ENTREPRISE -->
-      <text x="112" y="86" font-family="Arial,sans-serif" font-size="12"
+      <text x="124" y="86" font-family="Arial,sans-serif" font-size="12"
         fill="${textMuted}" opacity="${entOp.toFixed(2)}">${escXml(entreprise)}</text>
 
       <!-- Ligne séparatrice -->
-      <line x1="112" y1="96" x2="${lineX2.toFixed(0)}" y2="96"
+      <line x1="124" y1="96" x2="${lineX2.toFixed(0)}" y2="96"
         stroke="${accent}" stroke-width="0.8" opacity="${(inBuild ? eBuild * 0.25 : 0.25).toFixed(2)}"/>
 
       <!-- Infos contact -->
-      ${telephone ? `<text x="112" y="${yPhone}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="${infoOp.toFixed(2)}">☎ ${escXml(telephone)}</text>` : ''}
-      ${email     ? `<text x="112" y="${yEmail}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="${infoOp.toFixed(2)}">✉ ${escXml(email)}</text>` : ''}
-      ${addressLine ? `<text x="112" y="${yAddr}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}" opacity="${infoOp.toFixed(2)}">📍 ${escXml(addressLine)}</text>` : ''}
-      ${site      ? `<text x="112" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}" opacity="${infoOp.toFixed(2)}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
-      ${noteStars ? `<text x="112" y="${yNote}" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b" opacity="${infoOp.toFixed(2)}">${noteStars} ${note?.toFixed(1)}</text>` : ''}
+      ${telephone ? `<text x="124" y="${yPhone}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="${infoOp.toFixed(2)}">☎ ${escXml(telephone)}</text>` : ''}
+      ${email     ? `<text x="124" y="${yEmail}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="${infoOp.toFixed(2)}">✉ ${escXml(email)}</text>` : ''}
+      ${addressLine ? `<text x="124" y="${yAddr}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}" opacity="${infoOp.toFixed(2)}">📍 ${escXml(addressLine)}</text>` : ''}
+      ${site      ? `<text x="124" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}" opacity="${infoOp.toFixed(2)}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
+      ${noteStars ? `<text x="124" y="${yNote}" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b" opacity="${infoOp.toFixed(2)}">${noteStars} ${note?.toFixed(1)}</text>` : ''}
 
       <!-- CTA bouton — aligné à droite de la colonne info -->
       <g transform="translate(454,146) scale(${ctaScale.toFixed(4)}) translate(-74,-16)">

@@ -117,8 +117,8 @@ export function buildContactInfoLivingSystem(
 
   // ── DEFS ──────────────────────────────────────────────────────────────────
 
-  // Longueur du séparateur horizontal
-  const SEP_H_LEN = 456; // 568 - 112
+  // Longueur du séparateur horizontal — contenu débute à x=124, finit à x=568
+  const SEP_H_LEN = 444; // 568 - 124
 
   // Filtre glow doux pour icônes
   const filterDefs = `
@@ -161,9 +161,9 @@ export function buildContactInfoLivingSystem(
       <stop offset="100%" stop-color="${textColor}" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- Clip rect pour séparateur H draw animation -->
+    <!-- Clip rect pour séparateur H draw animation — x=124 aligné avec le contenu -->
     <clipPath id="ci-sep-h-clip">
-      <rect x="112" y="78" width="${SEP_H_LEN}" height="8"/>
+      <rect x="124" y="78" width="${SEP_H_LEN}" height="8"/>
     </clipPath>`;
 
   // ── CSS keyframes ──────────────────────────────────────────────────────────
@@ -323,17 +323,17 @@ export function buildContactInfoLivingSystem(
 
   // ── ÉLÉMENTS SVG ─────────────────────────────────────────────────────────
 
-  // ── Séparateur Vertical ────────────────────────────────────────────────────
+  // ── Séparateur Vertical — x=108 : 34px d'espace libre pour les animations du logo ──
   const sepVEl = `
     <!-- SEPARATEUR VERTICAL — grow from top + gradient + pulse -->
     <g>
       <!-- Fond statique très léger (fallback) -->
-      <rect x="96" y="16" width="1.5" height="158" fill="${accent}" opacity="0.08" rx="1"/>
+      <rect x="108" y="16" width="1.5" height="158" fill="${accent}" opacity="0.08" rx="1"/>
       <!-- Barre principale animée : grow from top -->
-      <rect x="96" y="16" width="1.5" height="158"
+      <rect x="108" y="16" width="1.5" height="158"
         fill="url(#ci-sep-v-grad)" rx="1"
         filter="url(#ci-sep-glow)"
-        style="transform-origin: 96px 16px;
+        style="transform-origin: 108px 16px;
                opacity: 0;
                animation:
                  ci-sep-v-grow ${sepVGrowS.toFixed(2)}s ${morphProf.speed > 1 ? 'cubic-bezier(0.34,1.56,0.64,1)' : 'ease-out'} ${D_SEP_V.toFixed(2)}s forwards,
@@ -347,7 +347,7 @@ export function buildContactInfoLivingSystem(
     <!-- TITRE / POSTE — shimmer reveal + underline draw + breathing + glow -->
     <g>
       <!-- Glow ambiant derrière le titre -->
-      <text x="112" y="71"
+      <text x="124" y="71"
         font-family="Arial,sans-serif" font-size="10" font-weight="700"
         fill="${accent}"
         filter="url(#ci-titre-glow)"
@@ -357,7 +357,7 @@ export function buildContactInfoLivingSystem(
       </text>
 
       <!-- Texte titre principal : typewriter reveal puis breathing -->
-      <text x="112" y="71"
+      <text x="124" y="71"
         font-family="Arial,sans-serif" font-size="10" font-weight="700"
         fill="${accent}" letter-spacing="1.5"
         style="clip-path: inset(0 100% 0 0);
@@ -370,14 +370,14 @@ export function buildContactInfoLivingSystem(
       </text>
 
       <!-- Shimmer scan au-dessus du texte (s'active après le reveal) -->
-      <rect x="112" y="61" width="55" height="13"
+      <rect x="124" y="61" width="55" height="13"
         fill="url(#ci-titre-shimmer-grad)"
         style="opacity:0;
                animation: ci-shimmer-scan ${shimmerS.toFixed(2)}s ease-in-out ${(D_TITRE + sepDrawS * 1.2 + 0.3).toFixed(2)}s infinite;">
       </rect>
 
       <!-- Underline accent draw L→R (sous le titre) -->
-      <line x1="112" y1="74.5" x2="${112 + TITRE_W}" y2="74.5"
+      <line x1="124" y1="74.5" x2="${124 + TITRE_W}" y2="74.5"
         stroke="${accentLight}" stroke-width="1"
         stroke-dasharray="${TITRE_W}" stroke-dashoffset="${TITRE_W}"
         opacity="${(gi * 0.7).toFixed(2)}"
@@ -393,10 +393,10 @@ export function buildContactInfoLivingSystem(
     <!-- SEPARATEUR HORIZONTAL — draw L→R + gradient scan + glow pulse -->
     <g>
       <!-- Ligne statique très légère (fallback) -->
-      <line x1="112" y1="82" x2="568" y2="82"
+      <line x1="124" y1="82" x2="568" y2="82"
         stroke="${accent}" stroke-width="0.8" opacity="0.10"/>
       <!-- Ligne principale : draw gauche → droite -->
-      <line x1="112" y1="82" x2="568" y2="82"
+      <line x1="124" y1="82" x2="568" y2="82"
         stroke="url(#ci-sep-h-grad)" stroke-width="0.8"
         stroke-dasharray="${SEP_H_LEN}" stroke-dashoffset="${SEP_H_LEN}"
         filter="url(#ci-sep-glow)"
@@ -413,12 +413,12 @@ export function buildContactInfoLivingSystem(
     <!-- TELEPHONE — slide-in + icon pulse -->
     <g style="opacity:0; animation: ci-info-enter 0.5s ease-out ${D_PHONE.toFixed(2)}s forwards;">
       <!-- Icône ☎ avec pulse -->
-      <text x="112" y="${yPhone}"
+      <text x="124" y="${yPhone}"
         font-family="Arial,sans-serif" font-size="11" fill="${accent}"
         filter="url(#ci-icon-glow)"
         style="animation: ci-icon-pulse ${iconPulseS.toFixed(2)}s ease-in-out ${(D_PHONE + 0.5).toFixed(2)}s infinite;">☎</text>
       <!-- Numéro -->
-      <text x="125" y="${yPhone}"
+      <text x="137" y="${yPhone}"
         font-family="Arial,sans-serif" font-size="11" fill="${textColor}">${escXml(telephone)}</text>
     </g>` : '';
 
@@ -427,12 +427,12 @@ export function buildContactInfoLivingSystem(
     <!-- EMAIL — slide-in décalé + icon bounce -->
     <g style="opacity:0; animation: ci-info-enter 0.5s ease-out ${D_EMAIL.toFixed(2)}s forwards;">
       <!-- Icône ✉ avec bounce -->
-      <text x="112" y="${yEmail}"
+      <text x="124" y="${yEmail}"
         font-family="Arial,sans-serif" font-size="11" fill="${accent}"
         filter="url(#ci-icon-glow)"
         style="display:inline-block; animation: ci-icon-bounce ${iconPulseS.toFixed(2)}s ease-in-out ${(D_EMAIL + 0.5).toFixed(2)}s infinite;">✉</text>
       <!-- Adresse email -->
-      <text x="125" y="${yEmail}"
+      <text x="137" y="${yEmail}"
         font-family="Arial,sans-serif" font-size="11" fill="${textColor}">${escXml(email)}</text>
     </g>` : '';
 
@@ -441,12 +441,12 @@ export function buildContactInfoLivingSystem(
     <!-- ADRESSE — slide-in tardif + icon pin pulse -->
     <g style="opacity:0; animation: ci-info-enter 0.5s ease-out ${D_ADDR.toFixed(2)}s forwards;">
       <!-- Icône 📍 avec pulse radial -->
-      <text x="112" y="${yAddr}"
+      <text x="124" y="${yAddr}"
         font-family="Arial,sans-serif" font-size="10" fill="${accent}"
-        style="transform-origin: 116px ${yAddr - 2}px;
+        style="transform-origin: 128px ${yAddr - 2}px;
                animation: ci-icon-pin ${(iconPulseS * PHI).toFixed(2)}s ease-in-out ${(D_ADDR + 0.6).toFixed(2)}s infinite;">📍</text>
       <!-- Texte adresse -->
-      <text x="126" y="${yAddr}"
+      <text x="138" y="${yAddr}"
         font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">${escXml(addressLine)}</text>
     </g>` : '';
 
@@ -455,12 +455,12 @@ export function buildContactInfoLivingSystem(
     <!-- SITE WEB — slide-in + icon orbit + pulse accent -->
     <g style="opacity:0; animation: ci-info-enter 0.5s ease-out ${D_SITE.toFixed(2)}s forwards;">
       <!-- Icône 🌐 avec rotation lente -->
-      <text x="112" y="${ySite}"
+      <text x="124" y="${ySite}"
         font-family="Arial,sans-serif" font-size="10" fill="${accent}"
-        style="transform-origin: 116px ${ySite - 2}px;
+        style="transform-origin: 128px ${ySite - 2}px;
                animation: ci-icon-orbit ${(pulseS * 3).toFixed(2)}s linear ${(D_SITE + 0.5).toFixed(2)}s infinite;">🌐</text>
       <!-- URL avec pulse accent -->
-      <text x="126" y="${ySite}"
+      <text x="138" y="${ySite}"
         font-family="Arial,sans-serif" font-size="10" fill="${accent}"
         style="animation: ci-site-pulse ${pulseS.toFixed(2)}s ease-in-out ${(D_SITE + 0.7).toFixed(2)}s infinite;">
         ${escXml((params.site).replace(/^https?:\/\//, ''))}
@@ -472,7 +472,7 @@ export function buildContactInfoLivingSystem(
   if (noteStars && note) {
     const count = Math.floor(note);
     starsEl = `\n    <!-- ÉTOILES — reveal séquentiel + twinkle -->`;
-    let xOffset = 112;
+    let xOffset = 124;
     for (let i = 0; i < count; i++) {
       const delay   = D_STARS + i * 0.12;
       const twDelay = delay + 0.5 + i * 0.08;
