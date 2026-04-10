@@ -6,6 +6,7 @@ import path from 'path';
 import { log } from '../vite';
 import type { SectorConfig } from './signature-renderer';
 import { selectEffectsForSector, renderEffectLayer, buildEffectCtx } from './gif-effect-engine';
+import { buildLogoLivingSystem, buildLogoGifFrame } from './logo-living-system';
 
 // ── Dossier de stockage des assets hébergés ───────────────────────────────────
 const SIG_ASSETS_DIR = path.join(process.cwd(), 'exports', 'hosted');
@@ -111,6 +112,11 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     ? `<animate attributeName="clip-path" from="inset(0 100% 0 0)" to="inset(0 0% 0 0)" dur="1.4s" begin="0.5s" fill="freeze"/>`
     : '';
 
+  // ── Logo Living System — 8 effets avec transitions fluides ────────────────
+  const lls = animated
+    ? buildLogoLivingSystem(50, accent, accentLight, palette)
+    : { defsHtml: '', stylesCSS: '', elements: '' };
+
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   viewBox="0 0 600 180" width="600" height="180">
   <defs>
@@ -118,10 +124,12 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       <stop offset="0%" stop-color="${accent}"/>
       <stop offset="100%" stop-color="${accentLight}"/>
     </linearGradient>
-    ${logo_url ? `<clipPath id="avatarLogoClip"><circle cx="24" cy="90" r="44"/></clipPath>` : ''}
+    ${logo_url ? `<clipPath id="avatarLogoClip"><circle cx="0" cy="0" r="44"/></clipPath>` : ''}
     <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
+    ${lls.defsHtml}
+    ${animated ? `<style>${lls.stylesCSS}</style>` : ''}
   </defs>
 
   <!-- Background -->
@@ -130,9 +138,13 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   <!-- Glow de fond (barre accent) -->
   <rect x="0" y="0" width="4" height="180" fill="url(#accentGrad)" rx="2">${glowAttr}</rect>
 
-  <!-- Avatar cercle + Logo -->
+  <!-- Avatar cercle + Logo Living System -->
   <g transform="translate(24,90)">
+    <!-- Effets logo derrière le cercle -->
+    ${lls.elements}
+    <!-- Cercle avatar principal -->
     <circle r="50" fill="${accent}18" stroke="${accent}" stroke-width="1.5">${breatheAttr}</circle>
+    <!-- Logo ou initiales -->
     ${logo_url
       ? `<image href="${escXml(logo_url)}" x="-44" y="-44" width="88" height="88" clip-path="url(#avatarLogoClip)" preserveAspectRatio="xMidYMid meet"/>`
       : `<text text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="${accent}">${escXml(initials)}</text>`
@@ -388,6 +400,9 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
       <!-- Barre accent gauche -->
       <rect x="0" y="${(180 - barH).toFixed(1)}" width="4" height="${barH.toFixed(1)}"
         fill="url(#barGrad${i})" opacity="${barOp.toFixed(2)}" rx="2"/>
+
+      <!-- Logo Living System — effets animés par frame -->
+      ${buildLogoGifFrame(i, TOTAL, 60, 90, 50, accent, accentLight)}
 
       <!-- Avatar — ring externe burst (SHINE) -->
       <circle cx="60" cy="90" r="${burstR}"
