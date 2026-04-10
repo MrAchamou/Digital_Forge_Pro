@@ -6,58 +6,216 @@
   :root { --sig-bg:{{palette.background}}; --sig-accent:{{palette.accent}}; --sig-text:{{palette.text}}; --sig-muted:{{palette.muted}}; --sig-border:{{palette.border}}; }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:transparent; font-family:'Segoe UI',Arial,sans-serif; }
-  @keyframes sigLogoGlow { 0%,100% { box-shadow:0 0 0 2px var(--sig-accent),0 0 14px var(--sig-accent)50,0 0 28px var(--sig-accent)20; } 50% { box-shadow:0 0 0 3px var(--sig-accent),0 0 28px var(--sig-accent)80,0 0 60px var(--sig-accent)40; } }
-  @keyframes sigLogoIn { 0% { opacity:0; transform:scale(0.6); filter:blur(8px) brightness(3); } 60% { transform:scale(1.06); filter:blur(0) brightness(1.3); } 100% { opacity:1; transform:scale(1); filter:blur(0) brightness(1); } }
-  @keyframes sigNeonPulse { 0%,100% { text-shadow:0 0 6px var(--sig-accent),0 0 14px var(--sig-accent)60; } 50% { text-shadow:0 0 18px var(--sig-accent),0 0 36px var(--sig-accent)80,0 0 70px var(--sig-accent)40; } }
+
+  /* ─── Keyframes de base ─────────────────────────────────────── */
+  @keyframes sigLogoGlow {
+    0%,100% { box-shadow:0 0 0 2px var(--sig-accent),0 0 14px var(--sig-accent)50,0 0 28px var(--sig-accent)20; }
+    50%      { box-shadow:0 0 0 3px var(--sig-accent),0 0 30px var(--sig-accent)90,0 0 60px var(--sig-accent)40,0 0 90px var(--sig-accent)20; }
+  }
+  @keyframes sigLogoIn {
+    0%   { opacity:0; transform:scale(0.6); filter:blur(8px) brightness(3); }
+    60%  { transform:scale(1.06); filter:blur(0) brightness(1.3); }
+    100% { opacity:1; transform:scale(1); filter:blur(0) brightness(1); }
+  }
+  @keyframes sigLogoFloat {
+    0%,100% { transform:translateY(0px) scale(1); }
+    33%     { transform:translateY(-3px) scale(1.01); }
+    66%     { transform:translateY(2px) scale(0.99); }
+  }
+  @keyframes sigNeonPulse {
+    0%,100% { text-shadow:0 0 6px var(--sig-accent),0 0 14px var(--sig-accent)60; }
+    50%     { text-shadow:0 0 18px var(--sig-accent),0 0 36px var(--sig-accent)80,0 0 70px var(--sig-accent)40; }
+  }
   @keyframes sigBarSlide { 0% { transform:scaleX(0); } 100% { transform:scaleX(1); } }
+  @keyframes sigBarShimmer {
+    0%   { background-position:0% 50%; }
+    100% { background-position:200% 50%; }
+  }
   @keyframes sigFade { 0% { opacity:0; } 100% { opacity:1; } }
   @keyframes sigSlideUp { 0% { opacity:0; transform:translateY(10px); } 100% { opacity:1; transform:translateY(0); } }
-  @keyframes sigGlitch { 0%,90%,100% { transform:translate(0); color:inherit; } 92% { transform:translate(-2px,1px); color:#0ff; } 94% { transform:translate(2px,-1px); color:#f0f; } 96% { transform:translate(0); } }
   @keyframes sigReveal { 0% { opacity:0; transform:translateX(-10px); } 100% { opacity:1; transform:translateX(0); } }
+  @keyframes sigGlitch {
+    0%,90%,100% { transform:translate(0); color:inherit; }
+    92% { transform:translate(-2px,1px); color:#0ff; }
+    94% { transform:translate(2px,-1px); color:#f0f; }
+    96% { transform:translate(0); }
+  }
+  @keyframes sigDividerFlow {
+    0%   { background:linear-gradient(180deg,transparent 0%,var(--sig-accent)30 20%,var(--sig-accent)80 50%,var(--sig-accent)30 80%,transparent 100%); }
+    50%  { background:linear-gradient(180deg,transparent 0%,var(--sig-accent)10 20%,var(--sig-accent)90 50%,var(--sig-accent)60 80%,transparent 100%); }
+    100% { background:linear-gradient(180deg,transparent 0%,var(--sig-accent)30 20%,var(--sig-accent)80 50%,var(--sig-accent)30 80%,transparent 100%); }
+  }
+  @keyframes sigDotPulse {
+    0%,100% { transform:scale(1); opacity:.7; box-shadow:0 0 0 0 var(--sig-accent)80; }
+    50%     { transform:scale(1.5); opacity:1; box-shadow:0 0 0 4px var(--sig-accent)20; }
+  }
+  @keyframes sigContactFloat {
+    0%,100% { transform:translateX(0px); }
+    50%     { transform:translateX(3px); }
+  }
+  @keyframes sigFooterBreathe {
+    0%,100% { background:linear-gradient(90deg,var(--sig-accent)12,transparent); }
+    50%     { background:linear-gradient(90deg,var(--sig-accent)25,var(--sig-accent)05,transparent); }
+  }
+  @keyframes sigArrowBounce {
+    0%,100% { transform:translateX(0); opacity:1; }
+    50%     { transform:translateX(5px); opacity:.7; }
+  }
+  @keyframes sigHdividerSweep {
+    0%   { background:linear-gradient(90deg,var(--sig-accent)80,var(--sig-accent)20,transparent); }
+    50%  { background:linear-gradient(90deg,transparent,var(--sig-accent)60,var(--sig-accent)40); }
+    100% { background:linear-gradient(90deg,var(--sig-accent)80,var(--sig-accent)20,transparent); }
+  }
+  @keyframes sigTitlePulse {
+    0%,100% { letter-spacing:0.12em; opacity:1; }
+    50%     { letter-spacing:0.16em; opacity:.85; }
+  }
 
-  .sig-wrap { display:inline-flex; flex-direction:column; background:var(--sig-bg); border:1px solid var(--sig-border); border-radius:10px; width:{{layout.width}}px; overflow:hidden; position:relative; }
-  .sig-top-bar { height:4px; background:linear-gradient(90deg, transparent, var(--sig-accent), #22d3ee, #a78bfa, var(--sig-accent), transparent); transform-origin:left; animation:sigBarSlide 0.8s ease-out both; }
-  .sig-main { display:flex; align-items:stretch; padding:16px 18px; gap:16px; }
+  /* ─── Structure de la carte ─────────────────────────────────── */
+  .sig-wrap {
+    display:inline-flex; flex-direction:column;
+    background:var(--sig-bg);
+    border:1px solid var(--sig-border);
+    border-radius:12px;
+    width:{{layout.width}}px;
+    overflow:hidden;
+    position:relative;
+  }
 
-  .sig-logo-zone { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .sig-logo-frame { width:88px; height:88px; border-radius:12px; overflow:hidden; background:linear-gradient(135deg,var(--sig-accent)20,#06b6d408); display:flex; align-items:center; justify-content:center; animation:sigLogoIn 1s ease-out 0s both, sigLogoGlow 2.5s ease-in-out 1.5s infinite; }
+  /* ─── Barre supérieure animée (shimmer continu) ─────────────── */
+  .sig-top-bar {
+    height:3px;
+    background:linear-gradient(90deg, transparent, var(--sig-accent), #22d3ee, #a78bfa, #ff006e, var(--sig-accent), transparent);
+    background-size:200% 100%;
+    transform-origin:left;
+    animation:sigBarSlide 0.8s ease-out both, sigBarShimmer 3s linear 1s infinite;
+  }
+
+  /* ─── Corps principal ───────────────────────────────────────── */
+  .sig-main { display:flex; align-items:stretch; padding:16px 18px; gap:14px; }
+
+  /* ─── Zone logo (gauche) ────────────────────────────────────── */
+  .sig-logo-zone { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:8px; width:88px; }
+  .sig-logo-frame {
+    width:80px; height:80px;
+    border-radius:14px;
+    overflow:hidden;
+    background:linear-gradient(135deg,var(--sig-accent)25,#06b6d410);
+    display:flex; align-items:center; justify-content:center;
+    animation:sigLogoIn 1s ease-out 0s both, sigLogoGlow 2.8s ease-in-out 1.5s infinite, sigLogoFloat 6s ease-in-out 2s infinite;
+  }
   .sig-logo-frame img { width:100%; height:100%; object-fit:contain; padding:8px; }
-  .sig-logo-emoji { font-size:40px; line-height:1; }
-  .sig-logo-dot { width:8px; height:8px; border-radius:50%; background:var(--sig-accent); animation:sigNeonPulse 1.5s ease-in-out 2s infinite; }
+  .sig-logo-emoji { font-size:38px; line-height:1; }
+  .sig-logo-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:var(--sig-accent);
+    animation:sigDotPulse 1.8s ease-in-out 1.5s infinite;
+  }
 
-  .sig-vdivider { width:1px; background:linear-gradient(180deg,transparent,var(--sig-accent)70,transparent); flex-shrink:0; margin:4px 0; }
+  /* ─── Séparateur vertical (flux de lumière continu) ─────────── */
+  .sig-vdivider {
+    width:1px;
+    background:linear-gradient(180deg,transparent,var(--sig-accent)70,transparent);
+    flex-shrink:0; margin:4px 0;
+    animation:sigDividerFlow 4s ease-in-out infinite;
+  }
 
-  .sig-info { flex:1; display:flex; flex-direction:column; gap:7px; min-width:0; }
+  /* ─── Zone informations (droite) ────────────────────────────── */
+  .sig-info { flex:1; display:flex; flex-direction:column; gap:6px; min-width:0; }
 
+  /* ─── En-tête : nom, titre, entreprise ──────────────────────── */
   .sig-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
-  .sig-header-left { display:flex; flex-direction:column; gap:2px; }
-  .sig-name { font-size:18px; font-weight:800; color:var(--sig-text); line-height:1.15; opacity:0; animation:sigReveal 1.2s ease-out 0.3s both, sigGlitch 8s ease-in-out 3s infinite; }
-  .sig-titre { font-size:11px; font-weight:700; color:var(--sig-accent); text-transform:uppercase; letter-spacing:0.12em; opacity:0; animation:sigSlideUp 0.8s ease-out 0.6s both; }
-  .sig-entreprise { font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFade 0.8s ease-out 0.75s both; }
-  .sig-rating { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFade 0.8s ease-out 1.2s both; white-space:nowrap; flex-shrink:0; }
+  .sig-header-left { display:flex; flex-direction:column; gap:3px; }
+
+  .sig-name {
+    font-size:18px; font-weight:800; color:var(--sig-text); line-height:1.15;
+    opacity:0;
+    animation:sigReveal 1.0s ease-out 0.3s both, sigGlitch 8s ease-in-out 4s infinite;
+  }
+  .sig-titre {
+    font-size:11px; font-weight:700; color:var(--sig-accent);
+    text-transform:uppercase; letter-spacing:0.12em;
+    opacity:0;
+    animation:sigSlideUp 0.8s ease-out 0.55s both, sigTitlePulse 5s ease-in-out 3s infinite;
+  }
+  .sig-entreprise {
+    font-size:11px; color:var(--sig-muted);
+    opacity:0;
+    animation:sigFade 0.8s ease-out 0.7s both;
+  }
+  .sig-rating {
+    display:flex; align-items:center; gap:4px;
+    font-size:11px; color:var(--sig-muted);
+    opacity:0; white-space:nowrap; flex-shrink:0;
+    animation:sigFade 0.8s ease-out 1.2s both;
+  }
   .sig-stars { color:#fbbf24; letter-spacing:1px; }
 
-  .sig-hdivider { height:1px; background:linear-gradient(90deg,var(--sig-accent)60,transparent); opacity:0; animation:sigFade 0.8s ease-out 0.8s both; }
+  /* ─── Séparateur horizontal (sweep continu) ─────────────────── */
+  .sig-hdivider {
+    height:1px;
+    background:linear-gradient(90deg,var(--sig-accent)80,var(--sig-accent)20,transparent);
+    opacity:0;
+    animation:sigFade 0.8s ease-out 0.8s both, sigHdividerSweep 6s ease-in-out 2s infinite;
+  }
 
-  .sig-contacts { display:flex; flex-direction:column; gap:5px; }
-  .sig-contact-item { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--sig-text); text-decoration:none; overflow:hidden; opacity:0; }
-  .sig-contact-item.phone { font-size:15px; font-weight:800; color:var(--sig-accent); animation:sigSlideUp 0.7s ease-out 0.9s both, sigNeonPulse 2s ease-in-out 2s infinite; }
-  .sig-contact-item.email { animation:sigSlideUp 0.8s ease-out 1.05s both; }
-  .sig-contact-item.site { animation:sigSlideUp 0.8s ease-out 1.15s both; }
-  .sig-contact-item.addr { animation:sigFade 0.8s ease-out 1.25s both; }
-  .sig-icon { width:15px; flex-shrink:0; font-size:12px; display:inline-flex; align-items:center; justify-content:center; color:var(--sig-accent); }
+  /* ─── Contacts ───────────────────────────────────────────────── */
+  .sig-contacts { display:flex; flex-direction:column; gap:4px; }
+  .sig-contact-item {
+    display:flex; align-items:center; gap:7px;
+    font-size:12px; color:var(--sig-text); text-decoration:none;
+    overflow:hidden; opacity:0;
+  }
+  .sig-contact-item.phone {
+    font-size:14px; font-weight:800; color:var(--sig-accent);
+    animation:sigSlideUp 0.7s ease-out 0.9s both,
+              sigNeonPulse 2.5s ease-in-out 2s infinite,
+              sigContactFloat 5s ease-in-out 3s infinite;
+  }
+  .sig-contact-item.email  { animation:sigSlideUp 0.8s ease-out 1.05s both; }
+  .sig-contact-item.site   { animation:sigSlideUp 0.8s ease-out 1.15s both; }
+  .sig-contact-item.addr   { animation:sigFade    0.8s ease-out 1.25s both; }
+  .sig-icon {
+    width:15px; flex-shrink:0; font-size:12px;
+    display:inline-flex; align-items:center; justify-content:center;
+    color:var(--sig-accent);
+  }
 
-  .sig-horaires-block { display:flex; align-items:center; gap:7px; padding:5px 8px; background:var(--sig-accent)10; border-left:2px solid var(--sig-accent)60; border-radius:0 4px 4px 0; font-size:11px; color:var(--sig-muted); opacity:0; animation:sigFade 0.8s ease-out 1.35s both; }
+  /* ─── Horaires ───────────────────────────────────────────────── */
+  .sig-horaires-block {
+    display:flex; align-items:center; gap:7px; padding:5px 8px;
+    background:var(--sig-accent)10; border-left:2px solid var(--sig-accent)60;
+    border-radius:0 4px 4px 0; font-size:11px; color:var(--sig-muted);
+    opacity:0;
+    animation:sigFade 0.8s ease-out 1.35s both;
+  }
 
-  .sig-footer { display:flex; align-items:center; justify-content:space-between; padding:8px 18px; background:linear-gradient(90deg,var(--sig-accent)15,transparent); border-top:1px solid var(--sig-accent)30; opacity:0; animation:sigFade 1s ease-out 1.6s both; gap:10px; }
+  /* ─── Pied de page ───────────────────────────────────────────── */
+  .sig-footer {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 18px;
+    background:linear-gradient(90deg,var(--sig-accent)15,transparent);
+    border-top:1px solid var(--sig-accent)30;
+    opacity:0; gap:10px;
+    animation:sigFade 1s ease-out 1.5s both, sigFooterBreathe 5s ease-in-out 3s infinite;
+  }
   .sig-badges { display:flex; flex-wrap:wrap; gap:5px; }
-  .sig-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:4px; font-size:10px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; font-family:monospace; }
-  .sig-badge.filled { background:var(--sig-accent); color:var(--sig-bg); }
+  .sig-badge  {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 8px; border-radius:4px;
+    font-size:10px; font-weight:700; letter-spacing:0.05em;
+    text-transform:uppercase; font-family:monospace;
+  }
+  .sig-badge.filled  { background:var(--sig-accent); color:var(--sig-bg); }
   .sig-badge.outline { background:transparent; border:1px solid var(--sig-accent); color:var(--sig-accent); }
+
+  /* ─── CTA ────────────────────────────────────────────────────── */
   .sig-cta { display:flex; align-items:center; gap:5px; white-space:nowrap; }
-  .sig-cta-text { font-size:11px; font-weight:700; color:var(--sig-accent); letter-spacing:0.04em; font-family:monospace; }
-  .sig-cta-arrow { font-size:14px; color:var(--sig-accent); animation:sigNeonPulse 1.5s ease-in-out 3s infinite; }
-  a { text-decoration:none; color:inherit; } a:hover { color:var(--sig-accent); }
+  .sig-cta-text  { font-size:11px; font-weight:700; color:var(--sig-accent); letter-spacing:0.04em; font-family:monospace; }
+  .sig-cta-arrow { font-size:14px; color:var(--sig-accent); animation:sigArrowBounce 2s ease-in-out 3s infinite; }
+
+  a { text-decoration:none; color:inherit; }
+  a:hover { color:var(--sig-accent); }
 </style>
 </head>
 <body>

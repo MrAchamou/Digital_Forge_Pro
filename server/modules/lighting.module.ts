@@ -177,8 +177,59 @@ export function buildLightingCSS(sectorId: string, accentColor: string, colorSch
   --sig-shadow-depth: "${profile.shadowDepth}";
 }`;
 
+  // ── Animations billboard universelles (toutes templates, tous secteurs)
+  const billboardKF = `@keyframes sig-divider-flow {
+  0%   { background: linear-gradient(180deg, transparent 0%, rgba(${r},${g},${b},.25) 30%, rgba(${r},${g},${b},${(gi*.8).toFixed(2)}) 50%, rgba(${r},${g},${b},.25) 70%, transparent 100%); }
+  50%  { background: linear-gradient(180deg, transparent 0%, rgba(${r},${g},${b},.10) 20%, rgba(${r},${g},${b},${gi.toFixed(2)}) 50%, rgba(${r},${g},${b},.40) 80%, transparent 100%); }
+  100% { background: linear-gradient(180deg, transparent 0%, rgba(${r},${g},${b},.25) 30%, rgba(${r},${g},${b},${(gi*.8).toFixed(2)}) 50%, rgba(${r},${g},${b},.25) 70%, transparent 100%); }
+}
+@keyframes sig-dot-pulse {
+  0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(${r},${g},${b},.8); opacity:.7; }
+  50%     { transform:scale(1.6); box-shadow:0 0 0 5px rgba(${r},${g},${b},0); opacity:1; }
+}
+@keyframes sig-logo-float {
+  0%,100% { transform:translateY(0px) scale(1) rotate(0deg); }
+  33%     { transform:translateY(-3px) scale(1.015) rotate(.3deg); }
+  66%     { transform:translateY(2px) scale(0.987) rotate(-.2deg); }
+}
+@keyframes sig-arrow-bounce {
+  0%,100% { transform:translateX(0); opacity:1; }
+  50%     { transform:translateX(5px); opacity:.65; }
+}
+@keyframes sig-hdivider-sweep {
+  0%   { opacity:.6; background: linear-gradient(90deg, rgba(${r},${g},${b},.9) 0%, rgba(${r},${g},${b},.3) 60%, transparent 100%); }
+  50%  { opacity:1;  background: linear-gradient(90deg, rgba(${r},${g},${b},.4) 0%, rgba(${r},${g},${b},.9) 50%, rgba(${r},${g},${b},.2) 100%); }
+  100% { opacity:.6; background: linear-gradient(90deg, rgba(${r},${g},${b},.9) 0%, rgba(${r},${g},${b},.3) 60%, transparent 100%); }
+}
+@keyframes sig-title-pulse {
+  0%,100% { letter-spacing:0.12em; opacity:1; }
+  50%     { letter-spacing:0.18em; opacity:.8; color:rgba(${r},${g},${b},1); }
+}
+@keyframes sig-footer-breathe {
+  0%,100% { background: linear-gradient(90deg, rgba(${r},${g},${b},.12) 0%, transparent 60%); }
+  50%     { background: linear-gradient(90deg, rgba(${r},${g},${b},.22) 0%, rgba(${r},${g},${b},.06) 40%, transparent 80%); }
+}
+@keyframes sig-topbar-shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}`;
+
+  const billboardCSS = `.sig-vdivider { animation: sig-divider-flow ${(parseFloat(speed)*1.3).toFixed(2)}s ease-in-out infinite; }
+.sig-logo-dot { animation: sig-dot-pulse ${(parseFloat(speed)*.7).toFixed(2)}s ease-in-out 1.5s infinite; }
+.sig-cta-arrow { animation: sig-arrow-bounce 2.2s ease-in-out 3s infinite; }
+.sig-hdivider { animation: sig-hdivider-sweep ${(parseFloat(speed)*1.8).toFixed(2)}s ease-in-out 2s infinite; }
+.sig-titre { animation: sig-title-pulse ${(parseFloat(speed)*1.6).toFixed(2)}s ease-in-out 3.5s infinite; }
+.sig-footer { animation: sig-footer-breathe ${(parseFloat(speed)*1.4).toFixed(2)}s ease-in-out 4s infinite; }
+.sig-top-bar {
+  background: linear-gradient(90deg, transparent, rgba(${r},${g},${b},1), #22d3ee, #a78bfa, rgba(${r},${g},${b},1), transparent);
+  background-size: 200% 100%;
+  animation: sig-topbar-shimmer 3s linear 1s infinite;
+}`;
+
   const reducedMotion = `@media (prefers-reduced-motion: reduce) {
-  .sig-avatar, .sig-bar, .sig-cta { animation: none !important; filter: none !important; }
+  .sig-avatar, .sig-bar, .sig-cta, .sig-vdivider, .sig-logo-dot,
+  .sig-cta-arrow, .sig-hdivider, .sig-titre, .sig-footer, .sig-top-bar,
+  .sig-name { animation: none !important; filter: none !important; }
 }`;
 
   return [
@@ -187,7 +238,9 @@ export function buildLightingCSS(sectorId: string, accentColor: string, colorSch
     avatarGlowKF,
     barGlowKF,
     ctaGlowKF,
+    billboardKF,
     `.sig-bar { animation: sig-bar-glow ${speed}s ease-in-out infinite; }`,
+    billboardCSS,
     cardShadow,
     extraCSS,
     reducedMotion,
