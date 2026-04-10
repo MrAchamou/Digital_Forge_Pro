@@ -1,9 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // LOGO LIVING SYSTEM — 8 Effets Spectaculaires avec Transitions Fluides
+//                    + Pont des Modules Existants (Morphing / Lighting / Physics)
 // ═══════════════════════════════════════════════════════════════════════════════
 // Cycle total : 36s | 8 effets × 4.5s | Crossfade 0.4s
 // Coordonnées : locales au groupe translate(cx,cy), centre = (0,0)
 // ═══════════════════════════════════════════════════════════════════════════════
+
+import { buildLogoModuleBridge, type VariantId } from './logo-module-bridge';
+
 //
 //  Effet 0  — NEON SPECTRUM     (NEON GLOW)       : anneau neon chromatique
 //  Effet 1  — SOUL AURA         (SOUL AURA)        : 4 couches auriques émotionnelles
@@ -83,16 +87,22 @@ function slotGroup(id: string, slot: number, content: string): string {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export interface LogoLivingResult {
-  defsHtml: string;    // à placer dans <defs>
+  defsHtml:  string;   // à placer dans <defs>
   stylesCSS: string;   // à placer dans <style>
-  elements: string;    // à insérer dans le groupe translate(cx,cy)
+  elements:  string;   // à insérer dans le groupe translate(cx,cy), AVANT le cercle avatar
+  innerWrap: {         // wrapper physique à appliquer sur <circle> + logo
+    openTag:  string;
+    closeTag: string;
+  };
 }
 
 export function buildLogoLivingSystem(
-  r: number,           // rayon du cercle avatar (ex: 50)
-  accent: string,      // couleur principale
-  accentLight: string, // couleur claire
-  palette: string[],   // palette complète [bg, accent, text, ...]
+  r: number,                      // rayon du cercle avatar (ex: 50)
+  accent: string,                 // couleur principale
+  accentLight: string,            // couleur claire
+  palette: string[],              // palette complète [bg, accent, text, ...]
+  sectorId: string  = 'default',  // secteur → MorphingEngine + LightingEngine + PhysicsEngine
+  variantId: VariantId = 'A',     // variante A/B/C/D → VarianceEngine
 ): LogoLivingResult {
 
   const [h, s, l] = hex2hsl(accent.length === 7 ? accent : '#6366f1');
@@ -471,10 +481,25 @@ export function buildLogoLivingSystem(
     `));
   }
 
+  // ── Pont des modules existants ────────────────────────────────────────────
+  const bridge = buildLogoModuleBridge(sectorId, variantId, r, accent, accentLight, true);
+
   return {
-    defsHtml: allDefs.join('\n'),
-    stylesCSS: allStyles.join('\n'),
-    elements: allGroups.join('\n'),
+    defsHtml: [
+      allDefs.join('\n'),
+      bridge.filterDefs,
+    ].filter(Boolean).join('\n'),
+    stylesCSS: [
+      allStyles.join('\n'),
+      bridge.stylesCSS,
+    ].filter(Boolean).join('\n'),
+    elements: [
+      `<!-- ── Couche permanente : Lighting + Morphing (${sectorId}) ── -->`,
+      bridge.baseLayer,
+      `<!-- ── Cycle 8 effets LLS ── -->`,
+      allGroups.join('\n'),
+    ].filter(Boolean).join('\n'),
+    innerWrap: bridge.innerWrap,
   };
 }
 
