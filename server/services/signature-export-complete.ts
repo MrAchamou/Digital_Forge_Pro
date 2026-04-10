@@ -146,6 +146,11 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     entreprise, accent, accentLight, meta.secteur ?? 'default', 'A', animated
   );
 
+  // ── CTA Living System — 9 effets spectaculaires sur le bouton CTA ─────────
+  const ctals = buildCTALivingSystem(
+    cta, accent, accentLight, meta.secteur ?? 'default', 'A', animated
+  );
+
   // ── Gradient cyclique pour le nom de l'entreprise (fallback statique) ─────
   const corpGradDef = `
     <linearGradient id="sg-corp-grad" x1="100" y1="0" x2="700" y2="0" gradientUnits="userSpaceOnUse">
@@ -167,12 +172,13 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     </linearGradient>
     ${corpGradDef}
     ${cnls.filterDefs}
+    ${ctals.filterDefs}
     ${logo_url ? `<clipPath id="avatarLogoClip"><circle cx="0" cy="0" r="44"/></clipPath>` : ''}
     <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     ${lls.defsHtml}
-    ${animated ? `<style>${lls.stylesCSS}${cnls.stylesCSS}</style>` : ''}
+    ${animated ? `<style>${lls.stylesCSS}${cnls.stylesCSS}${ctals.stylesCSS}</style>` : ''}
   </defs>
 
   <!-- Background -->
@@ -236,12 +242,15 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   <!-- Note -->
   ${noteStars ? `<text x="112" y="174" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}
 
-  <!-- CTA bouton — aligné à droite de la colonne info -->
-  <g transform="translate(380, 140)">
+  <!-- CTA bouton — CTA Living System (9 effets) ou fallback statique -->
+  ${animated && ctals.groupSVG
+    ? ctals.groupSVG
+    : `<g transform="translate(380, 140)">
     <rect width="148" height="32" rx="6" fill="${accent}" opacity="0.92"/>
     <text x="74" y="21" text-anchor="middle" font-family="Arial,sans-serif" font-size="11"
       font-weight="700" fill="#ffffff">${escXml(cta)}</text>
-  </g>
+  </g>`
+  }
 
   <!-- Site -->
   ${site ? `<text x="112" y="${(telephone || email || addressLine || noteStars) ? '172' : '155'}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
