@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Application full-stack (React + Express + TypeScript) qui génère des **signatures email animées premium** via un **pipeline Triple-IA** (GPT-4o → Claude Opus → Gemini Flash). Le rendu utilise une architecture multi-couches par zones avec une bibliothèque de 55 effets premium et un système de modules intelligents.
+Application full-stack (React + Express + TypeScript) qui génère des **signatures email animées premium** via un **pipeline Triple-IA** (GPT-4o → Claude Opus → Gemini Flash). Le rendu utilise une architecture multi-couches par zones avec une bibliothèque de **55 effets premium** et un système de modules intelligents.
 
 **Langue de communication** : Français.
 
@@ -15,13 +15,16 @@ Frontend (React + Vite)           Backend (Express + TypeScript)
 ─────────────────────────         ──────────────────────────────────────
 client/src/                       server/
   pages/                            index.ts          ← Serveur principal
-  hooks/                            routes.ts         ← API REST
-    use-effect-generator.ts         services/         ← Pipeline IA
-  components/                         triple-ai-director.ts  ← Orchestrateur 3 IA
-  lib/                                zone-effect-selector.ts
-    queryClient.ts                    zone-svg-renderer.ts
-                                      harmony-validator.ts
+    export-studio.tsx               routes.ts         ← API REST
+  hooks/                            services/         ← Pipeline IA
+    use-effect-generator.ts           triple-ai-director.ts  ← Orchestrateur 3 IA
+  components/                         zone-effect-selector.ts
+  lib/                                zone-svg-renderer.ts
+    queryClient.ts                    harmony-validator.ts
                                       gemini-wrapper.ts
+                                      signature-export-complete.ts  ← Moteur SVG animé + GIF
+                                      contact-info-living-system.ts ← CILS (zone contact)
+                                      preview-page-generator.ts     ← Preview email client
                                     modules/          ← Modules intelligents
                                     data/
                                       zone-effects-library.json
@@ -69,6 +72,112 @@ Chaque signature est composée de **7 zones** :
 
 ---
 
+## Moteur SVG Animé (`signature-export-complete.ts`)
+
+### Layout de référence (viewBox 0 0 600 190)
+
+```
+x=0    x=4   x=24(cx)   x=108   x=124             x=568/600
+│      │      │           │       │                 │
+│ glow │      │  avatar   │  sep  │  contenu CILS   │
+│ bar  │      │  r=50     │  V    │                 │
+│      │      │  cy=95    │       │                 │
+```
+
+| Élément | Position |
+|---------|----------|
+| Barre accent (glow) | `x=0, width=4` |
+| Avatar/Logo centré | `cx=24, cy=95, r=50` |
+| **Séparateur vertical** | `x=108` (34 px de marge depuis le bord droit du logo) |
+| **Contenu CILS** | `x=124` (icônes), `x=137/138` (textes) |
+| Séparateur horizontal | `x1=124, x2=568` |
+| `SEP_H_LEN` | `444` (568 − 124) |
+
+### VarianceEngine Background (animé uniquement)
+
+Injecté après le `<rect>` de fond, avant la barre glow :
+
+- **24 particules stellaires** déterministes (seed index × constante) — chacune animée `twinkle + drift`
+- **3 balayages diagonaux** `skewX(-12deg)` traversant la signature en 18 s (délais 0 / 6 / 12 s)
+- Désactivé en mode statique (`animated === false`)
+
+### Positions Y du CILS (séquentielles, pas de chevauchement)
+
+```typescript
+const _DY = 17;    // espacement entre champs
+const _Y0 = 99;    // Y de départ
+// yPhone   = _Y0 + _DY × 0   = 99
+// yEmail   = _Y0 + _DY × 1   = 116
+// yAddr    = _Y0 + _DY × 2   = 133
+// ySite    = _Y0 + _DY × 3   = 150
+// yNote    = _Y0 + _DY × 4   = 167
+```
+
+---
+
+## Export Studio (`/export`)
+
+Page de génération manuelle de signatures sans IA :
+
+- **Onglet Google Maps** : extraction automatique depuis une URL Maps
+- **Onglet Saisie manuelle** : formulaire complet (nom, titre, entreprise, téléphone, email, site, adresse, CP, ville, CTA, note étoiles, upload logo)
+- Génère un SVG animé identique au pipeline IA
+- Produit le même lien de preview premium
+
+---
+
+## Preview Premium (`preview-page-generator.ts`)
+
+Le lien de preview généré après chaque signature produit une **page livrable de niveau client** :
+
+### Fenêtre email macOS complète
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ● ● ●                    Gmail — Boîte de réception         │  ← Chrome macOS
+├─────────────────────────────────────────────────────────────┤
+│ [✏ Nouveau message]  [ 🔍 Rechercher dans les e-mails ]    │  ← Toolbar
+├──────────┬──────────────┬────────────────────────────────────┤
+│          │ Boîte de     │  Objet : [généré selon secteur]    │
+│  Nav     │ réception    │  De : Nom Client · Titre           │
+│  sidebar │              │  À : Destinataire fictif           │
+│  (icônes │  6 fausses   │                                    │
+│  Gmail)  │  emails      │  [Corps email personnalisé]        │
+│          │  contextuels │  — secteur/nom/entreprise/CTA —    │
+│          │  (Calendly,  │                                    │
+│          │  Stripe,     │  ── Signature professionnelle ──   │
+│          │  LinkedIn…)  │  [SVG ANIMÉ VIVANT]                │
+│          │              │  ════ VAR A · 00:00 ════           │
+└──────────┴──────────────┴────────────────────────────────────┘
+```
+
+### Contenu email contextualisé (`buildEmailContent`)
+
+Génère un email réaliste selon le secteur détecté dans les métadonnées :
+
+| Secteur | Destinataire | Sujet exemple |
+|---------|-------------|---------------|
+| Santé / Médical | Dr. Sophie Lambert | "Suite à votre consultation" |
+| Tech / Digital | Thomas Renard | "Proposition de collaboration" |
+| Artisanat / Bâtiment | Jean-Luc Perrin | "Devis pour vos travaux" |
+| Immobilier | Claire Fontaine | "Votre projet immobilier" |
+| Restauration | Isabelle Moreau | "Prestation traiteur" |
+| Coaching / Conseil | Alexandre Petit | "Programme sur mesure" |
+| Défaut | Marie Durand | "Suite à notre échange" |
+
+### Interactions premium
+
+| Interaction | Effet |
+|------------|-------|
+| Survol fenêtre email | Tilt 3D parallax (perspective 1400px, ±2.5°) + sparkles |
+| Survol zone signature | Restart animations SVG (mouseenter) |
+| Bouton "Rejouer" | Restart complet + burst 16 sparkles |
+| IntersectionObserver | Restart au scroll into viewport |
+| Pulse 25 s | Brightness flash + 5 sparkles |
+| Starfield (70 étoiles) | Fond twinkle animé |
+
+---
+
 ## Modules Intelligents (server/modules/)
 
 ### ✅ Module 1 — VarianceEngine v1.0 (opérationnel)
@@ -99,8 +208,6 @@ POST /api/signature/variants/render            — 4 HTMLs complets (A+B+C+D)
 POST /api/signature/variants/:id/render        — 1 HTML (A ou B ou C ou D)
 ```
 
-**Performance** : 4 variantes en ~40ms, 0 dépendance externe, 10/10 secteurs validés.
-
 ### ✅ Module 2 — TimingMaster v3.0 (opérationnel)
 
 **Fichier** : `server/modules/timing-master.module.ts`
@@ -124,8 +231,6 @@ GET  /api/timing/profiles/all      — Matrice 40 profils (10 secteurs × 4 vari
 POST /api/timing/css               — Bloc CSS injectable (style + Outlook + reduced-motion)
 POST /api/timing/inject            — Injection CSS dans un HTML complet
 ```
-
-**Performance** : 40 profils précalculables, 0 dépendance externe, 7 zones × arc narratif, 8/8 tests validés.
 
 ### ✅ Module 3 — ColorHarmonyEngine v3.0 (opérationnel)
 
@@ -151,8 +256,6 @@ POST /api/color/adapt           — Adapte palette secteur à couleur dominante 
 POST /api/color/inject          — Injecte CSS (WCAG auto-enforced) dans un HTML
 ```
 
-**Performance** : 0 dépendance externe, WCAG auto-enforced à l'injection, 7/7 tests validés.
-
 ### ✅ Module 4 — ContextAdaptationEngine v3.0 (opérationnel)
 
 **Fichier** : `server/modules/context-adaptation.module.ts`
@@ -175,8 +278,6 @@ POST /api/context/adapt           — CSS + inline + MSO pour un client + scheme
 POST /api/context/adapt/all       — Matrice 10 clients en une passe
 POST /api/context/inject          — Injecte dans un HTML complet
 ```
-
-**Performance** : 0 dépendance externe, 10/10 clients validés, SafetyValidator WCAG auto.
 
 ### ✅ Module 5 — PerformanceAdaptiveEngine v3.0 (opérationnel)
 
@@ -201,26 +302,6 @@ GET  /api/performance/tiers/all     — Matrice 3 tiers pré-générée
 POST /api/performance/inject        — Injecte dans un HTML complet + snippet JS FPS
 ```
 
-**Performance** : 7 hints analysés, score signé (-95 à 100), TierResolver 4 profils validés, 5 media queries empilés.
-
-### Modules existants (hérités)
-
-| Module | Fichier | Rôle |
-|--------|---------|------|
-| Physics | `physics.module.ts` | Calculs physiques pour effets dynamiques |
-| Particles | `particles.module.ts` | Système de particules |
-| Morphing | `morphing.module.ts` | Transformations morphologiques |
-| Lighting | `lighting.module.ts` | Éclairage et ombres |
-| PresetManager | `preset-manager.module.ts` | Gestionnaire de presets |
-
-### ✅ Priorité 2 — Intelligence de rendu
-
-| Module | Fichier | Rôle |
-|--------|---------|------|
-| **ContextualIntelligenceModerator** | `contextual-intelligence.module.ts` | Analyse la complexité des compositions générées. Écrête les couches excessives. Protège les zones lisibilité (titre, contact). Règles par secteur (finance=discret, startup=explosif). |
-| **SmartOptimizer** | `smart-optimizer.module.ts` | Calibre les intensités/vitesses selon le secteur, le profil de variation (A/B/C/D), la complexité du logo et le ton émotionnel. Matrices secteur × variation × contenu. |
-| **VisualFocusEngine** | `visual-focus.module.ts` | Guide l'œil selon un chemin adaptatif : A=logo→nom→CTA, B=logo→CTA→nom, C=fond→logo→nom→CTA, D=logo→CTA. Cascade Fibonacci d'apparition. Contraste adaptatif par zone. |
-
 ### Modules existants (hérités)
 
 | Module | Rôle |
@@ -233,6 +314,14 @@ POST /api/performance/inject        — Injecte dans un HTML complet + snippet J
 | `library-expansion.module.ts` | Extension de la bibliothèque d'effets |
 | `error-detection.module.ts` | Détection et correction automatique d'erreurs |
 | `batch-generator.module.ts` | Génération en lot |
+
+### ✅ Priorité 2 — Intelligence de rendu
+
+| Module | Fichier | Rôle |
+|--------|---------|------|
+| **ContextualIntelligenceModerator** | `contextual-intelligence.module.ts` | Analyse la complexité des compositions générées. Écrête les couches excessives. Protège les zones lisibilité (titre, contact). Règles par secteur (finance=discret, startup=explosif). |
+| **SmartOptimizer** | `smart-optimizer.module.ts` | Calibre les intensités/vitesses selon le secteur, le profil de variation (A/B/C/D), la complexité du logo et le ton émotionnel. Matrices secteur × variation × contenu. |
+| **VisualFocusEngine** | `visual-focus.module.ts` | Guide l'œil selon un chemin adaptatif : A=logo→nom→CTA, B=logo→CTA→nom, C=fond→logo→nom→CTA, D=logo→CTA. Cascade Fibonacci d'apparition. Contraste adaptatif par zone. |
 
 ---
 
@@ -341,3 +430,7 @@ GET  /api/preferences/recommendations — recommandations proactives
 - **P3** ✅ DynamicFusionOrchestrator + EffectFusionEngine + ExperienceOrchestrator
 - **P4** ✅ AdaptiveRenderingEngine + ContentAnalyzer + AnalyticsModule (v3 PostgreSQL)
 - **P5** ✅ PredictiveTransitionEngine + AttentionGuide + VisualSignatureEngine (v2 DB) + UserPreferencesEngine (v2 DB) + PresetManager (v2 DB)
+- **P6** ✅ Export Studio (`/export`) — saisie manuelle complète + logo upload
+- **P7** ✅ Alignements CILS — séparateur x=108, contenu x=124, SEP_H_LEN=444, positions Y séquentielles (Δ17px)
+- **P8** ✅ VarianceEngine Background — 24 particules stellaires + 3 scan diagonaux dans SVG animé
+- **P9** ✅ Preview Premium — client email macOS complet (fenêtre + sidebar + liste + email personnalisé par secteur + signature vivante)
