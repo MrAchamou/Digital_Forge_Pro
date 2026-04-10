@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Download, Mail, Smartphone, Monitor, Globe, Zap,
   CheckCircle, Loader2, ExternalLink, Copy, Package,
-  Sparkles, ChevronDown, ChevronRight, Eye
+  Sparkles, ChevronDown, ChevronRight, Eye, Upload, X, Star
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -217,6 +217,7 @@ interface FormData {
   gmbUrl: string;
   nom: string;
   titre: string;
+  entreprise: string;
   sectorId: string;
   telephone: string;
   email: string;
@@ -225,6 +226,7 @@ interface FormData {
   ville: string;
   code_postal: string;
   cta: string;
+  note: string;
 }
 
 const SECTORS = [
@@ -247,12 +249,24 @@ export default function ExportStudio() {
   const [mode, setMode] = useState<'gmb' | 'manual'>('gmb');
   const [result, setResult] = useState<ExportResult | null>(null);
   const [form, setForm] = useState<FormData>({
-    gmbUrl: '', nom: '', titre: '', sectorId: 'sante',
+    gmbUrl: '', nom: '', titre: '', entreprise: '', sectorId: 'sante',
     telephone: '', email: '', site: '', adresse: '',
-    ville: '', code_postal: '', cta: 'Nous contacter',
+    ville: '', code_postal: '', cta: 'Nous contacter', note: '',
   });
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: 'Logo trop lourd', description: 'Max 2 Mo', variant: 'destructive' }); return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => setLogoPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
 
   // Mutation GMB pipeline complet
   const gmbExport = useMutation({
@@ -298,10 +312,12 @@ export default function ExportStudio() {
       manualExport.mutate({
         sectorId: form.sectorId,
         data: {
-          nom: form.nom, titre: form.titre, entreprise: '',
+          nom: form.nom, titre: form.titre, entreprise: form.entreprise,
           telephone: form.telephone, email: form.email, site: form.site,
           adresse: form.adresse, ville: form.ville, code_postal: form.code_postal,
           cta: form.cta,
+          ...(form.note ? { note: parseFloat(form.note) } : {}),
+          ...(logoPreview ? { logo_url: logoPreview } : {}),
         },
       });
     }
@@ -392,6 +408,65 @@ export default function ExportStudio() {
             </motion.div>
           ) : (
             <motion.div key="manual" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+
+              {/* ── Logo Upload ─────────────────────────────────────────── */}
+              <div>
+                <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Logo de l'entreprise</label>
+                {logoPreview ? (
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <img
+                        src={logoPreview}
+                        alt="Logo"
+                        className="w-16 h-16 rounded-full object-cover border-2 border-forge-purple/40"
+                        data-testid="img-logo-preview"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setLogoPreview(null)}
+                        data-testid="btn-remove-logo"
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500/80 flex items-center justify-center hover:bg-red-500 transition-colors"
+                      >
+                        <X size={10} className="text-white" />
+                      </button>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-white/70 font-medium">Logo chargé</p>
+                      <p className="text-xs text-white/30 mt-0.5">Apparaîtra dans le cercle avatar de la signature</p>
+                      <label
+                        htmlFor="logo-upload"
+                        className="mt-2 inline-flex items-center gap-1.5 text-xs text-forge-purple cursor-pointer hover:text-forge-cyan transition-colors"
+                      >
+                        <Upload size={11} /> Remplacer
+                      </label>
+                    </div>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="logo-upload"
+                    data-testid="label-logo-upload"
+                    className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-white/[0.12] rounded-xl py-5 cursor-pointer hover:border-forge-purple/50 hover:bg-forge-purple/[0.04] transition-all group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.10] flex items-center justify-center group-hover:border-forge-purple/40 transition-colors">
+                      <Upload size={16} className="text-white/30 group-hover:text-forge-purple transition-colors" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-white/50 group-hover:text-white/70 transition-colors">Cliquer pour uploader un logo</p>
+                      <p className="text-xs text-white/25 mt-0.5">PNG, JPG, SVG — max 2 Mo</p>
+                    </div>
+                  </label>
+                )}
+                <input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  data-testid="input-logo-upload"
+                  className="hidden"
+                />
+              </div>
+
+              {/* ── Ligne 1 : Secteur + Entreprise ─────────────────────── */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Secteur *</label>
@@ -405,40 +480,62 @@ export default function ExportStudio() {
                   </select>
                 </div>
                 <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Nom de l'entreprise</label>
+                  <input type="text" value={form.entreprise} onChange={e => update('entreprise', e.target.value)}
+                    placeholder="Cabinet Médical Martin" data-testid="input-entreprise"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+              </div>
+
+              {/* ── Ligne 2 : Nom + Titre ───────────────────────────────── */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Nom complet *</label>
                   <input type="text" value={form.nom} onChange={e => update('nom', e.target.value)}
                     placeholder="Dr. Jean Martin" data-testid="input-nom-manual"
                     className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Titre</label>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Titre / Poste</label>
                   <input type="text" value={form.titre} onChange={e => update('titre', e.target.value)}
                     placeholder="Chirurgien-Dentiste" data-testid="input-titre-manual"
                     className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
                 </div>
+              </div>
+
+              {/* ── Ligne 3 : Téléphone + Email ─────────────────────────── */}
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Téléphone</label>
                   <input type="text" value={form.telephone} onChange={e => update('telephone', e.target.value)}
                     placeholder="01 88 33 49 41" data-testid="input-telephone"
                     className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Email</label>
                   <input type="email" value={form.email} onChange={e => update('email', e.target.value)}
                     placeholder="contact@cabinet.fr" data-testid="input-email"
                     className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
                 </div>
+              </div>
+
+              {/* ── Ligne 4 : Site web + Texte CTA ─────────────────────── */}
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Site web</label>
                   <input type="url" value={form.site} onChange={e => update('site', e.target.value)}
                     placeholder="https://cabinet.fr" data-testid="input-site"
                     className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
                 </div>
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Texte bouton CTA</label>
+                  <input type="text" value={form.cta} onChange={e => update('cta', e.target.value)}
+                    placeholder="Nous contacter" data-testid="input-cta"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
               </div>
+
+              {/* ── Ligne 5 : Adresse + Code postal ─────────────────────── */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
                   <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Adresse</label>
@@ -453,6 +550,41 @@ export default function ExportStudio() {
                     className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
                 </div>
               </div>
+
+              {/* ── Ligne 6 : Ville + Note ───────────────────────────────── */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Ville</label>
+                  <input type="text" value={form.ville} onChange={e => update('ville', e.target.value)}
+                    placeholder="Paris" data-testid="input-ville"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                </div>
+                <div>
+                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <Star size={11} className="text-amber-400" /> Note (étoiles, optionnel)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => update('note', form.note === String(n) ? '' : String(n))}
+                        data-testid={`btn-star-${n}`}
+                        className="transition-transform hover:scale-110"
+                      >
+                        <Star
+                          size={22}
+                          className={`transition-colors ${parseInt(form.note) >= n ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`}
+                        />
+                      </button>
+                    ))}
+                    {form.note && (
+                      <span className="text-xs text-amber-400 font-semibold ml-1">{form.note}/5</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
             </motion.div>
           )}
         </AnimatePresence>
