@@ -20,7 +20,10 @@
 //  LightingEngine  → intensité glow + profondeur shadow selon secteur
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { getVarianceParams, applyVarianceToColor, type VariantId } from './logo-module-bridge';
+import {
+  getVarianceParams, applyVarianceToColor, type VariantId,
+  LIGHTING_PROFILES, MORPH_PROFILES, PHYSICS_PROFILES,
+} from './logo-module-bridge';
 
 const PHI     = 1.6180339887;
 const PHI_INV = 1 / PHI;
@@ -36,30 +39,31 @@ const PERIMETER = 350;        // périmètre approximatif du rect arrondi (px)
 
 // ── Profils secteur ───────────────────────────────────────────────────────────
 
+// Profil CTA — uniquement les données spécifiques au CTA.
+// LightingEngine (glowInt/pulseSpeed), MorphingEngine (morphStyle/intensity),
+// PhysicsEngine (preset/floatAmp) sont lus directement depuis logo-module-bridge.
 interface CTASectorProfile {
-  bpm:          number;
-  globalMult:   number;
-  easing:       string;
-  glowInt:      number;
-  particles:    number;  // nombre de particules orbitales
-  glitch:       boolean;
-  sparkle:      boolean;
-  morphStyle:   string;
-  entryDelay:   number;  // délai avant l'entrée du bouton (s)
+  bpm:        number;
+  globalMult: number;
+  easing:     string;
+  particles:  number;  // nombre de particules orbitales (MAGNETIC PULL)
+  glitch:     boolean;
+  sparkle:    boolean;
+  entryDelay: number;  // délai avant l'entrée du bouton (QUANTUM PHASE)
 }
 
 const SECTOR_PROFILES: Record<string, CTASectorProfile> = {
-  tech:         { bpm: 72,  globalMult: 1.0,       easing: 'cubic-bezier(.25,.46,.45,.94)', glowInt: 0.85, particles: 6, glitch: true,  sparkle: true,  morphStyle: 'geometric', entryDelay: 0.9 },
-  startup:      { bpm: 96,  globalMult: PHI_INV,   easing: 'cubic-bezier(.68,-.55,.265,1.55)', glowInt: 0.90, particles: 8, glitch: true,  sparkle: true,  morphStyle: 'elastic',   entryDelay: 0.7 },
-  sante:        { bpm: 60,  globalMult: 1.2,       easing: 'cubic-bezier(.4,0,.6,1)',       glowInt: 0.45, particles: 3, glitch: false, sparkle: false, morphStyle: 'breathe',   entryDelay: 1.2 },
-  beaute:       { bpm: 58,  globalMult: 1.0,       easing: 'cubic-bezier(.25,.1,.25,1)',    glowInt: 0.70, particles: 4, glitch: false, sparkle: true,  morphStyle: 'liquid',    entryDelay: 1.0 },
-  finance:      { bpm: 44,  globalMult: PHI,       easing: 'cubic-bezier(.4,0,.2,1)',       glowInt: 0.30, particles: 2, glitch: false, sparkle: false, morphStyle: 'breathe',   entryDelay: 1.5 },
-  juridique:    { bpm: 40,  globalMult: PHI * 1.1, easing: 'cubic-bezier(0,0,.2,1)',        glowInt: 0.25, particles: 0, glitch: false, sparkle: false, morphStyle: 'breathe',   entryDelay: 1.8 },
-  creative:     { bpm: 80,  globalMult: 0.9,       easing: 'cubic-bezier(.34,1.56,.64,1)', glowInt: 0.95, particles: 8, glitch: true,  sparkle: true,  morphStyle: 'liquid',    entryDelay: 0.8 },
-  immobilier:   { bpm: 52,  globalMult: 1.3,       easing: 'cubic-bezier(.25,.1,.25,1)',    glowInt: 0.40, particles: 3, glitch: false, sparkle: false, morphStyle: 'breathe',   entryDelay: 1.1 },
-  restauration: { bpm: 68,  globalMult: 1.0,       easing: 'cubic-bezier(.4,0,.2,1)',       glowInt: 0.60, particles: 4, glitch: false, sparkle: true,  morphStyle: 'breathe',   entryDelay: 1.0 },
-  sport:        { bpm: 110, globalMult: PHI_INV * 0.9, easing: 'cubic-bezier(.68,-.55,.27,1.55)', glowInt: 0.95, particles: 8, glitch: true,  sparkle: true,  morphStyle: 'elastic',   entryDelay: 0.6 },
-  default:      { bpm: 60,  globalMult: 1.0,       easing: 'cubic-bezier(.4,0,.2,1)',       glowInt: 0.55, particles: 4, glitch: false, sparkle: true,  morphStyle: 'breathe',   entryDelay: 1.0 },
+  tech:         { bpm: 72,  globalMult: 1.0,           easing: 'cubic-bezier(.25,.46,.45,.94)',     particles: 6, glitch: true,  sparkle: true,  entryDelay: 0.9 },
+  startup:      { bpm: 96,  globalMult: PHI_INV,        easing: 'cubic-bezier(.68,-.55,.265,1.55)', particles: 8, glitch: true,  sparkle: true,  entryDelay: 0.7 },
+  sante:        { bpm: 60,  globalMult: 1.2,            easing: 'cubic-bezier(.4,0,.6,1)',           particles: 3, glitch: false, sparkle: false, entryDelay: 1.2 },
+  beaute:       { bpm: 58,  globalMult: 1.0,            easing: 'cubic-bezier(.25,.1,.25,1)',        particles: 4, glitch: false, sparkle: true,  entryDelay: 1.0 },
+  finance:      { bpm: 44,  globalMult: PHI,            easing: 'cubic-bezier(.4,0,.2,1)',           particles: 2, glitch: false, sparkle: false, entryDelay: 1.5 },
+  juridique:    { bpm: 40,  globalMult: PHI * 1.1,      easing: 'cubic-bezier(0,0,.2,1)',            particles: 0, glitch: false, sparkle: false, entryDelay: 1.8 },
+  creative:     { bpm: 80,  globalMult: 0.9,            easing: 'cubic-bezier(.34,1.56,.64,1)',      particles: 8, glitch: true,  sparkle: true,  entryDelay: 0.8 },
+  immobilier:   { bpm: 52,  globalMult: 1.3,            easing: 'cubic-bezier(.25,.1,.25,1)',        particles: 3, glitch: false, sparkle: false, entryDelay: 1.1 },
+  restauration: { bpm: 68,  globalMult: 1.0,            easing: 'cubic-bezier(.4,0,.2,1)',           particles: 4, glitch: false, sparkle: true,  entryDelay: 1.0 },
+  sport:        { bpm: 110, globalMult: PHI_INV * 0.9,  easing: 'cubic-bezier(.68,-.55,.27,1.55)',  particles: 8, glitch: true,  sparkle: true,  entryDelay: 0.6 },
+  default:      { bpm: 60,  globalMult: 1.0,            easing: 'cubic-bezier(.4,0,.2,1)',           particles: 4, glitch: false, sparkle: true,  entryDelay: 1.0 },
 };
 
 function getSector(sectorId: string): string {
@@ -131,22 +135,39 @@ export function buildCTALivingSystem(
   const cShift1 = `hsl(${(h+40)%360},${s}%,${Math.min(85,l+20)}%)`;  // teinte +40°
   const cShift2 = `hsl(${(h+180)%360},${clamp(s*0.7,20,100)}%,${Math.min(90,l+30)}%)`; // complémentaire
 
-  // ── Métriques temporelles ──────────────────────────────────────────────────
+  // ── LightingEngine (via logo-module-bridge) ────────────────────────────────
+  const lightProf = LIGHTING_PROFILES[sec] || LIGHTING_PROFILES['default'];
+  const gi        = lightProf.glowIntensity;   // intensité sectorielle réelle
+  const lightStyle = lightProf.style;          // electric/neon/aura/dramatic/soft/subtle
+
+  // ── MorphingEngine (via logo-module-bridge) ────────────────────────────────
+  const morphProf  = MORPH_PROFILES[sec] || MORPH_PROFILES['default'];
+  const morphStyle = morphProf.style;          // breathe/elastic/geometric/liquid/crystal
+  const morphInt   = morphProf.intensity;      // 0.25–0.95
+
+  // ── PhysicsEngine (via logo-module-bridge) ─────────────────────────────────
+  const physProf   = PHYSICS_PROFILES[sec] || PHYSICS_PROFILES['default'];
+  const floatAmp   = physProf.floatAmp;        // amplitude de flottement (px)
+  const physPreset = physProf.preset;          // float/bounce/spring/pendulum/gravity
+
+  // ── Métriques temporelles (TimingMaster) ──────────────────────────────────
   const beatS       = 60 / prof.bpm;
-  const heartbeatS  = clamp(beatS * 2 / tMult, 0.8, 4.0);     // 2 beats par heartbeat
-  const glowPulseS  = clamp(beatS * 4 / tMult, 1.5, 6.0);     // 4 beats par glow
-  const shimmerS    = clamp(beatS * 8 / tMult, 2.5, 8.0);     // 8 beats pour un scan
-  const orbitS      = clamp(60 / prof.bpm * 4 / tMult, 2, 8); // 4 beats par orbite
-  const gradRotS    = clamp(beatS * 16 / tMult, 4, 12);        // rotation gradient
-  const sparkleS    = clamp(beatS * 6 / tMult, 2, 10);        // périodicité sparkle
-  const breatheS    = clamp(beatS * 4 * tMult, 1, 6);         // BREATHING texte
-  const borderDrawS = clamp(0.6 / tMult, 0.3, 1.2);           // dessin contour
+  const heartbeatS  = clamp(beatS * 2 / tMult, 0.8, 4.0);                         // 2 beats par heartbeat
+  const glowPulseS  = clamp(beatS * 4 / (tMult * lightProf.pulseSpeed), 1.0, 6.0); // LightingEngine pulseSpeed
+  const shimmerS    = clamp(beatS * 8 / tMult, 2.5, 8.0);                          // 8 beats pour un scan
+  const orbitS      = clamp(beatS * 4 / tMult, 2, 8);                              // 4 beats par orbite
+  const gradRotS    = clamp(beatS * 16 / tMult, 4, 12);                            // rotation gradient
+  const sparkleS    = clamp(beatS * 6 / tMult, 2, 10);                             // périodicité sparkle
+  const breatheS    = clamp(beatS * 4 * tMult, 1, 6);                              // BREATHING texte
+  const borderDrawS = clamp(0.6 / tMult, 0.3, 1.2);                               // dessin contour
+  // PhysicsEngine période : formule de Hooke lmb-style
+  const physPeriod  = clamp(
+    (2 * Math.PI / Math.sqrt(physProf.stiffness / physProf.mass)) * tMult, 1.0, 8.0
+  );
 
   // Durée entrée QUANTUM PHASE
   const entryDur    = clamp(0.55 / tMult, 0.35, 1.0);
   const entryDelay  = prof.entryDelay;
-
-  const gi = prof.glowInt; // glowIntensity
 
   // ─────────────────────────────────────────────────────────────────────────
   // DEFS
@@ -231,8 +252,128 @@ export function buildCTALivingSystem(
       50%     { opacity: ${(gi * 0.85).toFixed(2)}; }
     }` : '';
 
+  // ── LightingEngine — glow style sectoriel ─────────────────────────────────
+  // Traduit lightStyle (electric/neon/aura/dramatic/soft/subtle) en variations
+  // du keyframe cta-glow-pulse pour que l'aura du bouton corresponde au secteur.
+  const lightingGlowCSS = (() => {
+    switch (lightStyle) {
+      case 'electric': return `
+        @keyframes cta-glow-pulse {
+          0%,85%,100% { opacity: ${(gi*0.20).toFixed(2)}; transform: scaleX(1) scaleY(1); }
+          48%  { opacity: ${(gi*0.55).toFixed(2)}; transform: scaleX(1.05) scaleY(1.12); }
+          50%  { opacity: ${(gi*0.70).toFixed(2)}; transform: scaleX(1.04) scaleY(1.10); }
+          52%  { opacity: ${(gi*0.55).toFixed(2)}; transform: scaleX(1.05) scaleY(1.12); }
+          86%  { opacity: ${(gi*0.12).toFixed(2)}; transform: scaleX(1) scaleY(1); }
+          87%  { opacity: ${(gi*0.35).toFixed(2)}; transform: scaleX(1.02) scaleY(1.06); }
+        }`;
+      case 'neon': return `
+        @keyframes cta-glow-pulse {
+          0%,100% { opacity: ${(gi*0.22).toFixed(2)}; transform: scaleX(1) scaleY(1); }
+          50%     { opacity: ${(gi*0.60).toFixed(2)}; transform: scaleX(1.04) scaleY(1.12); }
+        }`;
+      case 'aura': return `
+        @keyframes cta-glow-pulse {
+          0%,100% { opacity: ${(gi*0.25).toFixed(2)}; transform: scaleX(1) scaleY(1) rotate(0deg); }
+          33%     { opacity: ${(gi*0.50).toFixed(2)}; transform: scaleX(1.06) scaleY(1.15) rotate(2deg); }
+          66%     { opacity: ${(gi*0.38).toFixed(2)}; transform: scaleX(1.03) scaleY(1.10) rotate(-1deg); }
+        }`;
+      case 'dramatic': return `
+        @keyframes cta-glow-pulse {
+          0%,100% { opacity: ${(gi*0.18).toFixed(2)}; transform: scaleX(1) scaleY(1); }
+          40%     { opacity: ${(gi*0.65).toFixed(2)}; transform: scaleX(1.07) scaleY(1.18); }
+          60%     { opacity: ${(gi*0.50).toFixed(2)}; transform: scaleX(1.05) scaleY(1.12); }
+        }`;
+      default: return `  /* soft/subtle */
+        @keyframes cta-glow-pulse {
+          0%,100% { opacity: ${(gi*0.15).toFixed(2)}; transform: scaleX(1) scaleY(1); }
+          50%     { opacity: ${(gi*0.38).toFixed(2)}; transform: scaleX(1.02) scaleY(1.06); }
+        }`;
+    }
+  })();
+
+  // ── MorphingEngine — border animation selon le style sectoriel ────────────
+  // Traduit morphStyle (breathe/elastic/geometric/liquid/crystal) en animation
+  // du contour du bouton CTA (keyframe cta-border-morph).
+  const morphingBorderCSS = (() => {
+    const mi = morphInt;
+    switch (morphStyle) {
+      case 'elastic': return `
+        @keyframes cta-border-morph {
+          0%,100% { transform: scaleX(1) scaleY(1); stroke-opacity: ${(gi*0.55).toFixed(2)}; }
+          20%     { transform: scaleX(${(1+0.04*mi).toFixed(3)}) scaleY(${(1-0.03*mi).toFixed(3)}); stroke-opacity: ${(gi*0.90).toFixed(2)}; }
+          40%     { transform: scaleX(${(1-0.03*mi).toFixed(3)}) scaleY(${(1+0.04*mi).toFixed(3)}); stroke-opacity: ${(gi*0.70).toFixed(2)}; }
+          70%     { transform: scaleX(${(1+0.02*mi).toFixed(3)}) scaleY(${(1-0.01*mi).toFixed(3)}); stroke-opacity: ${(gi*0.80).toFixed(2)}; }
+        }`;
+      case 'geometric': return `
+        @keyframes cta-border-morph {
+          0%,100% { transform: rotate(0deg) scaleX(1); stroke-opacity: ${(gi*0.55).toFixed(2)}; }
+          25%     { stroke-opacity: ${(gi*0.95).toFixed(2)}; stroke-width: 2; }
+          50%     { stroke-opacity: ${(gi*0.60).toFixed(2)}; }
+          75%     { stroke-opacity: ${(gi*0.95).toFixed(2)}; stroke-width: 2; }
+        }`;
+      case 'liquid': return `
+        @keyframes cta-border-morph {
+          0%,100% { transform: scaleX(1) scaleY(1); stroke-opacity: ${(gi*0.50).toFixed(2)}; }
+          25%     { transform: scaleX(${(1+0.05*mi).toFixed(3)}) scaleY(${(1-0.04*mi).toFixed(3)}); stroke-opacity: ${(gi*0.85).toFixed(2)}; }
+          50%     { transform: scaleX(${(1-0.03*mi).toFixed(3)}) scaleY(${(1+0.05*mi).toFixed(3)}); stroke-opacity: ${(gi*0.65).toFixed(2)}; }
+          75%     { transform: scaleX(${(1+0.04*mi).toFixed(3)}) scaleY(${(1-0.03*mi).toFixed(3)}); stroke-opacity: ${(gi*0.80).toFixed(2)}; }
+        }`;
+      default: /* breathe/crystal/subtle */ return `
+        @keyframes cta-border-morph {
+          0%,100% { stroke-opacity: ${(gi*0.55).toFixed(2)}; }
+          50%     { stroke-opacity: ${(gi*0.95).toFixed(2)}; }
+        }`;
+    }
+  })();
+
+  // ── PhysicsEngine — flottement CTA ────────────────────────────────────────
+  // Applique le preset physique sectoriel en translateY/rotate sur le groupe.
+  // Keyframe nommée cta-physics (différent de lmb-physics du logo).
+  const physicsCSS = (() => {
+    if (floatAmp === 0) return '';
+    const amp = (Math.min(floatAmp, 4)).toFixed(1); // CTA: amplitude max réduite à 4px
+    switch (physPreset) {
+      case 'bounce': {
+        const d = (floatAmp * 0.6).toFixed(1);
+        return `@keyframes cta-physics {
+          0%   { transform: translateY(0px); }
+          35%  { transform: translateY(-${amp}px); }
+          50%  { transform: translateY(-${(parseFloat(amp)*0.2).toFixed(1)}px); }
+          65%  { transform: translateY(-${d}px); }
+          80%  { transform: translateY(-${(parseFloat(amp)*0.1).toFixed(1)}px); }
+          100% { transform: translateY(0px); }
+        }`;
+      }
+      case 'pendulum': {
+        const rot = Math.min(3, floatAmp * 0.5).toFixed(1);
+        return `@keyframes cta-physics {
+          0%,100% { transform: rotate(0deg); }
+          25%     { transform: rotate(-${rot}deg); }
+          75%     { transform: rotate(${rot}deg); }
+        }`;
+      }
+      case 'spring': {
+        return `@keyframes cta-physics {
+          0%   { transform: translateY(0px); }
+          15%  { transform: translateY(-${amp}px); }
+          30%  { transform: translateY(-${(parseFloat(amp)*0.8).toFixed(1)}px); }
+          50%  { transform: translateY(-${(parseFloat(amp)*0.3).toFixed(1)}px); }
+          100% { transform: translateY(0px); }
+        }`;
+      }
+      case 'gravity': return ''; // statique, pas de float
+      default: /* float */ return `@keyframes cta-physics {
+        0%,100% { transform: translateY(0px); }
+        50%     { transform: translateY(-${amp}px); }
+      }`;
+    }
+  })();
+  const physicsAnimStyle = (floatAmp > 0 && physPreset !== 'gravity' && physicsCSS)
+    ? `animation: cta-physics ${physPeriod.toFixed(2)}s ease-in-out ${(entryDelay + 0.3).toFixed(2)}s infinite;`
+    : '';
+
   const stylesCSS = `
-    /* ─── CTA Living System ─────────────────────────────────── */
+    /* ─── CTA Living System — Sector:${sec} LightStyle:${lightStyle} Morph:${morphStyle} Physics:${physPreset} Variant:${variantId} ─── */
 
     /* QUANTUM PHASE — entrée matérialisation */
     @keyframes cta-enter {
@@ -256,11 +397,8 @@ export function buildCTALivingSystem(
       100%    { transform: scale(1.10); opacity: 0; }
     }
 
-    /* NEON GLOW — aura pulsante permanente */
-    @keyframes cta-glow-pulse {
-      0%,100% { opacity: ${(gi * 0.20).toFixed(2)}; transform: scaleX(1)   scaleY(1); }
-      50%     { opacity: ${(gi * 0.45).toFixed(2)}; transform: scaleX(1.03) scaleY(1.08); }
-    }
+    /* LIGHTING ENGINE — glow pulse sectoriel (${lightStyle}) */
+    ${lightingGlowCSS}
 
     /* ELECTRIC FORM — scanner horizontal */
     @keyframes cta-shimmer {
@@ -276,11 +414,11 @@ export function buildCTALivingSystem(
       50%     { transform: scale(${variantId === 'B' ? '1.025' : '1.012'}); opacity: 0.95; }
     }
 
-    /* BORDER — fade-in de l'opacité du contour après le draw */
-    @keyframes cta-border-pulse {
-      0%,100% { stroke-opacity: ${(gi * 0.55).toFixed(2)}; }
-      50%     { stroke-opacity: ${(gi * 0.95).toFixed(2)}; }
-    }
+    /* MORPHING ENGINE — border morph sectoriel (${morphStyle}) */
+    ${morphingBorderCSS}
+
+    /* PHYSICS ENGINE — flottement sectoriel (${physPreset}, amp:${floatAmp}px) */
+    ${physicsCSS}
 
     /* Fade-in global */
     @keyframes cta-fadein {
@@ -360,16 +498,20 @@ export function buildCTALivingSystem(
     <rect width="${BTN_W}" height="${BTN_H}" rx="${BTN_RX}"
       fill="url(#cta-bg-grad)" opacity="0.95"/>`;
 
-  // ── COUCHE 5 : BORDER DRAW — contour qui se dessine ──────────────────────
+  // ── COUCHE 5 : BORDER DRAW + MorphingEngine ──────────────────────────────
+  // BORDER DRAW : contour qui se dessine à l'entrée (stroke-dashoffset)
+  // MorphingEngine : après le draw, keyframe cta-border-morph (style sectoriel)
+  const borderMorphOrigin = `${BTN_CX}px ${BTN_CY}px`;
   const borderEl = `
-    <!-- BORDER DRAW — contour progressif + pulsation -->
+    <!-- BORDER DRAW + MORPHING ENGINE (${morphStyle}) — contour progressif -->
     <rect x="0.75" y="0.75" width="${BTN_W - 1.5}" height="${BTN_H - 1.5}" rx="${BTN_RX - 0.5}"
       fill="none"
       stroke="url(#cta-border-grad)"
       stroke-width="1.5"
       stroke-dasharray="${PERIMETER}"
       stroke-dashoffset="${PERIMETER}"
-      style="animation: cta-border-pulse ${glowPulseS.toFixed(2)}s ease-in-out ${entryDelay + borderDrawS + 0.1}s infinite;">
+      style="animation: cta-border-morph ${glowPulseS.toFixed(2)}s ease-in-out ${(entryDelay + borderDrawS + 0.1).toFixed(2)}s infinite;
+             transform-origin: ${borderMorphOrigin};">
       <!-- Dessin progressif à l'entrée -->
       <animate attributeName="stroke-dashoffset"
         from="${PERIMETER}" to="0"
@@ -429,25 +571,40 @@ export function buildCTALivingSystem(
 
   // ── Assemblage final ──────────────────────────────────────────────────────
 
-  const sectorTag = `<!-- Sector: ${sec} | Variant: ${variantId} | BPM: ${prof.bpm} | Glow: ${(gi*100).toFixed(0)}% | Particles: ${prof.particles} -->`;
+  const sectorTag = `<!-- CTA Living System | Sector:${sec} | Variant:${variantId} | BPM:${prof.bpm} | LightEngine:${lightStyle}(${(gi*100).toFixed(0)}%) | MorphEngine:${morphStyle}(${(morphInt*100).toFixed(0)}%) | PhysicsEngine:${physPreset}(${floatAmp}px) | Particles:${prof.particles} -->`;
+
+  // PhysicsEngine wrapper — flottement sectoriel appliqué sur le groupe QUANTUM
+  // (animate se déclenche après l'entrée pour ne pas interférer avec cta-enter)
+  const physicsOpen  = physicsAnimStyle
+    ? `<g style="${physicsAnimStyle} transform-origin: ${BTN_CX}px ${BTN_CY}px;">`
+    : `<g>`;
+  const physicsClose = `</g>`;
 
   const groupSVG = `
-    <!-- ═══ CTA Living System ══════════════════════════════════════════════ -->
-    ${sectorTag}
-    <g style="opacity:0; animation: cta-enter ${entryDur.toFixed(2)}s ${prof.easing} ${entryDelay.toFixed(2)}s forwards;
-              transform-origin: ${BTN_CX}px ${BTN_CY}px;">
+  <!-- ═══ CTA Living System ════════════════════════════════════════════════ -->
+  ${sectorTag}
+  <g transform="translate(380, 140)">
 
-      ${haloEl}
-      ${heartbeatEl}
-      ${particlesEl}
-      ${btnBodyEl}
-      ${borderEl}
-      ${sparkleEl}
-      ${shimmerEl}
-      ${textEl}
+    ${haloEl}
+    ${heartbeatEl}
+    ${particlesEl}
 
-    </g>
-    <!-- ═══════════════════════════════════════════════════════════════════ -->`;
+    <!-- QUANTUM PHASE + PHYSICS ENGINE wrapper -->
+    ${physicsOpen}
+      <g style="opacity:0; animation: cta-enter ${entryDur.toFixed(2)}s ${prof.easing} ${entryDelay.toFixed(2)}s forwards;
+                transform-origin: ${BTN_CX}px ${BTN_CY}px;">
+
+        ${btnBodyEl}
+        ${borderEl}
+        ${sparkleEl}
+        ${shimmerEl}
+        ${textEl}
+
+      </g>
+    ${physicsClose}
+
+  </g>
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->`;
 
   return { filterDefs, stylesCSS, groupSVG };
 }

@@ -16,7 +16,7 @@ const PHI = 1.618033988749895;
 
 // ── Configs secteur extraites des modules existants ───────────────────────────
 
-const MORPH_PROFILES: Record<string, { style: string; intensity: number; speed: number }> = {
+export const MORPH_PROFILES: Record<string, { style: string; intensity: number; speed: number }> = {
   tech:         { style: 'geometric', intensity: 0.80, speed: 1.2 },
   startup:      { style: 'elastic',   intensity: 0.90, speed: 1.5 },
   sante:        { style: 'breathe',   intensity: 0.40, speed: 0.6 },
@@ -30,7 +30,7 @@ const MORPH_PROFILES: Record<string, { style: string; intensity: number; speed: 
   default:      { style: 'breathe',   intensity: 0.55, speed: 0.9 },
 };
 
-const LIGHTING_PROFILES: Record<string, { style: string; glowIntensity: number; pulseSpeed: number }> = {
+export const LIGHTING_PROFILES: Record<string, { style: string; glowIntensity: number; pulseSpeed: number }> = {
   tech:         { style: 'electric', glowIntensity: 0.85, pulseSpeed: 1.2 },
   startup:      { style: 'neon',     glowIntensity: 0.90, pulseSpeed: 1.4 },
   sante:        { style: 'soft',     glowIntensity: 0.45, pulseSpeed: 0.6 },
@@ -44,7 +44,7 @@ const LIGHTING_PROFILES: Record<string, { style: string; glowIntensity: number; 
   default:      { style: 'soft',     glowIntensity: 0.50, pulseSpeed: 0.8 },
 };
 
-const PHYSICS_PROFILES: Record<string, { preset: string; floatAmp: number; mass: number; stiffness: number; damping: number }> = {
+export const PHYSICS_PROFILES: Record<string, { preset: string; floatAmp: number; mass: number; stiffness: number; damping: number }> = {
   tech:         { preset: 'spring',   floatAmp: 3, mass: 0.8, stiffness: 200, damping: 18 },
   startup:      { preset: 'bounce',   floatAmp: 5, mass: 0.6, stiffness: 300, damping: 12 },
   sante:        { preset: 'float',    floatAmp: 8, mass: 1.2, stiffness: 80,  damping: 30 },
@@ -391,7 +391,7 @@ function buildLightingSVG(
 // Traduit le preset physique en animation CSS appliquée sur un wrapper interne
 // ─────────────────────────────────────────────────────────────────────────────
 
-function buildPhysicsSVG(
+export function buildPhysicsSVG(
   sectorId: string, timingMult: number
 ): { styles: string; openTag: string; closeTag: string } {
 
