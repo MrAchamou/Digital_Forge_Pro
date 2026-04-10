@@ -118,7 +118,7 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       <stop offset="0%" stop-color="${accent}"/>
       <stop offset="100%" stop-color="${accentLight}"/>
     </linearGradient>
-    <clipPath id="photoClip"><circle cx="60" cy="90" r="50"/></clipPath>
+    ${logo_url ? `<clipPath id="avatarLogoClip"><circle cx="24" cy="90" r="44"/></clipPath>` : ''}
     <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
@@ -130,11 +130,13 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   <!-- Glow de fond (barre accent) -->
   <rect x="0" y="0" width="4" height="180" fill="url(#accentGrad)" rx="2">${glowAttr}</rect>
 
-  <!-- Avatar cercle -->
+  <!-- Avatar cercle + Logo -->
   <g transform="translate(24,90)">
     <circle r="50" fill="${accent}18" stroke="${accent}" stroke-width="1.5">${breatheAttr}</circle>
-    <text text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif"
-      font-size="22" font-weight="700" fill="${accent}">${escXml(initials)}</text>
+    ${logo_url
+      ? `<image href="${escXml(logo_url)}" x="-44" y="-44" width="88" height="88" clip-path="url(#avatarLogoClip)" preserveAspectRatio="xMidYMid meet"/>`
+      : `<text text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="${accent}">${escXml(initials)}</text>`
+    }
   </g>
 
   <!-- Séparateur vertical -->
@@ -174,17 +176,12 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   <!-- Note -->
   ${noteStars ? `<text x="112" y="168" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}
 
-  <!-- CTA bouton -->
-  <g transform="translate(440, 132)">
-    <rect width="140" height="32" rx="6" fill="${accent}" opacity="0.92"/>
-    <text x="70" y="21" text-anchor="middle" font-family="Arial,sans-serif" font-size="11"
+  <!-- CTA bouton — aligné à droite de la colonne info -->
+  <g transform="translate(380, 130)">
+    <rect width="148" height="32" rx="6" fill="${accent}" opacity="0.92"/>
+    <text x="74" y="21" text-anchor="middle" font-family="Arial,sans-serif" font-size="11"
       font-weight="700" fill="#ffffff">${escXml(cta)}</text>
   </g>
-
-  ${logo_url ? `
-  <!-- Logo -->
-  <image href="${escXml(logo_url)}" x="540" y="10" width="48" height="48" preserveAspectRatio="xMidYMid meet"/>
-  ` : ''}
 
   <!-- Site -->
   ${site ? `<text x="112" y="${(telephone || email || addressLine || noteStars) ? '165' : '148'}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
@@ -373,6 +370,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
           <stop offset="0%"   stop-color="${accent}" stop-opacity="0.55"/>
           <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
         </radialGradient>
+        ${logo_url ? `<clipPath id="avatarGifClip${i}"><circle cx="60" cy="90" r="44"/></clipPath>` : ''}
       </defs>
 
       <!-- Fond -->
@@ -415,10 +413,15 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
       <circle cx="60" cy="90" r="${(44 * ring1Scale).toFixed(2)}"
         fill="url(#avatarGlow${i})" opacity="${ring1Op.toFixed(2)}"/>
 
-      <!-- Avatar — initiales -->
-      <text x="60" y="90" text-anchor="middle" dominant-baseline="middle"
-        font-family="Arial,sans-serif" font-size="22" font-weight="700"
-        fill="${accent}" opacity="${initialsOp.toFixed(2)}">${escXml(initials)}</text>
+      <!-- Avatar — logo ou initiales -->
+      ${logo_url
+        ? `<image href="${escXml(logo_url)}" x="16" y="46" width="88" height="88"
+            preserveAspectRatio="xMidYMid meet" opacity="${initialsOp.toFixed(2)}"
+            clip-path="url(#avatarGifClip${i})"/>`
+        : `<text x="60" y="90" text-anchor="middle" dominant-baseline="middle"
+            font-family="Arial,sans-serif" font-size="22" font-weight="700"
+            fill="${accent}" opacity="${initialsOp.toFixed(2)}">${escXml(initials)}</text>`
+      }
 
       <!-- Séparateur vertical -->
       <rect x="96" y="${(24 + (132 - sepH)).toFixed(1)}" width="1.5" height="${sepH.toFixed(1)}"
@@ -447,17 +450,14 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
       ${site      ? `<text x="112" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}" opacity="${infoOp.toFixed(2)}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
       ${noteStars ? `<text x="112" y="${yNote}" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b" opacity="${infoOp.toFixed(2)}">${noteStars} ${note?.toFixed(1)}</text>` : ''}
 
-      <!-- CTA bouton -->
-      <g transform="translate(510,148) scale(${ctaScale.toFixed(4)}) translate(-70,-16)">
-        <rect width="140" height="32" rx="6" fill="${accent}" opacity="${ctaOp.toFixed(2)}"/>
-        <rect width="140" height="32" rx="6" fill="${accentLight}"
+      <!-- CTA bouton — aligné à droite de la colonne info -->
+      <g transform="translate(454,146) scale(${ctaScale.toFixed(4)}) translate(-74,-16)">
+        <rect width="148" height="32" rx="6" fill="${accent}" opacity="${ctaOp.toFixed(2)}"/>
+        <rect width="148" height="32" rx="6" fill="${accentLight}"
           opacity="${(inShine ? 0.2 * Math.sin(tShine * Math.PI * 4) : 0).toFixed(3)}"/>
-        <text x="70" y="21" text-anchor="middle" font-family="Arial,sans-serif"
+        <text x="74" y="21" text-anchor="middle" font-family="Arial,sans-serif"
           font-size="11" font-weight="700" fill="#ffffff">${escXml(cta)}</text>
       </g>
-
-      <!-- Logo optionnel -->
-      ${logo_url ? `<image href="${escXml(logo_url)}" x="540" y="10" width="48" height="48" opacity="${infoOp.toFixed(2)}" preserveAspectRatio="xMidYMid meet"/>` : ''}
     </svg>`;
 
     try {
