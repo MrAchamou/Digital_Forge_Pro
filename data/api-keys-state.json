@@ -1,10 +1,10 @@
 {
-  "lastSaved": "2026-04-10T14:26:43.450Z",
+  "lastSaved": "2026-04-10T14:32:24.339Z",
   "keys": {
     "gemini_1": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-10T14:28:56.388Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 5,
       "errorCount": 16,
       "successCount": 0,
@@ -17,8 +17,8 @@
     },
     "gemini_2": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-10T14:28:55.798Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 4,
       "errorCount": 16,
       "successCount": 0,
@@ -31,8 +31,8 @@
     },
     "gemini_3": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-10T14:28:56.500Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 5,
       "errorCount": 16,
       "successCount": 0,
@@ -45,8 +45,8 @@
     },
     "gemini_4": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-10T14:28:56.078Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 4,
       "errorCount": 15,
       "successCount": 0,
@@ -59,8 +59,8 @@
     },
     "gemini_5": {
       "usageToday": 0,
-      "status": "cooldown",
-      "cooldownUntil": "2026-04-10T14:28:56.183Z",
+      "status": "active",
+      "cooldownUntil": null,
       "cooldownCount": 5,
       "errorCount": 15,
       "successCount": 0,
@@ -212,8 +212,5 @@
       "lastError": null
     }
   },
-  "monthlyUsage": {
-    "serper_2026-04": 4,
-    "cerebras_2026-04": 2
-  }
+  "monthlyUsage": {}
 }

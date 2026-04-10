@@ -1248,15 +1248,9 @@ export function buildStandalonePreviewHtml(params: {
   const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   const timeStr = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-  // Rendre le SVG responsive pour éviter toute coupure dans le conteneur email
-  // On injecte preserveAspectRatio et on supprime le height fixe
-  const responsiveSvg = animatedSvg
-    .replace(' width="600"', ' width="100%"')
-    .replace(' height="190"', '')
-    .replace('width="600"', 'width="100%"')
-    .replace(' height="190"', '')
-    // Ajouter preserveAspectRatio si absent
-    .replace('viewBox="0 0 600 190"', 'viewBox="0 0 600 190" preserveAspectRatio="xMidYMid meet"');
+  // Ne pas modifier le SVG — il doit rester à ses dimensions natives (600×190)
+  // pour que tous les éléments internes restent correctement positionnés
+  const responsiveSvg = animatedSvg;
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -1307,9 +1301,9 @@ export function buildStandalonePreviewHtml(params: {
   .sig-divider{border:none;border-top:1px solid #e0e0e0;margin:20px 0;}
   .sig-label{font-size:11px;color:#9aa0a6;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
 
-  /* ── Signature SVG responsive — AUCUNE coupure ── */
-  .sig-container{width:100%;max-width:620px;overflow:visible;}
-  .sig-container svg{display:block;width:100%;height:auto;}
+  /* ── Signature SVG — rendu pixel-perfect à ses dimensions natives 600×190 ── */
+  .sig-container{width:100%;overflow-x:auto;overflow-y:visible;line-height:0;}
+  .sig-container svg{display:block;}
 
   /* ── Barre d'actions reply ── */
   .reply-bar{border-top:1px solid #e0e0e0;padding:16px 24px;display:flex;gap:12px;}
