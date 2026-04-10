@@ -126,12 +126,28 @@ export function buildLightingCSS(sectorId: string, accentColor: string, colorSch
   97% { opacity: 1; }
   98% { opacity: .9; }
 }
-.sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite, sig-electric-flicker ${speedFast}s linear infinite; }`;
+@keyframes sig-glitch-name {
+  0%,90%,100% { transform:translate(0); color:inherit; text-shadow:none; }
+  92% { transform:translate(-2px,1px); color:#0ff; text-shadow:0 0 8px #0ff; }
+  94% { transform:translate(2px,-1px); color:#f0f; text-shadow:0 0 8px #f0f; }
+  96% { transform:translate(0); }
+}
+.sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite, sig-electric-flicker ${speedFast}s linear infinite; }
+.sig-name { animation: sig-glitch-name 8s ease-in-out 3s infinite; }`;
   } else if (profile.style === 'neon') {
-    extraCSS = `.sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite; }
-.sig-name { text-shadow: 0 0 ${Math.round(gi*8)}px rgba(${r},${g},${b},${(gi*.4).toFixed(2)}); }`;
+    extraCSS = `@keyframes sig-neon-pulse {
+  0%,100% { text-shadow: 0 0 6px rgba(${r},${g},${b},${(gi*.5).toFixed(2)}), 0 0 14px rgba(${r},${g},${b},${(gi*.3).toFixed(2)}); }
+  50%      { text-shadow: 0 0 18px rgba(${r},${g},${b},${(gi*.9).toFixed(2)}), 0 0 36px rgba(${r},${g},${b},${(gi*.6).toFixed(2)}), 0 0 70px rgba(${r},${g},${b},${(gi*.3).toFixed(2)}); }
+}
+.sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite; }
+.sig-name { animation: sig-neon-pulse ${(+speed*1.2).toFixed(2)}s ease-in-out 1s infinite; }`;
   } else if (profile.style === 'dramatic') {
-    extraCSS = `.sig-avatar { animation: sig-avatar-glow ${speedFast}s ease-in-out infinite; }
+    extraCSS = `@keyframes sig-dramatic-shimmer {
+  0%,100% { text-shadow: 0 0 4px rgba(${r},${g},${b},${(gi*.3).toFixed(2)}); }
+  50%      { text-shadow: 0 0 12px rgba(${r},${g},${b},${(gi*.8).toFixed(2)}), 0 0 24px rgba(${r},${g},${b},${(gi*.4).toFixed(2)}); }
+}
+.sig-avatar { animation: sig-avatar-glow ${speedFast}s ease-in-out infinite; }
+.sig-name { animation: sig-dramatic-shimmer ${(+speed*0.9).toFixed(2)}s ease-in-out 2s infinite; }
 .sig-title { text-shadow: 0 0 ${Math.round(gi*6)}px rgba(${r},${g},${b},${(gi*.5).toFixed(2)}); }
 .sig-cta { animation: sig-cta-glow ${speed}s ease-in-out infinite; }`;
   } else if (profile.style === 'aura') {
@@ -141,7 +157,12 @@ export function buildLightingCSS(sectorId: string, accentColor: string, colorSch
   50%  { background: radial-gradient(circle at 70% 60%, rgba(${r},${g},${b},${(gi*.35).toFixed(2)}) 0%, transparent 60%); }
   100% { background: radial-gradient(circle at 30% 40%, rgba(${r},${g},${b},${(gi*.25).toFixed(2)}) 0%, transparent 60%); }
 }
+@keyframes sig-aura-text-pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: ${(0.8 + gi * 0.15).toFixed(2)}; text-shadow: 0 0 8px rgba(${r},${g},${b},${(gi*.4).toFixed(2)}); }
+}
 .sig-avatar { animation: sig-avatar-glow ${speed}s ease-in-out infinite; }
+.sig-name { animation: sig-aura-text-pulse ${(+speed*1.4).toFixed(2)}s ease-in-out 1.5s infinite; }
 .sig-card::before { content:''; position:absolute; inset:0; border-radius:inherit; animation:sig-aura-rotate ${(+speed*1.5).toFixed(2)}s ease-in-out infinite; pointer-events:none; }`;
   } else {
     // soft / subtle

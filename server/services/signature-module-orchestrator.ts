@@ -131,33 +131,28 @@ function mergeModuleAnimations(css: string): string {
     const rawSel = m[1].trim();
     const body   = m[2];
 
-    // Ignorer pseudo-éléments et at-rules
     if (rawSel.includes('::') || rawSel.startsWith('@')) continue;
 
     const selectors = rawSel.split(',').map(s => s.trim()).filter(Boolean);
     const entries: AnimEntry[] = [];
 
-    // ① Shorthand: animation: name dur timing delay iter fill, ...
+    // ① Shorthand: animation: val1, val2, ...
+    //    Stocker chaque valeur brute telle quelle (ne pas décomposer positionellement)
     const shortRe = /(?:^|;)\s*animation:\s*([^;]+)/g;
     let sm: RegExpExecArray | null;
     while ((sm = shortRe.exec(body)) !== null) {
-      const raw = sm[1].replace(/!important/gi, '').trim();
-      if (raw === 'none') continue;
-      for (const part of splitRespectingParens(raw)) {
+      const rawVal = sm[1].replace(/!important/gi, '').trim();
+      if (!rawVal || rawVal === 'none') continue;
+      for (const part of splitRespectingParens(rawVal)) {
         const tokens = tokenizeAnimValue(part);
-        if (!tokens[0] || tokens[0] === 'none') continue;
-        entries.push({
-          name:   tokens[0],
-          dur:    tokens[1] ?? '1s',
-          timing: tokens[2] ?? 'ease',
-          delay:  tokens[3] ?? '0s',
-          iter:   tokens[4] ?? '1',
-          fill:   tokens[5] ?? 'none',
-        });
+        const name = tokens[0];
+        if (!name || name === 'none') continue;
+        entries.push({ name, raw: part.trim() });
       }
     }
 
-    // ② Long-form: animation-name + animation-duration etc.
+    // ② Long-form: animation-name + animation-duration + animation-timing-function etc.
+    //    Reconstruire chaque animation shorthand depuis les propriétés individuelles
     const nameM = body.match(/animation-name:\s*([^;]+)/);
     if (nameM) {
       const names = nameM[1].split(',').map(s => s.trim()).filter(s => s && s !== 'none');
@@ -169,20 +164,20 @@ function mergeModuleAnimations(css: string): string {
         const fillM  = body.match(/animation-fill-mode:\s*([^;]+)/);
 
         const durs  = durM  ? durM[1].split(',').map(s => s.trim())  : ['1s'];
-        const tims  = timM  ? timM[1].split(',').map(s => s.trim())  : ['ease'];
+        const tims  = timM  ? splitRespectingParens(timM[1]).map(s => s.trim()) : ['ease'];
         const dels  = delM  ? delM[1].split(',').map(s => s.trim())  : ['0s'];
         const iters = iterM ? iterM[1].split(',').map(s => s.trim()) : ['1'];
         const fills = fillM ? fillM[1].split(',').map(s => s.trim()) : ['none'];
 
         names.forEach((name, i) => {
-          entries.push({
-            name,
-            dur:    durs[i]  ?? durs[0]  ?? '1s',
-            timing: tims[i]  ?? tims[0]  ?? 'ease',
-            delay:  dels[i]  ?? dels[0]  ?? '0s',
-            iter:   iters[i] ?? iters[0] ?? '1',
-            fill:   fills[i] ?? fills[0] ?? 'none',
-          });
+          const dur   = durs[i]  ?? durs[0]  ?? '1s';
+          const tim   = tims[i]  ?? tims[0]  ?? 'ease';
+          const del   = dels[i]  ?? dels[0]  ?? '0s';
+          const iter  = iters[i] ?? iters[0] ?? '1';
+          const fill  = fills[i] ?? fills[0] ?? 'none';
+          const parts = [name, dur, tim, del, iter];
+          if (fill && fill !== 'none') parts.push(fill);
+          entries.push({ name, raw: parts.join(' ') });
         });
       }
     }
@@ -202,9 +197,8 @@ function mergeModuleAnimations(css: string): string {
   for (const [sel, entries] of bySelector.entries()) {
     if (entries.length < 2) continue;
 
-    // Dédupliquer par nom (priorité à la dernière occurrence = la plus complète)
+    // Dédupliquer par nom (priorité à la DERNIÈRE occurrence — la plus récente du pipeline)
     const seen = new Set<string>();
-    // On parcourt en sens inverse pour garder la plus récente en premier
     const unique = [...entries].reverse().filter(e => {
       if (seen.has(e.name)) return false;
       seen.add(e.name);
@@ -213,19 +207,13 @@ function mergeModuleAnimations(css: string): string {
 
     if (unique.length < 2) continue;
 
-    const animStr = unique.map(e => {
-      const parts: string[] = [e.name, e.dur, e.timing, e.delay, e.iter];
-      if (e.fill && e.fill !== 'none') parts.push(e.fill);
-      return parts.join(' ');
-    }).join(',\n    ');
-
+    const animStr = unique.map(e => e.raw).join(',\n    ');
     lines.push(`${sel} {\n  animation:\n    ${animStr};\n}`);
     mergedSels.push(sel);
   }
 
   if (mergedSels.length === 0) return css;
 
-  // Conserver l'accessibilité : reset dans prefers-reduced-motion
   lines.push(`@media (prefers-reduced-motion: reduce) {`);
   lines.push(`  ${mergedSels.join(', ')} { animation: none !important; }`);
   lines.push(`}`);
