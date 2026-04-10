@@ -1,0 +1,20 @@
+{
+  "nom": "Dr. Marie Legrand",
+  "titre": "Chirurgien-dentiste",
+  "entreprise": "Docali Lyon - Centre dentaire Lyon 7",
+  "email": "contact@docali-lyon.fr",
+  "telephone": "+33 4 78 61 23 45",
+  "site": "https://docali-lyon.fr",
+  "adresse": "",
+  "ville": "",
+  "code_postal": "",
+  "note": 0,
+  "logo_url": "",
+  "secteur": "sante",
+  "palette": [
+    "#0a1a10",
+    "#00b894",
+    "#e8fff4"
+  ],
+  "cta": "Prendre rendez-vous"
+}
