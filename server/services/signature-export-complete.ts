@@ -9,6 +9,7 @@ import { selectEffectsForSector, renderEffectLayer, buildEffectCtx } from './gif
 import { buildLogoLivingSystem, buildLogoGifFrame } from './logo-living-system';
 import { buildCorpNameLivingSystem } from './corp-name-living-system';
 import { buildCTALivingSystem } from './cta-living-system';
+import { buildContactInfoLivingSystem } from './contact-info-living-system';
 
 // ── Dossier de stockage des assets hébergés ───────────────────────────────────
 const SIG_ASSETS_DIR = path.join(process.cwd(), 'exports', 'hosted');
@@ -151,6 +152,25 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     cta, accent, accentLight, meta.secteur ?? 'default', 'A', animated
   );
 
+  // ── Positions Y dynamiques (partagées CILS + fallback statique) ────────────
+  const yPhone = 99;
+  const yEmail = telephone ? 116 : 99;
+  const yAddr  = (telephone && email) ? 133 : (telephone || email) ? 130 : 113;
+  const ySite  = (telephone || email || addressLine || noteStars) ? 170 : 153;
+  const yNote  = 175;
+
+  // ── Contact Info Living System — Titre + Séparateurs + Contacts animés ────
+  const cils = buildContactInfoLivingSystem(
+    {
+      titre, telephone, email, addressLine, site,
+      note, noteStars,
+      accent, accentLight, textColor, textMuted,
+      yPhone, yEmail, yAddr, ySite, yNote,
+    },
+    meta.secteur ?? 'default',
+    animated,
+  );
+
   // ── Gradient cyclique pour le nom de l'entreprise (fallback statique) ─────
   const corpGradDef = `
     <linearGradient id="sg-corp-grad" x1="100" y1="0" x2="700" y2="0" gradientUnits="userSpaceOnUse">
@@ -173,12 +193,13 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     ${corpGradDef}
     ${cnls.filterDefs}
     ${ctals.filterDefs}
+    ${cils.filterDefs}
     ${logo_url ? `<clipPath id="avatarLogoClip"><circle cx="0" cy="0" r="44"/></clipPath>` : ''}
     <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     ${lls.defsHtml}
-    ${animated ? `<style>${lls.stylesCSS}${cnls.stylesCSS}${ctals.stylesCSS}</style>` : ''}
+    ${animated ? `<style>${lls.stylesCSS}${cnls.stylesCSS}${ctals.stylesCSS}${cils.stylesCSS}</style>` : ''}
   </defs>
 
   <!-- Background -->
@@ -203,9 +224,6 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     ${lls.innerWrap?.closeTag ?? '</g>'}
   </g>
 
-  <!-- Séparateur vertical -->
-  <rect x="96" y="16" width="1.5" height="158" fill="${accent}" opacity="0.3" rx="1"/>
-
   <!-- ENTREPRISE — Corp Name Living System (gradient + halo + typewriter + glitch) -->
   ${animated
     ? `<g transform="translate(112, 36)">${cnls.groupSVG}</g>`
@@ -219,28 +237,27 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     ${escXml(nom)}${fadeInName}
   </text>
 
-  <!-- TITRE -->
+  ${animated && cils.groupSVG
+    ? /* Contact Info Living System — Titre + Séps + Contacts + Site + Étoiles animés */ cils.groupSVG
+    : /* ── Fallback statique ─────────────────────────────────────────────────────── */ `
+  <!-- Séparateur vertical (statique) -->
+  <rect x="96" y="16" width="1.5" height="158" fill="${accent}" opacity="0.3" rx="1"/>
+
+  <!-- TITRE (statique) -->
   <text x="112" y="71" font-family="Arial,sans-serif" font-size="10" font-weight="600"
-    fill="${accent}" letter-spacing="1.5"
-    style="clip-path:inset(0 100% 0 0)">
+    fill="${accent}" letter-spacing="1.5">
     ${escXml(titre.toUpperCase())}
-    ${typewriterAttr}
   </text>
 
-  <!-- Ligne séparatrice -->
+  <!-- Ligne séparatrice (statique) -->
   <line x1="112" y1="82" x2="568" y2="82" stroke="${accent}" stroke-width="0.8" opacity="0.25"/>
 
-  <!-- Téléphone -->
-  ${telephone ? `<text x="112" y="99" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">☎ ${escXml(telephone)}</text>` : ''}
-
-  <!-- Email -->
-  ${email ? `<text x="112" y="${telephone ? '116' : '99'}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">✉ ${escXml(email)}</text>` : ''}
-
-  <!-- Adresse -->
-  ${addressLine ? `<text x="112" y="${(telephone && email) ? '133' : (telephone || email) ? '133' : '116'}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">📍 ${escXml(addressLine)}</text>` : ''}
-
-  <!-- Note -->
-  ${noteStars ? `<text x="112" y="174" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}
+  ${telephone ? `<text x="112" y="${yPhone}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">☎ ${escXml(telephone)}</text>` : ''}
+  ${email     ? `<text x="112" y="${yEmail}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">✉ ${escXml(email)}</text>` : ''}
+  ${addressLine ? `<text x="112" y="${yAddr}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">📍 ${escXml(addressLine)}</text>` : ''}
+  ${site      ? `<text x="112" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
+  ${noteStars ? `<text x="112" y="${yNote}" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}`
+  }
 
   <!-- CTA bouton — CTA Living System (9 effets) ou fallback statique -->
   ${animated && ctals.groupSVG
@@ -251,9 +268,6 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       font-weight="700" fill="#ffffff">${escXml(cta)}</text>
   </g>`
   }
-
-  <!-- Site -->
-  ${site ? `<text x="112" y="${(telephone || email || addressLine || noteStars) ? '172' : '155'}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
 </svg>`;
 }
 
