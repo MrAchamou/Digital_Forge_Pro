@@ -78,6 +78,20 @@ function lighten(hex: string, amount: number): string {
   return `#${c(r)}${c(g)}${c(b)}`;
 }
 
+function hex2hsl(hex: string): [number, number, number] {
+  if (!hex || hex.length < 7) return [0, 0, 50];
+  const r = parseInt(hex.slice(1,3),16)/255;
+  const g = parseInt(hex.slice(3,5),16)/255;
+  const b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  const l2 = (max+min)/2;
+  if (max===min) return [0, 0, Math.round(l2*100)];
+  const d = max-min;
+  const s2 = l2 > 0.5 ? d/(2-max-min) : d/(max+min);
+  const h2 = max===r ? (g-b)/d+(g<b?6:0) : max===g ? (b-r)/d+2 : (r-g)/d+4;
+  return [Math.round(h2*60), Math.round(s2*100), Math.round(l2*100)];
+}
+
 function escXml(s: string): string {
   return String(s || '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -95,6 +109,14 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   const [bg, accent, textColor] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
   const accentLight = lighten(accent, 60);
   const textMuted = `${textColor}99`;
+
+  // ── Couleurs dérivées pour le gradient cyclique (effet NEXUS COMMAND) ───────
+  const [h, s, l] = hex2hsl(accent.length === 7 ? accent : '#6366f1');
+  const gradCol1 = accentLight;
+  const gradCol2 = accent;
+  const gradCol3 = `hsl(${(h + 80) % 360},${s}%,${Math.min(85, l + 20)}%)`;
+  const gradCol4 = `hsl(${(h + 160) % 360},${s}%,${l}%)`;
+  const gradCol5 = `hsl(${(h + 240) % 360},${s}%,${Math.min(85, l + 15)}%)`;
   const initials = `${nom.charAt(0)}${(nom.split(' ')[1] || '').charAt(0)}`.toUpperCase();
   const addressLine = [adresse, code_postal && ville ? `${code_postal} ${ville}` : (ville || code_postal)].filter(Boolean).join(', ');
   const noteStars = note ? '★'.repeat(Math.floor(note)) : '';
@@ -117,13 +139,26 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     ? buildLogoLivingSystem(50, accent, accentLight, palette, meta.secteur ?? 'default', 'A')
     : { defsHtml: '', stylesCSS: '', elements: '', innerWrap: { openTag: '<g>', closeTag: '</g>' } };
 
+  // ── Gradient cyclique pour le nom de l'entreprise (effet NEXUS COMMAND) ────
+  const corpGradDef = `
+    <linearGradient id="sg-corp-grad" x1="100" y1="0" x2="700" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="${gradCol1}"/>
+      <stop offset="20%"  stop-color="${gradCol2}"/>
+      <stop offset="40%"  stop-color="${gradCol3}"/>
+      <stop offset="65%"  stop-color="${gradCol4}"/>
+      <stop offset="85%"  stop-color="${gradCol5}"/>
+      <stop offset="100%" stop-color="${gradCol1}"/>
+      ${animated ? `<animateTransform attributeName="gradientTransform" type="translate" from="-400 0" to="400 0" dur="4s" repeatCount="indefinite"/>` : ''}
+    </linearGradient>`;
+
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-  viewBox="0 0 600 180" width="600" height="180">
+  viewBox="0 0 600 190" width="600" height="190">
   <defs>
     <linearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${accent}"/>
       <stop offset="100%" stop-color="${accentLight}"/>
     </linearGradient>
+    ${corpGradDef}
     ${logo_url ? `<clipPath id="avatarLogoClip"><circle cx="0" cy="0" r="44"/></clipPath>` : ''}
     <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -133,13 +168,13 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   </defs>
 
   <!-- Background -->
-  <rect width="600" height="180" fill="${bg}" rx="10"/>
+  <rect width="600" height="190" fill="${bg}" rx="10"/>
 
   <!-- Glow de fond (barre accent) -->
-  <rect x="0" y="0" width="4" height="180" fill="url(#accentGrad)" rx="2">${glowAttr}</rect>
+  <rect x="0" y="0" width="4" height="190" fill="url(#accentGrad)" rx="2">${glowAttr}</rect>
 
   <!-- Avatar cercle + Logo Living System -->
-  <g transform="translate(24,90)">
+  <g transform="translate(24,95)">
     <!-- Effets logo derrière le cercle (Lighting + Morphing + cycle LLS) -->
     ${lls.elements}
     <!-- PhysicsEngine wrapper (float / bounce / pendulum selon secteur) -->
@@ -155,51 +190,53 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   </g>
 
   <!-- Séparateur vertical -->
-  <rect x="96" y="24" width="1.5" height="132" fill="${accent}" opacity="0.3" rx="1"/>
+  <rect x="96" y="16" width="1.5" height="158" fill="${accent}" opacity="0.3" rx="1"/>
+
+  <!-- ENTREPRISE — headline gradient cyclique (effet NEXUS COMMAND) -->
+  <text x="112" y="36" font-family="Arial,sans-serif" font-size="21" font-weight="900"
+    fill="url(#sg-corp-grad)" letter-spacing="1">
+    ${escXml(entreprise.toUpperCase())}
+    ${animated ? `<animate attributeName="opacity" values="0;1" dur="0.4s" fill="freeze"/>` : ''}
+  </text>
 
   <!-- NOM -->
-  <text x="112" y="48" font-family="Arial,sans-serif" font-size="18" font-weight="700"
+  <text x="112" y="56" font-family="Arial,sans-serif" font-size="14" font-weight="700"
     fill="${textColor}" opacity="0">
     ${escXml(nom)}${fadeInName}
   </text>
 
   <!-- TITRE -->
-  <text x="112" y="68" font-family="Arial,sans-serif" font-size="11" font-weight="600"
-    fill="${accent}" letter-spacing="1.5" text-transform="uppercase"
+  <text x="112" y="71" font-family="Arial,sans-serif" font-size="10" font-weight="600"
+    fill="${accent}" letter-spacing="1.5"
     style="clip-path:inset(0 100% 0 0)">
     ${escXml(titre.toUpperCase())}
     ${typewriterAttr}
   </text>
 
-  <!-- ENTREPRISE -->
-  <text x="112" y="86" font-family="Arial,sans-serif" font-size="12" fill="${textMuted}">
-    ${escXml(entreprise)}
-  </text>
-
   <!-- Ligne séparatrice -->
-  <line x1="112" y1="96" x2="568" y2="96" stroke="${accent}" stroke-width="0.8" opacity="0.25"/>
+  <line x1="112" y1="82" x2="568" y2="82" stroke="${accent}" stroke-width="0.8" opacity="0.25"/>
 
   <!-- Téléphone -->
-  ${telephone ? `<text x="112" y="113" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">☎ ${escXml(telephone)}</text>` : ''}
+  ${telephone ? `<text x="112" y="99" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">☎ ${escXml(telephone)}</text>` : ''}
 
   <!-- Email -->
-  ${email ? `<text x="112" y="${telephone ? '130' : '113'}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">✉ ${escXml(email)}</text>` : ''}
+  ${email ? `<text x="112" y="${telephone ? '116' : '99'}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">✉ ${escXml(email)}</text>` : ''}
 
   <!-- Adresse -->
-  ${addressLine ? `<text x="112" y="${(telephone && email) ? '147' : (telephone || email) ? '147' : '130'}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">📍 ${escXml(addressLine)}</text>` : ''}
+  ${addressLine ? `<text x="112" y="${(telephone && email) ? '133' : (telephone || email) ? '133' : '116'}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">📍 ${escXml(addressLine)}</text>` : ''}
 
   <!-- Note -->
-  ${noteStars ? `<text x="112" y="168" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}
+  ${noteStars ? `<text x="112" y="174" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}
 
   <!-- CTA bouton — aligné à droite de la colonne info -->
-  <g transform="translate(380, 130)">
+  <g transform="translate(380, 140)">
     <rect width="148" height="32" rx="6" fill="${accent}" opacity="0.92"/>
     <text x="74" y="21" text-anchor="middle" font-family="Arial,sans-serif" font-size="11"
       font-weight="700" fill="#ffffff">${escXml(cta)}</text>
   </g>
 
   <!-- Site -->
-  ${site ? `<text x="112" y="${(telephone || email || addressLine || noteStars) ? '165' : '148'}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
+  ${site ? `<text x="112" y="${(telephone || email || addressLine || noteStars) ? '172' : '155'}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
 </svg>`;
 }
 
