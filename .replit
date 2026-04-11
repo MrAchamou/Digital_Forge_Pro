@@ -5,7 +5,7 @@ run = "npm run dev"
 channel = "stable-25_05"
 
 [deployment]
-run = ["node", "./dist/index.cjs"]
+run = ["node", "./dist/index.js"]
 deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
 
@@ -44,18 +44,3 @@ integrations = ["javascript_openai_ai_integrations:2.0.0", "javascript_anthropic
 [userenv]
 
 [userenv.shared]
-GEMINI_KEY_1 = "AIzaSyDvSlFPIEiN5zlcW-1AeD1LHhFwxaVGUsE"
-GEMINI_KEY_2 = "AIzaSyDKg8aohZGOU3p710ICmk9AsaScBD7pvg0"
-GEMINI_KEY_3 = "AIzaSyCbStYydmSl1ocHiXbVWaLiUd7XXmwWTnY"
-GEMINI_KEY_4 = "AIzaSyDsxuT-CPR_KS1fNIpKjZcnTT5BshR-sjA"
-GEMINI_KEY_5 = "AIzaSyDGJjE_Kv8GwxhRtymScLyizAIN62hm_2E"
-CEREBRAS_KEY_1 = "csk-8chppv325r99he2839n6vhkfrpcherkm58225cc324rhtf4t"
-CEREBRAS_KEY_2 = "csk-fcy48hwxrhxmxkd3j2yeynttv85t5yh5rv5wf42ex84pycvt"
-CEREBRAS_KEY_3 = "csk-dkfwe2x9dy63kyxw3xp3e9hfe9fjc5wm9r9fpe8x62yytp5k"
-CEREBRAS_KEY_4 = "csk-nhp66x238xvkmym66dykmwemj28j9dcm3nef3xx62w485xw2"
-CEREBRAS_KEY_5 = "csk-ch5jkvd3jnmncrkd2k55vjk6hjtfkcckrhfm3yyrnvx5fvc3"
-SERPER_KEY_1 = "bfa34b52df8a359fafd1b091886a1f3e183a3978"
-SERPER_KEY_2 = "ff8aff1c057b08df4ef0ceb4e07e41c2aac0ab35"
-SERPER_KEY_3 = "82e62e3f52b21499b8aaf3890376cd5dd323d200"
-SERPER_KEY_4 = "4df965f59d55be464ed55769fb6d39c4b8bc4524"
-SERPER_KEY_5 = "f22997694464049b84886ca43c8aee8a62594c98"

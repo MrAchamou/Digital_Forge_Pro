@@ -421,6 +421,13 @@ GET  /api/preferences/recommendations — recommandations proactives
 # Port : 5000 (Express + Vite proxy)
 ```
 
+### Migration Replit
+
+- Workflow principal : `Start application`, commande `npm run dev`, sortie web sur le port `5000`.
+- Déploiement configuré en autoscale avec `npm run build`, puis `node ./dist/index.js`.
+- Les clés API ne doivent pas être stockées dans `.replit`; utiliser les secrets Replit pour `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_KEY_*`, `CEREBRAS_KEY_*` et `SERPER_KEY_*`.
+- Vérification de migration : application lancée avec succès dans le preview Replit, santé système à `100%`, routes `/api/system/health` et `/api/library/real-time-stats` opérationnelles.
+
 ---
 
 ## État du projet
