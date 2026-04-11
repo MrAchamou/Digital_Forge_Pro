@@ -258,6 +258,220 @@ const SECTORS = [
   { id: 'transport', label: '🚗 Transport' },
 ];
 
+// ── Palettes par secteur (mirroir du serveur) ─────────────────────────────────
+
+const SECTOR_PALETTES: Record<string, [string, string, string]> = {
+  sante:        ['#0b1628', '#2dd4bf', '#e0f7f5'],
+  tech:         ['#0f172a', '#6366f1', '#e8e8ff'],
+  immobilier:   ['#0f1a0a', '#f59e0b', '#fef3c7'],
+  restauration: ['#1a0a00', '#e07b39', '#fff0e5'],
+  education:    ['#0f1f3a', '#3b82f6', '#dbeafe'],
+  artisanat:    ['#1a1208', '#a16207', '#fef9e7'],
+  commerce:     ['#1a0813', '#ec4899', '#fce7f3'],
+  services_pro: ['#0d1b2a', '#0ea5e9', '#e0f2fe'],
+  loisirs:      ['#1a0a1f', '#a855f7', '#f3e8ff'],
+  transport:    ['#0f1a1a', '#14b8a6', '#ccfbf1'],
+};
+
+function hex2hslClient(hex: string): [number, number, number] {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+}
+
+function clampC(v: number, min: number, max: number) { return Math.min(max, Math.max(min, v)); }
+
+// ── Composant aperçu en temps réel ───────────────────────────────────────────
+
+interface LivePreviewProps {
+  nom: string; titre: string; entreprise: string;
+  telephone: string; email: string; site: string;
+  cta: string; note: string; sectorId: string; logoPreview: string | null;
+}
+
+function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, note, sectorId, logoPreview }: LivePreviewProps) {
+  const palette = SECTOR_PALETTES[sectorId] ?? SECTOR_PALETTES['tech'];
+  const [bg, accent, textColor] = palette;
+
+  const [bgH, bgS, bgL] = hex2hslClient(bg);
+  const bgLight      = `hsl(${bgH},${bgS}%,${clampC(bgL + 28, 18, 62)}%)`;
+  const bgUltraLight = `hsl(${bgH},${clampC(bgS - 15, 8, 100)}%,${clampC(bgL + 46, 42, 80)}%)`;
+  const bgHue2       = `hsl(${(bgH + 60) % 360},${bgS}%,${bgL}%)`;
+  const bgHue2Light  = `hsl(${(bgH + 60) % 360},${bgS}%,${clampC(bgL + 32, 18, 60)}%)`;
+  const bgHue3       = `hsl(${(bgH + 180) % 360},${bgS}%,${bgL}%)`;
+  const bgHue3Light  = `hsl(${(bgH + 180) % 360},${bgS}%,${clampC(bgL + 24, 14, 55)}%)`;
+
+  const displayNom = nom || 'Votre Nom';
+  const displayTitre = titre || 'Votre Titre';
+  const displayEntreprise = entreprise || 'Votre Entreprise';
+  const displayCta = cta || 'Nous contacter';
+  const initiale = displayNom.charAt(0).toUpperCase();
+
+  const starRating = note ? parseInt(note) : 0;
+  const stars = starRating > 0 ? '★'.repeat(starRating) + '☆'.repeat(5 - starRating) : '';
+
+  const rng = (s: number) => { const x = Math.sin(s * 127.1 + 1.9) * 43758.5453; return x - Math.floor(x); };
+  const ar = parseInt(accent.slice(1, 3) || '99', 16);
+  const ag = parseInt(accent.slice(3, 5) || '99', 16);
+  const ab = parseInt(accent.slice(5, 7) || 'ff', 16);
+
+  const particles = Array.from({ length: 18 }, (_, i) => {
+    const cx  = Math.round(80 + rng(i * 3.71) * 510);
+    const cy  = Math.round(8  + rng(i * 7.33) * 174);
+    const r   = (0.5 + rng(i * 5.11) * 1.8).toFixed(1);
+    const dur = (2.8 + rng(i * 2.97) * 5.5).toFixed(1);
+    const del = (rng(i * 11.3) * 5.0).toFixed(1);
+    const op  = (0.1 + rng(i * 4.73) * 0.25).toFixed(2);
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(${ar},${ag},${ab},${op})">
+      <animate attributeName="opacity" values="0;${op};0" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+    </circle>`;
+  }).join('');
+
+  const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 600 190" width="600" height="190">
+  <defs>
+    <style>
+      @keyframes vbg-scan { 0%{transform:translateX(-80px) skewX(-12deg);opacity:0} 8%{opacity:1} 92%{opacity:1} 100%{transform:translateX(680px) skewX(-12deg);opacity:0} }
+    </style>
+    <linearGradient id="lp-anim-bg" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%">
+        <animate attributeName="stop-color" values="${bg};${bgLight};${bgHue2Light};${bgUltraLight};${bgHue3Light};${bgLight};${bg}" dur="16s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+      </stop>
+      <stop offset="45%">
+        <animate attributeName="stop-color" values="${bgHue2};${bg};${bgLight};${bgHue3};${bg};${bgHue2Light};${bgHue2}" dur="16s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+        <animate attributeName="stop-opacity" values="0.7;1;0.85;1;0.75;0.9;0.7" dur="16s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%">
+        <animate attributeName="stop-color" values="${bgHue3};${bgUltraLight};${bg};${bgHue2};${bgLight};${bgHue3Light};${bgHue3}" dur="16s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+      </stop>
+    </linearGradient>
+    <linearGradient id="lp-accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${accent}"/>
+      <stop offset="100%" stop-color="${accent}99"/>
+    </linearGradient>
+    <linearGradient id="lp-avatar-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${accent}"/>
+      <stop offset="100%" stop-color="${accent}66"/>
+    </linearGradient>
+    <clipPath id="lp-avatar-clip"><circle cx="55" cy="95" r="40"/></clipPath>
+    <filter id="lp-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="lp-soft"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+
+  <!-- Fond animé -->
+  <rect width="600" height="190" fill="url(#lp-anim-bg)" rx="10"/>
+
+  <!-- Particules ambiantes -->
+  <g opacity="0.8">${particles}</g>
+
+  <!-- Scan diagonal -->
+  <rect x="-80" y="0" width="50" height="190" fill="url(#lp-accent)" opacity="0.05" style="animation:vbg-scan 18s ease-in-out 0s infinite;"/>
+  <rect x="-80" y="0" width="30" height="190" fill="url(#lp-accent)" opacity="0.03" style="animation:vbg-scan 18s ease-in-out 9s infinite;"/>
+
+  <!-- Bande latérale accent -->
+  <rect x="0" y="0" width="4" height="190" fill="url(#lp-accent)" rx="2" opacity="0.9">
+    <animate attributeName="opacity" values="0.7;1;0.7" dur="3s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Halo derrière avatar -->
+  <circle cx="55" cy="95" r="48" fill="${accent}" opacity="0.08" filter="url(#lp-soft)">
+    <animate attributeName="r" values="44;50;44" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.06;0.13;0.06" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Avatar -->
+  ${logoPreview
+    ? `<image href="${logoPreview}" x="15" y="55" width="80" height="80" clip-path="url(#lp-avatar-clip)" preserveAspectRatio="xMidYMid slice"/>`
+    : `<circle cx="55" cy="95" r="40" fill="url(#lp-avatar-grad)" opacity="0.9"/>
+       <text x="55" y="101" text-anchor="middle" font-size="26" font-weight="700" fill="${textColor}" font-family="system-ui,sans-serif">${initiale}</text>`
+  }
+  <circle cx="55" cy="95" r="40" fill="none" stroke="${accent}" stroke-width="1.5" opacity="0.6">
+    <animate attributeName="opacity" values="0.4;0.9;0.4" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Nom -->
+  <text x="112" y="52" font-size="17" font-weight="700" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0">
+    <animate attributeName="opacity" values="0;1" dur="0.6s" fill="freeze"/>
+    ${displayNom.slice(0, 32)}
+  </text>
+
+  <!-- Trait séparateur sous le nom -->
+  <rect x="112" y="58" width="0" height="1.5" fill="${accent}" opacity="0.6" rx="1">
+    <animate attributeName="width" from="0" to="160" dur="0.8s" begin="0.3s" fill="freeze"/>
+  </rect>
+
+  <!-- Titre -->
+  <text x="112" y="76" font-size="11" fill="${accent}" font-family="system-ui,sans-serif" opacity="0.85">
+    ${displayTitre.slice(0, 40)}
+  </text>
+
+  <!-- Entreprise -->
+  <text x="112" y="94" font-size="10.5" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.6">
+    ${displayEntreprise.slice(0, 40)}
+  </text>
+
+  <!-- Étoiles -->
+  ${stars ? `<text x="112" y="110" font-size="11" fill="#f59e0b" font-family="system-ui,sans-serif">${stars}</text>` : ''}
+
+  <!-- Ligne de séparation -->
+  <rect x="112" y="${stars ? '118' : '104'}" width="350" height="0.5" fill="${accent}" opacity="0.15"/>
+
+  <!-- Infos contact -->
+  ${telephone ? `<text x="112" y="${stars ? '133' : '119'}" font-size="10" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.65">📞 ${telephone.slice(0, 30)}</text>` : ''}
+  ${email ? `<text x="${telephone ? '230' : '112'}" y="${stars ? '133' : '119'}" font-size="10" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.65">✉ ${email.slice(0, 30)}</text>` : ''}
+  ${site ? `<text x="112" y="${stars ? '148' : '134'}" font-size="10" fill="${accent}" font-family="system-ui,sans-serif" opacity="0.75">🌐 ${site.replace(/^https?:\/\//, '').slice(0, 35)}</text>` : ''}
+
+  <!-- Bouton CTA -->
+  <rect x="112" y="160" width="${Math.min(displayCta.length * 7.5 + 24, 180)}" height="22" rx="11" fill="${accent}" opacity="0.9">
+    <animate attributeName="opacity" values="0.75;1;0.75" dur="2.5s" repeatCount="indefinite"/>
+  </rect>
+  <text x="${112 + Math.min(displayCta.length * 7.5 + 24, 180) / 2}" y="175" text-anchor="middle" font-size="9.5" font-weight="600" fill="${bg}" font-family="system-ui,sans-serif">${displayCta.slice(0, 22)}</text>
+
+  <!-- Coin badge LIVE -->
+  <rect x="552" y="6" width="40" height="14" rx="7" fill="${accent}" opacity="0.15"/>
+  <text x="572" y="16.5" text-anchor="middle" font-size="7" font-weight="700" fill="${accent}" font-family="system-ui,sans-serif" opacity="0.8">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.8s" repeatCount="indefinite"/>
+    LIVE
+  </text>
+</svg>`;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-2"
+      data-testid="live-preview-panel"
+    >
+      <div className="flex items-center gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+        <span className="text-xs text-white/50 uppercase tracking-wider font-medium">Aperçu en direct</span>
+      </div>
+      <div className="rounded-xl overflow-hidden border border-white/[0.10] shadow-lg shadow-black/40">
+        <div
+          className="w-full"
+          style={{ lineHeight: 0 }}
+          dangerouslySetInnerHTML={{ __html: svgContent }}
+        />
+      </div>
+      <p className="text-[10px] text-white/25 text-right">
+        Secteur : {SECTORS.find(s => s.id === sectorId)?.label ?? sectorId} · Aperçu simplifié — le rendu final est plus riche
+      </p>
+    </motion.div>
+  );
+}
+
 // ── Page principale ───────────────────────────────────────────────────────────
 
 export default function ExportStudio() {
@@ -601,6 +815,31 @@ export default function ExportStudio() {
                 </div>
               </div>
 
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Aperçu en temps réel — uniquement en mode saisie manuelle */}
+        <AnimatePresence>
+          {mode === 'manual' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <LiveSignaturePreview
+                nom={form.nom}
+                titre={form.titre}
+                entreprise={form.entreprise}
+                telephone={form.telephone}
+                email={form.email}
+                site={form.site}
+                cta={form.cta}
+                note={form.note}
+                sectorId={form.sectorId}
+                logoPreview={logoPreview}
+              />
             </motion.div>
           )}
         </AnimatePresence>
