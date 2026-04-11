@@ -13,6 +13,7 @@ import {
 
 interface ExportResult {
   signatureId: string;
+  hostedSvgUrl?: string;
   hostedGifUrl?: string;
   gmbData?: any;
   sectorId?: string;
@@ -156,38 +157,53 @@ function PreviewSection({ result }: { result: ExportResult }) {
         )}
       </div>
 
-      {result.hostedGifUrl && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-sm font-semibold text-emerald-300">Signature hébergée — Animation active dans Gmail</span>
+      {(result.hostedSvgUrl || result.hostedGifUrl) && (() => {
+        const svgUrl = result.hostedSvgUrl;
+        const gifUrl = result.hostedGifUrl;
+        const activeUrl = svgUrl || gifUrl!;
+        const isSvg = !!svgUrl;
+        return (
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-sm font-semibold text-emerald-300">
+                Signature hébergée — {isSvg ? 'SVG Animé (qualité maximale)' : 'GIF Animé'}
+              </span>
+            </div>
+            <p className="text-xs text-white/50 mb-3">
+              {isSvg
+                ? 'Le SVG animé est embarqué directement dans votre fichier Gmail/Apple Mail. Toutes les animations CSS et SMIL sont actives — rendu identique au preview.'
+                : "Cette URL est embarquée dans votre fichier Gmail. Quand votre destinataire ouvre l'email, le GIF animé se charge automatiquement."}
+            </p>
+            <div className="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-2">
+              <code className="text-xs text-emerald-300 flex-1 truncate">{activeUrl}</code>
+              <button
+                data-testid="btn-copy-hosted-url"
+                onClick={() => { navigator.clipboard.writeText(activeUrl); }}
+                className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
+                title="Copier l'URL"
+              >
+                <Copy size={13} className="text-white/60" />
+              </button>
+              <a
+                href={activeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="link-test-hosted-url"
+                className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
+                title="Tester l'URL"
+              >
+                <ExternalLink size={13} className="text-white/60" />
+              </a>
+            </div>
+            {isSvg && gifUrl && (
+              <p className="text-[10px] text-white/30 mt-2">
+                Fallback GIF disponible : <code className="text-white/40">{gifUrl}</code>
+              </p>
+            )}
           </div>
-          <p className="text-xs text-white/50 mb-3">
-            Cette URL est embarquée dans votre fichier Gmail. Quand votre destinataire ouvre l'email, le GIF animé se charge automatiquement.
-          </p>
-          <div className="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-2">
-            <code className="text-xs text-emerald-300 flex-1 truncate">{result.hostedGifUrl}</code>
-            <button
-              data-testid="btn-copy-hosted-url"
-              onClick={() => { navigator.clipboard.writeText(result.hostedGifUrl!); }}
-              className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
-              title="Copier l'URL"
-            >
-              <Copy size={13} className="text-white/60" />
-            </button>
-            <a
-              href={result.hostedGifUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="link-test-hosted-url"
-              className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
-              title="Tester l'URL"
-            >
-              <ExternalLink size={13} className="text-white/60" />
-            </a>
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       <button
         onClick={() => setShowGuide(!showGuide)}

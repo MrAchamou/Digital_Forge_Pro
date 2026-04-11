@@ -698,12 +698,48 @@ function buildInlineTable(meta: ExportMetadata): string {
 </table>`;
 }
 
-export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hostedGifUrl?: string): string {
+export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hostedGifUrl?: string, animatedSvg?: string): string {
   const { nom = '', entreprise = '', telephone = '', email = '', site = '', palette = [], cta = 'Nous contacter' } = meta;
   const [, accent] = palette.length >= 2 ? palette : ['#0f172a', '#6366f1'];
 
-  // Si une URL hébergée est disponible : GIF animé en tête + liens cliquables en dessous.
-  // Gmail charge les images externes → signature VIVANTE dans la boîte de réception !
+  const linksRow = `
+  <tr>
+    <td style="padding:6px 0 0;">
+      <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;">
+        <tr>
+          ${telephone ? `<td style="padding-right:14px;"><a href="tel:${escXml(telephone)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9990; ${escXml(telephone)}</a></td>` : ''}
+          ${email ? `<td style="padding-right:14px;"><a href="mailto:${escXml(email)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9993; ${escXml(email)}</a></td>` : ''}
+          ${site ? `<td style="padding-right:14px;"><a href="${escXml(site)}" style="font-size:11px;color:${accent};text-decoration:none;">&#127760; ${escXml(site.replace(/^https?:\/\//, ''))}</a></td>` : ''}
+          ${cta && site ? `<td><a href="${escXml(site)}" style="display:inline-block;font-size:11px;font-weight:700;color:#ffffff;background:${accent};padding:5px 12px;border-radius:4px;text-decoration:none;">${escXml(cta)}</a></td>` : ''}
+        </tr>
+      </table>
+    </td>
+  </tr>`;
+
+  // ── Priorité 1 : SVG animé embarqué inline (meilleure qualité, toutes animations)
+  // Compatible Apple Mail, Thunderbird, webmails modernes. Pour Gmail web, le SVG
+  // est accepté dans les signatures configurées dans Paramètres → Signature.
+  if (animatedSvg) {
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body style="margin:0;padding:0;background:#ffffff;">
+<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;">
+  <tr>
+    <td style="padding:0;line-height:0;font-size:0;">
+      ${animatedSvg}
+    </td>
+  </tr>${linksRow}
+</table>
+<!-- EffectForge AI — ${escXml(nom)} — SVG animé inline -->
+</body>
+</html>`;
+  }
+
+  // ── Priorité 2 : GIF hébergé (fallback pour les environnements sans SVG)
   if (hostedGifUrl) {
     return `<!DOCTYPE html>
 <html lang="fr">
@@ -719,26 +755,14 @@ export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hos
         style="display:block;max-width:100%;border:0;border-radius:8px;"
         alt="${escXml(nom)} — ${escXml(entreprise)}" />
     </td>
-  </tr>
-  <tr>
-    <td style="padding:6px 0 0;">
-      <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;">
-        <tr>
-          ${telephone ? `<td style="padding-right:14px;"><a href="tel:${escXml(telephone)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9990; ${escXml(telephone)}</a></td>` : ''}
-          ${email ? `<td style="padding-right:14px;"><a href="mailto:${escXml(email)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9993; ${escXml(email)}</a></td>` : ''}
-          ${site ? `<td style="padding-right:14px;"><a href="${escXml(site)}" style="font-size:11px;color:${accent};text-decoration:none;">&#127760; ${escXml(site.replace(/^https?:\/\//, ''))}</a></td>` : ''}
-          ${cta && site ? `<td><a href="${escXml(site)}" style="display:inline-block;font-size:11px;font-weight:700;color:#ffffff;background:${accent};padding:5px 12px;border-radius:4px;text-decoration:none;">${escXml(cta)}</a></td>` : ''}
-        </tr>
-      </table>
-    </td>
-  </tr>
+  </tr>${linksRow}
 </table>
 <!-- EffectForge AI — ${escXml(nom)} — animated via hosted GIF -->
 </body>
 </html>`;
   }
 
-  // Sans URL hébergée : table 100% inline-styles statique (pas d'animation)
+  // ── Priorité 3 : table statique inline-styles (pas d'animation)
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1604,7 +1628,12 @@ export async function generateCompleteExport(
     pngBuffer: staticPng,
   }).catch(err => log(`Erreur sauvegarde assets: ${err.message}`, 'export-complete'));
 
-  const gmailHtml     = buildGmailHtml(meta, signatureHtml, hostedGifUrl);
+  // URL hébergée SVG (meilleure qualité que GIF pour l'export)
+  const hostedSvgUrl = hostedBaseUrl
+    ? `${hostedBaseUrl}/api/sig/${signatureId}.svg`
+    : undefined;
+
+  const gmailHtml     = buildGmailHtml(meta, signatureHtml, hostedGifUrl, animatedSvg);
   const outlookHtml   = buildOutlookHtml(meta, pngBase64);
   const appleHtml     = buildAppleMailHtml(meta, signatureHtml);
   const universalHtml = buildUniversalHtml(meta, hostedGifUrl);
@@ -1622,6 +1651,8 @@ export async function generateCompleteExport(
 
   return {
     signatureId,
+    hostedSvgUrl,
+    hostedGifUrl,
     formats: {
       gmail:       { html: gmailHtml,     filename: `${slug}-gmail.html` },
       outlook:     { html: outlookHtml,   filename: `${slug}-outlook.htm` },

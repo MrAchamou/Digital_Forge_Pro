@@ -1,0 +1,20 @@
+{
+  "nom": "Me. Julie MOUNIER",
+  "titre": "Avocat",
+  "entreprise": "Cabinet Julie MOUNIER",
+  "email": "contact@cabinetmounier.com",
+  "telephone": "06 71 91 84 02",
+  "site": "www.cabinetmounier.com/",
+  "adresse": "",
+  "ville": "",
+  "code_postal": "",
+  "note": 0,
+  "logo_url": "",
+  "secteur": "services_pro",
+  "palette": [
+    "#1a1035",
+    "#7c3aed",
+    "#ede9fe"
+  ],
+  "cta": "Consultation gratuite"
+}

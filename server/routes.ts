@@ -1028,10 +1028,11 @@ router.post('/signature/full-export', async (req, res) => {
     ]);
 
     return res.json({
-      signatureId: id,
-      hostedGifUrl: `${hostedBaseUrl}/api/sig/${id}.gif`,
-      previewUrl:   `${hostedBaseUrl}/api/signature/preview/${id}`,
-      downloadUrl:  `${hostedBaseUrl}/api/signature/download/${id}`,
+      signatureId:   id,
+      hostedSvgUrl:  `${hostedBaseUrl}/api/sig/${id}.svg`,
+      hostedGifUrl:  `${hostedBaseUrl}/api/sig/${id}.gif`,
+      previewUrl:    `${hostedBaseUrl}/api/signature/preview/${id}`,
+      downloadUrl:   `${hostedBaseUrl}/api/signature/download/${id}`,
       formats: {
         gmail:       { filename: result.formats.gmail.filename },
         outlook:     { filename: result.formats.outlook.filename },
@@ -1042,10 +1043,9 @@ router.post('/signature/full-export', async (req, res) => {
         animatedGif: { filename: result.formats.animatedGif.filename },
       },
       zip: { filename: zipFilename },
-      // Contenu inline pour le frontend
       preview: {
-        gmailHtml:    result.formats.gmail.html,
-        universalHtml: result.formats.universal.html,
+        gmailHtml:      result.formats.gmail.html,
+        universalHtml:  result.formats.universal.html,
         animatedSvgB64: Buffer.from(result.formats.animatedSvg.svg).toString('base64'),
         staticPngB64:   result.formats.staticPng.buffer.toString('base64'),
         animatedGifB64: result.formats.animatedGif.buffer.toString('base64'),
@@ -1123,6 +1123,7 @@ router.post('/signature/full-export-gmb', async (req, res) => {
 
     return res.json({
       signatureId:   result.signatureId,
+      hostedSvgUrl:  `${hostedBaseUrl}/api/sig/${result.signatureId}.svg`,
       hostedGifUrl:  `${hostedBaseUrl}/api/sig/${result.signatureId}.gif`,
       gmbData,
       sectorId,
