@@ -165,7 +165,7 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
 
   // ── Positions Y séquentielles — chaque champ présent occupe sa propre ligne ──
   // Espacement fixe 17px, aucun chevauchement possible quelle que soit la combinaison.
-  const _DY = 17, _Y0 = 99;
+  const _DY = 17, _Y0 = 114;
   const yPhone = _Y0;
   const yEmail = _Y0 + (telephone    ? 1 : 0) * _DY;
   const yAddr  = _Y0 + (telephone    ? 1 : 0) * _DY + (email       ? 1 : 0) * _DY;
@@ -224,7 +224,7 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     </linearGradient>` : '';
 
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-  viewBox="0 0 600 190" width="600" height="190">
+  viewBox="0 0 600 220" width="600" height="220">
   <defs>
     <linearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${accent}"/>
@@ -249,7 +249,7 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   </defs>
 
   <!-- Background animé — lumière ↔ obscurité + cycle de teintes (16s) -->
-  <rect width="600" height="190" fill="${animated ? 'url(#sg-anim-bg)' : bg}" rx="10"/>
+  <rect width="600" height="220" fill="${animated ? 'url(#sg-anim-bg)' : bg}" rx="10"/>
 
   <!-- VarianceEngine — Fond stellaire spectaculaire (seed déterministe, 24 particules) -->
   ${animated ? (() => {
@@ -258,9 +258,9 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     const ag3 = parseInt(accentLight.slice(3,5)||'99',16);
     const ab2 = parseInt(accentLight.slice(5,7)||'ff',16);
     const aLight = `rgba(${ar2},${ag3},${ab2}`;
-    const particles = Array.from({ length: 24 }, (_, i) => {
+    const particles = Array.from({ length: 28 }, (_, i) => {
       const cx  = Math.round(80 + rng(i * 3.71) * 510);
-      const cy  = Math.round(8  + rng(i * 7.33) * 174);
+      const cy  = Math.round(8  + rng(i * 7.33) * 204);
       const r   = (0.5 + rng(i * 5.11) * 2.2).toFixed(1);
       const dur = (2.8 + rng(i * 2.97) * 5.5).toFixed(1);
       const del = (rng(i * 11.3) * 5.0).toFixed(1);
@@ -271,16 +271,16 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     const scanDelay1 = '0s', scanDelay2 = '6s', scanDelay3 = '12s';
     const scanDur = '18s';
     return `<g id="variance-bg-particles">${particles}</g>
-  <rect x="-80" y="0" width="60" height="190" fill="url(#accentGrad)" opacity="0.06" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay1} infinite;"/>
-  <rect x="-80" y="0" width="40" height="190" fill="url(#accentGrad)" opacity="0.04" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay2} infinite;"/>
-  <rect x="-80" y="0" width="25" height="190" fill="url(#accentGrad)" opacity="0.03" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay3} infinite;"/>`;
+  <rect x="-80" y="0" width="60" height="220" fill="url(#accentGrad)" opacity="0.06" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay1} infinite;"/>
+  <rect x="-80" y="0" width="40" height="220" fill="url(#accentGrad)" opacity="0.04" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay2} infinite;"/>
+  <rect x="-80" y="0" width="25" height="220" fill="url(#accentGrad)" opacity="0.03" style="animation:vbg-scan ${scanDur} ease-in-out ${scanDelay3} infinite;"/>`;
   })() : ''}
 
   <!-- Glow de fond (barre accent) -->
-  <rect x="0" y="0" width="4" height="190" fill="url(#accentGrad)" rx="2">${glowAttr}</rect>
+  <rect x="0" y="0" width="4" height="220" fill="url(#accentGrad)" rx="2">${glowAttr}</rect>
 
   <!-- Avatar cercle + Logo Living System -->
-  <g transform="translate(24,95)">
+  <g transform="translate(24,110)">
     <!-- Effets logo derrière le cercle (Lighting + Morphing + cycle LLS) -->
     ${lls.elements}
     <!-- PhysicsEngine wrapper (float / bounce / pendulum selon secteur) -->
@@ -297,43 +297,43 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
 
   <!-- ENTREPRISE — Corp Name Living System (gradient + halo + typewriter + glitch) -->
   ${animated
-    ? `<g transform="translate(124, 36)">${cnls.groupSVG}</g>`
-    : `<text x="124" y="36" font-family="Arial,sans-serif" font-size="21" font-weight="900"
+    ? `<g transform="translate(124, 38)">${cnls.groupSVG}</g>`
+    : `<text x="124" y="38" font-family="Arial,sans-serif" font-size="18" font-weight="900"
          fill="url(#sg-corp-grad)" letter-spacing="1">${escXml(entreprise.toUpperCase())}</text>`
   }
 
-  <!-- NOM -->
-  <text x="124" y="56" font-family="Arial,sans-serif" font-size="14" font-weight="700"
-    fill="${textColor}" opacity="0">
+  <!-- NOM + TITRE inline sous le nom d'entreprise -->
+  <text x="124" y="${animated ? '62' : '62'}" font-family="Arial,sans-serif" font-size="14" font-weight="700"
+    fill="${textColor}" opacity="${animated ? '0' : '1'}">
     ${escXml(nom)}${fadeInName}
   </text>
 
   ${animated && cils.groupSVG
     ? /* Contact Info Living System — Titre + Séps + Contacts + Site + Étoiles animés */ cils.groupSVG
     : /* ── Fallback statique ─────────────────────────────────────────────────────── */ `
-  <!-- Séparateur vertical (statique) — x=108 : 34px de marge depuis le bord droit de l'avatar (r=50,cx=24→74) -->
-  <rect x="108" y="16" width="1.5" height="158" fill="${accent}" opacity="0.3" rx="1"/>
+  <!-- Séparateur vertical (statique) — x=108 -->
+  <rect x="108" y="18" width="1.5" height="184" fill="${accent}" opacity="0.3" rx="1"/>
 
   <!-- TITRE (statique) -->
-  <text x="124" y="71" font-family="Arial,sans-serif" font-size="10" font-weight="600"
+  <text x="124" y="80" font-family="Arial,sans-serif" font-size="10" font-weight="600"
     fill="${accent}" letter-spacing="1.5">
     ${escXml(titre.toUpperCase())}
   </text>
 
   <!-- Ligne séparatrice (statique) -->
-  <line x1="124" y1="82" x2="568" y2="82" stroke="${accent}" stroke-width="0.8" opacity="0.25"/>
+  <line x1="124" y1="92" x2="568" y2="92" stroke="${accent}" stroke-width="0.8" opacity="0.25"/>
 
-  ${telephone ? `<text x="124" y="${yPhone}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">☎ ${escXml(telephone)}</text>` : ''}
-  ${email     ? `<text x="124" y="${yEmail}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.8">✉ ${escXml(email)}</text>` : ''}
-  ${addressLine ? `<text x="124" y="${yAddr}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">📍 ${escXml(addressLine)}</text>` : ''}
-  ${site      ? `<text x="124" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">🌐 ${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
-  ${noteStars ? `<text x="124" y="${yNote}" font-family="Arial,sans-serif" font-size="12" fill="#f59e0b">${noteStars} ${note?.toFixed(1)}</text>` : ''}`
+  ${telephone ? `<text x="138" y="${yPhone}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.9">${escXml(telephone)}</text>` : ''}
+  ${email     ? `<text x="138" y="${yEmail}" font-family="Arial,sans-serif" font-size="11" fill="${textColor}" opacity="0.9">${escXml(email)}</text>` : ''}
+  ${addressLine ? `<text x="138" y="${yAddr}" font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">${escXml(addressLine)}</text>` : ''}
+  ${site      ? `<text x="138" y="${ySite}" font-family="Arial,sans-serif" font-size="10" fill="${accent}">${escXml(site.replace(/^https?:\/\//, ''))}</text>` : ''}
+  ${noteStars ? `<text x="124" y="${yNote}" font-family="Arial,sans-serif" font-size="13" fill="#f59e0b">${noteStars}  ${note?.toFixed(1)}</text>` : ''}`
   }
 
   <!-- CTA bouton — CTA Living System (9 effets) ou fallback statique -->
   ${animated && ctals.groupSVG
     ? ctals.groupSVG
-    : `<g transform="translate(380, 140)">
+    : `<g transform="translate(380, 170)">
     <rect width="148" height="32" rx="6" fill="${accent}" opacity="0.92"/>
     <text x="74" y="21" text-anchor="middle" font-family="Arial,sans-serif" font-size="11"
       font-weight="700" fill="#ffffff">${escXml(cta)}</text>

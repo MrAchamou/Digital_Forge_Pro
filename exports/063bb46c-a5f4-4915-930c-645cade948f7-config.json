@@ -1,0 +1,20 @@
+{
+  "nom": "Dr. Sophie Mercier",
+  "titre": "Chirurgienne Esthétique",
+  "entreprise": "Clinique Lumière Paris",
+  "email": "contact@clinique-lumiere.fr",
+  "telephone": "+33 1 44 55 66 77",
+  "site": "https://clinique-lumiere.fr",
+  "adresse": "42 Avenue Montaigne",
+  "ville": "Paris",
+  "code_postal": "75008",
+  "note": 5,
+  "logo_url": "",
+  "secteur": "sante",
+  "palette": [
+    "#0b1628",
+    "#2dd4bf",
+    "#e0f7f5"
+  ],
+  "cta": "Prendre rendez-vous"
+}

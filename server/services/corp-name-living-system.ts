@@ -204,10 +204,7 @@ export function buildCorpNameLivingSystem(
         <animate attributeName="width"
           from="0" to="${textW + 20}"
           dur="${typewriterS.toFixed(2)}s"
-          begin="0.2s" fill="freeze"
-          calcMode="linear"
-          keyTimes="0;1"
-          keySplines="${prof.easing}"/>
+          begin="0.2s" fill="freeze"/>
       </rect>
     </clipPath>`;
 

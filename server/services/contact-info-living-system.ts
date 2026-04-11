@@ -163,7 +163,7 @@ export function buildContactInfoLivingSystem(
 
     <!-- Clip rect pour séparateur H draw animation — x=124 aligné avec le contenu -->
     <clipPath id="ci-sep-h-clip">
-      <rect x="124" y="78" width="${SEP_H_LEN}" height="8"/>
+      <rect x="124" y="90" width="${SEP_H_LEN}" height="8"/>
     </clipPath>`;
 
   // ── CSS keyframes ──────────────────────────────────────────────────────────
@@ -328,26 +328,28 @@ export function buildContactInfoLivingSystem(
     <!-- SEPARATEUR VERTICAL — grow from top + gradient + pulse -->
     <g>
       <!-- Fond statique très léger (fallback) -->
-      <rect x="108" y="16" width="1.5" height="158" fill="${accent}" opacity="0.08" rx="1"/>
+      <rect x="108" y="18" width="1.5" height="184" fill="${accent}" opacity="0.08" rx="1"/>
       <!-- Barre principale animée : grow from top -->
-      <rect x="108" y="16" width="1.5" height="158"
+      <rect x="108" y="18" width="1.5" height="184"
         fill="url(#ci-sep-v-grad)" rx="1"
         filter="url(#ci-sep-glow)"
-        style="transform-origin: 108px 16px;
+        style="transform-origin: 108px 18px;
                opacity: 0;
                animation:
                  ci-sep-v-grow ${sepVGrowS.toFixed(2)}s ${morphProf.speed > 1 ? 'cubic-bezier(0.34,1.56,0.64,1)' : 'ease-out'} ${D_SEP_V.toFixed(2)}s forwards,
                  ci-sep-v-pulse ${pulseS.toFixed(2)}s ease-in-out ${(D_SEP_V + sepVGrowS + 0.1).toFixed(2)}s infinite;">
+        <animate attributeName="opacity" from="0" to="${(gi * 0.4).toFixed(2)}" dur="${sepVGrowS.toFixed(2)}s" begin="${D_SEP_V.toFixed(2)}s" fill="freeze"/>
       </rect>
     </g>`;
 
   // ── Titre / Poste ──────────────────────────────────────────────────────────
   const TITRE_W = 120; // largeur approximative pour l'underline
+  const TITRE_Y = 80;  // y absolu du texte titre
   const titreEl = titre ? `
     <!-- TITRE / POSTE — shimmer reveal + underline draw + breathing + glow -->
     <g>
       <!-- Glow ambiant derrière le titre -->
-      <text x="124" y="71"
+      <text x="124" y="${TITRE_Y}"
         font-family="Arial,sans-serif" font-size="10" font-weight="700"
         fill="${accent}"
         filter="url(#ci-titre-glow)"
@@ -357,7 +359,7 @@ export function buildContactInfoLivingSystem(
       </text>
 
       <!-- Texte titre principal : typewriter reveal puis breathing -->
-      <text x="124" y="71"
+      <text x="124" y="${TITRE_Y}"
         font-family="Arial,sans-serif" font-size="10" font-weight="700"
         fill="${accent}" letter-spacing="1.5"
         style="clip-path: inset(0 100% 0 0);
@@ -370,14 +372,14 @@ export function buildContactInfoLivingSystem(
       </text>
 
       <!-- Shimmer scan au-dessus du texte (s'active après le reveal) -->
-      <rect x="124" y="61" width="55" height="13"
+      <rect x="124" y="${TITRE_Y - 10}" width="55" height="13"
         fill="url(#ci-titre-shimmer-grad)"
         style="opacity:0;
                animation: ci-shimmer-scan ${shimmerS.toFixed(2)}s ease-in-out ${(D_TITRE + sepDrawS * 1.2 + 0.3).toFixed(2)}s infinite;">
       </rect>
 
       <!-- Underline accent draw L→R (sous le titre) -->
-      <line x1="124" y1="74.5" x2="${124 + TITRE_W}" y2="74.5"
+      <line x1="124" y1="${TITRE_Y + 3.5}" x2="${124 + TITRE_W}" y2="${TITRE_Y + 3.5}"
         stroke="${accentLight}" stroke-width="1"
         stroke-dasharray="${TITRE_W}" stroke-dashoffset="${TITRE_W}"
         opacity="${(gi * 0.7).toFixed(2)}"
@@ -389,14 +391,15 @@ export function buildContactInfoLivingSystem(
     </g>` : '';
 
   // ── Séparateur Horizontal ─────────────────────────────────────────────────
+  const SEP_H_Y = 94;  // y du séparateur horizontal
   const sepHEl = `
     <!-- SEPARATEUR HORIZONTAL — draw L→R + gradient scan + glow pulse -->
     <g>
       <!-- Ligne statique très légère (fallback) -->
-      <line x1="124" y1="82" x2="568" y2="82"
+      <line x1="124" y1="${SEP_H_Y}" x2="568" y2="${SEP_H_Y}"
         stroke="${accent}" stroke-width="0.8" opacity="0.10"/>
       <!-- Ligne principale : draw gauche → droite -->
-      <line x1="124" y1="82" x2="568" y2="82"
+      <line x1="124" y1="${SEP_H_Y}" x2="568" y2="${SEP_H_Y}"
         stroke="url(#ci-sep-h-grad)" stroke-width="0.8"
         stroke-dasharray="${SEP_H_LEN}" stroke-dashoffset="${SEP_H_LEN}"
         filter="url(#ci-sep-glow)"
@@ -412,13 +415,14 @@ export function buildContactInfoLivingSystem(
   const phoneEl = telephone ? `
     <!-- TELEPHONE — slide-in + icon pulse -->
     <g style="opacity:0; animation: ci-info-enter 0.5s ease-out ${D_PHONE.toFixed(2)}s forwards;">
-      <!-- Icône ☎ avec pulse -->
-      <text x="124" y="${yPhone}"
-        font-family="Arial,sans-serif" font-size="11" fill="${accent}"
-        filter="url(#ci-icon-glow)"
-        style="animation: ci-icon-pulse ${iconPulseS.toFixed(2)}s ease-in-out ${(D_PHONE + 0.5).toFixed(2)}s infinite;">☎</text>
+      <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="${D_PHONE.toFixed(2)}s" fill="freeze"/>
+      <!-- Icône téléphone SVG -->
+      <g transform="translate(124,${yPhone - 9}) scale(0.417)" filter="url(#ci-icon-glow)"
+         style="animation: ci-icon-pulse ${iconPulseS.toFixed(2)}s ease-in-out ${(D_PHONE + 0.5).toFixed(2)}s infinite;">
+        <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="${accent}"/>
+      </g>
       <!-- Numéro -->
-      <text x="137" y="${yPhone}"
+      <text x="138" y="${yPhone}"
         font-family="Arial,sans-serif" font-size="11" fill="${textColor}">${escXml(telephone)}</text>
     </g>` : '';
 
@@ -426,13 +430,14 @@ export function buildContactInfoLivingSystem(
   const emailEl = email ? `
     <!-- EMAIL — slide-in décalé + icon bounce -->
     <g style="opacity:0; animation: ci-info-enter 0.5s ease-out ${D_EMAIL.toFixed(2)}s forwards;">
-      <!-- Icône ✉ avec bounce -->
-      <text x="124" y="${yEmail}"
-        font-family="Arial,sans-serif" font-size="11" fill="${accent}"
-        filter="url(#ci-icon-glow)"
-        style="display:inline-block; animation: ci-icon-bounce ${iconPulseS.toFixed(2)}s ease-in-out ${(D_EMAIL + 0.5).toFixed(2)}s infinite;">✉</text>
+      <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="${D_EMAIL.toFixed(2)}s" fill="freeze"/>
+      <!-- Icône email SVG -->
+      <g transform="translate(124,${yEmail - 9}) scale(0.417)" filter="url(#ci-icon-glow)"
+         style="animation: ci-icon-bounce ${iconPulseS.toFixed(2)}s ease-in-out ${(D_EMAIL + 0.5).toFixed(2)}s infinite;">
+        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="${accent}"/>
+      </g>
       <!-- Adresse email -->
-      <text x="137" y="${yEmail}"
+      <text x="138" y="${yEmail}"
         font-family="Arial,sans-serif" font-size="11" fill="${textColor}">${escXml(email)}</text>
     </g>` : '';
 
@@ -440,11 +445,13 @@ export function buildContactInfoLivingSystem(
   const adresseEl = addressLine ? `
     <!-- ADRESSE — slide-in tardif + icon pin pulse -->
     <g style="opacity:0; animation: ci-info-enter 0.5s ease-out ${D_ADDR.toFixed(2)}s forwards;">
-      <!-- Icône 📍 avec pulse radial -->
-      <text x="124" y="${yAddr}"
-        font-family="Arial,sans-serif" font-size="10" fill="${accent}"
-        style="transform-origin: 128px ${yAddr - 2}px;
-               animation: ci-icon-pin ${(iconPulseS * PHI).toFixed(2)}s ease-in-out ${(D_ADDR + 0.6).toFixed(2)}s infinite;">📍</text>
+      <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="${D_ADDR.toFixed(2)}s" fill="freeze"/>
+      <!-- Icône localisation SVG -->
+      <g transform="translate(124,${yAddr - 9}) scale(0.417)"
+         style="transform-origin: 124px ${yAddr - 4}px;
+                animation: ci-icon-pin ${(iconPulseS * PHI).toFixed(2)}s ease-in-out ${(D_ADDR + 0.6).toFixed(2)}s infinite;">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="${accent}"/>
+      </g>
       <!-- Texte adresse -->
       <text x="138" y="${yAddr}"
         font-family="Arial,sans-serif" font-size="10" fill="${textMuted}">${escXml(addressLine)}</text>
@@ -454,11 +461,13 @@ export function buildContactInfoLivingSystem(
   const siteEl = params.site ? `
     <!-- SITE WEB — slide-in + icon orbit + pulse accent -->
     <g style="opacity:0; animation: ci-info-enter 0.5s ease-out ${D_SITE.toFixed(2)}s forwards;">
-      <!-- Icône 🌐 avec rotation lente -->
-      <text x="124" y="${ySite}"
-        font-family="Arial,sans-serif" font-size="10" fill="${accent}"
-        style="transform-origin: 128px ${ySite - 2}px;
-               animation: ci-icon-orbit ${(pulseS * 3).toFixed(2)}s linear ${(D_SITE + 0.5).toFixed(2)}s infinite;">🌐</text>
+      <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="${D_SITE.toFixed(2)}s" fill="freeze"/>
+      <!-- Icône globe SVG -->
+      <g transform="translate(124,${ySite - 9}) scale(0.417)"
+         style="transform-origin: 124px ${ySite - 4}px;
+                animation: ci-icon-orbit ${(pulseS * 3).toFixed(2)}s linear ${(D_SITE + 0.5).toFixed(2)}s infinite;">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="${accent}"/>
+      </g>
       <!-- URL avec pulse accent -->
       <text x="138" y="${ySite}"
         font-family="Arial,sans-serif" font-size="10" fill="${accent}"
@@ -478,18 +487,21 @@ export function buildContactInfoLivingSystem(
       const twDelay = delay + 0.5 + i * 0.08;
       starsEl += `
     <text x="${xOffset}" y="${yNote}"
-      font-family="Arial,sans-serif" font-size="12" fill="#f59e0b"
+      font-family="Arial,sans-serif" font-size="13" fill="#f59e0b"
       style="opacity:0;
              transform-origin: ${xOffset + 6}px ${yNote - 4}px;
              animation:
                ci-star-enter 0.3s cubic-bezier(0.34,1.56,0.64,1) ${delay.toFixed(2)}s forwards,
-               ci-star-twinkle ${(iconPulseS * 1.5).toFixed(2)}s ease-in-out ${twDelay.toFixed(2)}s infinite;">★</text>`;
-      xOffset += 14;
+               ci-star-twinkle ${(iconPulseS * 1.5).toFixed(2)}s ease-in-out ${twDelay.toFixed(2)}s infinite;">
+      <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="${delay.toFixed(2)}s" fill="freeze"/>
+      ★</text>`;
+      xOffset += 16;
     }
     starsEl += `
     <text x="${xOffset + 2}" y="${yNote}"
       font-family="Arial,sans-serif" font-size="10" fill="${textMuted}"
       style="opacity:0; animation: ci-info-enter 0.4s ease-out ${(D_STARS + count * 0.12 + 0.2).toFixed(2)}s forwards;">
+      <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="${(D_STARS + count * 0.12 + 0.2).toFixed(2)}s" fill="freeze"/>
       ${note.toFixed(1)}
     </text>`;
   }
