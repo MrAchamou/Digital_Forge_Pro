@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Download, Mail, Smartphone, Monitor, Globe, Zap,
   CheckCircle, Loader2, ExternalLink, Copy, Package,
-  Sparkles, ChevronDown, ChevronRight, Eye, Upload, X, Star
+  Sparkles, ChevronDown, ChevronRight, Eye, Upload, X, Star,
+  Palette, RotateCcw
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -300,10 +301,11 @@ interface LivePreviewProps {
   nom: string; titre: string; entreprise: string;
   telephone: string; email: string; site: string;
   cta: string; note: string; sectorId: string; logoPreview: string | null;
+  paletteOverride?: [string, string, string] | null;
 }
 
-function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, note, sectorId, logoPreview }: LivePreviewProps) {
-  const palette = SECTOR_PALETTES[sectorId] ?? SECTOR_PALETTES['tech'];
+function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, note, sectorId, logoPreview, paletteOverride }: LivePreviewProps) {
+  const palette = paletteOverride ?? SECTOR_PALETTES[sectorId] ?? SECTOR_PALETTES['tech'];
   const [bg, accent, textColor] = palette;
 
   const [bgH, bgS, bgL] = hex2hslClient(bg);
@@ -466,7 +468,12 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
         />
       </div>
       <p className="text-[10px] text-white/25 text-right">
-        Secteur : {SECTORS.find(s => s.id === sectorId)?.label ?? sectorId} · Aperçu simplifié — le rendu final est plus riche
+        {paletteOverride ? (
+          <span className="text-forge-cyan/50">Palette personnalisée · </span>
+        ) : (
+          <span>Secteur : {SECTORS.find(s => s.id === sectorId)?.label ?? sectorId} · </span>
+        )}
+        Aperçu simplifié — le rendu final est plus riche
       </p>
     </motion.div>
   );
@@ -484,6 +491,17 @@ export default function ExportStudio() {
     ville: '', code_postal: '', cta: 'Nous contacter', note: '',
   });
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [customPalette, setCustomPalette] = useState<[string, string, string] | null>(null);
+  const prevSectorRef = useRef(form.sectorId);
+
+  useEffect(() => {
+    if (prevSectorRef.current !== form.sectorId) {
+      prevSectorRef.current = form.sectorId;
+      setCustomPalette(null);
+    }
+  }, [form.sectorId]);
+
+  const effectivePalette: [string, string, string] = customPalette ?? SECTOR_PALETTES[form.sectorId] ?? SECTOR_PALETTES['tech'];
 
   const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }));
 
@@ -546,6 +564,7 @@ export default function ExportStudio() {
           telephone: form.telephone, email: form.email, site: form.site,
           adresse: form.adresse, ville: form.ville, code_postal: form.code_postal,
           cta: form.cta,
+          palette: effectivePalette,
           ...(form.note ? { note: parseFloat(form.note) } : {}),
           ...(logoPreview ? { logo_url: logoPreview } : {}),
         },
@@ -717,6 +736,84 @@ export default function ExportStudio() {
                 </div>
               </div>
 
+              {/* ── Palette de couleurs personnalisée ───────────────────── */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs text-white/50 uppercase tracking-wider flex items-center gap-1.5">
+                    <Palette size={11} /> Charte graphique
+                  </label>
+                  {customPalette && (
+                    <button
+                      type="button"
+                      onClick={() => setCustomPalette(null)}
+                      data-testid="btn-reset-palette"
+                      className="flex items-center gap-1 text-[10px] text-white/30 hover:text-forge-cyan transition-colors"
+                    >
+                      <RotateCcw size={9} /> Réinitialiser secteur
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.08] rounded-xl">
+                  {([
+                    { label: 'Fond', index: 0, tip: 'Couleur de fond de la signature' },
+                    { label: 'Accent', index: 1, tip: 'Couleur principale (icônes, bouton, traits)' },
+                    { label: 'Texte', index: 2, tip: 'Couleur du texte principal' },
+                  ] as const).map(({ label, index, tip }) => (
+                    <div key={label} className="flex items-center gap-2">
+                      <div className="relative group">
+                        <label
+                          htmlFor={`color-picker-${index}`}
+                          data-testid={`color-swatch-${label.toLowerCase()}`}
+                          className="block w-8 h-8 rounded-lg cursor-pointer border-2 border-white/20 hover:border-white/50 transition-all shadow-lg hover:scale-110 active:scale-95"
+                          style={{ background: effectivePalette[index] }}
+                          title={tip}
+                        />
+                        <input
+                          id={`color-picker-${index}`}
+                          type="color"
+                          value={effectivePalette[index]}
+                          onChange={e => {
+                            const next: [string, string, string] = [...effectivePalette] as [string, string, string];
+                            next[index] = e.target.value;
+                            setCustomPalette(next);
+                          }}
+                          data-testid={`input-color-${label.toLowerCase()}`}
+                          className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                        />
+                        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] text-white/35 whitespace-nowrap pointer-events-none">
+                          {label}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="mx-2 h-7 w-px bg-white/10"/>
+
+                  {/* Swatches rapides par secteur */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {Object.entries(SECTOR_PALETTES).map(([sid, pal]) => {
+                      const sector = SECTORS.find(s => s.id === sid);
+                      const isActive = effectivePalette[0] === pal[0] && effectivePalette[1] === pal[1];
+                      return (
+                        <button
+                          key={sid}
+                          type="button"
+                          onClick={() => { setCustomPalette(pal as [string, string, string]); update('sectorId', sid); prevSectorRef.current = sid; }}
+                          data-testid={`btn-palette-preset-${sid}`}
+                          title={sector?.label ?? sid}
+                          className={`w-5 h-5 rounded-md border transition-all hover:scale-110 ${isActive ? 'border-white/60 scale-110' : 'border-white/10'}`}
+                          style={{ background: `linear-gradient(135deg, ${pal[0]} 40%, ${pal[1]})` }}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  <div className="ml-auto text-[10px] text-white/20 hidden xl:block">
+                    Cliquer sur une couleur pour la modifier
+                  </div>
+                </div>
+              </div>
+
               {/* ── Ligne 2 : Nom + Titre ───────────────────────────────── */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -839,6 +936,7 @@ export default function ExportStudio() {
                 note={form.note}
                 sectorId={form.sectorId}
                 logoPreview={logoPreview}
+                paletteOverride={effectivePalette}
               />
             </motion.div>
           )}
