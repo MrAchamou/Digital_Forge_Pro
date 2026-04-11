@@ -74,20 +74,20 @@ Chaque signature est composée de **7 zones** :
 
 ## Moteur SVG Animé (`signature-export-complete.ts`)
 
-### Layout de référence (viewBox 0 0 600 190)
+### Layout de référence (viewBox 0 0 600 220)
 
 ```
 x=0    x=4   x=24(cx)   x=108   x=124             x=568/600
 │      │      │           │       │                 │
 │ glow │      │  avatar   │  sep  │  contenu CILS   │
 │ bar  │      │  r=50     │  V    │                 │
-│      │      │  cy=95    │       │                 │
+│      │      │  cy=110   │       │                 │
 ```
 
 | Élément | Position |
 |---------|----------|
 | Barre accent (glow) | `x=0, width=4` |
-| Avatar/Logo centré | `cx=24, cy=95, r=50` |
+| Avatar/Logo centré | `cx=24, cy=110, r=50` |
 | **Séparateur vertical** | `x=108` (34 px de marge depuis le bord droit du logo) |
 | **Contenu CILS** | `x=124` (icônes), `x=137/138` (textes) |
 | Séparateur horizontal | `x1=124, x2=568` |
@@ -105,12 +105,12 @@ Injecté après le `<rect>` de fond, avant la barre glow :
 
 ```typescript
 const _DY = 17;    // espacement entre champs
-const _Y0 = 99;    // Y de départ
-// yPhone   = _Y0 + _DY × 0   = 99
-// yEmail   = _Y0 + _DY × 1   = 116
-// yAddr    = _Y0 + _DY × 2   = 133
-// ySite    = _Y0 + _DY × 3   = 150
-// yNote    = _Y0 + _DY × 4   = 167
+const _Y0 = 114;   // Y de départ SVG
+// yPhone   = _Y0 + _DY × 0   = 114
+// yEmail   = _Y0 + _DY × 1   = 131
+// yAddr    = _Y0 + _DY × 2   = 148
+// ySite    = _Y0 + _DY × 3   = 165
+// yNote    = _Y0 + _DY × 4   = 182
 ```
 
 ---
@@ -441,3 +441,4 @@ GET  /api/preferences/recommendations — recommandations proactives
 - **P7** ✅ Alignements CILS — séparateur x=108, contenu x=124, SEP_H_LEN=444, positions Y séquentielles (Δ17px)
 - **P8** ✅ VarianceEngine Background — 24 particules stellaires + 3 scan diagonaux dans SVG animé
 - **P9** ✅ Preview Premium — client email macOS complet (fenêtre + sidebar + liste + email personnalisé par secteur + signature vivante)
+- **P10** ✅ Export email 600×220 — SVG/GIF/PNG alignés, wrappers Gmail/Apple/Universal sur fond palette, backups SMIL pour nom entreprise et titre CILS

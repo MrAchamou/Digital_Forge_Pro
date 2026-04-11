@@ -362,13 +362,12 @@ export function buildContactInfoLivingSystem(
       <text x="124" y="${TITRE_Y}"
         font-family="Arial,sans-serif" font-size="10" font-weight="700"
         fill="${accent}" letter-spacing="1.5"
-        style="clip-path: inset(0 100% 0 0);
-               animation: ci-titre-breathe ${breatheS.toFixed(2)}s ease-in-out ${(D_TITRE + 1.4).toFixed(2)}s infinite;">
+        opacity="0"
+        style="animation: ci-titre-breathe ${breatheS.toFixed(2)}s ease-in-out ${(D_TITRE + 1.4).toFixed(2)}s infinite;">
         ${escXml(titre.toUpperCase())}
-        <!-- Typewriter clip reveal -->
-        <animate attributeName="clip-path"
-          from="inset(0 100% 0 0)" to="inset(0 0% 0 0)"
-          dur="${(sepDrawS * 1.2).toFixed(2)}s" begin="${D_TITRE.toFixed(2)}s" fill="freeze"/>
+        <animate attributeName="opacity"
+          from="0" to="1"
+          dur="${(sepDrawS * 0.4).toFixed(2)}s" begin="${D_TITRE.toFixed(2)}s" fill="freeze"/>
       </text>
 
       <!-- Shimmer scan au-dessus du texte (s'active après le reveal) -->

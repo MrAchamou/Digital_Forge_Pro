@@ -353,13 +353,12 @@ export function buildAnimatedSVG(meta: ExportMetadata): string {
 export async function buildStaticPng(meta: ExportMetadata): Promise<Buffer> {
   const svg = buildSignatureSVGBase(meta, false);
   try {
-    return await sharp(Buffer.from(svg)).resize(600, 180).png({ quality: 95 }).toBuffer();
+    return await sharp(Buffer.from(svg)).resize(600, 220).png({ quality: 95 }).toBuffer();
   } catch (err: any) {
     log(`Sharp PNG error: ${err.message}`, 'export-complete');
-    // Fallback minimal
-    const fb = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="180" viewBox="0 0 600 180">
-      <rect width="600" height="180" fill="${meta.palette?.[0] || '#0f172a'}"/>
-      <text x="300" y="90" text-anchor="middle" font-family="Arial" font-size="20"
+    const fb = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="220" viewBox="0 0 600 220">
+      <rect width="600" height="220" fill="${meta.palette?.[0] || '#0f172a'}"/>
+      <text x="300" y="110" text-anchor="middle" font-family="Arial" font-size="20"
         fill="${meta.palette?.[2] || '#e8e8ff'}">${escXml(meta.nom)} — ${escXml(meta.entreprise)}</text>
     </svg>`;
     return sharp(Buffer.from(fb)).png().toBuffer();
@@ -489,7 +488,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
           <stop offset="100%" stop-color="white" stop-opacity="0"/>
         </linearGradient>
       </defs>
-      <rect x="${sweepX.toFixed(0)}" y="0" width="180" height="180"
+      <rect x="${sweepX.toFixed(0)}" y="0" width="180" height="220"
         fill="url(#sweep${i})" transform="skewX(-15)" rx="0"/>
     ` : '';
 
@@ -511,7 +510,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
     const effectLayerSvg = renderEffectLayer(activeEffects, effectCtx);
 
     const frameSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-      viewBox="0 0 600 180" width="600" height="180">
+      viewBox="0 0 600 220" width="600" height="220">
       <defs>
         <linearGradient id="bgGrad${i}" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%"   stop-color="${bg}"/>
@@ -529,7 +528,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
       </defs>
 
       <!-- Fond -->
-      <rect width="600" height="180" fill="url(#bgGrad${i})" rx="10"/>
+      <rect width="600" height="220" fill="url(#bgGrad${i})" rx="10"/>
 
       <!-- ═══ Calque effets premium SVG ═══ -->
       ${effectLayerSvg}
@@ -620,7 +619,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
 
     try {
       const pngBuf = await sharp(Buffer.from(frameSvg))
-        .resize(600, 180)
+        .resize(600, 220)
         .png({ compressionLevel: 1 })
         .toBuffer();
       frames.push(pngBuf);
@@ -634,7 +633,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
   // ── Encoder en GIF
   try {
     const GifEncoder = (await import('gif-encoder-2')).default;
-    const encoder = new GifEncoder(600, 180, 'neuquant', true, frames.length);
+    const encoder = new GifEncoder(600, 220, 'neuquant', true, frames.length);
 
     encoder.setRepeat(0);    // boucle infinie
     encoder.setDelay(65);    // 65ms/frame → ~15fps fluide
@@ -643,7 +642,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
 
     for (const framePng of frames) {
       const raw = await sharp(framePng)
-        .resize(600, 180)
+        .resize(600, 220)
         .ensureAlpha()
         .raw()
         .toBuffer();
@@ -739,7 +738,7 @@ function buildInlineTable(meta: ExportMetadata): string {
 
 export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hostedGifUrl?: string, animatedSvg?: string): string {
   const { nom = '', entreprise = '', telephone = '', email = '', site = '', palette = [], cta = 'Nous contacter' } = meta;
-  const [, accent] = palette.length >= 2 ? palette : ['#0f172a', '#6366f1'];
+  const [bg, accent] = palette.length >= 2 ? palette : ['#0f172a', '#6366f1'];
 
   const linksRow = `
   <tr>
@@ -765,8 +764,8 @@ export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hos
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-<body style="margin:0;padding:0;background:#ffffff;">
-<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;">
+<body style="margin:0;padding:0;background:${bg};">
+<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;background:${bg};border-radius:10px;">
   <tr>
     <td style="padding:0;line-height:0;font-size:0;">
       ${animatedSvg}
@@ -786,11 +785,11 @@ export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hos
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-<body style="margin:0;padding:0;background:#ffffff;">
-<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;">
+<body style="margin:0;padding:0;background:${bg};">
+<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;background:${bg};border-radius:10px;">
   <tr>
     <td style="padding:0;">
-      <img src="${hostedGifUrl}" width="620" height="180"
+      <img src="${hostedGifUrl}" width="600" height="220"
         style="display:block;max-width:100%;border:0;border-radius:8px;"
         alt="${escXml(nom)} — ${escXml(entreprise)}" />
     </td>
@@ -808,7 +807,7 @@ export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hos
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-<body style="margin:0;padding:0;background:#ffffff;">
+<body style="margin:0;padding:0;background:${bg};">
 ${buildInlineTable(meta)}
 <!-- EffectForge AI — ${escXml(nom)} -->
 </body>
@@ -898,7 +897,7 @@ export function buildAppleMailHtml(meta: ExportMetadata, signatureHtml: string):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Signature Apple Mail — ${escXml(nom)}</title>
 <style>
-  body{margin:0;padding:0;background:#fff;-webkit-font-smoothing:antialiased;}
+  body{margin:0;padding:0;background:${bg};-webkit-font-smoothing:antialiased;}
   @media (prefers-color-scheme:dark){body{background:${bg};}}
 </style>
 </head>
@@ -974,10 +973,10 @@ export function buildUniversalHtml(
 <!-- ══ Non-Outlook (Gmail, Webmail, mobile) ══ -->
 <!--[if !mso]><!-->
 ${hostedGifUrl ? `
-<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;">
+<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;background:${bg};border-radius:10px;">
   <tr>
     <td style="padding:0;">
-      <img src="${hostedGifUrl}" width="620" height="180"
+      <img src="${hostedGifUrl}" width="600" height="220"
         style="display:block;max-width:100%;border:0;border-radius:8px;"
         alt="${escXml(nom)} — ${escXml(entreprise)}" />
     </td>

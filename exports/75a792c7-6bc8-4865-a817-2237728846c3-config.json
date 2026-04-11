@@ -1,0 +1,20 @@
+{
+  "nom": "Jean Dupont",
+  "titre": "Directeur Innovation",
+  "entreprise": "Forge Noire Studio",
+  "email": "jean@example.com",
+  "telephone": "+33 1 23 45 67 89",
+  "site": "https://example.com",
+  "adresse": "10 rue de la Paix",
+  "ville": "Paris",
+  "code_postal": "75002",
+  "note": 4.9,
+  "logo_url": "",
+  "secteur": "tech",
+  "palette": [
+    "#0f172a",
+    "#6366f1",
+    "#e8e8ff"
+  ],
+  "cta": "Nous contacter"
+}

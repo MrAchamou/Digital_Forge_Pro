@@ -1,0 +1,71 @@
+Je vais tester moi-même en générant une signature complète via l'API, puis j'analyserai le rendu pour identifier ce qui manque au niveau premium.
+
+
+4 actions
+Bien, j'ai le SVG. Laissez-moi l'analyser en profondeur — structure complète, HTML Gmail, et le PNG statique pour tout évaluer.
+
+
+6 actions
+Laissez-moi créer un fichier HTML de test et prendre un screenshot du rendu réel.
+
+
+4 actions
+Je peux voir le rendu réel via l'URL hébergée. Laissez-moi screenshoter le SVG et la page de prévisualisation.
+
+
+3 actions
+Je vois le début de la signature. Laissez-moi faire une capture du SVG complet pour voir le rendu total.
+
+
+3 actions
+Je vois clairement les problèmes. Analysons rapidement :
+
+
+9 actions
+Trouvé ! Le bug vient de corp-name-living-system.ts qui injecte cubic-bezier() CSS directement dans un attribut SMIL keySplines. Laissez-moi lire le code complet et préparer tous les correctifs.
+
+
+8 actions
+Maintenant je comprends le problème fondamental : les CSS animations ne fonctionnent pas quand le SVG est affiché en tant que fichier externe (comme une image email). Le contenu reste invisible. Je dois lire les fichiers clés pour préparer le correctif global.
+
+
+8 actions
+Excellent ! J'ai maintenant une vision complète de tous les problèmes. Voici ce que je vais corriger simultanément :
+
+Bug SMIL keySplines dans CNLS — syntaxe invalide cubic-bezier() dans attribut SMIL
+Contact info invisible — CSS animations ne fonctionnent pas en SVG-image email → ajout backup SMIL
+Hauteur 190→220px pour plus d'espace visuel premium
+Fond blanc Gmail → fond sombre dans le tableau fallback
+Icônes emoji → SVG paths propres et professionnels
+Nom opacity:0 en mode statique → correction du bug sur PNG
+
+6 actions
+J'ai maintenant une image complète. Je vais implémenter tous les correctifs en parallèle : bug SMIL, contenu invisible, hauteur, fond Gmail, icônes SVG.
+
+
+2 actions
+Maintenant les correctifs principaux dans contact-info-living-system.ts — ajout des icônes SVG propres et backup SMIL pour chaque info de contact :
+
+
+2 actions
+Maintenant les correctifs de hauteur et de layout dans signature-export-complete.ts :
+
+
+8 actions
+Maintenant, j'ajuste les positions Y des contacts et la hauteur du séparateur dans le CILS :
+
+
+2 actions
+Maintenant mettons à jour les positions dans le CILS pour correspondre à la nouvelle hauteur :
+
+
+2 actions
+Maintenant mettons à jour les positions Y du titre et du séparateur H dans le CILS :
+
+
+2 actions
+Il faut aussi mettre à jour le clip-path du séparateur H qui est hardcodé à y=78, et corriger le fond Gmail :
+
+
+Edited server/services/contact-info-living-system.ts
+View changes
