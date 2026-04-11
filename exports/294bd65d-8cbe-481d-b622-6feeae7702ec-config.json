@@ -1,0 +1,20 @@
+{
+  "nom": "Me. Julie MOUNIER",
+  "titre": "Avocat",
+  "entreprise": "Cabinet Julie MOUNIER",
+  "email": "contact@cabinetmounier.com",
+  "telephone": "06 71 91 84 02",
+  "site": "www.cabinetmounier.com/",
+  "adresse": "21-23 Rue d'Algérie",
+  "ville": "Lyon",
+  "code_postal": "69001",
+  "note": 4.8,
+  "logo_url": "",
+  "secteur": "services_pro",
+  "palette": [
+    "#1a1035",
+    "#7c3aed",
+    "#ede9fe"
+  ],
+  "cta": "Consultation gratuite"
+}
