@@ -239,6 +239,7 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     ${lls.defsHtml}
+    ${animBgGradDef}
     ${animated ? `<style>${lls.stylesCSS}${cnls.stylesCSS}${ctals.stylesCSS}${cils.stylesCSS}
     /* ── VarianceEngine Background — particules stellaires + scan diagonal ── */
     @keyframes vbg-twinkle { 0%,100%{opacity:0;transform:scale(0.4)} 50%{opacity:1;transform:scale(1)} }
@@ -247,8 +248,8 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     </style>` : ''}
   </defs>
 
-  <!-- Background -->
-  <rect width="600" height="190" fill="${bg}" rx="10"/>
+  <!-- Background animé — lumière ↔ obscurité + cycle de teintes (16s) -->
+  <rect width="600" height="190" fill="${animated ? 'url(#sg-anim-bg)' : bg}" rx="10"/>
 
   <!-- VarianceEngine — Fond stellaire spectaculaire (seed déterministe, 24 particules) -->
   ${animated ? (() => {
