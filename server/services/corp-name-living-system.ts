@@ -64,10 +64,21 @@ function clamp(v: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, v));
 }
 
-// Estime la largeur d'un texte en majuscules, police Arial 21px
-function estimateTextWidth(text: string): number {
-  const avgCharWidth = 13.8; // px pour Arial 21px majuscule
-  return Math.ceil(text.length * avgCharWidth);
+function escSvgText(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function estimateTextWidth(text: string, fontSize: number, letterSpacing: number): number {
+  const glyphUnits: Record<string, number> = {
+    I: 0.28, J: 0.42, L: 0.55, F: 0.58, T: 0.62, E: 0.62, S: 0.62, Z: 0.62,
+    A: 0.72, B: 0.72, C: 0.72, D: 0.74, G: 0.78, H: 0.76, K: 0.72, N: 0.78,
+    O: 0.78, P: 0.68, Q: 0.8, R: 0.72, U: 0.76, V: 0.72, X: 0.72, Y: 0.7,
+    M: 0.9, W: 0.96,
+    ' ': 0.35, '.': 0.28, ',': 0.28, '-': 0.35, '&': 0.72, "'": 0.18,
+  };
+  const chars = Array.from(text.toUpperCase());
+  const glyphWidth = chars.reduce((sum, char) => sum + (glyphUnits[char] ?? 0.66) * fontSize, 0);
+  return Math.ceil(glyphWidth + Math.max(0, chars.length - 1) * letterSpacing);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -137,10 +148,23 @@ export function buildCorpNameLivingSystem(
   const breatheS    = clamp((beatS * 8) * tMult, 2, 8);               // BREATHING
   const glitchPeriod= clamp((prof.haloPeriod * 1.3) / tMult, 4, 16);  // GLITCH SPAWN
 
-  // ── Largeur estimée du texte ───────────────────────────────────────────────
-  const textW = estimateTextWidth(text);
-  const textH = 26;   // hauteur ~de la police
-  const padX  = 8;    // padding horizontal du halo
+  const displayText = text.toUpperCase();
+  const safeText = escSvgText(displayText);
+  const maxTextW = 438;
+  const baseFontSize = 21;
+  const minFontSize = 14;
+  const baseLetterSpacing = 1;
+  const rawTextW = estimateTextWidth(displayText, baseFontSize, baseLetterSpacing);
+  const fitRatio = rawTextW > maxTextW ? maxTextW / rawTextW : 1;
+  const fontSize = Math.max(minFontSize, Math.floor(baseFontSize * fitRatio));
+  const letterSpacing = rawTextW > maxTextW ? 0.3 : baseLetterSpacing;
+  const fittedTextW = estimateTextWidth(displayText, fontSize, letterSpacing);
+  const textW = Math.min(maxTextW, fittedTextW);
+  const textH = Math.ceil(fontSize * 1.25);
+  const padX  = 8;
+  const lengthAttrs = fittedTextW > maxTextW
+    ? ` textLength="${maxTextW}" lengthAdjust="spacingAndGlyphs"`
+    : '';
 
   // ─────────────────────────────────────────────────────────────────────────
   // DEFS : filtres + gradients
@@ -321,10 +345,10 @@ export function buildCorpNameLivingSystem(
     <!-- Texte principal — révélation typewriter + gradient cyclique -->
     <g clip-path="url(#cnls-type-clip)">
       <text x="0" y="0"
-        font-family="Arial,sans-serif" font-size="21" font-weight="900"
-        fill="url(#cnls-grad)" letter-spacing="1"
+        font-family="Arial,sans-serif" font-size="${fontSize}" font-weight="900"
+        fill="url(#cnls-grad)" letter-spacing="${letterSpacing}"${lengthAttrs}
         style="${breatheStyle}">
-        ${text.toUpperCase().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+        ${safeText}
       </text>
     </g>`;
 
@@ -332,11 +356,11 @@ export function buildCorpNameLivingSystem(
   const ghostEl = prof.glowInt > 0.5 ? `
     <!-- Ghost text — ombre colorée en décalage (ECHO TRAIL) -->
     <text x="1" y="1"
-      font-family="Arial,sans-serif" font-size="21" font-weight="900"
-      fill="${gcGhost}" fill-opacity="${(prof.glowInt * 0.12).toFixed(2)}" letter-spacing="1"
+      font-family="Arial,sans-serif" font-size="${fontSize}" font-weight="900"
+      fill="${gcGhost}" fill-opacity="${(prof.glowInt * 0.12).toFixed(2)}" letter-spacing="${letterSpacing}"${lengthAttrs}
       filter="url(#cnls-glow-f)"
       aria-hidden="true">
-      ${text.toUpperCase().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+      ${safeText}
     </text>` : '';
 
   // ── Shimmer ELECTRIC FORM ─────────────────────────────────────────────
