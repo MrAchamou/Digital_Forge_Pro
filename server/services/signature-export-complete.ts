@@ -120,6 +120,17 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   const gradCol3 = `hsl(${(h + 80) % 360},${s}%,${Math.min(85, l + 20)}%)`;
   const gradCol4 = `hsl(${(h + 160) % 360},${s}%,${l}%)`;
   const gradCol5 = `hsl(${(h + 240) % 360},${s}%,${Math.min(85, l + 15)}%)`;
+
+  // ── Couleurs dérivées pour l'animation du fond (lumière ↔ obscurité + teintes) ─
+  const [bgH, bgS, bgL] = hex2hsl(bg.length === 7 ? bg : '#0f172a');
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+  const bgLight      = `hsl(${bgH},${bgS}%,${clamp(bgL + 28, 18, 62)}%)`;
+  const bgUltraLight = `hsl(${bgH},${clamp(bgS - 15, 8, 100)}%,${clamp(bgL + 46, 42, 80)}%)`;
+  const bgHue2       = `hsl(${(bgH + 60) % 360},${bgS}%,${bgL}%)`;
+  const bgHue2Light  = `hsl(${(bgH + 60) % 360},${bgS}%,${clamp(bgL + 32, 18, 60)}%)`;
+  const bgHue3       = `hsl(${(bgH + 180) % 360},${bgS}%,${bgL}%)`;
+  const bgHue3Light  = `hsl(${(bgH + 180) % 360},${bgS}%,${clamp(bgL + 24, 14, 55)}%)`;
+
   const initials = `${nom.charAt(0)}${(nom.split(' ')[1] || '').charAt(0)}`.toUpperCase();
   const addressLine = [adresse, code_postal && ville ? `${code_postal} ${ville}` : (ville || code_postal)].filter(Boolean).join(', ');
   const noteStars = note ? '★'.repeat(Math.floor(note)) : '';
@@ -184,6 +195,33 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       <stop offset="100%" stop-color="${gradCol1}"/>
       ${animated ? `<animateTransform attributeName="gradientTransform" type="translate" from="-400 0" to="400 0" dur="4s" repeatCount="indefinite"/>` : ''}
     </linearGradient>`;
+
+  // ── Gradient de fond animé — lumière ↔ obscurité + cycle de teintes ─────
+  // Cycle sur 16s : sombre → lumineux → autre teinte → complémentaire → sombre
+  const animBgGradDef = animated ? `
+    <linearGradient id="sg-anim-bg" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%">
+        <animate attributeName="stop-color"
+          values="${bg};${bgLight};${bgHue2Light};${bgUltraLight};${bgHue3Light};${bgLight};${bg}"
+          dur="16s" repeatCount="indefinite" calcMode="spline"
+          keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+      </stop>
+      <stop offset="45%">
+        <animate attributeName="stop-color"
+          values="${bgHue2};${bg};${bgLight};${bgHue3};${bg};${bgHue2Light};${bgHue2}"
+          dur="16s" repeatCount="indefinite" calcMode="spline"
+          keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+        <animate attributeName="stop-opacity"
+          values="0.7;1;0.85;1;0.75;0.9;0.7"
+          dur="16s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%">
+        <animate attributeName="stop-color"
+          values="${bgHue3};${bgUltraLight};${bg};${bgHue2};${bgLight};${bgHue3Light};${bgHue3}"
+          dur="16s" repeatCount="indefinite" calcMode="spline"
+          keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+      </stop>
+    </linearGradient>` : '';
 
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   viewBox="0 0 600 190" width="600" height="190">
