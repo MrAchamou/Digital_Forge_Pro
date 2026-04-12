@@ -54,6 +54,7 @@ export interface ExportMetadata {
   cta3?: string;
   banniere_texte?: string;
   banniere_lien?: string;
+  white_label?: boolean;
   zoneEffects?: ZoneEffectsMap;
   [key: string]: any;
 }
@@ -130,15 +131,15 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   const gradCol4 = `hsl(${(h + 160) % 360},${s}%,${l}%)`;
   const gradCol5 = `hsl(${(h + 240) % 360},${s}%,${Math.min(85, l + 15)}%)`;
 
-  // ── Couleurs dérivées pour l'animation du fond (lumière ↔ obscurité + teintes) ─
+  // ── Couleurs dérivées pour l'animation du fond (lumière ↔ obscurité, teinte stable) ─
   const [bgH, bgS, bgL] = hex2hsl(bg.length === 7 ? bg : '#0f172a');
   const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
   const bgLight      = `hsl(${bgH},${bgS}%,${clamp(bgL + 28, 18, 62)}%)`;
   const bgUltraLight = `hsl(${bgH},${clamp(bgS - 15, 8, 100)}%,${clamp(bgL + 46, 42, 80)}%)`;
-  const bgHue2       = `hsl(${(bgH + 60) % 360},${bgS}%,${bgL}%)`;
-  const bgHue2Light  = `hsl(${(bgH + 60) % 360},${bgS}%,${clamp(bgL + 32, 18, 60)}%)`;
-  const bgHue3       = `hsl(${(bgH + 180) % 360},${bgS}%,${bgL}%)`;
-  const bgHue3Light  = `hsl(${(bgH + 180) % 360},${bgS}%,${clamp(bgL + 24, 14, 55)}%)`;
+  const bgHue2       = `hsl(${bgH},${bgS}%,${clamp(bgL - 6, 8, 48)}%)`;
+  const bgHue2Light  = `hsl(${bgH},${bgS}%,${clamp(bgL + 32, 18, 60)}%)`;
+  const bgHue3       = `hsl(${bgH},${clamp(bgS - 8, 8, 100)}%,${clamp(bgL - 12, 6, 42)}%)`;
+  const bgHue3Light  = `hsl(${bgH},${bgS}%,${clamp(bgL + 24, 14, 55)}%)`;
 
   const initials = `${nom.charAt(0)}${(nom.split(' ')[1] || '').charAt(0)}`.toUpperCase();
   const addressLine = [adresse, code_postal && ville ? `${code_postal} ${ville}` : (ville || code_postal)].filter(Boolean).join(', ');
@@ -1064,6 +1065,7 @@ export function buildInstallationGuide(
 ): string {
   const { nom = '', entreprise = '', secteur = '', palette = [] } = meta;
   const [bg, accent, textColor] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
+  const brandLabel = meta.white_label ? entreprise : 'EffectForge AI';
 
   const steps = [
     {
@@ -1175,7 +1177,7 @@ export function buildInstallationGuide(
     <div style="display:inline-flex;align-items:center;gap:8px;background:${accent}18;
       border:1px solid ${accent}44;border-radius:100px;padding:6px 18px;font-size:11px;
       letter-spacing:2px;text-transform:uppercase;color:${accent};margin-bottom:20px;">
-      ✦ EffectForge AI — Signature Vivante
+      ✦ ${escXml(brandLabel)} — Signature Vivante
     </div>
     <h1 style="font-size:28px;font-weight:700;color:${accent};margin-bottom:8px;">${escXml(nom)}</h1>
     <p style="color:#6b7280;font-size:14px;">${escXml(entreprise)} · Secteur ${escXml(secteur)} · ID: ${signatureId.slice(0, 8)}</p>
@@ -1224,8 +1226,8 @@ export function buildInstallationGuide(
   ${stepsHtml}
 
   <div style="margin-top:40px;text-align:center;padding:20px;background:${accent}0a;border-radius:12px;border:1px solid ${accent}22;">
-    <p style="font-size:13px;color:#6b7280;">Signature générée par <strong style="color:${accent};">EffectForge AI</strong> · ID: ${signatureId}</p>
-    <p style="font-size:11px;color:#9ca3af;margin-top:4px;">Pour toute assistance : hello@effectforge.ai</p>
+    <p style="font-size:13px;color:#6b7280;">Signature générée par <strong style="color:${accent};">${escXml(brandLabel)}</strong> · ID: ${signatureId}</p>
+    ${meta.white_label ? '' : '<p style="font-size:11px;color:#9ca3af;margin-top:4px;">Pour toute assistance : hello@effectforge.ai</p>'}
   </div>
 
 </div>
@@ -1252,12 +1254,14 @@ function buildReadmeMd(params: {
   secteur: string;
   palette: string[];
   effectsUsed?: string[];
+  whiteLabel?: boolean;
 }): string {
-  const { signatureId, nom, titre, entreprise, email, telephone, site, secteur, palette, effectsUsed = [] } = params;
+  const { signatureId, nom, titre, entreprise, email, telephone, site, secteur, palette, effectsUsed = [], whiteLabel = false } = params;
   const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const brandLabel = whiteLabel ? entreprise : 'EffectForge AI';
 
   return `# 🎨 Signature Email Animée — ${nom}
-> Générée par **EffectForge AI** · ${dateStr}
+> Générée par **${brandLabel}** · ${dateStr}
 
 ---
 
@@ -1348,12 +1352,12 @@ ${effectsUsed.length > 0 ? `\n## ✦ Effets visuels actifs\n\n${effectsUsed.map(
 
 ## 📞 Support
 
-Ce package a été généré par **EffectForge AI — God Tier Engine v3.0**.
+Ce package a été généré par **${brandLabel}**.
 Pour toute assistance, consultez le \`GUIDE_INSTALLATION.html\` inclus.
 
 ---
 
-*© EffectForge AI · ${nom} · ${entreprise} · ${dateStr}*
+*© ${brandLabel} · ${nom} · ${entreprise} · ${dateStr}*
 `;
 }
 
@@ -1369,11 +1373,17 @@ export function buildStandalonePreviewHtml(params: {
   palette: string[];
   animatedSvg: string;
   effectsUsed?: string[];
+  whiteLabel?: boolean;
 }): string {
-  const { signatureId, nom, titre, entreprise, email, secteur, palette, animatedSvg } = params;
+  const { signatureId, nom, titre, entreprise, email, secteur, palette, animatedSvg, whiteLabel = false } = params;
   const [, accent] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
   const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   const timeStr = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const brandLabel = whiteLabel ? entreprise : 'EffectForge AI';
+  const brandInitials = whiteLabel
+    ? entreprise.split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || 'CL'
+    : 'EF';
+  const contactEmail = whiteLabel ? email : 'studio@effectforge.ai';
 
   // Ne pas modifier le SVG — il doit rester à ses dimensions natives (600×190)
   // pour que tous les éléments internes restent correctement positionnés
@@ -1457,7 +1467,7 @@ export function buildStandalonePreviewHtml(params: {
 <!-- Barre Gmail simulée -->
 <div class="gmail-nav">
   <div class="gmail-logo">M<span>ail</span></div>
-  <input class="gmail-search" type="text" value="Votre nouvelle signature EffectForge AI" readonly />
+  <input class="gmail-search" type="text" value="Votre nouvelle signature ${escZip(brandLabel)}" readonly />
   <div class="nav-label">Aperçu client</div>
 </div>
 
@@ -1483,12 +1493,12 @@ export function buildStandalonePreviewHtml(params: {
       <span class="tag"><span class="live-dot"></span>Signature vivante</span>
     </div>
 
-    <!-- Email d'EffectForge au client -->
+    <!-- Email de livraison au client -->
     <div class="message-card">
       <div class="message-header">
-        <div class="avatar">EF</div>
+        <div class="avatar">${escZip(brandInitials)}</div>
         <div class="sender-info">
-          <div class="sender-name">EffectForge AI <span style="font-weight:400;color:#5f6368;">&lt;studio@effectforge.ai&gt;</span></div>
+          <div class="sender-name">${escZip(brandLabel)} <span style="font-weight:400;color:#5f6368;">&lt;${escZip(contactEmail || 'contact@example.com')}&gt;</span></div>
           <div class="sender-detail">À : <a href="mailto:${escZip(email || '')}">${escZip(nom || 'vous')}</a>${email ? ` &lt;${escZip(email)}&gt;` : ''}</div>
         </div>
         <div class="msg-date">${dateStr} à ${timeStr}</div>
@@ -1505,7 +1515,7 @@ export function buildStandalonePreviewHtml(params: {
           <p>Avez-vous des retouches à apporter ? Couleurs, texte, disposition, effets… N'hésitez pas à nous contacter, nous ajustons tout sous 24h.</p>
         </div>
 
-        <a href="mailto:studio@effectforge.ai?subject=Retouche signature ${encodeURIComponent(nom + ' — ' + entreprise)}" class="msg-cta">
+        <a href="mailto:${escZip(contactEmail || '')}?subject=Retouche signature ${encodeURIComponent(nom + ' — ' + entreprise)}" class="msg-cta">
           ✉️ Demander des modifications
         </a>
 
@@ -1528,10 +1538,10 @@ export function buildStandalonePreviewHtml(params: {
   </main>
 </div>
 
-<!-- Barre EffectForge -->
+<!-- Barre livraison -->
 <div class="effectforge-banner">
   <div class="ef-brand">
-    <strong>EffectForge AI</strong> · Signature ID : <code style="font-size:11px;color:#9aa0a6;">${escZip(signatureId)}</code><br>
+    <strong>${escZip(brandLabel)}</strong> · Signature ID : <code style="font-size:11px;color:#9aa0a6;">${escZip(signatureId)}</code><br>
     <span style="font-size:11px;">${escZip(nom)} · ${escZip(titre || secteur)} · ${escZip(entreprise)} · ${dateStr}</span>
   </div>
   <div class="ef-actions">
@@ -1551,9 +1561,11 @@ function buildPaletteHtmlZip(params: {
   entreprise: string;
   palette: string[];
   signatureId: string;
+  whiteLabel?: boolean;
 }): string {
-  const { nom, entreprise, palette, signatureId } = params;
+  const { nom, entreprise, palette, signatureId, whiteLabel = false } = params;
   const [bg, accent, textLight] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
+  const brandLabel = whiteLabel ? entreprise : 'EffectForge AI';
   function hexToRgb(hex: string): string {
     const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return r ? `${parseInt(r[1],16)}, ${parseInt(r[2],16)}, ${parseInt(r[3],16)}` : '0, 0, 0';
@@ -1579,7 +1591,7 @@ function buildPaletteHtmlZip(params: {
 </style>
 </head>
 <body>
-  <p class="label">Charte Colorimétrique · EffectForge AI</p>
+  <p class="label">Charte Colorimétrique · ${escZip(brandLabel)}</p>
   <h1>${escZip(nom)} · <span>${escZip(entreprise)}</span></h1>
   <p class="sub">Palette officielle de votre signature email animée</p>
   <div class="swatches">
@@ -1593,7 +1605,7 @@ function buildPaletteHtmlZip(params: {
       </div>`;
     }).join('')}
   </div>
-  <footer>Signature ${escZip(signatureId)} · EffectForge AI</footer>
+  <footer>Signature ${escZip(signatureId)} · ${escZip(brandLabel)}</footer>
 </body>
 </html>`;
 }
@@ -1637,18 +1649,21 @@ export async function buildCompleteZip(params: {
       secteur: meta.secteur || '',
       palette: meta.palette || ['#0f172a', '#6366f1', '#e8e8ff'],
       effectsUsed,
+      whiteLabel: Boolean(meta.white_label),
     };
 
     const readmeMd = buildReadmeMd(readmeParams);
     const previewHtml = buildStandalonePreviewHtml({
       ...readmeParams,
       animatedSvg: params.animatedSvg,
+      whiteLabel: Boolean(meta.white_label),
     });
     const paletteHtml = buildPaletteHtmlZip({
       nom: params.nom,
       entreprise: meta.entreprise || params.nom,
       palette: meta.palette || ['#0f172a', '#6366f1', '#e8e8ff'],
       signatureId: params.signatureId,
+      whiteLabel: Boolean(meta.white_label),
     });
 
     archive.append(previewHtml,          { name: `${slug}/PREVIEW — Ouvrez ce fichier.html` });
@@ -1665,7 +1680,7 @@ export async function buildCompleteZip(params: {
     archive.append(JSON.stringify({
       signatureId: params.signatureId,
       generatedAt: new Date().toISOString(),
-      engine: 'EffectForge AI v3.0',
+      engine: meta.white_label ? (meta.entreprise || params.nom) : 'EffectForge AI v3.0',
       client: {
         nom: params.nom,
         titre: meta.titre || '',

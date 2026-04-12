@@ -380,8 +380,8 @@ export function buildCorpNameLivingSystem(
   const groupSVG = `
     <!-- ═══ Corp Name Living System ═══════════════════════════════════════ -->
     <!-- Sector: ${sec} | Variant: ${variantId} | BPM: ${prof.bpm} | Glow: ${(prof.glowInt*100).toFixed(0)}% -->
-    <g style="animation: cnls-fadein 0.4s ease-out 0s forwards; opacity:0; transform-origin: 0px 0px;">
-      <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0s" fill="freeze"/>
+    <g style="animation: cnls-fadein 0.22s ease-out 0s forwards; opacity:0; transform-origin: 0px 0px;">
+      <animate attributeName="opacity" from="0" to="1" dur="0.22s" begin="0s" fill="freeze"/>
 
       ${haloEl}
       ${glowEl}

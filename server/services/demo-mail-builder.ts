@@ -14,6 +14,7 @@ export interface DemoMailConfig {
   destinataireEmail: string;
   objetMail:         string;
   corpsMail:         string;
+  whiteLabel?:       boolean;
 }
 
 const SECTOR_COLORS: Record<string, string> = {
@@ -79,7 +80,7 @@ function getObjet(secteur: string, objetMail: string, nomClient: string): string
 export function buildDemoMailHtml(cfg: DemoMailConfig): string {
   const {
     nomClient, titreClient, entrepriseClient, emailClient, secteur,
-    gifUrl, signatureHtml, palette, destinataireNom, destinataireEmail, objetMail, corpsMail,
+    gifUrl, signatureHtml, palette, destinataireNom, destinataireEmail, objetMail, corpsMail, whiteLabel = false,
   } = cfg;
 
   const accent = palette?.[0] || SECTOR_COLORS[secteur] || '#6366f1';
@@ -93,6 +94,7 @@ export function buildDemoMailHtml(cfg: DemoMailConfig): string {
   const destPrenom = destNom.split(' ')[0] || 'Marie';
   const senderLocal = emailClient || nomClient.toLowerCase().replace(/\s+/g, '.');
   const senderDomain = entrepriseClient.toLowerCase().replace(/\s+/g, '') || 'cabinet.fr';
+  const brandLabel = whiteLabel ? entrepriseClient : 'EffectForge AI';
 
   log(`Demo mail généré pour ${nomClient} (${secteur})`, 'demo-builder');
 
@@ -188,7 +190,7 @@ export function buildDemoMailHtml(cfg: DemoMailConfig): string {
   </div>
 
   <div class="preview-label">
-    ✦ Aperçu de votre Signature Vivante EffectForge AI · ${escHtml(nomClient)} · ${escHtml(SECTOR_LABELS[secteur] || 'Professionnel')}
+    ✦ Aperçu de votre Signature Vivante ${escHtml(brandLabel)} · ${escHtml(nomClient)} · ${escHtml(SECTOR_LABELS[secteur] || 'Professionnel')}
   </div>
 </div>
 

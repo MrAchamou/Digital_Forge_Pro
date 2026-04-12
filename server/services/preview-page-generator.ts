@@ -149,14 +149,17 @@ export async function generatePreviewPage(params: {
   outputDir: string;
   gmailHtml?: string;
   outlookHtml?: string;
+  whiteLabel?: boolean;
 }): Promise<string> {
   const {
     signatureId, svgContent, metadata, scenario,
     pageContent, baseUrl, outputDir,
     gmailHtml = '', outlookHtml = '',
+    whiteLabel = Boolean(metadata?.white_label),
   } = params;
   const { nom = 'Client', entreprise = 'Entreprise', palette = [] } = metadata;
   const [bg, accent, accentAlt = '#e8e8ff'] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
+  const brandLabel = whiteLabel ? entreprise : 'EffectForge AI';
 
   const siteRaw   = (metadata.site || '').replace(/https?:\/\//, '').replace(/\/$/, '') || `${entreprise.toLowerCase().replace(/\s+/g, '')}.fr`;
   const emailAddr = metadata.email || `contact@${siteRaw}`;
@@ -194,7 +197,7 @@ export async function generatePreviewPage(params: {
   const svgCodeB64     = Buffer.from(svgContent || '',  'utf-8').toString('base64');
 
   const ogTitle       = `Signature ${esc(nom)} — ${esc(entreprise)}`;
-  const ogDescription = `${esc(pageContent.description || 'Signature email animée générée par EffectForge AI')}`;
+  const ogDescription = `${esc(pageContent.description || `Signature email animée générée par ${brandLabel}`)}`;
 
   // Corps de l'email avec sauts de ligne → <br>
   const bodyHtml = emailContent.body.split('\n').map(l => l === '' ? '<br>' : `${esc(l)}<br>`).join('');
@@ -217,13 +220,13 @@ export async function generatePreviewPage(params: {
 <title>${esc(pageContent.titre_page)}</title>
 <meta name="description" content="${ogDescription}">
 <meta property="og:type"        content="website">
-<meta property="og:title"       content="${ogTitle} | EffectForge AI">
+<meta property="og:title"       content="${ogTitle} | ${esc(brandLabel)}">
 <meta property="og:description" content="${ogDescription}">
 <meta property="og:image"       content="${pngUrl}">
 <meta property="og:url"         content="${previewUrl}">
-<meta property="og:site_name"   content="EffectForge AI">
+<meta property="og:site_name"   content="${esc(brandLabel)}">
 <meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="${ogTitle} | EffectForge AI">
+<meta name="twitter:title"       content="${ogTitle} | ${esc(brandLabel)}">
 <meta name="twitter:description" content="${ogDescription}">
 <meta name="twitter:image"       content="${pngUrl}">
 <style>
@@ -587,7 +590,7 @@ export async function generatePreviewPage(params: {
      HERO
 ══════════════════════════════════════════════════ -->
 <section class="hero">
-  <div class="livrable-badge">✦ Livrable EffectForge AI · Signature Vivante</div>
+  <div class="livrable-badge">✦ Livrable ${esc(brandLabel)} · Signature Vivante</div>
   <div class="hero-company">${esc(nom)} · ${esc(entreprise)}</div>
   <h1>${pageContent.headline}</h1>
   <p class="hero-desc">${pageContent.description}</p>
@@ -756,7 +759,7 @@ export async function generatePreviewPage(params: {
 
 <!-- ── FOOTER ── -->
 <footer class="footer">
-  <p>${pageContent.footer}</p>
+  <p>${whiteLabel ? `© ${esc(brandLabel)} · Signature vivante` : pageContent.footer}</p>
   <p style="margin-top:8px;font-size:11px;opacity:0.4;">ID: ${signatureId}</p>
 </footer>
 

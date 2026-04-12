@@ -80,6 +80,7 @@ const TECH_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 
 interface FormState {
   mode: 'demo' | 'reel';
+  white_label: boolean;
   prenom: string; nom: string; titre: string; entreprise: string;
   secteur: string; telephone: string; email: string; site: string; ville: string;
   logo_url: string; banniere_texte: string; banniere_lien: string; cta: string;
@@ -88,7 +89,7 @@ interface FormState {
 }
 
 const EMPTY_FORM: FormState = {
-  mode: 'demo',
+  mode: 'demo', white_label: false,
   prenom: '', nom: '', titre: '', entreprise: '', secteur: 'sante',
   telephone: '', email: '', site: '', ville: '', logo_url: '',
   banniere_texte: '', banniere_lien: '', cta: 'Nous contacter',
@@ -101,6 +102,7 @@ function NouveauClientForm({ onClose, onSuccess }: { onClose: () => void; onSucc
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [section, setSection] = useState<'identite' | 'contacts' | 'demo' | 'commande'>('identite');
   const update = (k: keyof FormState, v: string) => setForm(f => ({ ...f, [k]: v }));
+  const updateBool = (k: keyof FormState, v: boolean) => setForm(f => ({ ...f, [k]: v }));
 
   const mutation = useMutation({
     mutationFn: async (data: FormState) => {
@@ -307,6 +309,25 @@ function NouveauClientForm({ onClose, onSuccess }: { onClose: () => void; onSucc
                     placeholder="149,00 €" data-testid="input-montant" />
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => updateBool('white_label', !form.white_label)}
+                data-testid="btn-white-label"
+                className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border transition-all text-left"
+                style={{
+                  background: form.white_label ? '#8b5cf612' : 'transparent',
+                  borderColor: form.white_label ? '#8b5cf660' : 'rgba(255,255,255,0.08)',
+                }}
+              >
+                <span className={`mt-0.5 w-4 h-4 rounded border flex-shrink-0 ${form.white_label ? 'bg-forge-purple border-forge-purple' : 'border-white/20'}`} />
+                <span>
+                  <span className={`block text-sm font-bold ${form.white_label ? 'text-white' : 'text-white/60'}`}>Option white-label +50€</span>
+                  <span className="block text-[11px] text-white/35 leading-relaxed mt-1">
+                    Remplace les mentions EffectForge AI par le nom du client dans les pages livrées et fichiers d'installation.
+                  </span>
+                </span>
+              </button>
 
               {/* Notes internes */}
               <div>

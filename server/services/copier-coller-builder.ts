@@ -4,6 +4,7 @@ export interface CopierCollerConfig {
   palette:       string[];
   signatureId:   string;
   signatureHtml?: string;
+  whiteLabel?:    boolean;
 }
 
 function escHtml(s: string): string {
@@ -11,8 +12,9 @@ function escHtml(s: string): string {
 }
 
 export function buildCopierCollerHtml(cfg: CopierCollerConfig): string {
-  const { nomClient, gifUrl, palette, signatureId, signatureHtml } = cfg;
+  const { nomClient, gifUrl, palette, signatureId, signatureHtml, whiteLabel = false } = cfg;
   const accent = palette?.[0] || '#6366f1';
+  const brandLabel = whiteLabel ? nomClient : 'EffectForge AI';
 
   const gmailCode = `<img src="${gifUrl}" width="600" alt="Signature ${nomClient}" style="display:block;border:0;max-width:100%;">`;
   const outlookCode = `<!--[if mso]><v:image xmlns:v="urn:schemas-microsoft-com:vml" style="width:600px;height:220px;" src="${gifUrl}"/><![endif]--><!--[if !mso]><!--><img src="${gifUrl}" width="600" alt="Signature ${nomClient}" style="display:block;border:0;"><!--<![endif]-->`;
@@ -103,7 +105,7 @@ export function buildCopierCollerHtml(cfg: CopierCollerConfig): string {
     <div class="url-val">${escHtml(gifUrl)}</div>
   </div>
 
-  <div class="footer">Signature EffectForge AI · ID: ${escHtml(signatureId.slice(0, 8))}</div>
+  <div class="footer">Signature ${escHtml(brandLabel)} · ID: ${escHtml(signatureId.slice(0, 8))}</div>
 </div>
 
 <script>

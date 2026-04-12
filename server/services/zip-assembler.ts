@@ -16,12 +16,14 @@ function buildLocalPreviewHtml(params: {
   signatureId: string;
   palette: string[];
   effectsUsed: string[];
+  whiteLabel?: boolean;
 }): string {
-  const { svgContent, nom, titre, entreprise, email, telephone, site, secteur, signatureId, palette, effectsUsed } = params;
+  const { svgContent, nom, titre, entreprise, email, telephone, site, secteur, signatureId, palette, effectsUsed, whiteLabel = false } = params;
   const [bg, accent, textLight] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
   const initials = `${nom.charAt(0)}${(nom.split(' ')[1] || '').charAt(0)}`.toUpperCase();
   const effectsList = effectsUsed.length > 0 ? effectsUsed.join(' · ') : 'SOUL_AURA · NEON_PULSE';
   const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const brandLabel = whiteLabel ? entreprise : 'EffectForge AI';
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -158,7 +160,7 @@ function buildLocalPreviewHtml(params: {
 <div class="header">
   <div class="badge">
     <span class="dot"></span>
-    Signature Vivante · EffectForge AI
+    Signature Vivante · ${escHtml(brandLabel)}
   </div>
   <h1 class="headline">${escHtml(nom)}<br><span>${escHtml(entreprise)}</span></h1>
   <p class="subline">${escHtml(titre || secteur)} · Créée le ${dateStr}</p>
@@ -233,11 +235,11 @@ function buildLocalPreviewHtml(params: {
   </div>
   <div style="text-align:right;">
     <p style="font-size:11px;opacity:0.3;margin-bottom:4px;">Générée par</p>
-    <p style="font-size:13px;opacity:0.6;font-weight:600;">EffectForge AI</p>
+    <p style="font-size:13px;opacity:0.6;font-weight:600;">${escHtml(brandLabel)}</p>
   </div>
 </div>
 
-<footer>© EffectForge AI · ${nom} · ${entreprise} · ${dateStr}</footer>
+<footer>© ${escHtml(brandLabel)} · ${escHtml(nom)} · ${escHtml(entreprise)} · ${dateStr}</footer>
 
 </body>
 </html>`;
@@ -249,9 +251,11 @@ function buildPaletteHtml(params: {
   entreprise: string;
   palette: string[];
   signatureId: string;
+  whiteLabel?: boolean;
 }): string {
-  const { nom, entreprise, palette, signatureId } = params;
+  const { nom, entreprise, palette, signatureId, whiteLabel = false } = params;
   const [bg, accent, textLight] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
+  const brandLabel = whiteLabel ? entreprise : 'EffectForge AI';
 
   function hexToRgb(hex: string): string {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -282,7 +286,7 @@ function buildPaletteHtml(params: {
 </style>
 </head>
 <body>
-  <p class="title">Charte Colorimétrique · EffectForge AI</p>
+  <p class="title">Charte Colorimétrique · ${escHtml(brandLabel)}</p>
   <h1>${escHtml(nom)} · <span>${escHtml(entreprise)}</span></h1>
   <p class="sub">Palette officielle de votre signature email animée</p>
   <div class="swatches">
@@ -296,7 +300,7 @@ function buildPaletteHtml(params: {
       </div>`;
     }).join('')}
   </div>
-  <footer>Signature ${signatureId} · EffectForge AI</footer>
+  <footer>Signature ${escHtml(signatureId)} · ${escHtml(brandLabel)}</footer>
 </body>
 </html>`;
 }
@@ -564,7 +568,7 @@ function buildEmailPitchHtml(params: {
 <body>
 <div class="outer-wrap">
 
-  <div class="label-top">Email de pitch client · EffectForge AI · ${escHtml(entreprise)}</div>
+  <div class="label-top">Email de pitch client · ${escHtml(entreprise)}</div>
 
   <!-- ── Shell email ── -->
   <div class="email-shell">
@@ -622,7 +626,7 @@ function buildEmailPitchHtml(params: {
 
       <!-- ── Séparateur signature ── -->
       <hr class="sig-separator">
-      <div class="sig-label">Signature professionnelle animée — EffectForge AI</div>
+      <div class="sig-label">Signature professionnelle animée — ${escHtml(entreprise)}</div>
 
       <!-- ── La signature SVG animée ── -->
       <div class="sig-zone">
@@ -643,7 +647,7 @@ function buildEmailPitchHtml(params: {
 
   <!-- ── Note d'utilisation ── -->
   <div class="usage-note">
-    <strong>Comment utiliser ce fichier :</strong> Cet email est un modèle de pitch prêt à l'emploi. Personnalisez le destinataire (champ "À :") et adaptez le contenu selon vos besoins. La signature animée ci-dessous est votre signature EffectForge AI générée le ${dateStr}. ID : ${escHtml(signatureId)}.
+    <strong>Comment utiliser ce fichier :</strong> Cet email est un modèle de pitch prêt à l'emploi. Personnalisez le destinataire (champ "À :") et adaptez le contenu selon vos besoins. La signature animée ci-dessous a été générée le ${dateStr}. ID : ${escHtml(signatureId)}.
   </div>
 
 </div>
@@ -677,6 +681,7 @@ export async function assembleZip(params: {
     note?: number;
     avis?: number;
     slogan?: string;
+    white_label?: boolean;
   };
   effectsUsed?: string[];
 }): Promise<string> {
@@ -699,6 +704,7 @@ export async function assembleZip(params: {
   const note = metadata.note || 0;
   const avis = metadata.avis || 0;
   const slogan = metadata.slogan || '';
+  const whiteLabel = Boolean(metadata.white_label);
 
   const safeName = entreprise
     .toLowerCase()
@@ -714,11 +720,11 @@ export async function assembleZip(params: {
   // ── Preview locale premium ──────────────────────────────────────────────
   const localPreviewHtml = buildLocalPreviewHtml({
     svgContent, nom, titre, entreprise, email, telephone, site, secteur,
-    signatureId, palette, effectsUsed,
+    signatureId, palette, effectsUsed, whiteLabel,
   });
 
   // ── Carte palette de marque ─────────────────────────────────────────────
-  const paletteHtml = buildPaletteHtml({ nom, entreprise, palette, signatureId });
+  const paletteHtml = buildPaletteHtml({ nom, entreprise, palette, signatureId, whiteLabel });
 
   // ── Email pitch de prospection client ──────────────────────────────────
   const emailPitchHtml = buildEmailPitchHtml({
@@ -751,7 +757,7 @@ export async function assembleZip(params: {
     total_files:        fileEntries.length + 1,
     total_size_bytes:   fileEntries.reduce((acc, f) => acc + f.size, 0),
     files:              fileEntries,
-    generator:          'EffectForge AI — God Tier',
+    generator:          whiteLabel ? entreprise : 'EffectForge AI — God Tier',
     version:            '3.0',
     instructions:       '→ Commencez par ouvrir "PREVIEW — Ouvrez ce fichier.html" dans votre navigateur.',
   };

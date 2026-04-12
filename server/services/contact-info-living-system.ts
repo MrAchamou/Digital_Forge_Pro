@@ -511,6 +511,8 @@ export function buildContactInfoLivingSystem(
   const groupSVG = `
   <!-- ═══ Contact Info Living System ══════════════════════════════════════ -->
   ${sectorTag}
+  <g style="animation: ci-info-enter 0.28s ease-out 0s forwards; opacity:0;">
+  <animate attributeName="opacity" from="0" to="1" dur="0.28s" begin="0s" fill="freeze"/>
 
   ${sepVEl}
   ${titreEl}
@@ -520,6 +522,7 @@ export function buildContactInfoLivingSystem(
   ${adresseEl}
   ${siteEl}
   ${starsEl}
+  </g>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->`;
 

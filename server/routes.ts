@@ -1106,6 +1106,7 @@ router.post('/signature/full-export', async (req, res) => {
       cta3:            data.cta3            || '',
       banniere_texte:  data.banniere_texte  || '',
       banniere_lien:   data.banniere_lien   || '',
+      white_label:     Boolean(data.white_label),
       zoneEffects:     data.zoneEffects     || undefined,
     };
 
@@ -1130,6 +1131,7 @@ router.post('/signature/full-export', async (req, res) => {
       palette:     meta.palette?.length ? meta.palette : ['#0f172a', '#6366f1', '#e8e8ff'],
       animatedSvg: result.formats.animatedSvg.svg,
       effectsUsed: [],
+      whiteLabel:  Boolean(meta.white_label),
     });
 
     const zipFilename = result.zip.filename;
@@ -1234,6 +1236,7 @@ router.post('/signature/full-export-gmb', async (req, res) => {
       secteur:     sectorId,
       palette:     sigData.palette,
       cta:         sigData.cta,
+      white_label: Boolean(sigData.white_label),
     };
 
     // 5. Export complet avec URL hébergée
@@ -2527,7 +2530,7 @@ router.post('/pipeline/generate', async (req, res) => {
       telephone = '', email = '', site = '', ville = '', logo_url = '',
       palette = [], banniere_texte = '', banniere_lien = '', cta = 'Nous contacter',
       destinataire_nom = '', destinataire_email = '', objet_mail = '', corps_mail = '',
-      mode = 'demo', notes_interne = '', montant = '',
+      mode = 'demo', notes_interne = '', montant = '', white_label = false,
     } = req.body;
 
     if (!nom) return res.status(400).json({ error: 'Le nom est obligatoire' });
@@ -2541,13 +2544,13 @@ router.post('/pipeline/generate', async (req, res) => {
         (numero_commande, mode, statut_crm, notes_interne, montant,
          nom, prenom, titre, entreprise, secteur, telephone, email, site, ville, logo_url,
          palette, banniere_texte, banniere_lien, cta,
-         destinataire_nom, destinataire_email, objet_mail, corps_mail, status)
-       VALUES ($1,$2,'en_attente',$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,'en_cours')
+         destinataire_nom, destinataire_email, objet_mail, corps_mail, white_label, status)
+       VALUES ($1,$2,'en_attente',$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,'en_cours')
        RETURNING *`,
       [numero_commande, mode, notes_interne, montant,
        nomComplet, prenom, titre, entreprise, secteur, telephone, email, site, ville, logo_url,
        paletteJson, banniere_texte, banniere_lien, cta,
-       destinataire_nom, destinataire_email, objet_mail, corps_mail]
+       destinataire_nom, destinataire_email, objet_mail, corps_mail, Boolean(white_label)]
     );
     const client = insertResult.rows[0];
     const clientId: string = client.id;
@@ -2576,6 +2579,7 @@ router.post('/pipeline/generate', async (req, res) => {
           adresse: '', ville, code_postal: '', note: 0,
           logo_url, secteur, palette: effectivePalette,
           cta, banniere_texte, banniere_lien,
+          white_label: Boolean(white_label),
         };
 
         const signatureHtml = renderSignatureWithModules(secteur, meta, { tier: 'ultra' }).html;
@@ -2594,8 +2598,9 @@ router.post('/pipeline/generate', async (req, res) => {
           palette: effectivePalette,
           destinataireNom: destinataire_nom, destinataireEmail: destinataire_email,
           objetMail: objet_mail, corpsMail: corps_mail,
+          whiteLabel: Boolean(white_label),
         });
-        const copierHtml = buildCopierCollerHtml({ nomClient: nomComplet, gifUrl, palette: effectivePalette, signatureId: sigId, signatureHtml });
+        const copierHtml = buildCopierCollerHtml({ nomClient: nomComplet, gifUrl, palette: effectivePalette, signatureId: sigId, signatureHtml, whiteLabel: Boolean(white_label) });
 
         const demoToken  = clientId.replace(/-/g, '').slice(0, 12);
         await Promise.all([

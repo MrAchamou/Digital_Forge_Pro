@@ -123,6 +123,7 @@ Page de génération manuelle de signatures sans IA :
 - **Onglet Saisie manuelle** : formulaire complet (nom, titre, entreprise, téléphone, email, site, adresse, CP, ville, CTA, note étoiles, upload logo)
 - Génère un SVG animé identique au pipeline IA
 - Produit le même lien de preview premium
+- Option **white-label +50€** : transmise à l'export et au CRM via `white_label`, remplace les mentions EffectForge AI par le nom du client dans les livrables concernés.
 
 ---
 

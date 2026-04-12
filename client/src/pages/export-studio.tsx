@@ -248,6 +248,7 @@ interface FormData {
   banniereTexte: string;
   banniereLien: string;
   note: string;
+  whiteLabel: boolean;
 }
 
 const SECTORS = [
@@ -762,10 +763,10 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
   const [bgH, bgS, bgL] = hex2hslClient(bg);
   const bgLight      = `hsl(${bgH},${bgS}%,${clampC(bgL + 28, 18, 62)}%)`;
   const bgUltraLight = `hsl(${bgH},${clampC(bgS - 15, 8, 100)}%,${clampC(bgL + 46, 42, 80)}%)`;
-  const bgHue2       = `hsl(${(bgH + 60) % 360},${bgS}%,${bgL}%)`;
-  const bgHue2Light  = `hsl(${(bgH + 60) % 360},${bgS}%,${clampC(bgL + 32, 18, 60)}%)`;
-  const bgHue3       = `hsl(${(bgH + 180) % 360},${bgS}%,${bgL}%)`;
-  const bgHue3Light  = `hsl(${(bgH + 180) % 360},${bgS}%,${clampC(bgL + 24, 14, 55)}%)`;
+  const bgHue2       = `hsl(${bgH},${bgS}%,${clampC(bgL - 6, 8, 48)}%)`;
+  const bgHue2Light  = `hsl(${bgH},${bgS}%,${clampC(bgL + 32, 18, 60)}%)`;
+  const bgHue3       = `hsl(${bgH},${clampC(bgS - 8, 8, 100)}%,${clampC(bgL - 12, 6, 42)}%)`;
+  const bgHue3Light  = `hsl(${bgH},${bgS}%,${clampC(bgL + 24, 14, 55)}%)`;
 
   const displayNom = escapeSvgText(nom || 'Votre Nom');
   const displayTitre = escapeSvgText(titre || 'Votre Titre');
@@ -1058,6 +1059,7 @@ export default function ExportStudio() {
     telephone: '', email: '', site: '', adresse: '',
     ville: '', code_postal: '', cta: 'Nous contacter',
     cta2: '', cta3: '', banniereTexte: '', banniereLien: '', note: '',
+    whiteLabel: false,
   });
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [customPalette, setCustomPalette] = useState<[string, string, string] | null>(null);
@@ -1102,6 +1104,7 @@ export default function ExportStudio() {
   };
 
   const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }));
+  const updateBool = (k: keyof FormData, v: boolean) => setForm(f => ({ ...f, [k]: v }));
 
   const toggleZoneEffect = (zone: ZoneName, effectId: string) => {
     setSelectedCombinationPreset(null);
@@ -1200,6 +1203,7 @@ export default function ExportStudio() {
           nom: form.nom || undefined,
           titre: form.titre || undefined,
           email: form.email || undefined,
+          white_label: form.whiteLabel,
         },
       });
     } else {
@@ -1218,6 +1222,7 @@ export default function ExportStudio() {
           ...(form.cta3 ? { cta3: form.cta3 } : {}),
           ...(form.banniereTexte ? { banniere_texte: form.banniereTexte } : {}),
           ...(form.banniereLien ? { banniere_lien: form.banniereLien } : {}),
+          white_label: form.whiteLabel,
           palette: effectivePalette,
           preset: selectedPreset,
           ...(Object.keys(cleanZoneEffects).length > 0 ? { zoneEffects: cleanZoneEffects } : {}),
@@ -1829,6 +1834,25 @@ export default function ExportStudio() {
                   <p className="text-[10px] text-forge-purple/60 mt-1.5">Apparaît en bas de la signature dans la prévisualisation</p>
                 )}
               </div>
+
+              <button
+                type="button"
+                onClick={() => updateBool('whiteLabel', !form.whiteLabel)}
+                data-testid="btn-white-label-export"
+                className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border transition-all text-left"
+                style={{
+                  background: form.whiteLabel ? '#8b5cf612' : 'rgba(255,255,255,0.03)',
+                  borderColor: form.whiteLabel ? '#8b5cf660' : 'rgba(255,255,255,0.08)',
+                }}
+              >
+                <span className={`mt-0.5 w-4 h-4 rounded border flex-shrink-0 ${form.whiteLabel ? 'bg-forge-purple border-forge-purple' : 'border-white/20'}`} />
+                <span>
+                  <span className={`block text-sm font-bold ${form.whiteLabel ? 'text-white' : 'text-white/60'}`}>White-label +50€</span>
+                  <span className="block text-[11px] text-white/35 leading-relaxed mt-1">
+                    Les pages d'installation et exports remplacent EffectForge AI par le nom du client.
+                  </span>
+                </span>
+              </button>
 
               {/* ── Ligne 5 : Adresse + Code postal ─────────────────────── */}
               <div className="grid grid-cols-3 gap-4">
