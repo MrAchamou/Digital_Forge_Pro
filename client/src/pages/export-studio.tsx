@@ -1153,6 +1153,9 @@ export default function ExportStudio() {
     },
     onSuccess: (data: ExportResult) => {
       setResult(data);
+      setBannerUpdateText(form.banniereTexte || '');
+      setBannerUpdateLien(form.banniereLien || '');
+      setBannerUpdateDone(null);
       toast({ title: 'Export complet généré !', description: `7 formats prêts pour ${data.sectorLabel || data.sectorId}` });
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     },
@@ -1167,6 +1170,9 @@ export default function ExportStudio() {
     },
     onSuccess: (data: ExportResult) => {
       setResult(data);
+      setBannerUpdateText(form.banniereTexte || '');
+      setBannerUpdateLien(form.banniereLien || '');
+      setBannerUpdateDone(null);
       toast({ title: 'Export complet généré !', description: '7 formats exportés avec succès' });
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     },
@@ -2104,6 +2110,99 @@ export default function ExportStudio() {
                 </motion.div>
               );
             })()}
+
+            {/* ── Panel "Mettre à jour la bannière" ─────────────────────────── */}
+            {result.signatureId && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl border border-forge-purple/30 bg-forge-purple/[0.06] overflow-hidden"
+              >
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-forge-purple/20 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-forge-purple/20 border border-forge-purple/40 flex items-center justify-center">
+                    <Zap size={14} className="text-forge-purple" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">Mettre à jour la bannière</p>
+                    <p className="text-[10px] text-white/40">Le GIF est régénéré à la même URL — aucun changement dans votre email</p>
+                  </div>
+                  <span className="ml-auto text-[9px] px-2 py-0.5 rounded-full bg-forge-cyan/10 border border-forge-cyan/25 text-forge-cyan font-medium tracking-wider uppercase">
+                    URL permanente
+                  </span>
+                </div>
+
+                {/* Body */}
+                <div className="px-6 py-5 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[10px] text-white/50 uppercase tracking-wider mb-1.5 block">
+                        Texte de la bannière
+                      </label>
+                      <input
+                        type="text"
+                        value={bannerUpdateText}
+                        onChange={e => setBannerUpdateText(e.target.value)}
+                        placeholder="Ex : Promo été — 20% de réduction"
+                        data-testid="input-banner-update-text"
+                        className="w-full bg-black/20 border border-white/[0.10] rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-forge-purple/60 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/50 uppercase tracking-wider mb-1.5 block">
+                        Lien cliquable (optionnel)
+                      </label>
+                      <input
+                        type="url"
+                        value={bannerUpdateLien}
+                        onChange={e => setBannerUpdateLien(e.target.value)}
+                        placeholder="https://..."
+                        data-testid="input-banner-update-lien"
+                        className="w-full bg-black/20 border border-white/[0.10] rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-forge-purple/60 transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleBannerUpdate}
+                      disabled={bannerUpdating}
+                      data-testid="btn-update-banner"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff' }}
+                    >
+                      {bannerUpdating ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Régénération en cours…
+                        </>
+                      ) : (
+                        <>
+                          <Zap size={13} />
+                          {bannerUpdateText ? 'Appliquer la bannière' : 'Supprimer la bannière'}
+                        </>
+                      )}
+                    </button>
+
+                    {bannerUpdateDone && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-1.5 text-xs text-green-400"
+                        data-testid="text-banner-update-done"
+                      >
+                        <CheckCircle size={13} />
+                        {bannerUpdateDone}
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <p className="text-[10px] text-white/30 leading-relaxed">
+                    💡 Laissez le texte vide pour supprimer la bannière du GIF. L'URL reste identique — vos emails existants afficheront automatiquement la nouvelle version.
+                  </p>
+                </div>
+              </motion.div>
+            )}
 
             {/* Aperçu */}
             <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6">

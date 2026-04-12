@@ -1,0 +1,69 @@
+Je comprends la vision complète. Laisse-moi vérifier ce qui existe côté serveur pour savoir exactement ce qu'il faut implémenter.
+
+
+14 actions
+Parfait. J'ai tout ce qu'il me faut. Voici ce que j'implémente — la vision complète :
+
+GIF unifié — la zone signature (220px) + zone bannière dynamique (60px) = 280px dans un seul fichier
+URL permanente — même UUID, le GIF est réécrit quand la bannière change
+Endpoint de mise à jour bannière — POST /api/sig/:id/update-banner relit le config JSON, régénère le GIF, écrase le fichier existant, l'URL client ne change jamais
+Panel UI — après génération, un widget "Mettre à jour la bannière" directement dans l'Export Studio
+Commençons par le moteur d'export :
+
+
+3 actions
+J'ai toute la vision maintenant. Je vais tout implémenter en parallèle — modifications du moteur GIF, des routes, et du frontend.
+
+Etape 1 — ExportMetadata + banner dans buildSignatureSVGBase + buildAnimatedGif :
+
+
+2 actions
+Etape 2 — Banner zone dans le SVG statique/animé :
+
+
+2 actions
+Maintenant j'update le viewBox/height du SVG et j'ajoute la zone bannière en bas :
+
+
+2 actions
+Maintenant les rects internes du background (220 → SVG_H) et la zone bannière avant </svg> :
+
+
+4 actions
+J'ajoute la zone bannière avant </svg> dans buildSignatureSVGBase :
+
+
+2 actions
+Etape 3 — buildStaticPng dimensions dynamiques + buildAnimatedGif banner :
+
+
+2 actions
+Etape 4 — buildAnimatedGif : dimensions dynamiques + zone bannière dans chaque frame :
+
+
+2 actions
+Maintenant je mets à jour les frames SVG du GIF — dimensions dynamiques + zone bannière :
+
+
+10 actions
+Maintenant le GifEncoder et la boucle de rendu des frames :
+
+
+2 actions
+Etape 5 — routes.ts : extraction des champs bannière + endpoint update-banner :
+
+
+2 actions
+Maintenant j'ajoute l'endpoint update-banner et j'adapte la cache-control du serve :
+
+
+2 actions
+Etape 6 — Panel UI "Mettre à jour la bannière" dans le frontend :
+
+
+9 actions
+J'ajoute les états pour le panneau bannière et l'UI complète :
+
+
+2 actions
+Maintenant j'ajoute le handler de mise à jour bannière :
