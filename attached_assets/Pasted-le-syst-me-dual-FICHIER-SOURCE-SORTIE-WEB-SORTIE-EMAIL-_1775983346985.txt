@@ -1,0 +1,39 @@
+le système dual
+FICHIER SOURCE        SORTIE WEB          SORTIE EMAIL
+SVG animé        →   SVG live             GIF animé
+(ton travail)        (dashboard,          (signature universelle,
+                      landing page,        bannière pub mail,
+                      réseaux sociaux)     compatible Outlook)
+Un seul fichier source produit deux outputs. C'est ton avantage compétitif — le pro configure une fois, il obtient les deux.
+
+Ce que voit le prospect qui reçoit un mail
+┌─────────────────────────────────────────────┐
+│  ●  Photo animée — logo vivant              │
+│                                             │
+│  Dr Jean Martin                             │  ← nom shimmer
+│  Médecin Généraliste                        │  ← titre glow
+│  ─────────────────────────────────────      │  ← séparateur draw
+│  📞 +229 XX XX XX XX                        │
+│  ✉  jean.martin@cabinet.com                 │
+│  🌐 www.cabinet-martin.com                  │
+│                                             │
+│  [ Prendre rendez-vous → ]                  │  ← CTA pulsant
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │  BANNIÈRE PUB ROTATIVE              │   │  ← zone premium
+│  │  "Nouveau : consultation en ligne"  │   │
+│  └─────────────────────────────────────┘   │
+└─────────────────────────────────────────────┘
+Le prospect reçoit ça dans Outlook. Il voit une image animée, professionnelle, avec un bouton CTA. Il ne sait pas que c'est un GIF. Il pense juste "c'est quoi ça, je veux pareil".
+
+La bannière pub — c'est ton upsell naturel
+La zone du bas change selon la campagne active du client. Le médecin met "Consultation en ligne disponible". L'avocat met "Consultation gratuite 30 min". L'agence met "Nouveau : pack branding 2026".
+Sans toucher à sa signature. Il change juste sa bannière depuis le dashboard — et tous ses mails envoyés depuis ce moment affichent la nouvelle bannière. C'est exactement ce que font Exclaimer et Opensense à 3€/user/mois pour les grandes boîtes. Toi tu le fais pour tout le monde, avec des animations que personne d'autre n'a.
+
+Le plan concret en 3 étapes
+Étape 1 — Le générateur SVG → GIF (c'est le GifRenderer qu'on a déjà défini)
+Ton SVG animé devient la template source. Le serveur remplace les variables {{nom}}, {{titre}}, {{tel}}, {{cta_texte}}, {{banniere_url}} et génère le GIF.
+Étape 2 — Le dashboard utilisateur
+Formulaire simple : infos perso + choix d'animation parmi tes 55 effets + upload logo + texte CTA + bannière. Le dashboard prévisualise en SVG live, génère le GIF, fournit l'URL et le tutoriel d'installation en 3 clics (Gmail / Outlook / Apple Mail).
+Étape 3 — La bannière dynamique
+L'URL du GIF reste la même — mais quand le client change sa bannière depuis le dashboard, le GIF est régénéré automatiquement en arrière-plan. Ses anciens mails gardent l'ancienne bannière, ses nouveaux mails affichent la nouvelle. Zéro action de sa part.
