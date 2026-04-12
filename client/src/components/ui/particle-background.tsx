@@ -15,11 +15,11 @@ interface Particle {
 
 const PALETTE = [
   "#00d4ff",
-  "#8b5cf6",
-  "#ff006e",
-  "#06b6d4",
-  "#a855f7",
   "#0ea5e9",
+  "#0284c7",
+  "#06b6d4",
+  "#38bdf8",
+  "#7dd3fc",
 ];
 
 export default function ParticleBackground() {
@@ -158,7 +158,7 @@ export default function ParticleBackground() {
       drawBlob(
         w * (0.82 + 0.08 * Math.cos(t * 0.8)),
         h * (0.7 + 0.12 * Math.sin(t * 1.1)),
-        w * 0.22, 139, 92, 246, 0.16
+        w * 0.22, 15, 60, 180, 0.14
       );
       drawBlob(
         w * (0.5 + 0.12 * Math.sin(t * 0.5)),

@@ -905,9 +905,9 @@ function renderContactEffect(d_fn: Function, e: ZoneEffectDecision, varId: strin
           0%   { transform: translateY(8px); opacity: 0; }
           100% { transform: translateY(0);   opacity: 1; }
         }`,
-        elements: `<rect x="186" y="87" width="180" height="12" fill="${col}" fill-opacity="${i*0.08}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.3}s 1 both;"/>
-          <rect x="186" y="102" width="160" height="12" fill="${col}" fill-opacity="${i*0.06}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.6}s 1 both;"/>
-          <rect x="186" y="117" width="170" height="12" fill="${col}" fill-opacity="${i*0.07}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.9}s 1 both;"/>`,
+        elements: `<rect x="186" y="87" width="180" height="12" fill="${col}" fill-opacity="${i*0.08}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.05}s 1 both;"/>
+          <rect x="186" y="102" width="160" height="12" fill="${col}" fill-opacity="${i*0.06}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.12}s 1 both;"/>
+          <rect x="186" y="117" width="170" height="12" fill="${col}" fill-opacity="${i*0.07}" rx="2" style="animation:${pfx}-cascade 0.6s ease-out ${delay+0.2}s 1 both;"/>`,
       };
     }
 

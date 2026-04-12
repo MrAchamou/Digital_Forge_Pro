@@ -472,7 +472,7 @@ export function buildCTALivingSystem(
       const size     = 1.5 + (i % 3) * 0.8; // 1.5, 2.3, 3.1 alternés
       const dur      = orbitS * (1 + (i % 3) * 0.12); // légère variation
       const delay    = FIB[i % FIB.length];
-      const opacity  = (gi * (0.45 + (i % 3) * 0.18)).toFixed(2);
+      const opacity  = Math.min(0.08 + (i % 3) * 0.035, 0.15).toFixed(2);
       const blurSize = (size * gi * 1.5).toFixed(1);
 
       particlesEl += `

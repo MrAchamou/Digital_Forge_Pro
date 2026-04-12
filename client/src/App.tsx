@@ -77,7 +77,7 @@ function App() {
               <Router />
             </main>
             <footer className="text-center py-6 text-forge-white/30 text-xs border-t border-white/[0.04]">
-              <p>EffectForge AI &mdash; Digital Forge of the Future &mdash; GOD Level Performance</p>
+              <p>EffectForge AI &mdash; Plateforme de génération de signatures email animées</p>
             </footer>
           </div>
         </div>

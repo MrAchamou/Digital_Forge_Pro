@@ -203,6 +203,7 @@ export const pipelineClients = pgTable("pipeline_clients", {
   banniere_texte:   text("banniere_texte").notNull().default(''),
   banniere_lien:    text("banniere_lien").notNull().default(''),
   cta:              text("cta").notNull().default('Nous contacter'),
+  white_label:      boolean("white_label").notNull().default(false),
   destinataire_nom:   text("destinataire_nom").notNull().default(''),
   destinataire_email: text("destinataire_email").notNull().default(''),
   objet_mail:       text("objet_mail").notNull().default(''),

@@ -108,7 +108,7 @@ export function buildContactInfoLivingSystem(
   // Délais d'entrée séquentiels (Fibonacci)
   const D_SEP_V    = 0.15;
   const D_TITRE    = 0.30;
-  const D_SEP_H    = D_TITRE + 0.55;
+  const D_SEP_H    = D_TITRE + 0.15;
   const D_PHONE    = D_SEP_H + sepDrawS + 0.25;
   const D_EMAIL    = D_PHONE + FIB[2];
   const D_ADDR     = D_EMAIL + FIB[2];
