@@ -2434,22 +2434,51 @@ router.get('/test/choreo', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PIPELINE OUTPUT — CRUD Clients + Génération + Demo Mail
+// CRM PIPELINE — Base de données clients complète
 // ═══════════════════════════════════════════════════════════════════════════
 
-/** Liste tous les clients pipeline */
+/** Génère un numéro de commande unique ex: CMD-2026-0042 */
+async function genNumeroCommande(mode: string): Promise<string> {
+  const year = new Date().getFullYear();
+  const prefix = mode === 'reel' ? 'CMD' : 'DEM';
+  const countRes = await pgPool.query(
+    `SELECT COUNT(*) FROM pipeline_clients WHERE EXTRACT(YEAR FROM created_at) = $1 AND mode = $2`,
+    [year, mode]
+  );
+  const n = parseInt(countRes.rows[0].count, 10) + 1;
+  return `${prefix}-${year}-${String(n).padStart(4, '0')}`;
+}
+
+/** Liste tous les clients (filtrés par mode si ?mode=demo|reel) */
 router.get('/pipeline/clients', async (req, res) => {
   try {
-    const result = await pgPool.query(
-      'SELECT * FROM pipeline_clients ORDER BY created_at DESC'
-    );
+    const { mode } = req.query;
+    let query = 'SELECT * FROM pipeline_clients';
+    const params: any[] = [];
+    if (mode === 'demo' || mode === 'reel') {
+      query += ' WHERE mode = $1';
+      params.push(mode);
+    }
+    query += ' ORDER BY created_at DESC';
+    const result = await pgPool.query(query, params);
     return res.json(result.rows);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
 });
 
-/** Crée un client et lance le pipeline complet */
+/** Détail d'un client */
+router.get('/pipeline/clients/:id', async (req, res) => {
+  try {
+    const result = await pgPool.query('SELECT * FROM pipeline_clients WHERE id=$1', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Client introuvable' });
+    return res.json(result.rows[0]);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/** Crée un client et lance le pipeline (mode demo ou reel) */
 router.post('/pipeline/generate', async (req, res) => {
   try {
     const {
@@ -2457,21 +2486,25 @@ router.post('/pipeline/generate', async (req, res) => {
       telephone = '', email = '', site = '', ville = '', logo_url = '',
       palette = [], banniere_texte = '', banniere_lien = '', cta = 'Nous contacter',
       destinataire_nom = '', destinataire_email = '', objet_mail = '', corps_mail = '',
+      mode = 'demo', notes_interne = '', montant = '',
     } = req.body;
 
     if (!nom) return res.status(400).json({ error: 'Le nom est obligatoire' });
 
     const nomComplet = [prenom, nom].filter(Boolean).join(' ');
     const paletteJson = JSON.stringify(palette.length ? palette : []);
+    const numero_commande = await genNumeroCommande(mode);
 
     const insertResult = await pgPool.query(
       `INSERT INTO pipeline_clients
-        (nom, prenom, titre, entreprise, secteur, telephone, email, site, ville, logo_url,
+        (numero_commande, mode, statut_crm, notes_interne, montant,
+         nom, prenom, titre, entreprise, secteur, telephone, email, site, ville, logo_url,
          palette, banniere_texte, banniere_lien, cta,
          destinataire_nom, destinataire_email, objet_mail, corps_mail, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,'en_cours')
+       VALUES ($1,$2,'en_attente',$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,'en_cours')
        RETURNING *`,
-      [nomComplet, prenom, titre, entreprise, secteur, telephone, email, site, ville, logo_url,
+      [numero_commande, mode, notes_interne, montant,
+       nomComplet, prenom, titre, entreprise, secteur, telephone, email, site, ville, logo_url,
        paletteJson, banniere_texte, banniere_lien, cta,
        destinataire_nom, destinataire_email, objet_mail, corps_mail]
     );
@@ -2479,7 +2512,6 @@ router.post('/pipeline/generate', async (req, res) => {
     const clientId: string = client.id;
     const hostedBase = getPublicBaseUrl(req);
 
-    // Génération async — on renvoie l'ID immédiatement
     (async () => {
       try {
         const { generateCompleteExport } = await import('./services/signature-export-complete');
@@ -2488,22 +2520,20 @@ router.post('/pipeline/generate', async (req, res) => {
         const { buildCopierCollerHtml } = await import('./services/copier-coller-builder');
 
         const SECTOR_PALETTES: Record<string, string[]> = {
-          medecine: ['#0ea5e9','#f0f9ff','#ffffff'], medical: ['#0ea5e9','#f0f9ff','#ffffff'], sante: ['#0ea5e9','#f0f9ff','#ffffff'],
-          juridique: ['#1e293b','#f8fafc','#e2e8f0'], droit: ['#1e293b','#f8fafc','#e2e8f0'],
+          sante: ['#0ea5e9','#f0f9ff','#ffffff'], medecine: ['#0ea5e9','#f0f9ff','#ffffff'],
+          juridique: ['#1e293b','#f8fafc','#e2e8f0'],
           immobilier: ['#d97706','#fffbeb','#ffffff'],
-          finance: ['#0f766e','#f0fdf4','#ffffff'], banque: ['#0f766e','#f0fdf4','#ffffff'],
-          tech: ['#7c3aed','#faf5ff','#ffffff'], informatique: ['#7c3aed','#faf5ff','#ffffff'],
-          creatif: ['#db2777','#fdf2f8','#ffffff'], marketing: ['#db2777','#fdf2f8','#ffffff'],
+          finance: ['#0f766e','#f0fdf4','#ffffff'],
+          tech: ['#7c3aed','#faf5ff','#ffffff'],
+          creatif: ['#db2777','#fdf2f8','#ffffff'],
           autre: ['#334155','#f8fafc','#e2e8f0'],
         };
-
         const effectivePalette = palette.length >= 3 ? palette : (SECTOR_PALETTES[secteur] || SECTOR_PALETTES['autre']);
 
         const meta = {
           nom: nomComplet, titre, entreprise, email, telephone, site,
           adresse: '', ville, code_postal: '', note: 0,
-          logo_url, secteur,
-          palette: effectivePalette,
+          logo_url, secteur, palette: effectivePalette,
           cta, banniere_texte, banniere_lien,
         };
 
@@ -2513,7 +2543,7 @@ router.post('/pipeline/generate', async (req, res) => {
         const sigId = result.signatureId;
         const gifUrl = `${hostedBase}/api/sig/${sigId}.gif`;
         const EXPORTS_DIR = path.join(process.cwd(), 'exports');
-        const DEMO_DIR   = path.join(EXPORTS_DIR, 'demo');
+        const DEMO_DIR = path.join(EXPORTS_DIR, 'demo');
         await fs.promises.mkdir(DEMO_DIR, { recursive: true });
 
         const demoHtml = buildDemoMailHtml({
@@ -2523,61 +2553,74 @@ router.post('/pipeline/generate', async (req, res) => {
           destinataireNom: destinataire_nom, destinataireEmail: destinataire_email,
           objetMail: objet_mail, corpsMail: corps_mail,
         });
-
-        const copierHtml = buildCopierCollerHtml({
-          nomClient: nomComplet, gifUrl, palette: effectivePalette, signatureId: sigId,
-        });
+        const copierHtml = buildCopierCollerHtml({ nomClient: nomComplet, gifUrl, palette: effectivePalette, signatureId: sigId });
 
         const demoToken  = clientId.replace(/-/g, '').slice(0, 12);
-        const demoPath   = path.join(DEMO_DIR, `${demoToken}.html`);
-        const copierPath = path.join(DEMO_DIR, `${demoToken}-copier.html`);
-
         await Promise.all([
-          fs.promises.writeFile(demoPath,   demoHtml,   'utf-8'),
-          fs.promises.writeFile(copierPath, copierHtml, 'utf-8'),
+          fs.promises.writeFile(path.join(DEMO_DIR, `${demoToken}.html`), demoHtml, 'utf-8'),
+          fs.promises.writeFile(path.join(DEMO_DIR, `${demoToken}-copier.html`), copierHtml, 'utf-8'),
           fs.promises.writeFile(path.join(EXPORTS_DIR, `${sigId}-config.json`), JSON.stringify(meta, null, 2), 'utf-8'),
           fs.promises.writeFile(path.join(EXPORTS_DIR, result.zip.filename), result.zip.buffer),
         ]);
 
-        const demoUrl = `${hostedBase}/api/demo/${demoToken}`;
-        const zipUrl  = `${hostedBase}/api/signature/download/${sigId}`;
+        const demoUrl   = `${hostedBase}/api/demo/${demoToken}`;
+        const copierUrl = `${hostedBase}/api/demo/${demoToken}/copier`;
+        const zipUrl    = `${hostedBase}/api/signature/download/${sigId}`;
 
         await pgPool.query(
           `UPDATE pipeline_clients
-           SET status='livre', signature_id=$1, gif_url=$2, demo_url=$3, zip_url=$4, updated_at=NOW()
-           WHERE id=$5`,
-          [sigId, gifUrl, demoUrl, zipUrl, clientId]
+           SET status='livre', statut_crm='livre', signature_id=$1,
+               gif_url=$2, demo_url=$3, zip_url=$4, copier_url=$5, updated_at=NOW()
+           WHERE id=$6`,
+          [sigId, gifUrl, demoUrl, zipUrl, copierUrl, clientId]
         );
-        log(`Pipeline terminé pour ${nomComplet} — ID: ${sigId}`, 'pipeline');
+        log(`Pipeline terminé [${mode}] ${nomComplet} — ${numero_commande}`, 'pipeline');
       } catch (err: any) {
         await pgPool.query(
           `UPDATE pipeline_clients SET status='erreur', error=$1, updated_at=NOW() WHERE id=$2`,
           [err.message, clientId]
         );
-        log(`Pipeline erreur pour ${nomComplet}: ${err.message}`, 'pipeline');
+        log(`Pipeline erreur [${mode}] ${nomComplet}: ${err.message}`, 'pipeline');
       }
     })();
 
-    return res.json({ clientId, status: 'en_cours' });
+    return res.json({ clientId, numero_commande, mode, status: 'en_cours' });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
 });
 
-/** Statut d'un client */
-router.get('/pipeline/clients/:id', async (req, res) => {
+/** Met à jour le statut CRM d'un client */
+router.patch('/pipeline/clients/:id/statut', async (req, res) => {
   try {
-    const result = await pgPool.query(
-      'SELECT * FROM pipeline_clients WHERE id=$1', [req.params.id]
+    const { statut_crm } = req.body;
+    const allowed = ['en_attente', 'en_cours', 'livre', 'confirme', 'annule'];
+    if (!allowed.includes(statut_crm)) return res.status(400).json({ error: 'Statut invalide' });
+    await pgPool.query(
+      `UPDATE pipeline_clients SET statut_crm=$1, updated_at=NOW() WHERE id=$2`,
+      [statut_crm, req.params.id]
     );
-    if (!result.rows[0]) return res.status(404).json({ error: 'Client introuvable' });
-    return res.json(result.rows[0]);
+    return res.json({ success: true, statut_crm });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
 });
 
-/** Mise à jour bannière d'un client */
+/** Met à jour les notes internes et le montant */
+router.patch('/pipeline/clients/:id/notes', async (req, res) => {
+  try {
+    const { notes_interne = '', montant = '' } = req.body;
+    await pgPool.query(
+      `UPDATE pipeline_clients SET notes_interne=$1, montant=$2, updated_at=NOW() WHERE id=$3`,
+      [notes_interne, montant, req.params.id]
+    );
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/** Met à jour la bannière d'un client */
 router.patch('/pipeline/clients/:id/banner', async (req, res) => {
   try {
     const { banniere_texte, banniere_lien } = req.body;
@@ -2598,12 +2641,10 @@ router.patch('/pipeline/clients/:id/banner', async (req, res) => {
       fs.promises.writeFile(gifHostPath, gifBuffer),
       fs.promises.writeFile(configPath, JSON.stringify(meta, null, 2), 'utf-8'),
     ]);
-
     await pgPool.query(
       `UPDATE pipeline_clients SET banniere_texte=$1, banniere_lien=$2, updated_at=NOW() WHERE id=$3`,
       [meta.banniere_texte, meta.banniere_lien, req.params.id]
     );
-
     return res.json({ success: true, message: 'Bannière mise à jour' });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });

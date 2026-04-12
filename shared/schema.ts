@@ -182,6 +182,13 @@ export const apiKeyStates = pgTable("api_key_states", {
 // ─── Pipeline Clients ─────────────────────────────────────────────────────────
 export const pipelineClients = pgTable("pipeline_clients", {
   id:               varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  // CRM
+  numero_commande:  text("numero_commande").notNull().default(''),
+  mode:             text("mode").notNull().default('demo'),        // 'demo' | 'reel'
+  statut_crm:       text("statut_crm").notNull().default('en_attente'), // 'en_attente'|'en_cours'|'livre'|'confirme'|'annule'
+  notes_interne:    text("notes_interne").notNull().default(''),
+  montant:          text("montant").notNull().default(''),
+  // Identité client
   nom:              text("nom").notNull(),
   prenom:           text("prenom").notNull().default(''),
   titre:            text("titre").notNull().default(''),
@@ -200,19 +207,22 @@ export const pipelineClients = pgTable("pipeline_clients", {
   destinataire_email: text("destinataire_email").notNull().default(''),
   objet_mail:       text("objet_mail").notNull().default(''),
   corps_mail:       text("corps_mail").notNull().default(''),
-  status:           text("status").notNull().default('pending'),
+  // Pipeline technique
+  status:           text("status").notNull().default('pending'),   // 'pending'|'en_cours'|'livre'|'erreur'
   signature_id:     text("signature_id"),
   gif_url:          text("gif_url"),
   demo_url:         text("demo_url"),
   zip_url:          text("zip_url"),
+  copier_url:       text("copier_url"),
   error:            text("error"),
   createdAt:        timestamp("created_at").defaultNow(),
   updatedAt:        timestamp("updated_at").defaultNow(),
 });
 
 export const insertPipelineClientSchema = createInsertSchema(pipelineClients).omit({
-  id: true, status: true, signature_id: true, gif_url: true,
-  demo_url: true, zip_url: true, error: true, createdAt: true, updatedAt: true,
+  id: true, numero_commande: true, status: true, statut_crm: true,
+  signature_id: true, gif_url: true, demo_url: true, zip_url: true,
+  copier_url: true, error: true, createdAt: true, updatedAt: true,
 });
 
 export type PipelineClient = typeof pipelineClients.$inferSelect;
