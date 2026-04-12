@@ -1,0 +1,66 @@
+OK là on parle stratégie produit. Voilà la description complète du produit final, telle que tu pourrais la coller dans Replit, Cursor ou n'importe quel agent de code.
+
+---
+
+**🎯 NOM DU PRODUIT (exemple) : LiveSign**
+*La première signature email 100% vivante, universelle, sans code*
+
+---
+
+**CE QUE C'EST**
+
+Un générateur SaaS qui produit pour chaque utilisateur une **URL d'image unique** (`https://livesign.io/sig/[userID].gif`) à coller dans n'importe quelle signature email. Cette image est un GIF haute qualité, **généré et mis à jour côté serveur**, qui affiche en animation fluide et en boucle tous les éléments de la marque personnelle ou d'entreprise de l'utilisateur.
+
+---
+
+**LES ÉLÉMENTS VIVANTS DE LA SIGNATURE**
+
+Chaque bloc est animé de façon subtile et premium — pas un clignotement, mais un **mouvement vivant, élégant, continu** :
+
+- **Background** — dégradé animé, particules légères, ou vague de couleur en mouvement lent selon la charte de l'utilisateur
+- **Logo** — apparition en fondu, légère respiration (scale subtil en boucle), ou shimmer lumineux
+- **Nom & Titre** — typo qui s'affiche en glissement propre, ou scintillement discret sur le nom
+- **Infos de contact** — icônes animées (téléphone, mail, localisation) avec micro-interactions
+- **Réseaux sociaux** — icônes qui s'illuminent en séquence
+- **CTA (Call To Action)** — bouton ou bannière avec effet lumineux en boucle, couleur pulsante, ou bordure animée qui attire l'œil
+- **Bannière dynamique** — zone du bas qui change selon la campagne active (promo, événement, actualité) sans que l'utilisateur touche à sa signature
+
+---
+
+**CE QUI REND ÇA UNIVERSEL ET PREMIUM**
+
+- Fonctionne dans **Gmail, Outlook, Apple Mail, Yahoo, Thunderbird** — partout, sans exception, car c'est une simple image GIF
+- **Aucune installation, aucun plugin** — l'utilisateur copie-colle une balise `<img>` ou suit un tutoriel en 2 minutes
+- L'image est **régénérée côté serveur** → changer sa campagne ou son CTA = la signature de tous les mails envoyés est mise à jour en temps réel
+- **Dashboard simple** : l'utilisateur choisit ses couleurs, uploade son logo, écrit ses infos, choisit son animation parmi des presets premium
+- **Analytics** : combien de fois la signature a été vue, clics sur le CTA
+
+---
+
+**LES PRESETS D'ANIMATION (ce qui fait l'effet "je veux ça")**
+
+| Preset | Ambiance |
+|---|---|
+| **Ember** | Tons chauds, lueur dorée, premium corporate |
+| **Pulse** | Fond sombre, néon subtil, tech/startup |
+| **Flow** | Dégradé pastel en mouvement lent, créatif/agence |
+| **Crystal** | Blanc, reflets argentés, luxe/finance |
+| **Jungle** | Vert profond, mouvement organique, durable/RSE |
+
+---
+
+**MODÈLE ÉCONOMIQUE**
+
+- **Gratuit** : signature statique, 1 preset basique
+- **Pro ~9€/mois** : tous les presets, CTA animé, bannière dynamique, analytics
+- **Team ~3€/user/mois** : dashboard centralisé, branding unifié pour toute l'équipe
+
+---
+
+**CE QUE TU DONNES À REPLIT**
+
+> *"Crée un générateur de signature email vivante. Le backend reçoit les données d'un utilisateur (nom, titre, email, téléphone, logo URL, couleurs, CTA, preset d'animation choisi) et génère un fichier GIF animé hébergé à une URL unique. Le GIF doit contenir tous les éléments de la signature avec des animations fluides en boucle. Le frontend est un formulaire simple de configuration. Stack suggérée : Node.js + Canvas/Sharp/FFmpeg pour la génération GIF côté serveur."*
+
+---
+
+Tu veux qu'on affine un élément — les animations, le dashboard, ou directement le prompt exact pour Replit ?
