@@ -382,9 +382,66 @@ interface LivePreviewProps {
   telephone: string; email: string; site: string;
   cta: string; note: string; sectorId: string; logoPreview: string | null;
   paletteOverride?: [string, string, string] | null;
+  zoneEffects?: ZoneEffectsMap;
 }
 
-function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, note, sectorId, logoPreview, paletteOverride }: LivePreviewProps) {
+function escapeSvgText(value: string) {
+  return value.replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&apos;',
+  }[char] ?? char));
+}
+
+function renderLiveEffectPreview(effectId: string, zone: ZoneName, index: number, accent: string, textColor: string) {
+  const rects: Record<ZoneName, { x: number; y: number; w: number; h: number; cx: number; cy: number; r?: number }> = {
+    fond: { x: 0, y: 0, w: 600, h: 190, cx: 300, cy: 95 },
+    avatar: { x: 10, y: 50, w: 90, h: 90, cx: 55, cy: 95, r: 45 },
+    nom: { x: 106, y: 32, w: 260, h: 70, cx: 236, cy: 67 },
+    contact: { x: 106, y: 106, w: 330, h: 52, cx: 271, cy: 132 },
+    cta: { x: 106, y: 154, w: 210, h: 34, cx: 211, cy: 171 },
+  };
+  const z = rects[zone];
+  const delay = (index * 0.35).toFixed(2);
+  const opacity = zone === 'fond' ? 0.22 : 0.72;
+  const clipId = `live-zone-${zone}-${index}-${effectId}`;
+  const clip = zone === 'avatar'
+    ? `<clipPath id="${clipId}"><circle cx="${z.cx}" cy="${z.cy}" r="${z.r}"/></clipPath>`
+    : `<clipPath id="${clipId}"><rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="10"/></clipPath>`;
+  const particles = Array.from({ length: zone === 'fond' ? 14 : 7 }, (_, i) => {
+    const px = z.x + 8 + ((i * 37 + index * 19) % Math.max(12, z.w - 16));
+    const py = z.y + 8 + ((i * 23 + index * 11) % Math.max(12, z.h - 16));
+    const toY = py - 10 - (i % 4) * 2;
+    return `<circle cx="${px}" cy="${py}" r="${zone === 'fond' ? 1.4 : 1.8}" fill="${accent}" opacity="0">
+      <animate attributeName="opacity" values="0;${opacity};0" dur="${(1.6 + (i % 4) * 0.25).toFixed(2)}s" begin="${delay}s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="${py};${toY};${py}" dur="${(2.2 + (i % 3) * 0.4).toFixed(2)}s" begin="${delay}s" repeatCount="indefinite"/>
+    </circle>`;
+  }).join('');
+
+  const wavePath = `M ${z.x - 20} ${z.cy} C ${z.x + z.w * 0.2} ${z.cy - 18}, ${z.x + z.w * 0.35} ${z.cy + 18}, ${z.x + z.w * 0.55} ${z.cy} S ${z.x + z.w * 0.85} ${z.cy - 18}, ${z.x + z.w + 20} ${z.cy}`;
+  const zigzagPath = `M ${z.x + 4} ${z.cy} L ${z.x + z.w * 0.18} ${z.y + 8} L ${z.x + z.w * 0.33} ${z.y + z.h - 8} L ${z.x + z.w * 0.50} ${z.cy - 12} L ${z.x + z.w * 0.68} ${z.cy + 14} L ${z.x + z.w - 4} ${z.cy - 4}`;
+
+  const body: Record<string, string> = {
+    neuralPulse: `<circle cx="${z.cx}" cy="${z.cy}" r="6" fill="${accent}" opacity="0.8"/><circle cx="${z.cx}" cy="${z.cy}" r="12" fill="none" stroke="${accent}" stroke-width="1.5" opacity="0.75"><animate attributeName="r" values="8;${Math.min(z.w, z.h) * 0.48};8" dur="2.2s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.75;0;0.75" dur="2.2s" begin="${delay}s" repeatCount="indefinite"/></circle>`,
+    sparkleAura: particles,
+    orbitalRings: `<ellipse cx="${z.cx}" cy="${z.cy}" rx="${Math.max(20, z.w * 0.32)}" ry="${Math.max(10, z.h * 0.23)}" fill="none" stroke="${accent}" stroke-width="1.4" opacity="${opacity}" transform="rotate(-16 ${z.cx} ${z.cy})"><animate attributeName="stroke-dashoffset" values="0;-70" dur="2.4s" begin="${delay}s" repeatCount="indefinite"/></ellipse><ellipse cx="${z.cx}" cy="${z.cy}" rx="${Math.max(14, z.w * 0.22)}" ry="${Math.max(8, z.h * 0.16)}" fill="none" stroke="${textColor}" stroke-width="0.8" opacity="0.35" transform="rotate(24 ${z.cx} ${z.cy})"/>`,
+    electricArcs: `<path d="${zigzagPath}" fill="none" stroke="${accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}"><animate attributeName="stroke-dasharray" values="0 260;80 80;0 260" dur="1.35s" begin="${delay}s" repeatCount="indefinite"/></path>`,
+    waveDistortion: `<path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="2" opacity="${opacity}"><animate attributeName="d" values="${wavePath};M ${z.x - 20} ${z.cy + 6} C ${z.x + z.w * 0.2} ${z.cy + 20}, ${z.x + z.w * 0.35} ${z.cy - 20}, ${z.x + z.w * 0.55} ${z.cy + 4} S ${z.x + z.w * 0.85} ${z.cy + 18}, ${z.x + z.w + 20} ${z.cy - 2};${wavePath}" dur="2.8s" begin="${delay}s" repeatCount="indefinite"/></path>`,
+    neonGlow: `<rect x="${z.x + 4}" y="${z.y + 4}" width="${Math.max(20, z.w - 8)}" height="${Math.max(12, z.h - 8)}" rx="12" fill="none" stroke="${accent}" stroke-width="2" opacity="${opacity}" filter="url(#lp-glow)"><animate attributeName="opacity" values="0.3;${opacity};0.3" dur="1.8s" begin="${delay}s" repeatCount="indefinite"/></rect>`,
+    particleStream: `<path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="1" opacity="0.2"/>${particles}`,
+    glitchScan: `<rect x="${z.x}" y="${z.y}" width="${z.w}" height="5" fill="${accent}" opacity="0.5"><animate attributeName="y" values="${z.y};${z.y + z.h};${z.y}" dur="1.7s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.55;0" dur="1.7s" begin="${delay}s" repeatCount="indefinite"/></rect><rect x="${z.x + 8}" y="${z.cy}" width="${Math.max(30, z.w * 0.4)}" height="1" fill="${textColor}" opacity="0.45"/>`,
+    crystalFacets: `<polygon points="${z.cx},${z.y + 7} ${z.x + z.w - 8},${z.cy} ${z.cx},${z.y + z.h - 7} ${z.x + 8},${z.cy}" fill="${accent}" opacity="0.13" stroke="${accent}" stroke-width="1.2"><animate attributeName="opacity" values="0.08;0.24;0.08" dur="2.4s" begin="${delay}s" repeatCount="indefinite"/></polygon><path d="M ${z.cx} ${z.y + 7} L ${z.cx} ${z.y + z.h - 7} M ${z.x + 8} ${z.cy} L ${z.x + z.w - 8} ${z.cy}" stroke="${accent}" opacity="0.35"/>`,
+    magneticField: `<ellipse cx="${z.cx}" cy="${z.cy}" rx="${Math.max(18, z.w * 0.38)}" ry="${Math.max(10, z.h * 0.18)}" fill="none" stroke="${accent}" stroke-width="1" opacity="0.35"/><ellipse cx="${z.cx}" cy="${z.cy}" rx="${Math.max(24, z.w * 0.46)}" ry="${Math.max(14, z.h * 0.28)}" fill="none" stroke="${accent}" stroke-width="1" opacity="0.25"><animate attributeName="rx" values="${Math.max(24, z.w * 0.40)};${Math.max(28, z.w * 0.50)};${Math.max(24, z.w * 0.40)}" dur="2.6s" begin="${delay}s" repeatCount="indefinite"/></ellipse>`,
+    echoTrail: `<rect x="${z.x + 8}" y="${z.y + 8}" width="${Math.max(16, z.w - 16)}" height="${Math.max(10, z.h - 16)}" rx="10" fill="none" stroke="${accent}" stroke-width="1.2" opacity="0.45"/><rect x="${z.x + 14}" y="${z.y + 14}" width="${Math.max(16, z.w - 28)}" height="${Math.max(10, z.h - 28)}" rx="8" fill="none" stroke="${accent}" stroke-width="1" opacity="0.22"><animate attributeName="opacity" values="0.08;0.35;0.08" dur="2.1s" begin="${delay}s" repeatCount="indefinite"/></rect>`,
+    stellarDrift: particles,
+  };
+
+  return `${clip}<g clip-path="url(#${clipId})" data-live-effect="${effectId}" opacity="${zone === 'fond' ? 1 : 0.9}">${body[effectId] ?? particles}</g>`;
+}
+
+function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, note, sectorId, logoPreview, paletteOverride, zoneEffects = {} }: LivePreviewProps) {
   const palette = paletteOverride ?? SECTOR_PALETTES[sectorId] ?? SECTOR_PALETTES['tech'];
   const [bg, accent, textColor] = palette;
 
@@ -396,10 +453,13 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
   const bgHue3       = `hsl(${(bgH + 180) % 360},${bgS}%,${bgL}%)`;
   const bgHue3Light  = `hsl(${(bgH + 180) % 360},${bgS}%,${clampC(bgL + 24, 14, 55)}%)`;
 
-  const displayNom = nom || 'Votre Nom';
-  const displayTitre = titre || 'Votre Titre';
-  const displayEntreprise = entreprise || 'Votre Entreprise';
-  const displayCta = cta || 'Nous contacter';
+  const displayNom = escapeSvgText(nom || 'Votre Nom');
+  const displayTitre = escapeSvgText(titre || 'Votre Titre');
+  const displayEntreprise = escapeSvgText(entreprise || 'Votre Entreprise');
+  const displayCta = escapeSvgText(cta || 'Nous contacter');
+  const safeTelephone = escapeSvgText(telephone);
+  const safeEmail = escapeSvgText(email);
+  const safeSite = escapeSvgText(site.replace(/^https?:\/\//, ''));
   const initiale = displayNom.charAt(0).toUpperCase();
 
   const starRating = note ? parseInt(note) : 0;
@@ -421,6 +481,20 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
       <animate attributeName="opacity" values="0;${op};0" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
     </circle>`;
   }).join('');
+
+  const selectedEffectEntries = Object.entries(zoneEffects).flatMap(([zone, ids]) =>
+    (ids ?? []).map((effectId, index) => ({ zone: zone as ZoneName, effectId, index }))
+  );
+
+  const liveEffectLayers = selectedEffectEntries.map(({ zone, effectId, index }) =>
+    renderLiveEffectPreview(effectId, zone, index, accent, textColor)
+  ).join('');
+
+  const activeEffectLabels = selectedEffectEntries.map(({ zone, effectId }) => {
+    const zoneLabel = COMPOSER_ZONES.find(z => z.id === zone)?.label ?? zone;
+    const effect = EFFECT_CATALOG.find(e => e.id === effectId);
+    return `${zoneLabel}: ${effect?.label ?? effectId}`;
+  });
 
   const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 600 190" width="600" height="190">
   <defs>
@@ -457,6 +531,8 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
 
   <!-- Particules ambiantes -->
   <g opacity="0.8">${particles}</g>
+
+  ${liveEffectLayers}
 
   <!-- Scan diagonal -->
   <rect x="-80" y="0" width="50" height="190" fill="url(#lp-accent)" opacity="0.05" style="animation:vbg-scan 18s ease-in-out 0s infinite;"/>
@@ -511,9 +587,9 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
   <rect x="112" y="${stars ? '118' : '104'}" width="350" height="0.5" fill="${accent}" opacity="0.15"/>
 
   <!-- Infos contact -->
-  ${telephone ? `<text x="112" y="${stars ? '133' : '119'}" font-size="10" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.65">📞 ${telephone.slice(0, 30)}</text>` : ''}
-  ${email ? `<text x="${telephone ? '230' : '112'}" y="${stars ? '133' : '119'}" font-size="10" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.65">✉ ${email.slice(0, 30)}</text>` : ''}
-  ${site ? `<text x="112" y="${stars ? '148' : '134'}" font-size="10" fill="${accent}" font-family="system-ui,sans-serif" opacity="0.75">🌐 ${site.replace(/^https?:\/\//, '').slice(0, 35)}</text>` : ''}
+  ${telephone ? `<text x="112" y="${stars ? '133' : '119'}" font-size="10" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.65">📞 ${safeTelephone.slice(0, 30)}</text>` : ''}
+  ${email ? `<text x="${telephone ? '230' : '112'}" y="${stars ? '133' : '119'}" font-size="10" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.65">✉ ${safeEmail.slice(0, 30)}</text>` : ''}
+  ${site ? `<text x="112" y="${stars ? '148' : '134'}" font-size="10" fill="${accent}" font-family="system-ui,sans-serif" opacity="0.75">🌐 ${safeSite.slice(0, 35)}</text>` : ''}
 
   <!-- Bouton CTA -->
   <rect x="112" y="160" width="${Math.min(displayCta.length * 7.5 + 24, 180)}" height="22" rx="11" fill="${accent}" opacity="0.9">
@@ -555,6 +631,19 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
         )}
         Aperçu simplifié — le rendu final est plus riche
       </p>
+      {activeEffectLabels.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 justify-end" data-testid="list-live-effect-preview">
+          {activeEffectLabels.map(label => (
+            <span
+              key={label}
+              className="px-2 py-0.5 rounded-full border border-forge-cyan/20 bg-forge-cyan/[0.06] text-[9px] text-forge-cyan/70"
+              data-testid={`text-live-effect-${label.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}`}
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -1228,6 +1317,7 @@ export default function ExportStudio() {
                 sectorId={form.sectorId}
                 logoPreview={logoPreview}
                 paletteOverride={effectivePalette}
+                zoneEffects={zoneEffects}
               />
             </motion.div>
           )}
