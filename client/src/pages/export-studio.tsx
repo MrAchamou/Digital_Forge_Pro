@@ -259,6 +259,56 @@ const SECTORS = [
   { id: 'transport', label: '🚗 Transport' },
 ];
 
+// ── Presets LiveSign ──────────────────────────────────────────────────────────
+
+const LIVESIGN_PRESETS = [
+  {
+    id: 'ember',
+    name: 'Ember',
+    tagline: 'Lueur dorée · Corporate premium',
+    icon: '🔥',
+    palette: ['#1a0d00', '#f59e0b', '#fef3c7'] as [string, string, string],
+    sectorId: 'restauration',
+    preview: ['#1a0d00', '#f59e0b'],
+  },
+  {
+    id: 'pulse',
+    name: 'Pulse',
+    tagline: 'Néon subtil · Tech & Startup',
+    icon: '⚡',
+    palette: ['#0f172a', '#6366f1', '#e8e8ff'] as [string, string, string],
+    sectorId: 'tech',
+    preview: ['#0f172a', '#6366f1'],
+  },
+  {
+    id: 'flow',
+    name: 'Flow',
+    tagline: 'Dégradé pastel · Créatif & Agence',
+    icon: '🌊',
+    palette: ['#1a0a1f', '#a855f7', '#f3e8ff'] as [string, string, string],
+    sectorId: 'loisirs',
+    preview: ['#1a0a1f', '#a855f7'],
+  },
+  {
+    id: 'crystal',
+    name: 'Crystal',
+    tagline: 'Reflets argentés · Luxe & Finance',
+    icon: '💎',
+    palette: ['#0d1b2a', '#0ea5e9', '#e0f2fe'] as [string, string, string],
+    sectorId: 'services_pro',
+    preview: ['#0d1b2a', '#0ea5e9'],
+  },
+  {
+    id: 'jungle',
+    name: 'Jungle',
+    tagline: 'Vert organique · Durable & RSE',
+    icon: '🌿',
+    palette: ['#0a1a0d', '#22c55e', '#dcfce7'] as [string, string, string],
+    sectorId: 'sante',
+    preview: ['#0a1a0d', '#22c55e'],
+  },
+];
+
 // ── Palettes par secteur (mirroir du serveur) ─────────────────────────────────
 
 const SECTOR_PALETTES: Record<string, [string, string, string]> = {
@@ -492,6 +542,9 @@ export default function ExportStudio() {
   });
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [customPalette, setCustomPalette] = useState<[string, string, string] | null>(null);
+  const [selectedPreset, setSelectedPreset] = useState<string>('pulse');
+  const [copiedUrl, setCopiedUrl] = useState(false);
+  const [copiedTag, setCopiedTag] = useState(false);
   const prevSectorRef = useRef(form.sectorId);
 
   useEffect(() => {
@@ -501,7 +554,15 @@ export default function ExportStudio() {
     }
   }, [form.sectorId]);
 
-  const effectivePalette: [string, string, string] = customPalette ?? SECTOR_PALETTES[form.sectorId] ?? SECTOR_PALETTES['tech'];
+  const activePreset = LIVESIGN_PRESETS.find(p => p.id === selectedPreset) ?? LIVESIGN_PRESETS[1];
+  const effectivePalette: [string, string, string] = customPalette ?? activePreset.palette ?? SECTOR_PALETTES[form.sectorId] ?? SECTOR_PALETTES['tech'];
+
+  const copyToClipboard = (text: string, setter: (v: boolean) => void) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setter(true);
+      setTimeout(() => setter(false), 2000);
+    });
+  };
 
   const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }));
 
@@ -558,13 +619,14 @@ export default function ExportStudio() {
     } else {
       if (!form.nom) return toast({ title: 'Le nom est requis', variant: 'destructive' });
       manualExport.mutate({
-        sectorId: form.sectorId,
+        sectorId: activePreset.sectorId,
         data: {
           nom: form.nom, titre: form.titre, entreprise: form.entreprise,
           telephone: form.telephone, email: form.email, site: form.site,
           adresse: form.adresse, ville: form.ville, code_postal: form.code_postal,
           cta: form.cta,
           palette: effectivePalette,
+          preset: selectedPreset,
           ...(form.note ? { note: parseFloat(form.note) } : {}),
           ...(logoPreview ? { logo_url: logoPreview } : {}),
         },
@@ -657,6 +719,58 @@ export default function ExportStudio() {
             </motion.div>
           ) : (
             <motion.div key="manual" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+
+              {/* ── LiveSign Preset Selector ─────────────────────────────── */}
+              <div>
+                <label className="text-xs text-white/50 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <Sparkles size={11} className="text-forge-cyan" /> Preset d'animation
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                  {LIVESIGN_PRESETS.map(preset => {
+                    const isActive = selectedPreset === preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPreset(preset.id);
+                          setCustomPalette(null);
+                        }}
+                        data-testid={`btn-preset-${preset.id}`}
+                        className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
+                          isActive
+                            ? 'border-white/40 bg-white/[0.08] scale-[1.03]'
+                            : 'border-white/[0.08] bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]'
+                        }`}
+                      >
+                        {isActive && (
+                          <div
+                            className="absolute inset-0 rounded-xl opacity-20"
+                            style={{ background: `linear-gradient(135deg, ${preset.preview[0]}, ${preset.preview[1]})` }}
+                          />
+                        )}
+                        <div
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-lg relative"
+                          style={{ background: `linear-gradient(135deg, ${preset.preview[0]}, ${preset.preview[1]})` }}
+                        >
+                          {preset.icon}
+                        </div>
+                        <div className="text-center relative">
+                          <p className={`text-xs font-bold ${isActive ? 'text-white' : 'text-white/60'}`}>{preset.name}</p>
+                          <p className="text-[9px] text-white/30 leading-tight mt-0.5 hidden lg:block">{preset.tagline.split('·')[0].trim()}</p>
+                        </div>
+                        {isActive && (
+                          <div
+                            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                            style={{ background: preset.preview[1] }}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-white/25 mt-2">{activePreset.tagline}</p>
+              </div>
 
               {/* ── Logo Upload ─────────────────────────────────────────── */}
               <div>
@@ -991,6 +1105,136 @@ export default function ExportStudio() {
                 Tout télécharger (.zip)
               </button>
             </div>
+
+            {/* ── LiveSign Hero ────────────────────────────────────────────── */}
+            {mode === 'manual' && result.signatureId && (() => {
+              const gifUrl = `/api/sig/${result.signatureId}.gif`;
+              const imgTag = `<img src="${gifUrl}" alt="Signature ${form.nom}" style="max-width:600px;display:block;" />`;
+              const preset = LIVESIGN_PRESETS.find(p => p.id === selectedPreset) ?? LIVESIGN_PRESETS[1];
+              return (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="relative rounded-2xl overflow-hidden border border-white/[0.10] bg-white/[0.03]"
+                >
+                  {/* Glow accent */}
+                  <div
+                    className="absolute inset-0 opacity-10 pointer-events-none"
+                    style={{ background: `radial-gradient(ellipse at top left, ${preset.preview[1]}, transparent 60%)` }}
+                  />
+
+                  {/* Header */}
+                  <div className="relative px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-base"
+                        style={{ background: `linear-gradient(135deg, ${preset.preview[0]}, ${preset.preview[1]})` }}
+                      >
+                        {preset.icon}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white">Votre signature est vivante</p>
+                        <p className="text-[10px] text-white/40">Preset {preset.name} · GIF animé hébergé · Universel</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                      <span className="text-[10px] text-green-400 font-medium">LIVE</span>
+                    </div>
+                  </div>
+
+                  {/* GIF Preview + URL */}
+                  <div className="relative p-6 flex flex-col lg:flex-row gap-6">
+                    {/* GIF preview */}
+                    <div className="flex-shrink-0 flex flex-col items-center gap-3">
+                      <div
+                        className="rounded-xl overflow-hidden border border-white/[0.10] p-2"
+                        style={{ background: preset.preview[0] }}
+                      >
+                        <img
+                          src={gifUrl}
+                          alt="Aperçu signature animée"
+                          data-testid="img-livesign-gif-preview"
+                          className="w-64 h-auto rounded-lg"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      </div>
+                      <p className="text-[9px] text-white/25">Aperçu du GIF animé en boucle</p>
+                    </div>
+
+                    {/* URL + instructions */}
+                    <div className="flex-1 flex flex-col gap-4">
+                      {/* URL hébergée */}
+                      <div>
+                        <p className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                          <Zap size={10} className="text-forge-cyan" /> URL de votre signature GIF
+                        </p>
+                        <div className="flex items-center gap-2 bg-black/20 border border-white/[0.10] rounded-xl px-4 py-3">
+                          <code className="flex-1 text-xs text-forge-cyan font-mono truncate" data-testid="text-gif-url">
+                            {gifUrl}
+                          </code>
+                          <button
+                            onClick={() => copyToClipboard(gifUrl, setCopiedUrl)}
+                            data-testid="btn-copy-gif-url"
+                            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            style={{
+                              background: copiedUrl ? '#22c55e20' : 'rgba(255,255,255,0.06)',
+                              color: copiedUrl ? '#22c55e' : 'rgba(255,255,255,0.5)',
+                              border: `1px solid ${copiedUrl ? '#22c55e40' : 'rgba(255,255,255,0.08)'}`,
+                            }}
+                          >
+                            {copiedUrl ? <><CheckCircle size={11} /> Copié !</> : <><Copy size={11} /> Copier</>}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Tag img */}
+                      <div>
+                        <p className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                          <Package size={10} className="text-forge-purple" /> Tag HTML à coller dans votre email
+                        </p>
+                        <div className="flex flex-col gap-2 bg-black/20 border border-white/[0.10] rounded-xl px-4 py-3">
+                          <code className="text-xs text-white/50 font-mono break-all leading-relaxed" data-testid="text-img-tag">
+                            {imgTag}
+                          </code>
+                          <button
+                            onClick={() => copyToClipboard(imgTag, setCopiedTag)}
+                            data-testid="btn-copy-img-tag"
+                            className="self-start flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            style={{
+                              background: copiedTag ? '#22c55e20' : 'rgba(99,102,241,0.12)',
+                              color: copiedTag ? '#22c55e' : '#a5b4fc',
+                              border: `1px solid ${copiedTag ? '#22c55e40' : 'rgba(99,102,241,0.25)'}`,
+                            }}
+                          >
+                            {copiedTag ? <><CheckCircle size={11} /> Copié !</> : <><Copy size={11} /> Copier le tag</>}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Instructions rapides */}
+                      <div className="flex flex-col gap-1.5">
+                        <p className="text-xs text-white/40 uppercase tracking-wider">Intégration en 2 étapes</p>
+                        {[
+                          { step: '1', text: 'Téléchargez le fichier HTML correspondant à votre client email', color: '#6366f1' },
+                          { step: '2', text: 'Ou collez le tag <img> ci-dessus directement dans la signature HTML de votre client', color: '#00d4ff' },
+                        ].map(({ step, text, color }) => (
+                          <div key={step} className="flex items-start gap-2.5">
+                            <div
+                              className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0 mt-0.5"
+                              style={{ background: `${color}20`, color, border: `1px solid ${color}30` }}
+                            >
+                              {step}
+                            </div>
+                            <p className="text-xs text-white/40 leading-relaxed">{text}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })()}
 
             {/* Aperçu */}
             <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6">
