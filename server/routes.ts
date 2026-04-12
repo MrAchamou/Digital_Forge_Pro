@@ -2549,7 +2549,8 @@ router.post('/pipeline/generate', async (req, res) => {
         const demoHtml = buildDemoMailHtml({
           signatureId: sigId, nomClient: nomComplet, titreClient: titre,
           entrepriseClient: entreprise, emailClient: email, secteur,
-          gifUrl, palette: effectivePalette,
+          gifUrl, signatureHtml,
+          palette: effectivePalette,
           destinataireNom: destinataire_nom, destinataireEmail: destinataire_email,
           objetMail: objet_mail, corpsMail: corps_mail,
         });

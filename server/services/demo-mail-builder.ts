@@ -8,6 +8,7 @@ export interface DemoMailConfig {
   emailClient:       string;
   secteur:           string;
   gifUrl:            string;
+  signatureHtml?:    string;  // HTML animé CSS — rendu direct navigateur
   palette:           string[];
   destinataireNom:   string;
   destinataireEmail: string;
@@ -78,7 +79,7 @@ function getObjet(secteur: string, objetMail: string, nomClient: string): string
 export function buildDemoMailHtml(cfg: DemoMailConfig): string {
   const {
     nomClient, titreClient, entrepriseClient, emailClient, secteur,
-    gifUrl, palette, destinataireNom, destinataireEmail, objetMail, corpsMail,
+    gifUrl, signatureHtml, palette, destinataireNom, destinataireEmail, objetMail, corpsMail,
   } = cfg;
 
   const accent = palette?.[0] || SECTOR_COLORS[secteur] || '#6366f1';
@@ -125,6 +126,7 @@ export function buildDemoMailHtml(cfg: DemoMailConfig): string {
   .mail-body p{margin-bottom:16px}
   .sig-wrapper{padding:0 0 28px 52px}
   .sig-img{max-width:600px;width:100%;display:block;border-radius:4px}
+  .sig-live{max-width:620px;transform-origin:left top;}
   .preview-label{background:linear-gradient(135deg,${accent},${accent}88);color:#fff;text-align:center;padding:10px 20px;font-size:12px;letter-spacing:.05em;font-weight:600}
   @media(max-width:600px){.mail-body,.sig-wrapper{padding-left:0}.gmail-search{display:none}.chrome-bar{gap:8px}}
 </style>
@@ -172,10 +174,14 @@ export function buildDemoMailHtml(cfg: DemoMailConfig): string {
       <p>Cordialement,</p>
     </div>
 
-    <!-- Signature vivante -->
+    <!-- Signature vivante — HTML animé CSS si disponible, sinon GIF fallback -->
     <div class="sig-wrapper">
-      <img src="${escHtml(gifUrl)}" alt="Signature ${escHtml(nomClient)}" class="sig-img"
-        onerror="this.style.display='none'" />
+      ${signatureHtml
+        ? `<div class="sig-live">${signatureHtml}</div>
+      <!-- GIF fallback caché (pour compatibilité copier-coller email) -->
+      <img src="${escHtml(gifUrl)}" alt="Signature ${escHtml(nomClient)}" class="sig-img" style="display:none" />`
+        : `<img src="${escHtml(gifUrl)}" alt="Signature ${escHtml(nomClient)}" class="sig-img" onerror="this.style.display='none'" />`
+      }
     </div>
   </div>
 

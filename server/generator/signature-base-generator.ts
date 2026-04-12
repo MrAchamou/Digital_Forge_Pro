@@ -286,6 +286,14 @@ export class SignatureBaseGenerator {
 
   // ── LOGO ─────────────────────────────────────────────────────────────────────
 
+  /** Adapte la taille de police selon la longueur du nom d'entreprise pour le badge */
+  private logoTextAttrs(len: number): { fontSize: number; letterSpacing: number } {
+    if (len <= 12) return { fontSize: 10, letterSpacing: 1 };
+    if (len <= 16) return { fontSize: 9,  letterSpacing: 0.5 };
+    if (len <= 22) return { fontSize: 8,  letterSpacing: 0 };
+    return { fontSize: 7, letterSpacing: 0 };
+  }
+
   private buildLogoOrText(logoUrl: string | undefined, company: string, accent: string, textColor: string, logo3d?: boolean): string {
     if (logo3d) {
       return logoUrl ? this.build3DLogoImage(logoUrl, accent) : this.build3DLogoText(company, accent);
@@ -293,16 +301,18 @@ export class SignatureBaseGenerator {
     if (logoUrl) {
       return `<image href="${this.escapeXml(logoUrl)}" x="10" y="120" width="100" height="36" preserveAspectRatio="xMidYMid meet" id="company-logo"/>`;
     }
-    const shortName = company.slice(0, 12);
-    return `<rect x="10" y="122" width="120" height="26" rx="4" fill="${accent}" fill-opacity="0.15" id="logo-bg"/>
-  <text x="70" y="139" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="${accent}" letter-spacing="1" id="company-logo-text">${this.escapeXml(shortName.toUpperCase())}</text>`;
+    const shortName = company.slice(0, 24);
+    const { fontSize, letterSpacing } = this.logoTextAttrs(shortName.length);
+    return `<rect x="5" y="122" width="132" height="26" rx="4" fill="${accent}" fill-opacity="0.15" id="logo-bg"/>
+  <text x="71" y="139" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${fontSize}" font-weight="700" fill="${accent}" letter-spacing="${letterSpacing}" id="company-logo-text">${this.escapeXml(shortName.toUpperCase())}</text>`;
   }
 
   private build3DLogoText(company: string, accent: string): string {
-    const shortName = this.escapeXml(company.slice(0, 12).toUpperCase());
+    const shortName = this.escapeXml(company.slice(0, 24).toUpperCase());
     const d = (amt: number) => this.lightenHex(accent, amt);
     const bright = d(55);
-    const fontAttrs = `text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" letter-spacing="1"`;
+    const { fontSize: fz, letterSpacing: ls } = this.logoTextAttrs(shortName.length);
+    const fontAttrs = `text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${fz}" font-weight="700" letter-spacing="${ls}"`;
     const extLayers = [
       { dx: 4, dy: 4, fill: d(-160) },
       { dx: 3, dy: 3, fill: d(-130) },
@@ -310,10 +320,10 @@ export class SignatureBaseGenerator {
       { dx: 1, dy: 1, fill: d(-60)  },
     ];
     const extRects = extLayers.map(l =>
-      `<rect x="${10 + l.dx}" y="${122 + l.dy}" width="120" height="26" rx="4" fill="${l.fill}"/>`
+      `<rect x="${5 + l.dx}" y="${122 + l.dy}" width="132" height="26" rx="4" fill="${l.fill}"/>`
     ).join('\n  ');
     const extTexts = extLayers.map(l =>
-      `<text x="${70 + l.dx}" y="${139 + l.dy}" ${fontAttrs} fill="${l.fill}">${shortName}</text>`
+      `<text x="${71 + l.dx}" y="${139 + l.dy}" ${fontAttrs} fill="${l.fill}">${shortName}</text>`
     ).join('\n  ');
     return `<defs>
     <linearGradient id="logo3d-toplight" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -332,15 +342,15 @@ export class SignatureBaseGenerator {
   <!-- ══ Logo 3D Extrusion — text shadow layers ══ -->
   ${extTexts}
   <!-- ══ Top face: rect principale ══ -->
-  <rect x="10" y="122" width="120" height="26" rx="4" fill="${accent}" fill-opacity="0.22" id="logo-bg"/>
+  <rect x="5" y="122" width="132" height="26" rx="4" fill="${accent}" fill-opacity="0.22" id="logo-bg"/>
   <!-- ══ Lighting gradient (top-lit) ══ -->
-  <rect x="10" y="122" width="120" height="26" rx="4" fill="url(#logo3d-toplight)" pointer-events="none"/>
+  <rect x="5" y="122" width="132" height="26" rx="4" fill="url(#logo3d-toplight)" pointer-events="none"/>
   <!-- ══ Top edge specular (bevel) ══ -->
-  <rect x="10" y="122" width="120" height="3" rx="2" fill="${bright}" fill-opacity="0.50" pointer-events="none"/>
+  <rect x="5" y="122" width="132" height="3" rx="2" fill="${bright}" fill-opacity="0.50" pointer-events="none"/>
   <!-- ══ Right edge bevel ══ -->
-  <rect x="128" y="122" width="2" height="26" rx="1" fill="${bright}" fill-opacity="0.20" pointer-events="none"/>
+  <rect x="135" y="122" width="2" height="26" rx="1" fill="${bright}" fill-opacity="0.20" pointer-events="none"/>
   <!-- ══ Main text (top face) ══ -->
-  <text x="70" y="139" ${fontAttrs} fill="${accent}" id="company-logo-text">${shortName}</text>
+  <text x="71" y="139" ${fontAttrs} fill="${accent}" id="company-logo-text">${shortName}</text>
   <!-- ══ Text specular shimmer ══ -->
   <text x="70" y="139" ${fontAttrs} fill="url(#logo3d-shine)" pointer-events="none">${shortName}</text>`;
   }
