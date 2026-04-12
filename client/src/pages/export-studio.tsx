@@ -96,8 +96,8 @@ function FormatCard({
 
 // ── Section preview ───────────────────────────────────────────────────────────
 
-function PreviewSection({ result }: { result: ExportResult }) {
-  const [activeTab, setActiveTab] = useState<'animated' | 'gmail' | 'gif' | 'static'>('animated');
+function PreviewSection({ result, defaultTab = 'gif' }: { result: ExportResult; defaultTab?: 'animated' | 'gif' | 'gmail' | 'static' }) {
+  const [activeTab, setActiveTab] = useState<'animated' | 'gmail' | 'gif' | 'static'>(defaultTab);
   const [showGuide, setShowGuide] = useState(false);
 
   const tabs = [
@@ -476,48 +476,119 @@ function escapeSvgText(value: string) {
 
 function renderLiveEffectPreview(effectId: string, zone: ZoneName, index: number, accent: string, textColor: string) {
   const rects: Record<ZoneName, { x: number; y: number; w: number; h: number; cx: number; cy: number; r?: number }> = {
-    fond: { x: 0, y: 0, w: 600, h: 190, cx: 300, cy: 95 },
-    avatar: { x: 10, y: 50, w: 90, h: 90, cx: 55, cy: 95, r: 45 },
-    nom: { x: 106, y: 32, w: 260, h: 70, cx: 236, cy: 67 },
-    contact: { x: 106, y: 106, w: 330, h: 52, cx: 271, cy: 132 },
-    cta: { x: 106, y: 154, w: 210, h: 34, cx: 211, cy: 171 },
+    fond:    { x: 0,   y: 0,   w: 600, h: 190, cx: 300, cy: 95 },
+    avatar:  { x: 10,  y: 50,  w: 90,  h: 90,  cx: 55,  cy: 95, r: 45 },
+    nom:     { x: 106, y: 32,  w: 260, h: 70,  cx: 236, cy: 67 },
+    contact: { x: 106, y: 106, w: 330, h: 52,  cx: 271, cy: 132 },
+    cta:     { x: 106, y: 154, w: 210, h: 34,  cx: 211, cy: 171 },
   };
   const z = rects[zone];
   const delay = (index * 0.35).toFixed(2);
-  const opacity = zone === 'fond' ? 0.22 : 0.72;
+  const op = zone === 'fond' ? 0.20 : 0.68;
   const clipId = `live-zone-${zone}-${index}-${effectId}`;
   const clip = zone === 'avatar'
-    ? `<clipPath id="${clipId}"><circle cx="${z.cx}" cy="${z.cy}" r="${z.r}"/></clipPath>`
+    ? `<clipPath id="${clipId}"><circle cx="${z.cx}" cy="${z.cy}" r="${z.r ?? 45}"/></clipPath>`
     : `<clipPath id="${clipId}"><rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="10"/></clipPath>`;
-  const particles = Array.from({ length: zone === 'fond' ? 14 : 7 }, (_, i) => {
-    const px = z.x + 8 + ((i * 37 + index * 19) % Math.max(12, z.w - 16));
-    const py = z.y + 8 + ((i * 23 + index * 11) % Math.max(12, z.h - 16));
-    const toY = py - 10 - (i % 4) * 2;
-    return `<circle cx="${px}" cy="${py}" r="${zone === 'fond' ? 1.4 : 1.8}" fill="${accent}" opacity="0">
-      <animate attributeName="opacity" values="0;${opacity};0" dur="${(1.6 + (i % 4) * 0.25).toFixed(2)}s" begin="${delay}s" repeatCount="indefinite"/>
-      <animate attributeName="cy" values="${py};${toY};${py}" dur="${(2.2 + (i % 3) * 0.4).toFixed(2)}s" begin="${delay}s" repeatCount="indefinite"/>
+
+  const n = zone === 'fond' ? 14 : 7;
+  const seed = (i: number, s: number) => ((i * 137.508 + s * 31.41) % 1);
+  const px = (i: number) => z.x + 8 + seed(i, 3) * Math.max(8, z.w - 16);
+  const py = (i: number) => z.y + 8 + seed(i, 7) * Math.max(8, z.h - 16);
+  const starPath = (cx: number, cy: number, r: number) => {
+    const arm = r * 2.8;
+    const rh = r * 0.32;
+    return `M${cx},${(cy - arm).toFixed(1)} L${(cx + rh).toFixed(1)},${cy} L${cx},${(cy + arm).toFixed(1)} L${(cx - rh).toFixed(1)},${cy} Z`;
+  };
+
+  const stars = Array.from({ length: n }, (_, i) => {
+    const x = px(i), y = py(i);
+    const r = 0.8 + seed(i, 5) * 1.8;
+    const dur = (1.8 + seed(i, 2) * 2.5).toFixed(2);
+    const del = (seed(i, 11) * 3).toFixed(2);
+    return `<path d="${starPath(x, y, r)}" fill="${accent}" opacity="0">
+      <animate attributeName="opacity" values="0;${op};0" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+    </path>`;
+  }).join('');
+
+  const wavePath = `M${z.x - 10},${z.cy} C${z.x + z.w * 0.2},${z.cy - 16} ${z.x + z.w * 0.4},${z.cy + 16} ${z.x + z.w * 0.6},${z.cy} S${z.x + z.w * 0.85},${z.cy - 14} ${z.x + z.w + 10},${z.cy}`;
+  const wavePath2 = `M${z.x - 10},${z.cy + 5} C${z.x + z.w * 0.2},${z.cy + 20} ${z.x + z.w * 0.4},${z.cy - 18} ${z.x + z.w * 0.6},${z.cy + 4} S${z.x + z.w * 0.85},${z.cy + 16} ${z.x + z.w + 10},${z.cy - 2}`;
+
+  const rx1 = Math.max(20, z.w * 0.33), ry1 = Math.max(10, z.h * 0.24);
+  const rx2 = Math.max(14, z.w * 0.22), ry2 = Math.max(7, z.h * 0.16);
+  const sat1x = `${(z.cx + rx1).toFixed(1)};${(z.cx - rx1).toFixed(1)};${(z.cx + rx1).toFixed(1)}`;
+  const sat1y = `${z.cy};${z.cy};${z.cy}`;
+
+  const nodesX = [z.x+z.w*0.08, z.x+z.w*0.22, z.x+z.w*0.38, z.x+z.w*0.55, z.x+z.w*0.72, z.x+z.w*0.88];
+  const nodesY = [z.y+z.h*0.3,  z.y+z.h*0.7,  z.y+z.h*0.25, z.y+z.h*0.75, z.y+z.h*0.3,  z.y+z.h*0.65];
+  const edges = [[0,1],[1,2],[2,3],[3,4],[4,5],[1,3],[2,4]];
+  const nodeLines = edges.map(([a,b]) => `<line x1="${nodesX[a].toFixed(0)}" y1="${nodesY[a].toFixed(0)}" x2="${nodesX[b].toFixed(0)}" y2="${nodesY[b].toFixed(0)}" stroke="${accent}" stroke-width="0.7" opacity="0.3"/>`).join('');
+  const nodeDots = nodesX.map((nx, i) => `<circle cx="${nx.toFixed(0)}" cy="${nodesY[i].toFixed(0)}" r="2.2" fill="${accent}" opacity="0"><animate attributeName="opacity" values="0;0.7;0.2;0.7;0" dur="${(2.4 + i * 0.3).toFixed(1)}s" begin="${(i * 0.22).toFixed(2)}s" repeatCount="indefinite"/></circle>`).join('');
+
+  const FACETS = [
+    { fx: z.x + z.w * 0.82, fy: z.y + z.h * 0.18, s: Math.min(z.w, z.h) * 0.18 },
+    { fx: z.x + z.w * 0.92, fy: z.y + z.h * 0.55, s: Math.min(z.w, z.h) * 0.13 },
+    { fx: z.x + z.w * 0.78, fy: z.y + z.h * 0.82, s: Math.min(z.w, z.h) * 0.15 },
+  ];
+  const facetPolys = FACETS.map((f, fi) => {
+    const pts = [
+      `${f.fx.toFixed(0)},${(f.fy - f.s).toFixed(0)}`,
+      `${(f.fx + f.s * 0.7).toFixed(0)},${(f.fy - f.s * 0.3).toFixed(0)}`,
+      `${(f.fx + f.s * 0.7).toFixed(0)},${(f.fy + f.s * 0.5).toFixed(0)}`,
+      `${f.fx.toFixed(0)},${(f.fy + f.s).toFixed(0)}`,
+      `${(f.fx - f.s * 0.7).toFixed(0)},${(f.fy + f.s * 0.5).toFixed(0)}`,
+      `${(f.fx - f.s * 0.7).toFixed(0)},${(f.fy - f.s * 0.3).toFixed(0)}`,
+    ].join(' ');
+    return `<polygon points="${pts}" fill="${accent}" stroke="${accent}" stroke-width="0.5" opacity="0.05">
+      <animate attributeName="opacity" values="0.03;0.18;0.03" dur="${(2.2 + fi * 0.6).toFixed(1)}s" begin="${delay}s" repeatCount="indefinite"/>
+    </polygon>`;
+  }).join('');
+
+  const fieldLines = [0, 1, 2, 3, 4].map(i => {
+    const ang = (i / 5) * Math.PI * 2;
+    const r1 = 56 + i * 4, r2 = 90 + i * 12;
+    const sx = (z.cx + r1 * Math.cos(ang)).toFixed(1);
+    const sy = (z.cy + r1 * Math.sin(ang)).toFixed(1);
+    const ex = (z.cx + r2 * Math.cos(ang + 0.8)).toFixed(1);
+    const ey = (z.cy + r2 * Math.sin(ang + 0.8)).toFixed(1);
+    const cpx = (z.cx + (r1 + r2) / 2 * Math.cos(ang + 0.4) + 20).toFixed(1);
+    const cpy = (z.cy + (r1 + r2) / 2 * Math.sin(ang + 0.4)).toFixed(1);
+    return `<path d="M${sx},${sy} Q${cpx},${cpy} ${ex},${ey}" fill="none" stroke="${accent}" stroke-width="0.7" opacity="0.25">
+      <animate attributeName="opacity" values="0.1;0.35;0.1" dur="${(2.5 + i * 0.4).toFixed(1)}s" begin="${(i * 0.3).toFixed(2)}s" repeatCount="indefinite"/>
+    </path>`;
+  }).join('');
+
+  const echoes = [1, 2, 3].map(i => `<rect x="${i * 5}" y="${(z.cy - 15 * (0.9 ** i)).toFixed(0)}" width="2" height="${(30 * (0.9 ** i)).toFixed(0)}" fill="${accent}" rx="1" opacity="0">
+    <animate attributeName="opacity" values="0;${(0.04 - i * 0.01).toFixed(3)};0" dur="${(2.1 + i * 0.3).toFixed(1)}s" begin="${(i * 0.08).toFixed(2)}s" repeatCount="indefinite"/>
+  </rect>`).join('');
+
+  const glitchH = Math.min(6, z.h * 0.08);
+  const driftStars = Array.from({ length: Math.min(n, 12) }, (_, i) => {
+    const sx = (z.x + 12 + seed(i, 3) * (z.w - 24)).toFixed(1);
+    const sy = (z.y + 4 + seed(i, 7) * (z.h - 8)).toFixed(1);
+    const dx = (seed(i, 13) * 40).toFixed(1);
+    const dur = (3.5 + seed(i, 9) * 4).toFixed(1);
+    return `<circle cx="${sx}" cy="${sy}" r="${(seed(i, 5) * 1.2 + 0.4).toFixed(1)}" fill="${accent}" opacity="0">
+      <animate attributeName="cx" values="${sx};${(parseFloat(sx) + parseFloat(dx)).toFixed(1)};${sx}" dur="${dur}s" begin="${(seed(i, 11) * 3).toFixed(2)}s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0.22;0" dur="${dur}s" begin="${(seed(i, 11) * 3).toFixed(2)}s" repeatCount="indefinite"/>
     </circle>`;
   }).join('');
 
-  const wavePath = `M ${z.x - 20} ${z.cy} C ${z.x + z.w * 0.2} ${z.cy - 18}, ${z.x + z.w * 0.35} ${z.cy + 18}, ${z.x + z.w * 0.55} ${z.cy} S ${z.x + z.w * 0.85} ${z.cy - 18}, ${z.x + z.w + 20} ${z.cy}`;
-  const zigzagPath = `M ${z.x + 4} ${z.cy} L ${z.x + z.w * 0.18} ${z.y + 8} L ${z.x + z.w * 0.33} ${z.y + z.h - 8} L ${z.x + z.w * 0.50} ${z.cy - 12} L ${z.x + z.w * 0.68} ${z.cy + 14} L ${z.x + z.w - 4} ${z.cy - 4}`;
-
   const body: Record<string, string> = {
-    neuralPulse: `<circle cx="${z.cx}" cy="${z.cy}" r="6" fill="${accent}" opacity="0.8"/><circle cx="${z.cx}" cy="${z.cy}" r="12" fill="none" stroke="${accent}" stroke-width="1.5" opacity="0.75"><animate attributeName="r" values="8;${Math.min(z.w, z.h) * 0.48};8" dur="2.2s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.75;0;0.75" dur="2.2s" begin="${delay}s" repeatCount="indefinite"/></circle>`,
-    sparkleAura: particles,
-    orbitalRings: `<ellipse cx="${z.cx}" cy="${z.cy}" rx="${Math.max(20, z.w * 0.32)}" ry="${Math.max(10, z.h * 0.23)}" fill="none" stroke="${accent}" stroke-width="1.4" opacity="${opacity}" transform="rotate(-16 ${z.cx} ${z.cy})"><animate attributeName="stroke-dashoffset" values="0;-70" dur="2.4s" begin="${delay}s" repeatCount="indefinite"/></ellipse><ellipse cx="${z.cx}" cy="${z.cy}" rx="${Math.max(14, z.w * 0.22)}" ry="${Math.max(8, z.h * 0.16)}" fill="none" stroke="${textColor}" stroke-width="0.8" opacity="0.35" transform="rotate(24 ${z.cx} ${z.cy})"/>`,
-    electricArcs: `<path d="${zigzagPath}" fill="none" stroke="${accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}"><animate attributeName="stroke-dasharray" values="0 260;80 80;0 260" dur="1.35s" begin="${delay}s" repeatCount="indefinite"/></path>`,
-    waveDistortion: `<path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="2" opacity="${opacity}"><animate attributeName="d" values="${wavePath};M ${z.x - 20} ${z.cy + 6} C ${z.x + z.w * 0.2} ${z.cy + 20}, ${z.x + z.w * 0.35} ${z.cy - 20}, ${z.x + z.w * 0.55} ${z.cy + 4} S ${z.x + z.w * 0.85} ${z.cy + 18}, ${z.x + z.w + 20} ${z.cy - 2};${wavePath}" dur="2.8s" begin="${delay}s" repeatCount="indefinite"/></path>`,
-    neonGlow: `<rect x="${z.x + 4}" y="${z.y + 4}" width="${Math.max(20, z.w - 8)}" height="${Math.max(12, z.h - 8)}" rx="12" fill="none" stroke="${accent}" stroke-width="2" opacity="${opacity}" filter="url(#lp-glow)"><animate attributeName="opacity" values="0.3;${opacity};0.3" dur="1.8s" begin="${delay}s" repeatCount="indefinite"/></rect>`,
-    particleStream: `<path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="1" opacity="0.2"/>${particles}`,
-    glitchScan: `<rect x="${z.x}" y="${z.y}" width="${z.w}" height="5" fill="${accent}" opacity="0.5"><animate attributeName="y" values="${z.y};${z.y + z.h};${z.y}" dur="1.7s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.55;0" dur="1.7s" begin="${delay}s" repeatCount="indefinite"/></rect><rect x="${z.x + 8}" y="${z.cy}" width="${Math.max(30, z.w * 0.4)}" height="1" fill="${textColor}" opacity="0.45"/>`,
-    crystalFacets: `<polygon points="${z.cx},${z.y + 7} ${z.x + z.w - 8},${z.cy} ${z.cx},${z.y + z.h - 7} ${z.x + 8},${z.cy}" fill="${accent}" opacity="0.13" stroke="${accent}" stroke-width="1.2"><animate attributeName="opacity" values="0.08;0.24;0.08" dur="2.4s" begin="${delay}s" repeatCount="indefinite"/></polygon><path d="M ${z.cx} ${z.y + 7} L ${z.cx} ${z.y + z.h - 7} M ${z.x + 8} ${z.cy} L ${z.x + z.w - 8} ${z.cy}" stroke="${accent}" opacity="0.35"/>`,
-    magneticField: `<ellipse cx="${z.cx}" cy="${z.cy}" rx="${Math.max(18, z.w * 0.38)}" ry="${Math.max(10, z.h * 0.18)}" fill="none" stroke="${accent}" stroke-width="1" opacity="0.35"/><ellipse cx="${z.cx}" cy="${z.cy}" rx="${Math.max(24, z.w * 0.46)}" ry="${Math.max(14, z.h * 0.28)}" fill="none" stroke="${accent}" stroke-width="1" opacity="0.25"><animate attributeName="rx" values="${Math.max(24, z.w * 0.40)};${Math.max(28, z.w * 0.50)};${Math.max(24, z.w * 0.40)}" dur="2.6s" begin="${delay}s" repeatCount="indefinite"/></ellipse>`,
-    echoTrail: `<rect x="${z.x + 8}" y="${z.y + 8}" width="${Math.max(16, z.w - 16)}" height="${Math.max(10, z.h - 16)}" rx="10" fill="none" stroke="${accent}" stroke-width="1.2" opacity="0.45"/><rect x="${z.x + 14}" y="${z.y + 14}" width="${Math.max(16, z.w - 28)}" height="${Math.max(10, z.h - 28)}" rx="8" fill="none" stroke="${accent}" stroke-width="1" opacity="0.22"><animate attributeName="opacity" values="0.08;0.35;0.08" dur="2.1s" begin="${delay}s" repeatCount="indefinite"/></rect>`,
-    stellarDrift: particles,
+    neuralPulse: `${nodeLines}${nodeDots}<circle cx="${z.cx}" cy="${z.cy}" r="3.5" fill="${accent}" opacity="0.85"/><circle cx="${z.cx}" cy="${z.cy}" r="9" fill="none" stroke="${accent}" stroke-width="1.4" opacity="0"><animate attributeName="r" values="9;${Math.min(z.w, z.h) * 0.44};9" dur="2.2s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.6;0;0.6" dur="2.2s" begin="${delay}s" repeatCount="indefinite"/></circle>`,
+    sparkleAura: stars,
+    orbitalRings: `<ellipse cx="${z.cx}" cy="${z.cy}" rx="${rx1}" ry="${ry1}" fill="none" stroke="${accent}" stroke-width="1.2" opacity="${op * 0.6}" stroke-dasharray="4 3"><animateTransform attributeName="transform" type="rotate" from="0 ${z.cx} ${z.cy}" to="360 ${z.cx} ${z.cy}" dur="4.5s" repeatCount="indefinite"/></ellipse><ellipse cx="${z.cx}" cy="${z.cy}" rx="${rx2}" ry="${ry2}" fill="none" stroke="${textColor}" stroke-width="0.7" opacity="0.3" stroke-dasharray="3 4"><animateTransform attributeName="transform" type="rotate" from="360 ${z.cx} ${z.cy}" to="0 ${z.cx} ${z.cy}" dur="3s" repeatCount="indefinite"/></ellipse><circle r="2.8" fill="${accent}" opacity="${op}"><animateMotion dur="4.5s" repeatCount="indefinite"><mpath/></animateMotion><animate attributeName="cx" values="${sat1x}" dur="4.5s" repeatCount="indefinite"/><animate attributeName="cy" values="${sat1y}" dur="4.5s" repeatCount="indefinite"/></circle>`,
+    electricArcs: `<polyline points="${z.x+4},${z.cy} ${z.x+z.w*0.18},${z.y+6} ${z.x+z.w*0.33},${z.y+z.h-6} ${z.x+z.w*0.50},${z.cy-10} ${z.x+z.w*0.68},${z.cy+12} ${z.x+z.w-4},${z.cy-3}" fill="none" stroke="${accent}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0"><animate attributeName="opacity" values="0;${op};0;${op * 0.6};0" dur="1.35s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="stroke-dasharray" values="0 300;120 60;0 300" dur="1.35s" begin="${delay}s" repeatCount="indefinite"/></polyline>`,
+    waveDistortion: `<path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="1.8" opacity="${op * 0.7}"><animate attributeName="d" values="${wavePath};${wavePath2};${wavePath}" dur="2.8s" begin="${delay}s" repeatCount="indefinite"/></path><path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="0.7" opacity="${op * 0.25}" transform="translate(0,10)"><animate attributeName="d" values="${wavePath};${wavePath2};${wavePath}" dur="3.5s" begin="${delay}s" repeatCount="indefinite"/></path>`,
+    neonGlow: `<rect x="${z.x + 3}" y="${z.y + 3}" width="${Math.max(20, z.w - 6)}" height="${Math.max(12, z.h - 6)}" rx="10" fill="none" stroke="${accent}" stroke-width="1.8" opacity="0" filter="url(#lp-glow)"><animate attributeName="opacity" values="0.25;${op};0.25" dur="1.8s" begin="${delay}s" repeatCount="indefinite"/></rect><rect x="${z.x + 7}" y="${z.y + 7}" width="${Math.max(16, z.w - 14)}" height="${Math.max(8, z.h - 14)}" rx="8" fill="none" stroke="${accent}" stroke-width="0.8" opacity="0"><animate attributeName="opacity" values="0.1;${op * 0.5};0.1" dur="2.1s" begin="${delay}s" repeatCount="indefinite"/></rect>`,
+    particleStream: `<path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="0.8" opacity="0.18"/>${stars}`,
+    glitchScan: `<rect x="${z.x}" y="${z.y}" width="${z.w}" height="${glitchH}" fill="${accent}" opacity="0"><animate attributeName="y" values="${z.y};${z.y + z.h - glitchH};${z.y}" dur="1.7s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.45;0.1;0.5;0" dur="1.7s" begin="${delay}s" repeatCount="indefinite"/></rect><rect x="${z.x + 40}" y="${z.cy - 0.5}" width="${z.w * 0.35}" height="1" fill="${textColor}" opacity="0.3"><animate attributeName="x" values="${z.x+40};${z.x+z.w*0.5};${z.x+40}" dur="0.85s" begin="${delay}s" repeatCount="indefinite"/></rect>`,
+    crystalFacets: `${facetPolys}<polygon points="${z.cx},${z.y+5} ${z.x+z.w-6},${z.cy} ${z.cx},${z.y+z.h-5} ${z.x+6},${z.cy}" fill="${accent}" opacity="0.06" stroke="${accent}" stroke-width="0.9"><animate attributeName="opacity" values="0.04;0.16;0.04" dur="2.6s" begin="${delay}s" repeatCount="indefinite"/></polygon><line x1="${z.cx}" y1="${z.y+5}" x2="${z.cx}" y2="${z.y+z.h-5}" stroke="${accent}" stroke-width="0.4" opacity="0.3"/><line x1="${z.x+6}" y1="${z.cy}" x2="${z.x+z.w-6}" y2="${z.cy}" stroke="${accent}" stroke-width="0.4" opacity="0.3"/>`,
+    magneticField: fieldLines,
+    echoTrail: echoes,
+    stellarDrift: driftStars,
   };
 
-  return `${clip}<g clip-path="url(#${clipId})" data-live-effect="${effectId}" opacity="${zone === 'fond' ? 1 : 0.9}">${body[effectId] ?? particles}</g>`;
+  return `${clip}<g clip-path="url(#${clipId})" data-live-effect="${effectId}" opacity="${zone === 'fond' ? 1 : 0.92}">${body[effectId] ?? stars}</g>`;
 }
 
 function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, note, sectorId, logoPreview, paletteOverride, zoneEffects = {} }: LivePreviewProps) {
@@ -682,6 +753,25 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
     <animate attributeName="opacity" values="0.5;1;0.5" dur="1.8s" repeatCount="indefinite"/>
     LIVE
   </text>
+
+  <!-- Indicateur de phases GIF -->
+  <g opacity="0.55">
+    <text x="450" y="183" font-size="6.5" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.4">GIF :</text>
+    <rect x="472" y="176" width="28" height="9" rx="4.5" fill="${accent}" opacity="0.18"/>
+    <text x="486" y="183" text-anchor="middle" font-size="6" font-weight="700" fill="${accent}" font-family="system-ui,sans-serif">BUILD</text>
+    <rect x="504" y="176" width="24" height="9" rx="4.5" fill="${accent}" opacity="0.28"/>
+    <text x="516" y="183" text-anchor="middle" font-size="6" font-weight="700" fill="${accent}" font-family="system-ui,sans-serif">LIVE</text>
+    <rect x="532" y="176" width="28" height="9" rx="4.5" fill="${accent}" opacity="0.18"/>
+    <text x="546" y="183" text-anchor="middle" font-size="6" font-weight="700" fill="${accent}" font-family="system-ui,sans-serif">SHINE</text>
+    <line x1="500" y1="180.5" x2="503" y2="180.5" stroke="${accent}" stroke-width="0.8" opacity="0.35"/>
+    <line x1="528" y1="180.5" x2="531" y2="180.5" stroke="${accent}" stroke-width="0.8" opacity="0.35"/>
+    <rect x="504" y="177.5" width="24" height="6" rx="3">
+      <animate attributeName="x" values="472;504;532;504;472" dur="4.5s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+      <animate attributeName="width" values="28;24;28;24;28" dur="4.5s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+      <animate attributeName="fill" values="${accent};${accent};${accent};${accent};${accent}" dur="4.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0.45;0;0.45;0" dur="4.5s" repeatCount="indefinite"/>
+    </rect>
+  </g>
 </svg>`;
 
   return (
@@ -746,7 +836,17 @@ export default function ExportStudio() {
   const [composerOpen, setComposerOpen] = useState(false);
   const [zoneEffects, setZoneEffects] = useState<ZoneEffectsMap>({});
   const [selectedCombinationPreset, setSelectedCombinationPreset] = useState<string | null>(null);
+  const [generationStep, setGenerationStep] = useState(0);
   const prevSectorRef = useRef(form.sectorId);
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  const GENERATION_STEPS = [
+    { label: 'Calcul palette & harmonies de couleurs…',  pct: 15 },
+    { label: 'Génération des 80 frames SVG…',           pct: 35 },
+    { label: 'Encodage GIF haute qualité (dithering)…', pct: 60 },
+    { label: 'Assemblage ZIP 7 formats…',               pct: 80 },
+    { label: 'Finalisation & hébergement CDN…',         pct: 95 },
+  ];
 
   useEffect(() => {
     if (prevSectorRef.current !== form.sectorId) {
@@ -754,6 +854,7 @@ export default function ExportStudio() {
       setCustomPalette(null);
     }
   }, [form.sectorId]);
+
 
   const activePreset = LIVESIGN_PRESETS.find(p => p.id === selectedPreset) ?? LIVESIGN_PRESETS[1];
   const effectivePalette: [string, string, string] = customPalette ?? activePreset.palette ?? SECTOR_PALETTES[form.sectorId] ?? SECTOR_PALETTES['tech'];
@@ -818,6 +919,7 @@ export default function ExportStudio() {
     onSuccess: (data: ExportResult) => {
       setResult(data);
       toast({ title: 'Export complet généré !', description: `7 formats prêts pour ${data.sectorLabel || data.sectorId}` });
+      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     },
     onError: (e: any) => toast({ title: 'Erreur', description: e.message, variant: 'destructive' }),
   });
@@ -831,11 +933,22 @@ export default function ExportStudio() {
     onSuccess: (data: ExportResult) => {
       setResult(data);
       toast({ title: 'Export complet généré !', description: '7 formats exportés avec succès' });
+      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     },
     onError: (e: any) => toast({ title: 'Erreur', description: e.message, variant: 'destructive' }),
   });
 
   const isPending = gmbExport.isPending || manualExport.isPending;
+
+  useEffect(() => {
+    if (!isPending) { setGenerationStep(0); return; }
+    setGenerationStep(0);
+    const timings = [0, 900, 2200, 3600, 4800];
+    const timers = timings.map((delay, i) =>
+      setTimeout(() => setGenerationStep(i), delay)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [isPending]);
 
   const handleSubmit = () => {
     if (mode === 'gmb') {
@@ -854,7 +967,7 @@ export default function ExportStudio() {
         Object.entries(zoneEffects).filter(([, v]) => v && v.length > 0)
       );
       manualExport.mutate({
-        sectorId: activePreset.sectorId,
+        sectorId: form.sectorId,
         data: {
           nom: form.nom, titre: form.titre, entreprise: form.entreprise,
           telephone: form.telephone, email: form.email, site: form.site,
@@ -1489,31 +1602,47 @@ export default function ExportStudio() {
         </AnimatePresence>
 
         {/* Bouton génération */}
-        <button
-          onClick={handleSubmit}
-          disabled={isPending}
-          data-testid="btn-generate-export"
-          className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(135deg, #6366f1, #00d4ff)', color: '#fff' }}
-        >
-          {isPending ? (
-            <>
-              <Loader2 size={18} className="animate-spin" />
-              Génération en cours... (SVG · GIF · 5 formats HTML · ZIP)
-            </>
-          ) : (
-            <>
-              <Sparkles size={18} />
-              Générer la Signature Vivante Complète
-            </>
+        <div className="space-y-2">
+          <button
+            onClick={handleSubmit}
+            disabled={isPending}
+            data-testid="btn-generate-export"
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-sm transition-all disabled:cursor-not-allowed overflow-hidden relative"
+            style={{ background: 'linear-gradient(135deg, #6366f1, #00d4ff)', color: '#fff' }}
+          >
+            {isPending ? (
+              <div className="flex flex-col items-center gap-1.5 w-full px-4">
+                <div className="flex items-center gap-2">
+                  <Loader2 size={16} className="animate-spin shrink-0" />
+                  <span className="text-sm font-semibold">{GENERATION_STEPS[generationStep]?.label}</span>
+                </div>
+                <div className="w-full max-w-xs h-1.5 bg-white/20 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-white rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${GENERATION_STEPS[generationStep]?.pct ?? 5}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <Sparkles size={18} />
+                Générer la Signature Vivante Complète
+              </>
+            )}
+          </button>
+          {isPending && (
+            <p className="text-center text-[10px] text-white/30">
+              Étape {generationStep + 1}/{GENERATION_STEPS.length} · SVG · GIF · 5 formats HTML · ZIP
+            </p>
           )}
-        </button>
+        </div>
       </div>
 
       {/* Résultat */}
       <AnimatePresence>
         {result && (
           <motion.div
+            ref={resultRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
@@ -1673,7 +1802,7 @@ export default function ExportStudio() {
               <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4 flex items-center gap-2">
                 <Eye size={14} /> Aperçu par format
               </h3>
-              <PreviewSection result={result} />
+              <PreviewSection result={result} defaultTab={mode === 'manual' ? 'gif' : 'animated'} />
             </div>
 
             {/* Grille des formats */}
