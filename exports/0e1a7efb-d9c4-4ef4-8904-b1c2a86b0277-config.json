@@ -1,0 +1,33 @@
+{
+  "nom": "Test User",
+  "titre": "Directeur",
+  "entreprise": "EffectForge",
+  "email": "test@example.com",
+  "telephone": "+33 1 23 45 67 89",
+  "site": "effectforge.ai",
+  "adresse": "1 rue Test",
+  "ville": "Paris",
+  "code_postal": "75001",
+  "note": 0,
+  "logo_url": "",
+  "secteur": "tech",
+  "palette": [
+    "#0f172a",
+    "#6366f1",
+    "#e8e8ff"
+  ],
+  "cta": "Prendre rendez-vous",
+  "zoneEffects": {
+    "avatar": [
+      "neuralPulse",
+      "sparkleAura"
+    ],
+    "nom": [
+      "neonGlow"
+    ],
+    "cta": [
+      "electricArcs",
+      "particleStream"
+    ]
+  }
+}
