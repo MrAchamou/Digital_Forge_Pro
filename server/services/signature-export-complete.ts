@@ -50,6 +50,10 @@ export interface ExportMetadata {
   secteur: string;
   palette: string[];
   cta?: string;
+  cta2?: string;
+  cta3?: string;
+  banniere_texte?: string;
+  banniere_lien?: string;
   zoneEffects?: ZoneEffectsMap;
   [key: string]: any;
 }
@@ -108,7 +112,11 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   const { nom = 'Prénom Nom', titre = 'Titre', entreprise = 'Entreprise',
           email = '', telephone = '', site = '', adresse = '', ville = '',
           code_postal = '', note, logo_url, cta = 'Nous contacter',
+          banniere_texte = '', banniere_lien = '',
           palette = [] } = meta;
+  const hasBanner  = !!(banniere_texte && banniere_texte.trim());
+  const SVG_H      = hasBanner ? 280 : 220;
+  const BANNER_Y   = 222;
 
   const [bg, accent, textColor] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
   const accentLight = lighten(accent, 60);
@@ -225,7 +233,7 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
     </linearGradient>` : '';
 
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-  viewBox="0 0 600 220" width="600" height="220">
+  viewBox="0 0 600 ${SVG_H}" width="600" height="${SVG_H}">
   <defs>
     <linearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${accent}"/>
@@ -250,7 +258,7 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
   </defs>
 
   <!-- Background animé — lumière ↔ obscurité + cycle de teintes (16s) -->
-  <rect width="600" height="220" fill="${animated ? 'url(#sg-anim-bg)' : bg}" rx="10"/>
+  <rect width="600" height="${SVG_H}" fill="${animated ? 'url(#sg-anim-bg)' : bg}" rx="10"/>
 
   <!-- VarianceEngine — Fond stellaire spectaculaire (seed déterministe, 24 particules) -->
   ${animated ? (() => {
@@ -340,6 +348,36 @@ function buildSignatureSVGBase(meta: ExportMetadata, animated = false): string {
       font-weight="700" fill="#ffffff">${escXml(cta)}</text>
   </g>`
   }
+
+  ${hasBanner ? `
+  <!-- ═══ ZONE BANNIÈRE DYNAMIQUE ═══ -->
+  <!-- Ligne séparatrice bannière -->
+  <line x1="0" y1="${BANNER_Y}" x2="600" y2="${BANNER_Y}" stroke="${accent}" stroke-width="0.8" opacity="0.35"/>
+
+  <!-- Fond bannière -->
+  <rect x="0" y="${BANNER_Y}" width="600" height="${SVG_H - BANNER_Y}" fill="${accent}18" rx="0"/>
+
+  <!-- Badge PROMO animé -->
+  <g transform="translate(12,${BANNER_Y + 9})">
+    <rect width="46" height="18" rx="4" fill="${accent}" opacity="0.92"/>
+    <text x="23" y="13" text-anchor="middle" font-family="Arial,sans-serif" font-size="9"
+      font-weight="700" fill="#ffffff" letter-spacing="0.5">PROMO</text>
+    ${animated ? `<animate attributeName="opacity" values="0.92;0.65;0.92" dur="1.8s" repeatCount="indefinite"/>` : ''}
+  </g>
+
+  <!-- Texte bannière -->
+  <text x="70" y="${BANNER_Y + 20}" font-family="Arial,sans-serif" font-size="11" font-weight="600"
+    fill="${textColor}" opacity="0.95">${escXml(banniere_texte)}</text>
+
+  <!-- Flèche → -->
+  <text x="572" y="${BANNER_Y + 20}" font-family="Arial,sans-serif" font-size="13"
+    fill="${accent}" opacity="0.8">→</text>
+
+  ${banniere_lien ? `
+  <!-- Lien cliquable bannière -->
+  <a href="${escXml(banniere_lien)}" target="_blank">
+    <rect x="0" y="${BANNER_Y}" width="600" height="${SVG_H - BANNER_Y}" fill="transparent" rx="0" style="cursor:pointer;"/>
+  </a>` : ''}` : ''}
 </svg>`;
 }
 
@@ -353,12 +391,13 @@ export function buildAnimatedSVG(meta: ExportMetadata): string {
 
 export async function buildStaticPng(meta: ExportMetadata): Promise<Buffer> {
   const svg = buildSignatureSVGBase(meta, false);
+  const pngH = (meta.banniere_texte && meta.banniere_texte.trim()) ? 280 : 220;
   try {
-    return await sharp(Buffer.from(svg)).resize(600, 220).png({ quality: 95 }).toBuffer();
+    return await sharp(Buffer.from(svg)).resize(600, pngH).png({ quality: 95 }).toBuffer();
   } catch (err: any) {
     log(`Sharp PNG error: ${err.message}`, 'export-complete');
-    const fb = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="220" viewBox="0 0 600 220">
-      <rect width="600" height="220" fill="${meta.palette?.[0] || '#0f172a'}"/>
+    const fb = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="${pngH}" viewBox="0 0 600 ${pngH}">
+      <rect width="600" height="${pngH}" fill="${meta.palette?.[0] || '#0f172a'}"/>
       <text x="300" y="110" text-anchor="middle" font-family="Arial" font-size="20"
         fill="${meta.palette?.[2] || '#e8e8ff'}">${escXml(meta.nom)} — ${escXml(meta.entreprise)}</text>
     </svg>`;
@@ -380,7 +419,12 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
 
   const { nom = '', titre = '', entreprise = '', telephone = '', email = '',
           adresse = '', code_postal = '', ville = '', site = '', note,
-          logo_url, cta = 'Nous contacter' } = meta;
+          logo_url, cta = 'Nous contacter',
+          banniere_texte = '', banniere_lien = '' } = meta;
+
+  const hasBanner = !!(banniere_texte && banniere_texte.trim());
+  const GIF_H     = hasBanner ? 280 : 220;
+  const BANNER_Y  = 222;
 
   const initials    = `${nom.charAt(0)}${(nom.split(' ')[1] || '').charAt(0)}`.toUpperCase();
   const addressLine = [adresse, code_postal && ville ? `${code_postal} ${ville}` : (ville || code_postal)].filter(Boolean).join(', ');
@@ -497,7 +541,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
           <stop offset="100%" stop-color="white" stop-opacity="0"/>
         </linearGradient>
       </defs>
-      <rect x="${sweepX.toFixed(0)}" y="0" width="180" height="220"
+      <rect x="${sweepX.toFixed(0)}" y="0" width="180" height="${GIF_H}"
         fill="url(#sweep${i})" transform="skewX(-15)" rx="0"/>
     ` : '';
 
@@ -521,7 +565,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
       : renderEffectLayer(activeEffects, effectCtx);
 
     const frameSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-      viewBox="0 0 600 220" width="600" height="220">
+      viewBox="0 0 600 ${GIF_H}" width="600" height="${GIF_H}">
       <defs>
         <linearGradient id="bgGrad${i}" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%"   stop-color="${bg}"/>
@@ -539,7 +583,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
       </defs>
 
       <!-- Fond -->
-      <rect width="600" height="220" fill="url(#bgGrad${i})" rx="10"/>
+      <rect width="600" height="${GIF_H}" fill="url(#bgGrad${i})" rx="10"/>
 
       <!-- ═══ Calque effets premium SVG ═══ -->
       ${effectLayerSvg}
@@ -626,11 +670,31 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
         <text x="74" y="21" text-anchor="middle" font-family="Arial,sans-serif"
           font-size="11" font-weight="700" fill="#ffffff">${escXml(cta)}</text>
       </g>
+
+      ${hasBanner ? `
+      <!-- ═══ ZONE BANNIÈRE DYNAMIQUE ═══ -->
+      <line x1="0" y1="${BANNER_Y}" x2="600" y2="${BANNER_Y}"
+        stroke="${accent}" stroke-width="0.8" opacity="0.35"/>
+      <rect x="0" y="${BANNER_Y}" width="600" height="${GIF_H - BANNER_Y}"
+        fill="rgba(${ar},${ag2},${ab},0.1)" rx="0"/>
+      <g transform="translate(12,${BANNER_Y + 9})">
+        <rect width="46" height="18" rx="4" fill="${accent}"
+          opacity="${(0.7 + 0.3 * Math.abs(Math.sin(tGlobal * Math.PI * 2))).toFixed(2)}"/>
+        <text x="23" y="13" text-anchor="middle" font-family="Arial,sans-serif"
+          font-size="9" font-weight="700" fill="#ffffff" letter-spacing="0.5">PROMO</text>
+      </g>
+      <text x="70" y="${BANNER_Y + 20}" font-family="Arial,sans-serif" font-size="11"
+        font-weight="600" fill="${textColor}"
+        opacity="${(0.8 + 0.2 * Math.abs(Math.sin(tGlobal * Math.PI * 1.5))).toFixed(2)}">
+        ${escXml(banniere_texte)}
+      </text>
+      <text x="572" y="${BANNER_Y + 20}" font-family="Arial,sans-serif" font-size="13"
+        fill="${accent}" opacity="0.8">→</text>` : ''}
     </svg>`;
 
     try {
       const pngBuf = await sharp(Buffer.from(frameSvg))
-        .resize(600, 220)
+        .resize(600, GIF_H)
         .png({ compressionLevel: 1 })
         .toBuffer();
       frames.push(pngBuf);
@@ -644,7 +708,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
   // ── Encoder en GIF
   try {
     const GifEncoder = (await import('gif-encoder-2')).default;
-    const encoder = new GifEncoder(600, 220, 'neuquant', true, frames.length);
+    const encoder = new GifEncoder(600, GIF_H, 'neuquant', true, frames.length);
 
     encoder.setRepeat(0);    // boucle infinie
     encoder.setDelay(90);    // 90ms/frame → ~11fps (léger, toujours fluide)
@@ -653,7 +717,7 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
 
     for (const framePng of frames) {
       const raw = await sharp(framePng)
-        .resize(600, 220)
+        .resize(600, GIF_H)
         .ensureAlpha()
         .raw()
         .toBuffer();

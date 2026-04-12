@@ -1064,6 +1064,10 @@ export default function ExportStudio() {
   const [selectedPreset, setSelectedPreset] = useState<string>('pulse');
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedTag, setCopiedTag] = useState(false);
+  const [bannerUpdateText, setBannerUpdateText] = useState('');
+  const [bannerUpdateLien, setBannerUpdateLien] = useState('');
+  const [bannerUpdating, setBannerUpdating] = useState(false);
+  const [bannerUpdateDone, setBannerUpdateDone] = useState<string | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
   const [zoneEffects, setZoneEffects] = useState<ZoneEffectsMap>({});
   const [selectedCombinationPreset, setSelectedCombinationPreset] = useState<string | null>(null);
@@ -1221,6 +1225,29 @@ export default function ExportStudio() {
   const downloadAll = () => {
     if (!result) return;
     downloadB64(result.preview.zipB64, result.formats.gmail?.filename?.replace('gmail.html', 'package.zip') || 'signature-package.zip', 'application/zip');
+  };
+
+  const handleBannerUpdate = async () => {
+    if (!result?.signatureId) return;
+    setBannerUpdating(true);
+    setBannerUpdateDone(null);
+    try {
+      const res = await apiRequest('POST', `/api/sig/${result.signatureId}/update-banner`, {
+        banniere_texte: bannerUpdateText,
+        banniere_lien:  bannerUpdateLien,
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBannerUpdateDone(data.message || 'Bannière mise à jour !');
+        toast({ title: '✅ Bannière mise à jour', description: 'Le GIF à la même URL affiche maintenant la nouvelle bannière.' });
+      } else {
+        toast({ title: 'Erreur', description: data.error, variant: 'destructive' });
+      }
+    } catch (err: any) {
+      toast({ title: 'Erreur réseau', description: err.message, variant: 'destructive' });
+    } finally {
+      setBannerUpdating(false);
+    }
   };
 
   return (

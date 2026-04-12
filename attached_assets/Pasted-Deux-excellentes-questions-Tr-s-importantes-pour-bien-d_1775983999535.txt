@@ -1,0 +1,93 @@
+Deux excellentes questions. Très importantes pour bien définir le produit.
+
+---
+
+**Question 1 — On livre quoi exactement ?**
+
+On livre **une seule chose** — mais qui fait les deux rôles.
+
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│   [ZONE SIGNATURE]                      │
+│   Logo + Nom + Titre + Contacts + CTA  │
+│                                         │
+│   ══════════════════════════════════   │
+│                                         │
+│   [ZONE BANNIÈRE]                       │
+│   Message promotionnel / campagne       │
+│                                         │
+└─────────────────────────────────────────┘
+         ↑
+    C'est UN seul fichier GIF
+    Une seule image dans le mail
+```
+
+Le client ne voit pas deux choses séparées. Il voit **une signature complète** dont la partie basse est une bannière. Exactement comme une carte de visite qui a une pub au dos — sauf que c'est animé et dans chaque mail.
+
+---
+
+**Question 2 — Comment la bannière change sans programmer ?**
+
+C'est là que c'est élégant. Voici la magie :
+
+**Ce que tu livres au client :**
+```
+<img src="https://tonserveur.com/sig/jean-martin.gif">
+```
+Une seule ligne. Il la colle dans Outlook ou Gmail une fois. **Il ne retouche plus jamais à sa signature.**
+
+**Ce qui se passe côté serveur :**
+
+```
+Client ouvre un mail
+        ↓
+Son client mail charge l'image depuis ton URL
+        ↓
+Ton serveur regarde : "quelle bannière est active 
+                       pour jean-martin aujourd'hui ?"
+        ↓
+Il génère et retourne le GIF avec la bannière du moment
+        ↓
+Le client voit la bonne bannière
+```
+
+Chaque fois que l'image est chargée, elle est **servie dynamiquement**. Pas stockée une fois pour toutes.
+
+**Pour changer la bannière**, le client t'envoie juste un WhatsApp ou remplit un formulaire simple :
+
+> *"Je veux mettre : Nouveau cabinet ouvert rue des Fleurs — jusqu'au 30 avril"*
+
+Toi tu changes une ligne dans un fichier de config ou une entrée en base de données. Le GIF suivant servi à cette URL intègre la nouvelle bannière. **Zéro technique pour lui.**
+
+---
+
+**Pour la version sans programmation du tout**
+
+Si tu veux livrer quelque chose **maintenant**, avant même d'avoir le serveur, tu peux utiliser une astuce simple :
+
+**Cloudinary** — une plateforme d'hébergement d'images — permet de **remplacer une image à la même URL**. Tu upploades le nouveau GIF avec le même nom de fichier. L'URL ne change pas. La signature du client affiche automatiquement le nouveau GIF.
+
+```
+Semaine 1 → tu uploades jean-martin-sig.gif (bannière "Cabinet ouvert")
+Semaine 3 → client veut changer → tu uploades le nouveau GIF 
+             MÊME nom → MÊME URL → sa signature est à jour
+```
+
+Le client n'a rien fait. Sa signature dans Outlook est à jour partout.
+
+**C'est ça ton service récurrent à 19€/mois** — tu gères les changements de bannière pour lui. C'est 10 minutes de travail par client par mois. Sur 50 clients = 950€/mois pour ~8h de travail total.
+
+---
+
+**Résumé ultra clair**
+
+| | |
+|---|---|
+| Ce qu'on livre | 1 seul fichier — signature + bannière fusionnées |
+| Comment ça change | Tu remplaces le GIF sur le serveur, l'URL reste identique |
+| Effort client | Zéro — il colle l'URL une fois, jamais plus |
+| Effort toi | 10 min par changement de bannière |
+| Sans programmation | Oui — Cloudinary suffit pour démarrer |
+
+Tu veux qu'on définisse maintenant le **contenu exact** de ce qu'on livre — les zones, les éléments, ce qui est fixe et ce qui est dynamique — pour que tu puisses coter et vendre dès cette semaine ?

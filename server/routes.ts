@@ -956,9 +956,80 @@ router.get('/sig/:filename', async (req, res) => {
   const ext = path.extname(filename).slice(1) as 'gif' | 'svg' | 'png';
   const mimeTypes = { gif: 'image/gif', svg: 'image/svg+xml', png: 'image/png' };
   res.setHeader('Content-Type', mimeTypes[ext]);
-  res.setHeader('Cache-Control', 'public, max-age=2592000'); // 30 jours
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Autoriser chargement depuis Gmail/email clients
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  // GIF avec bannière = cache court (la bannière peut changer) ; sinon 30 jours
+  if (ext === 'gif') {
+    const id = filename.replace('.gif', '');
+    const configPath = path.join(process.cwd(), 'exports', `${id}-config.json`);
+    try {
+      const cfg = JSON.parse(await fs.promises.readFile(configPath, 'utf-8'));
+      if (cfg.banniere_texte) {
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=2592000');
+      }
+    } catch {
+      res.setHeader('Cache-Control', 'public, max-age=2592000');
+    }
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=2592000'); // 30 jours
+  }
+
   return res.sendFile(filePath);
+});
+
+/** Mise à jour de la bannière sans changer l'URL — régénère le GIF, même UUID */
+router.post('/sig/:id/update-banner', async (req, res) => {
+  const { id } = req.params;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(id)) {
+    return res.status(400).json({ error: 'ID invalide' });
+  }
+
+  const { banniere_texte, banniere_lien } = req.body;
+
+  const configPath  = path.join(process.cwd(), 'exports', `${id}-config.json`);
+  const gifHostPath = path.join(process.cwd(), 'exports', 'hosted', `${id}.gif`);
+
+  // 1. Lire la configuration existante
+  let meta: any;
+  try {
+    meta = JSON.parse(await fs.promises.readFile(configPath, 'utf-8'));
+  } catch {
+    return res.status(404).json({ error: 'Signature introuvable — générez-la d\'abord' });
+  }
+
+  // 2. Mettre à jour les champs bannière
+  meta.banniere_texte = (banniere_texte || '').trim();
+  meta.banniere_lien  = (banniere_lien  || '').trim();
+
+  // 3. Régénérer le GIF avec la nouvelle bannière
+  try {
+    const { buildAnimatedGif, saveSignatureAssets } = await import('./services/signature-export-complete');
+    const gifBuffer = await buildAnimatedGif(meta);
+
+    // 4. Écraser le GIF hébergé — même URL, nouveau contenu
+    await fs.promises.writeFile(gifHostPath, gifBuffer);
+
+    // 5. Sauvegarder la config mise à jour
+    await fs.promises.writeFile(configPath, JSON.stringify(meta, null, 2), 'utf-8');
+
+    const hostedBaseUrl = getPublicBaseUrl(req);
+    const hostedGifUrl  = `${hostedBaseUrl}/api/sig/${id}.gif`;
+
+    log(`Bannière mise à jour: ${id} — "${meta.banniere_texte}"`, 'update-banner');
+    return res.json({
+      success:      true,
+      signatureId:  id,
+      hostedGifUrl,
+      banniere_texte: meta.banniere_texte,
+      message:      meta.banniere_texte
+        ? `Bannière mise à jour — "${meta.banniere_texte}"`
+        : 'Bannière supprimée du GIF',
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: `Erreur régénération GIF: ${err.message}` });
+  }
 });
 
 // === EXPORT COMPLET MULTI-CLIENT ===
@@ -974,21 +1045,25 @@ router.post('/signature/full-export', async (req, res) => {
     const signatureHtml = renderSignatureWithModules(sectorId, data, { tier: 'ultra' }).html;
 
     const meta = {
-      nom:         data.nom         || '',
-      titre:       data.titre       || '',
-      entreprise:  data.entreprise  || '',
-      email:       data.email       || '',
-      telephone:   data.telephone   || '',
-      site:        data.site        || '',
-      adresse:     data.adresse     || '',
-      ville:       data.ville       || '',
-      code_postal: data.code_postal || '',
-      note:        data.note        || 0,
-      logo_url:    data.logo_url    || '',
-      secteur:     sectorId,
-      palette:     data.palette     || [],
-      cta:         data.cta         || '',
-      zoneEffects: data.zoneEffects || undefined,
+      nom:             data.nom             || '',
+      titre:           data.titre           || '',
+      entreprise:      data.entreprise      || '',
+      email:           data.email           || '',
+      telephone:       data.telephone       || '',
+      site:            data.site            || '',
+      adresse:         data.adresse         || '',
+      ville:           data.ville           || '',
+      code_postal:     data.code_postal     || '',
+      note:            data.note            || 0,
+      logo_url:        data.logo_url        || '',
+      secteur:         sectorId,
+      palette:         data.palette         || [],
+      cta:             data.cta             || '',
+      cta2:            data.cta2            || '',
+      cta3:            data.cta3            || '',
+      banniere_texte:  data.banniere_texte  || '',
+      banniere_lien:   data.banniere_lien   || '',
+      zoneEffects:     data.zoneEffects     || undefined,
     };
 
     const hostedBaseUrl = getPublicBaseUrl(req);

@@ -1,0 +1,202 @@
+OK. Voilà la définition complète et précise de ce qu'on livre.
+
+---
+
+**LA STRUCTURE DU LIVRABLE**
+
+```
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│  ◉  [LOGO ANIMÉ]    Prénom NOM                 │
+│                     Titre / Spécialité          │
+│                     Entreprise                  │
+│                                                 │
+│  ─────────────────────────────────────────────  │
+│                                                 │
+│  📞  +XXX XX XX XX XX                          │
+│  ✉   email@entreprise.com                      │
+│  🌐  www.entreprise.com                        │
+│  📍  Ville, Pays                               │
+│                                                 │
+│  [ 🔵  Prendre rendez-vous → ]                 │
+│                                                 │
+│  ═════════════════════════════════════════════  │
+│                                                 │
+│  ┌─────────────────────────────────────────┐   │
+│  │                                         │   │
+│  │   BANNIÈRE DYNAMIQUE                    │   │
+│  │   Texte campagne + visuel               │   │
+│  │                                         │   │
+│  └─────────────────────────────────────────┘   │
+│                                                 │
+└─────────────────────────────────────────────────┘
+         600px × 220px — 1 seul GIF animé
+```
+
+---
+
+**CE QUI EST FIXE** *(créé une fois, ne change jamais)*
+
+| Élément | Ce qu'on fait |
+|---|---|
+| Logo | Redesign ou création from scratch basé sur scraping |
+| Nom complet | Tel quel |
+| Titre / Spécialité | Extrait du site ou LinkedIn |
+| Entreprise | Idem |
+| Téléphone | Scrapé |
+| Email | Scrapé |
+| Site web | Scrapé |
+| Ville / Pays | Scrapé |
+| CTA | Texte fixe au départ — ex: "Prendre rendez-vous" |
+| Animations | Effet choisi parmi tes 55 — **unique par client** |
+| Palette couleurs | Extraite de la charte du site web du client |
+
+---
+
+**CE QUI EST DYNAMIQUE** *(change selon campagne — service récurrent)*
+
+| Élément | Exemple concret |
+|---|---|
+| Texte bannière | "Nouveau : consultation en ligne disponible" |
+| Sous-texte | "Prenez rendez-vous avant le 30 avril" |
+| Couleur bannière | S'adapte à la saison / l'événement |
+| Visuel bannière | Icône ou illustration simple |
+| Lien CTA bannière | URL de la landing page de la campagne |
+
+---
+
+**LES 3 ANIMATIONS QUI VIVENT EN PERMANENCE**
+
+Peu importe le client, ces éléments bougent toujours :
+
+**1. Le logo** — respiration subtile, glow coloré, effet choisi parmi tes 55. C'est la pièce centrale — ce qui accroche l'œil en premier.
+
+**2. Le fond** — dégradé qui mute lentement en couleur. Jamais statique, jamais agressif. On voit que ça vit sans savoir exactement pourquoi.
+
+**3. Le CTA** — particules orbitales, heartbeat rings, shimmer. C'est le seul élément qui "appelle à l'action" visuellement dans toute la signature.
+
+Tout le reste — nom, contacts, séparateurs — a des micro-animations d'entrée subtiles mais reste stable une fois en place. C'est intentionnel : trop d'animation tue l'attention.
+
+---
+
+**LE PROCESSUS DE PRODUCTION — ta méthode de travail**
+
+```
+JOUR 1 — 45 minutes de travail
+
+  Étape 1 : Scraping (10 min)
+  → Google, site web, LinkedIn, Facebook de l'entreprise
+  → Extraire : nom exact, titre, tel, email, site, ville
+  → Extraire : couleurs dominantes du site
+  → Extraire : logo existant si disponible
+
+  Étape 2 : Création logo (20 min)
+  → Avec Midjourney ou Ideogram selon le secteur
+  → 3 propositions générées
+  → Tu choisis la meilleure
+
+  Étape 3 : Assemblage signature (15 min)
+  → Tu remplis les variables dans ton template SVG
+  → Tu choisis l'effet parmi tes 55 selon le secteur
+     (médecin → breathing organique,
+      avocat → crystal élégant,
+      immobilier → flow dégradé,
+      tech → pulse néon)
+  → Génération du GIF
+  → Upload Cloudinary → URL unique
+
+JOUR 1 — Livraison
+
+  Tu envoies le mail de démo au prospect
+  (on va le construire juste après)
+```
+
+---
+
+**CE QUE REÇOIT LE CLIENT À LA COMMANDE**
+
+Un dossier simple avec 3 éléments :
+
+**1. Son GIF** — le fichier téléchargeable
+
+**2. Son URL permanente** — la ligne à copier-coller :
+```
+https://cdn.livesign.io/sig/jean-martin-cabinet.gif
+```
+
+**3. Le guide d'installation** — 1 page, 3 versions :
+- Gmail en 4 captures d'écran
+- Outlook en 4 captures d'écran
+- Apple Mail en 4 captures d'écran
+
+---
+
+**CE QUE COMPREND L'ABONNEMENT 19€/MOIS**
+
+- Jusqu'à **2 changements de bannière par mois**
+- Délai de mise à jour : **24h**
+- Le client envoie juste un message WhatsApp ou email avec le nouveau texte
+- Tu régénères le GIF, tu uploades sur Cloudinary, même URL — c'est fait
+
+Au-delà de 2 changements dans le mois : 9€ par changement supplémentaire.
+
+---
+
+**LA GRILLE TARIFAIRE COMPLÈTE**
+
+```
+┌────────────────────────────────────────────────┐
+│                                                │
+│  CRÉATION                          137€        │
+│  Signature vivante complète                    │
+│  Logo redesign inclus                          │
+│  Livraison 48h                                 │
+│                                                │
+│  ────────────────────────────────────────────  │
+│                                                │
+│  MAINTENANCE BANNIÈRE              19€/mois    │
+│  2 changements/mois inclus                     │
+│  Délai 24h                                     │
+│  Résiliable à tout moment                      │
+│                                                │
+│  ────────────────────────────────────────────  │
+│                                                │
+│  CHANGEMENT SUPPLÉMENTAIRE         9€          │
+│  Au-delà des 2 inclus                          │
+│                                                │
+│  ────────────────────────────────────────────  │
+│                                                │
+│  PACK ÉQUIPE  (à partir de 3 personnes)        │
+│  97€/personne création                         │
+│  + 14€/personne/mois maintenance               │
+│                                                │
+└────────────────────────────────────────────────┘
+```
+
+---
+
+**LA PROJECTION SUR 6 MOIS**
+
+Si tu fais 2 ventes par semaine — ce qui est très conservateur avec la méthode du mail de démo personnalisé :
+
+```
+Mois 1 :   8 clients × 137€  = 1 096€ création
+           + 0€ récurrent (trop tôt)
+
+Mois 2 :   8 clients × 137€  = 1 096€ création
+           + 8 × 19€          =   152€ récurrent
+
+Mois 3 :   8 clients × 137€  = 1 096€ création
+           + 16 × 19€         =   304€ récurrent
+
+Mois 6 :   8 clients × 137€  = 1 096€ création
+           + 40 × 19€         =   760€ récurrent
+           ─────────────────────────────────────
+           TOTAL MOIS 6       = 1 856€
+```
+
+À partir du mois 6, le récurrent seul couvre tes charges fixes. La création devient du pur bénéfice.
+
+---
+
+Maintenant on construit le **mail de démo** — le mail simulé que tu envoies au prospect avec sa signature déjà faite à son nom. C'est la pièce qui déclenche les ventes. On y va ?
