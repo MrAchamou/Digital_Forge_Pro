@@ -91,6 +91,8 @@ export function buildDemoMailHtml(cfg: DemoMailConfig): string {
   const destNom = destinataireNom || 'Marie Dupont';
   const destEmail = destinataireEmail || 'client@exemple.com';
   const destPrenom = destNom.split(' ')[0] || 'Marie';
+  const senderLocal = emailClient || nomClient.toLowerCase().replace(/\s+/g, '.');
+  const senderDomain = entrepriseClient.toLowerCase().replace(/\s+/g, '') || 'cabinet.fr';
 
   log(`Demo mail généré pour ${nomClient} (${secteur})`, 'demo-builder');
 
@@ -162,7 +164,7 @@ export function buildDemoMailHtml(cfg: DemoMailConfig): string {
       <div class="avatar" style="background:${escHtml(accent)}">${escHtml(initials)}</div>
       <div class="sender-info">
         <div class="sender-name">${escHtml(nomClient)}${titreClient ? ` · <span style="font-weight:400;color:#5f6368">${escHtml(titreClient)}</span>` : ''}</div>
-        <div class="sender-email">&lt;${escHtml(emailClient || nomClient.toLowerCase().replace(/\s+/g, '.')}@${escHtml(entrepriseClient.toLowerCase().replace(/\s+/g, '') || 'cabinet.fr')}&gt;</div>
+        <div class="sender-email">&lt;${escHtml(senderLocal)}@${escHtml(senderDomain)}&gt;</div>
         <div class="to-line">À : ${escHtml(destNom)} &lt;${escHtml(destEmail)}&gt;</div>
       </div>
       <div class="mail-time">${today} à ${heure}</div>
