@@ -243,6 +243,10 @@ interface FormData {
   ville: string;
   code_postal: string;
   cta: string;
+  cta2: string;
+  cta3: string;
+  banniereTexte: string;
+  banniereLien: string;
   note: string;
 }
 
@@ -459,7 +463,9 @@ function clampC(v: number, min: number, max: number) { return Math.min(max, Math
 interface LivePreviewProps {
   nom: string; titre: string; entreprise: string;
   telephone: string; email: string; site: string;
-  cta: string; note: string; sectorId: string; logoPreview: string | null;
+  cta: string; cta2?: string; cta3?: string;
+  banniereTexte?: string; banniereLien?: string;
+  note: string; sectorId: string; logoPreview: string | null;
   paletteOverride?: [string, string, string] | null;
   zoneEffects?: ZoneEffectsMap;
 }
@@ -749,7 +755,7 @@ function renderLiveEffectPreview(effectId: string, accent: string, textColor: st
   return `<g data-live-effect="${effectId}" opacity="0.92">${body}</g>`;
 }
 
-function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, note, sectorId, logoPreview, paletteOverride, zoneEffects = {} }: LivePreviewProps) {
+function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, cta2 = '', cta3 = '', banniereTexte = '', banniereLien = '', note, sectorId, logoPreview, paletteOverride, zoneEffects = {} }: LivePreviewProps) {
   const palette = paletteOverride ?? SECTOR_PALETTES[sectorId] ?? SECTOR_PALETTES['tech'];
   const [bg, accent, textColor] = palette;
 
@@ -764,7 +770,6 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
   const displayNom = escapeSvgText(nom || 'Votre Nom');
   const displayTitre = escapeSvgText(titre || 'Votre Titre');
   const displayEntreprise = escapeSvgText(entreprise || 'Votre Entreprise');
-  const displayCta = escapeSvgText(cta || 'Nous contacter');
   const safeTelephone = escapeSvgText(telephone);
   const safeEmail = escapeSvgText(email);
   const safeSite = escapeSvgText(site.replace(/^https?:\/\//, ''));
@@ -794,6 +799,18 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
     (ids ?? []).map((effectId, index) => ({ zone: zone as ZoneName, effectId, index }))
   );
 
+  const displayCta1 = escapeSvgText(cta || 'Nous contacter');
+  const displayCta2 = escapeSvgText(cta2);
+  const displayCta3 = escapeSvgText(cta3);
+  const displayBanniere = escapeSvgText(banniereTexte);
+  const hasMultiCta = !!(cta2 || cta3);
+  const hasBanniere = !!banniereTexte;
+  const svgHeight = hasBanniere ? 250 : 197;
+
+  const ctaW1 = Math.min(displayCta1.length * 7.2 + 24, 175);
+  const ctaW2 = displayCta2 ? Math.min(displayCta2.length * 7.2 + 24, 175) : ctaW1;
+  const ctaW3 = displayCta3 ? Math.min(displayCta3.length * 7.2 + 24, 175) : ctaW1;
+
   // Dédupliquer : chaque effet est rendu UNE FOIS à l'échelle de la pleine carte
   // (identique au moteur GIF — pas de clippage par zone)
   const uniqueEffects = Array.from(new Set(selectedEffectEntries.map(e => e.effectId)));
@@ -807,7 +824,7 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
     return `${zoneLabel}: ${effect?.label ?? effectId}`;
   });
 
-  const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 600 190" width="600" height="190">
+  const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 600 ${svgHeight}" width="600" height="${svgHeight}">
   <defs>
     <style>
       @keyframes vbg-scan { 0%{transform:translateX(-80px) skewX(-12deg);opacity:0} 8%{opacity:1} 92%{opacity:1} 100%{transform:translateX(680px) skewX(-12deg);opacity:0} }
@@ -838,7 +855,7 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
   </defs>
 
   <!-- Fond animé -->
-  <rect width="600" height="190" fill="url(#lp-anim-bg)" rx="10"/>
+  <rect width="600" height="${svgHeight}" fill="url(#lp-anim-bg)" rx="10"/>
 
   <!-- Particules ambiantes -->
   <g opacity="0.8">${particles}</g>
@@ -902,11 +919,63 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
   ${email ? `<text x="${telephone ? '230' : '112'}" y="${stars ? '133' : '119'}" font-size="10" fill="${textColor}" font-family="system-ui,sans-serif" opacity="0.65">✉ ${safeEmail.slice(0, 30)}</text>` : ''}
   ${site ? `<text x="112" y="${stars ? '148' : '134'}" font-size="10" fill="${accent}" font-family="system-ui,sans-serif" opacity="0.75">🌐 ${safeSite.slice(0, 35)}</text>` : ''}
 
-  <!-- Bouton CTA -->
-  <rect x="112" y="160" width="${Math.min(displayCta.length * 7.5 + 24, 180)}" height="22" rx="11" fill="${accent}" opacity="0.9">
+  <!-- CTAs rotatifs -->
+  ${hasMultiCta ? `
+  <!-- CTA 1 -->
+  <g>
+    <rect x="112" y="158" width="${ctaW1}" height="22" rx="11" fill="${accent}" opacity="0">
+      <animate attributeName="opacity" values="0;0.9;0.9;0;0;0;0" keyTimes="0;0.04;0.30;0.36;0.66;0.69;1" dur="9s" repeatCount="indefinite"/>
+    </rect>
+    <text x="${112 + ctaW1 / 2}" y="173" text-anchor="middle" font-size="9.5" font-weight="600" fill="${bg}" font-family="system-ui,sans-serif" opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0;0;0;0" keyTimes="0;0.04;0.30;0.36;0.66;0.69;1" dur="9s" repeatCount="indefinite"/>
+      ${displayCta1.slice(0, 22)}
+    </text>
+  </g>
+  <!-- CTA 2 -->
+  <g>
+    <rect x="112" y="158" width="${ctaW2}" height="22" rx="11" fill="${accent}" opacity="0">
+      <animate attributeName="opacity" values="0;0.9;0.9;0;0;0;0" keyTimes="0;0.04;0.30;0.36;0.66;0.69;1" dur="9s" begin="3s" repeatCount="indefinite"/>
+    </rect>
+    <text x="${112 + ctaW2 / 2}" y="173" text-anchor="middle" font-size="9.5" font-weight="600" fill="${bg}" font-family="system-ui,sans-serif" opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0;0;0;0" keyTimes="0;0.04;0.30;0.36;0.66;0.69;1" dur="9s" begin="3s" repeatCount="indefinite"/>
+      ${displayCta2.slice(0, 22)}
+    </text>
+  </g>
+  <!-- CTA 3 -->
+  ${displayCta3 ? `<g>
+    <rect x="112" y="158" width="${ctaW3}" height="22" rx="11" fill="${accent}" opacity="0">
+      <animate attributeName="opacity" values="0;0.9;0.9;0;0;0;0" keyTimes="0;0.04;0.30;0.36;0.66;0.69;1" dur="9s" begin="6s" repeatCount="indefinite"/>
+    </rect>
+    <text x="${112 + ctaW3 / 2}" y="173" text-anchor="middle" font-size="9.5" font-weight="600" fill="${bg}" font-family="system-ui,sans-serif" opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0;0;0;0" keyTimes="0;0.04;0.30;0.36;0.66;0.69;1" dur="9s" begin="6s" repeatCount="indefinite"/>
+      ${displayCta3.slice(0, 22)}
+    </text>
+  </g>` : ''}
+  ` : `
+  <!-- CTA unique pulsant -->
+  <rect x="112" y="158" width="${ctaW1}" height="22" rx="11" fill="${accent}" opacity="0.9">
     <animate attributeName="opacity" values="0.75;1;0.75" dur="2.5s" repeatCount="indefinite"/>
   </rect>
-  <text x="${112 + Math.min(displayCta.length * 7.5 + 24, 180) / 2}" y="175" text-anchor="middle" font-size="9.5" font-weight="600" fill="${bg}" font-family="system-ui,sans-serif">${displayCta.slice(0, 22)}</text>
+  <text x="${112 + ctaW1 / 2}" y="173" text-anchor="middle" font-size="9.5" font-weight="600" fill="${bg}" font-family="system-ui,sans-serif">${displayCta1.slice(0, 22)}</text>
+  `}
+
+  <!-- Bannière pub -->
+  ${hasBanniere ? `
+  <rect x="4" y="197" width="592" height="44" rx="8" fill="${accent}" opacity="0.04">
+    <animate attributeName="opacity" values="0.03;0.08;0.03" dur="4s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="4" y="197" width="592" height="44" rx="8" fill="none" stroke="${accent}" stroke-width="0.8" opacity="0.18"/>
+  <rect x="14" y="207" width="40" height="14" rx="7" fill="${accent}" opacity="0.22"/>
+  <text x="34" y="217.5" text-anchor="middle" font-size="7" font-weight="700" fill="${accent}" font-family="system-ui,sans-serif" opacity="0.9" letter-spacing="0.5">PROMO</text>
+  <text x="62" y="222" font-size="10.5" font-weight="600" fill="${textColor}" font-family="system-ui,sans-serif">
+    <animate attributeName="opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite"/>
+    ${displayBanniere.slice(0, 58)}
+  </text>
+  <text x="574" y="222" font-size="13" fill="${accent}" font-family="system-ui,sans-serif" opacity="0">
+    <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite"/>
+    →
+  </text>
+  ` : ''}
 
   <!-- Coin badge LIVE -->
   <rect x="552" y="6" width="40" height="14" rx="7" fill="${accent}" opacity="0.15"/>
@@ -987,7 +1056,8 @@ export default function ExportStudio() {
   const [form, setForm] = useState<FormData>({
     gmbUrl: '', nom: '', titre: '', entreprise: '', sectorId: 'sante',
     telephone: '', email: '', site: '', adresse: '',
-    ville: '', code_postal: '', cta: 'Nous contacter', note: '',
+    ville: '', code_postal: '', cta: 'Nous contacter',
+    cta2: '', cta3: '', banniereTexte: '', banniereLien: '', note: '',
   });
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [customPalette, setCustomPalette] = useState<[string, string, string] | null>(null);
@@ -1134,6 +1204,10 @@ export default function ExportStudio() {
           telephone: form.telephone, email: form.email, site: form.site,
           adresse: form.adresse, ville: form.ville, code_postal: form.code_postal,
           cta: form.cta,
+          ...(form.cta2 ? { cta2: form.cta2 } : {}),
+          ...(form.cta3 ? { cta3: form.cta3 } : {}),
+          ...(form.banniereTexte ? { banniere_texte: form.banniereTexte } : {}),
+          ...(form.banniereLien ? { banniere_lien: form.banniereLien } : {}),
           palette: effectivePalette,
           preset: selectedPreset,
           ...(Object.keys(cleanZoneEffects).length > 0 ? { zoneEffects: cleanZoneEffects } : {}),
@@ -1665,20 +1739,62 @@ export default function ExportStudio() {
                 </div>
               </div>
 
-              {/* ── Ligne 4 : Site web + Texte CTA ─────────────────────── */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Site web</label>
-                  <input type="url" value={form.site} onChange={e => update('site', e.target.value)}
-                    placeholder="https://cabinet.fr" data-testid="input-site"
-                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+              {/* ── Ligne 4 : Site web ──────────────────────────────────── */}
+              <div>
+                <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Site web</label>
+                <input type="url" value={form.site} onChange={e => update('site', e.target.value)}
+                  placeholder="https://cabinet.fr" data-testid="input-site"
+                  className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+              </div>
+
+              {/* ── CTAs rotatifs ────────────────────────────────────────── */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <label className="text-xs text-white/50 uppercase tracking-wider">Boutons CTA</label>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-forge-cyan/10 border border-forge-cyan/20 text-forge-cyan/70">rotatifs en animation</span>
                 </div>
-                <div>
-                  <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Texte bouton CTA</label>
-                  <input type="text" value={form.cta} onChange={e => update('cta', e.target.value)}
-                    placeholder="Nous contacter" data-testid="input-cta"
-                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/30 w-5 shrink-0">1</span>
+                    <input type="text" value={form.cta} onChange={e => update('cta', e.target.value)}
+                      placeholder="Nous contacter" data-testid="input-cta"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/30 w-5 shrink-0">2</span>
+                    <input type="text" value={form.cta2} onChange={e => update('cta2', e.target.value)}
+                      placeholder="Prendre rendez-vous (optionnel)" data-testid="input-cta2"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/30 w-5 shrink-0">3</span>
+                    <input type="text" value={form.cta3} onChange={e => update('cta3', e.target.value)}
+                      placeholder="Voir nos offres (optionnel)" data-testid="input-cta3"
+                      className="flex-1 bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                  </div>
                 </div>
+                {(form.cta2 || form.cta3) && (
+                  <p className="text-[10px] text-forge-cyan/50 mt-1.5">Les boutons s'affichent en alternance dans l'animation</p>
+                )}
+              </div>
+
+              {/* ── Bannière pub ─────────────────────────────────────────── */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <label className="text-xs text-white/50 uppercase tracking-wider">Bannière pub</label>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-forge-purple/10 border border-forge-purple/20 text-forge-purple/70">zone premium · modifiable sans regénérer</span>
+                </div>
+                <div className="space-y-2">
+                  <input type="text" value={form.banniereTexte} onChange={e => update('banniereTexte', e.target.value)}
+                    placeholder="Nouveau : consultation en ligne disponible" data-testid="input-banniere-texte"
+                    className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-forge-purple/60 transition-colors" />
+                  <input type="url" value={form.banniereLien} onChange={e => update('banniereLien', e.target.value)}
+                    placeholder="https://... (lien cliquable, optionnel)" data-testid="input-banniere-lien"
+                    className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg px-4 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-forge-purple/40 transition-colors" />
+                </div>
+                {form.banniereTexte && (
+                  <p className="text-[10px] text-forge-purple/60 mt-1.5">Apparaît en bas de la signature dans la prévisualisation</p>
+                )}
               </div>
 
               {/* ── Ligne 5 : Adresse + Code postal ─────────────────────── */}
@@ -1752,6 +1868,10 @@ export default function ExportStudio() {
                 email={form.email}
                 site={form.site}
                 cta={form.cta}
+                cta2={form.cta2}
+                cta3={form.cta3}
+                banniereTexte={form.banniereTexte}
+                banniereLien={form.banniereLien}
                 note={form.note}
                 sectorId={form.sectorId}
                 logoPreview={logoPreview}
