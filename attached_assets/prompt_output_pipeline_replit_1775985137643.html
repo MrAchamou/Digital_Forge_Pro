@@ -1,0 +1,371 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.w{padding:1rem 0;font-family:var(--font-mono,monospace)}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.title{font-size:12px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.1em;text-transform:uppercase}
+.badge{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--color-background-warning);color:var(--color-text-warning)}
+.block{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:1rem}
+.label{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);padding:10px 16px 6px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.code{font-family:var(--font-mono,monospace);font-size:12.5px;line-height:1.8;color:var(--color-text-primary);padding:14px 16px;white-space:pre-wrap;word-break:break-word}
+.r{color:#E24B4A;font-weight:500}
+.g{color:#1D9E75;font-weight:500}
+.b{color:#185FA5;font-weight:500}
+.o{color:#BA7517;font-weight:500}
+.c{color:var(--color-text-tertiary)}
+.footer{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:0.5px solid var(--color-border-tertiary)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:11px;padding:3px 8px;border-radius:12px}
+.pg{background:var(--color-background-success);color:var(--color-text-success)}
+.pb{background:var(--color-background-info);color:var(--color-text-info)}
+.po{background:var(--color-background-warning);color:var(--color-text-warning)}
+.pr{background:var(--color-background-danger);color:var(--color-text-danger)}
+.btn{display:flex;align-items:center;gap:6px;font-size:13px;padding:8px 16px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn:active{transform:scale(.98)}
+</style>
+
+<div class="w">
+<div class="header">
+  <span class="title">Prompt Replit — Output Pipeline God-Tier</span>
+  <span class="badge">God Tier</span>
+</div>
+
+<div class="block">
+<div class="label">Vision du système — lire en premier</div>
+<div class="code"><span class="c"># CE QUE TU DOIS CONSTRUIRE</span>
+
+Un pipeline de génération automatique d'output premium pour
+une agence de signatures email vivantes.
+
+L'opérateur entre les données d'un client dans un formulaire.
+Le système génère automatiquement et simultanément <span class="g">5 fichiers</span>
+qui constituent le livrable complet au client.
+
+<span class="r">RÈGLE ABSOLUE :</span>
+Ces 5 fichiers forment un système solidaire.
+Ils partagent les mêmes données source.
+Ils se génèrent ensemble, en une seule action.
+Jamais séparément, jamais manuellement.</div>
+</div>
+
+<div class="block">
+<div class="label">Les 5 fichiers du livrable — définition exacte</div>
+<div class="code"><span class="g">FICHIER 1 — signature-[nom-client].gif</span>
+  Le GIF animé final. 600×220px.
+  Contient : logo animé + infos + CTA + bannière dynamique.
+  Généré depuis le SVG template avec les variables du client.
+  Encodé avec qualité maximale + Floyd-Steinberg dithering.
+  Hébergé sur Cloudinary → URL CDN permanente.
+
+<span class="g">FICHIER 2 — demo-mail-[nom-client].html</span>
+  Interface Gmail simulée ultra-réaliste.
+  Affiche un vrai mail professionnel avec :
+    → Expéditeur = nom + email du client
+    → Objet = adapté au secteur détecté automatiquement
+    → Corps = message professionnel crédible (secteur-aware)
+    → Signature = le GIF du fichier 1 intégré en live
+  Ce fichier est hébergé et accessible via URL publique.
+  C'est le lien qu'on envoie au prospect pour le convaincre.
+
+<span class="g">FICHIER 3 — guide-installation-[nom-client].pdf</span>
+  PDF 7 pages généré automatiquement.
+  Page de couverture personnalisée avec nom + logo du client.
+  1 page par client mail : Gmail, Outlook, Apple Mail,
+  Yahoo, Thunderbird, Mobile, Méthode HTML universelle.
+  Captures annotées avec flèches + étapes numérotées.
+  Lien URL personnel du client sur chaque page.
+
+<span class="g">FICHIER 4 — copier-coller-[nom-client].html</span>
+  Page ultra-simple, une seule fonction :
+  3 boutons — "Copier pour Gmail", "Copier pour Outlook",
+  "Copier code HTML universel".
+  Chaque bouton copie le bon code dans le presse-papier.
+  Design épuré, une seule couleur, zéro distraction.
+
+<span class="g">FICHIER 5 — livrable-[nom-client].zip</span>
+  Archive qui contient les fichiers 1 à 4.
+  + fichier MON-LIEN-PERMANENT.txt (juste l'URL Cloudinary)
+  Téléchargeable en un clic depuis le dashboard opérateur.</div>
+</div>
+
+<div class="block">
+<div class="label">Le formulaire opérateur — données d'entrée</div>
+<div class="code"><span class="c"># SECTION 1 — Identité client</span>
+prénom          : string   (obligatoire)
+nom             : string   (obligatoire)
+titre           : string   (obligatoire — ex: "Médecin Généraliste")
+entreprise      : string   (optionnel)
+secteur         : select   (médical / juridique / immobilier /
+                            finance / tech / créatif / autre)
+
+<span class="c"># SECTION 2 — Coordonnées</span>
+téléphone       : string
+email           : string
+site_web        : string   (si fourni → scraping automatique)
+ville           : string
+pays            : string
+
+<span class="c"># SECTION 3 — Visuel</span>
+logo_url        : upload ou URL   (optionnel)
+couleur_1       : color picker    (extraite du site si scraping)
+couleur_2       : color picker
+effet_animation : select (liste des 55 effets disponibles)
+
+<span class="c"># SECTION 4 — Bannière dynamique</span>
+banniere_texte  : string   (ex: "Consultation en ligne disponible")
+banniere_sous_texte : string   (ex: "Disponible jusqu'au 30 avril")
+banniere_cta    : string   (ex: "Prendre rendez-vous")
+banniere_url    : string   (URL du lien CTA)
+
+<span class="c"># SECTION 5 — Mail de démo</span>
+destinataire_nom   : string  (ex: "Marie Dupont" — un faux patient/client)
+destinataire_email : string  (ex: "marie.dupont@exemple.com")
+objet_mail         : string  (auto-généré selon secteur, modifiable)
+corps_mail         : textarea (auto-généré selon secteur, modifiable)</div>
+</div>
+
+<div class="block">
+<div class="label">Le scraping automatique — quand site_web est fourni</div>
+<div class="code"><span class="c"># Si l'opérateur entre une URL de site web,
+# le système scrape automatiquement :</span>
+
+→ Couleurs dominantes du site (palette hex extraite)
+→ Logo existant (si trouvable)
+→ Numéro de téléphone
+→ Adresse email de contact
+→ Adresse physique / ville
+→ Description de l'activité (pour auto-générer corps mail)
+→ Nom exact de l'entreprise
+
+<span class="o">Ces données pré-remplissent le formulaire.
+L'opérateur valide, corrige si besoin, puis génère.</span>
+
+<span class="c"># Stack scraping :</span>
+<span class="b">puppeteer</span> ou <span class="b">playwright</span>  → rendu JS des sites modernes
+<span class="b">cheerio</span>              → parsing HTML
+<span class="b">color-thief</span>          → extraction palette couleurs
+<span class="b">sharp</span>                → traitement image logo</div>
+</div>
+
+<div class="block">
+<div class="label">La génération du mail de démo — logique exacte</div>
+<div class="code"><span class="c"># demo-mail-[nom].html doit être une interface
+# Gmail simulée PARFAITE — pas un wireframe.</span>
+
+<span class="g">Structure HTML du mail simulé :</span>
+
+┌─ Barre Gmail simulée (gris clair, logo G fictif)
+│
+├─ En-tête du mail
+│   ├─ Avatar initiales du client (couleur_1)
+│   ├─ Nom expéditeur = [prénom nom du client]
+│   ├─ Email expéditeur = [email du client]
+│   ├─ Date = date du jour formatée
+│   ├─ Objet = généré selon secteur
+│   └─ À : [destinataire_nom] [destinataire_email]
+│
+├─ Corps du mail
+│   └─ Texte professionnel crédible, secteur-aware
+│      Médical   → "Suite à votre consultation..."
+│      Juridique → "Suite à notre entretien concernant..."
+│      Immobilier→ "Suite à la visite du bien situé..."
+│      Finance   → "Suite à notre point patrimonial..."
+│      (généré automatiquement, modifiable dans formulaire)
+│
+└─ Signature
+    └─ [GIF animé] affiché en pleine largeur (600px)
+       src = URL Cloudinary du fichier 1
+
+<span class="r">CRITIQUE :</span>
+Le HTML du mail de démo est hébergé à une URL publique.
+Format : https://[domaine]/demo/[token-unique]
+Ce lien est ce qu'on envoie au prospect.
+Il doit s'afficher parfaitement sur mobile ET desktop.</div>
+</div>
+
+<div class="block">
+<div class="label">La logique de génération des couleurs secteur-aware</div>
+<div class="code"><span class="c"># Si aucune couleur fournie ET pas de scraping,
+# le système applique une palette par secteur :</span>
+
+médical     → #0ea5e9 (bleu confiance) + #f0f9ff
+juridique   → #1e293b (noir autorité)  + #f8fafc
+immobilier  → #d97706 (or premium)    + #fffbeb
+finance     → #0f766e (vert stabilité) + #f0fdf4
+tech        → #7c3aed (violet innovation) + #faf5ff
+créatif     → #db2777 (rose créativité) + #fdf2f8
+autre       → #334155 (gris neutre)    + #f8fafc
+
+<span class="c"># Ces couleurs s'appliquent à :</span>
+→ Palette du SVG/GIF généré
+→ Couleur d'accent du PDF guide
+→ Couleur du bouton dans copier-coller.html
+→ Couleur de l'avatar dans le mail de démo</div>
+</div>
+
+<div class="block">
+<div class="label">Le dashboard opérateur — interface de production</div>
+<div class="code"><span class="c"># Page principale — vue liste des clients</span>
+
+Tableau avec colonnes :
+  Nom client | Secteur | Date création | Statut | Actions
+
+Statuts possibles :
+  <span class="o">EN ATTENTE</span>  → formulaire rempli, pas encore généré
+  <span class="b">EN COURS</span>    → pipeline en cours d'exécution
+  <span class="g">LIVRÉ</span>       → tous les fichiers générés
+  <span class="r">ERREUR</span>      → échec d'une étape
+
+Actions par ligne :
+  [Voir démo] → ouvre demo-mail.html dans nouvel onglet
+  [Télécharger ZIP] → télécharge livrable.zip
+  [Copier lien démo] → copie l'URL publique du mail simulé
+  [Régénérer] → relance le pipeline avec mêmes données
+  [Modifier bannière] → formulaire rapide bannière seule
+
+<span class="c"># Bouton principal en haut à droite :</span>
+<span class="g">[ + Nouveau client ]</span> → ouvre le formulaire de création</div>
+</div>
+
+<div class="block">
+<div class="label">Le pipeline de génération — ordre d'exécution</div>
+<div class="code"><span class="b">ÉTAPE 1</span> — Validation des données (1s)
+  Vérifier que tous les champs obligatoires sont remplis.
+  Si site_web fourni → lancer le scraping en parallèle.
+
+<span class="b">ÉTAPE 2</span> — Génération du SVG personnalisé (2s)
+  Charger le template SVG master.
+  Remplacer toutes les variables :
+    {{PRENOM_NOM}}, {{TITRE}}, {{ENTREPRISE}}
+    {{TEL}}, {{EMAIL}}, {{SITE}}, {{VILLE}}
+    {{COULEUR_1}}, {{COULEUR_2}}
+    {{BANNIERE_TEXTE}}, {{BANNIERE_SOUS_TEXTE}}
+    {{BANNIERE_CTA}}, {{BANNIERE_URL}}
+    {{LOGO_URL}}
+
+<span class="b">ÉTAPE 3</span> — Rendu GIF depuis SVG (8-15s)
+  Instancier l'effet choisi (parmi les 55).
+  Appliquer le browser-shim.
+  Boucle 80 frames × deltaTime organique.
+  Encoder GIF qualité max + Floyd-Steinberg.
+  Upload Cloudinary → stocker URL en DB.
+
+<span class="b">ÉTAPE 4</span> — Génération mail de démo (1s)
+  Charger template HTML Gmail simulé.
+  Injecter données client + URL GIF.
+  Auto-générer corps mail selon secteur.
+  Héberger à URL publique unique.
+
+<span class="b">ÉTAPE 5</span> — Génération PDF guide (3s)
+  Charger template PDF 7 pages.
+  Injecter nom, logo, URL personnelle sur chaque page.
+  Générer PDF avec puppeteer headless.
+
+<span class="b">ÉTAPE 6</span> — Génération copier-coller.html (1s)
+  Template HTML avec 3 boutons.
+  Injecter les 3 codes (Gmail / Outlook / HTML universel)
+  avec l'URL Cloudinary du client.
+
+<span class="b">ÉTAPE 7</span> — Création du ZIP (1s)
+  Assembler fichiers 1 à 4 + MON-LIEN-PERMANENT.txt
+  Zipper → stocker → rendre disponible au téléchargement.
+
+<span class="b">ÉTAPE 8</span> — Notification (immédiat)
+  Mettre à jour statut client → LIVRÉ.
+  Afficher résumé avec tous les liens sur le dashboard.</div>
+</div>
+
+<div class="block">
+<div class="label">Stack technique complète</div>
+<div class="code"><span class="c"># Backend</span>
+<span class="b">Node.js + TypeScript</span>     → runtime principal
+<span class="b">Express.js</span>               → serveur HTTP + routes API
+<span class="b">PostgreSQL</span>               → base de données clients + cache
+<span class="b">canvas</span> (npm)             → rendu SVG→frames côté serveur
+<span class="b">gif-encoder-2</span>            → encodage GIF qualité max
+<span class="b">puppeteer</span>               → scraping sites + génération PDF
+<span class="b">cheerio</span>                  → parsing HTML scraping
+<span class="b">color-thief-node</span>         → extraction couleurs logo/site
+<span class="b">cloudinary</span>               → hébergement CDN GIFs + démos
+<span class="b">archiver</span>                 → création fichiers ZIP
+<span class="b">md5</span>                      → cache par hash paramètres
+
+<span class="c"># Frontend dashboard</span>
+<span class="b">React + Vite</span>             → interface opérateur
+<span class="b">TailwindCSS</span>              → styling
+<span class="b">React Query</span>              → état serveur + polling statut
+
+<span class="c"># Fichiers INTOUCHABLES (déjà existants)</span>
+<span class="r">effects/*.js</span>             → les 55 effets animés
+<span class="r">BaseEffect.js</span>            → classe de base
+<span class="r">VarianceEngine.ts</span>        → moteur génétique
+<span class="r">browser-shim.ts</span>          → adapter Node/browser</div>
+</div>
+
+<div class="block">
+<div class="label">Structure des fichiers à créer</div>
+<div class="code">src/
+  <span class="g">pipeline/</span>
+    <span class="g">index.ts</span>              ← orchestrateur principal
+    <span class="g">scraper.ts</span>            ← scraping site web client
+    <span class="g">svg-builder.ts</span>        ← injection variables dans SVG
+    <span class="g">gif-renderer.ts</span>       ← SVG → GIF (déjà défini)
+    <span class="g">demo-builder.ts</span>       ← génération mail de démo HTML
+    <span class="g">pdf-builder.ts</span>        ← génération guide PDF
+    <span class="g">copy-builder.ts</span>       ← génération page copier-coller
+    <span class="g">zip-builder.ts</span>        ← assemblage ZIP final
+  <span class="g">templates/</span>
+    <span class="g">master.svg</span>            ← SVG template avec {{variables}}
+    <span class="g">demo-mail.html</span>        ← template Gmail simulé
+    <span class="g">guide-install.html</span>    ← template PDF 7 pages
+    <span class="g">copy-paste.html</span>       ← template page copier-coller
+    <span class="g">sector-content.json</span>   ← corps mails par secteur
+  <span class="g">dashboard/</span>             ← React frontend opérateur
+  <span class="g">routes/</span>
+    <span class="g">clients.ts</span>            ← CRUD clients
+    <span class="g">generate.ts</span>           ← POST /generate → lance pipeline
+    <span class="g">assets.ts</span>             ← GET fichiers générés
+  <span class="g">db/</span>
+    <span class="g">schema.sql</span>            ← tables clients + outputs + cache
+
+<span class="r">NE PAS TOUCHER :</span>
+  effects/*, BaseEffect.js, VarianceEngine.ts, browser-shim.ts</div>
+</div>
+
+<div class="block">
+<div class="label">Ordre de construction — étape par étape</div>
+<div class="code"><span class="b">1.</span> Installer toutes les dépendances npm
+<span class="b">2.</span> Créer schema.sql + initialiser PostgreSQL
+<span class="b">3.</span> Créer svg-builder.ts (injection variables dans template SVG)
+<span class="b">4.</span> Créer gif-renderer.ts (SVG → GIF — voir prompt GifRenderer)
+<span class="b">5.</span> Tester : formulaire minimal → GIF généré → URL Cloudinary ✓
+<span class="b">6.</span> Créer demo-builder.ts (template Gmail simulé)
+<span class="b">7.</span> Créer pdf-builder.ts (puppeteer → PDF 7 pages)
+<span class="b">8.</span> Créer copy-builder.ts (page copier-coller)
+<span class="b">9.</span> Créer zip-builder.ts (assemblage final)
+<span class="b">10.</span> Créer pipeline/index.ts (orchestrateur qui enchaîne 1→9)
+<span class="b">11.</span> Créer scraper.ts (scraping optionnel)
+<span class="b">12.</span> Créer routes API (clients + generate + assets)
+<span class="b">13.</span> Créer dashboard React (formulaire + liste clients)
+
+<span class="r">À chaque étape : tester avant de passer à la suivante.
+Si une étape échoue : corriger SANS toucher aux fichiers protégés.</span></div>
+</div>
+
+<div class="footer">
+  <div class="pills">
+    <span class="pill pg">Node.js + TypeScript</span>
+    <span class="pill pb">React + Vite</span>
+    <span class="pill po">Puppeteer + Cloudinary</span>
+    <span class="pill pr">55 effets protégés</span>
+  </div>
+  <button class="btn" onclick="
+    const all = [...document.querySelectorAll('.code')].map(e=>e.innerText).join('\n\n---\n\n');
+    navigator.clipboard.writeText(all).then(()=>{
+      this.textContent='Copié ✓';
+      setTimeout(()=>this.textContent='Copier tout',2000);
+    });
+  ">Copier tout</button>
+</div>
+</div>

@@ -179,6 +179,45 @@ export const apiKeyStates = pgTable("api_key_states", {
   last_saved:       timestamp("last_saved").defaultNow(),
 });
 
+// ─── Pipeline Clients ─────────────────────────────────────────────────────────
+export const pipelineClients = pgTable("pipeline_clients", {
+  id:               varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  nom:              text("nom").notNull(),
+  prenom:           text("prenom").notNull().default(''),
+  titre:            text("titre").notNull().default(''),
+  entreprise:       text("entreprise").notNull().default(''),
+  secteur:          text("secteur").notNull().default('autre'),
+  telephone:        text("telephone").notNull().default(''),
+  email:            text("email").notNull().default(''),
+  site:             text("site").notNull().default(''),
+  ville:            text("ville").notNull().default(''),
+  logo_url:         text("logo_url").notNull().default(''),
+  palette:          text("palette").array().notNull().default(sql`'{}'`),
+  banniere_texte:   text("banniere_texte").notNull().default(''),
+  banniere_lien:    text("banniere_lien").notNull().default(''),
+  cta:              text("cta").notNull().default('Nous contacter'),
+  destinataire_nom:   text("destinataire_nom").notNull().default(''),
+  destinataire_email: text("destinataire_email").notNull().default(''),
+  objet_mail:       text("objet_mail").notNull().default(''),
+  corps_mail:       text("corps_mail").notNull().default(''),
+  status:           text("status").notNull().default('pending'),
+  signature_id:     text("signature_id"),
+  gif_url:          text("gif_url"),
+  demo_url:         text("demo_url"),
+  zip_url:          text("zip_url"),
+  error:            text("error"),
+  createdAt:        timestamp("created_at").defaultNow(),
+  updatedAt:        timestamp("updated_at").defaultNow(),
+});
+
+export const insertPipelineClientSchema = createInsertSchema(pipelineClients).omit({
+  id: true, status: true, signature_id: true, gif_url: true,
+  demo_url: true, zip_url: true, error: true, createdAt: true, updatedAt: true,
+});
+
+export type PipelineClient = typeof pipelineClients.$inferSelect;
+export type InsertPipelineClient = z.infer<typeof insertPipelineClientSchema>;
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,

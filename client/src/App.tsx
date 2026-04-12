@@ -15,6 +15,7 @@ import Library from "@/pages/library";
 import Modules from "@/pages/modules";
 import Studio from "@/pages/studio";
 import ExportStudio from "@/pages/export-studio";
+import PipelineDashboard from "@/pages/pipeline-dashboard";
 import Navigation from "@/components/ui/navigation";
 import ParticleBackground from "@/components/ui/particle-background";
 import { useEffect } from "react";
@@ -55,6 +56,7 @@ function Router() {
       <Route path="/expansion" component={Expansion} />
       <Route path="/studio" component={Studio} />
       <Route path="/export" component={ExportStudio} />
+      <Route path="/pipeline" component={PipelineDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

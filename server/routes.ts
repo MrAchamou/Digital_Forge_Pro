@@ -86,6 +86,8 @@ import {
   SignatureInput,
 } from './modules/dynamic-fusion-orchestrator.module';
 
+import { pool as pgPool } from './db';
+
 const router = express.Router();
 
 // === SANTÉ SYSTÈME ===
@@ -2428,6 +2430,223 @@ router.get('/test/choreo', async (req, res) => {
 </html>`);
   } catch (err: any) {
     res.status(500).send(`<pre style="color:red;background:#111;padding:20px">${err.stack}</pre>`);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PIPELINE OUTPUT — CRUD Clients + Génération + Demo Mail
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Liste tous les clients pipeline */
+router.get('/pipeline/clients', async (req, res) => {
+  try {
+    const result = await pgPool.query(
+      'SELECT * FROM pipeline_clients ORDER BY created_at DESC'
+    );
+    return res.json(result.rows);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/** Crée un client et lance le pipeline complet */
+router.post('/pipeline/generate', async (req, res) => {
+  try {
+    const {
+      nom, prenom = '', titre = '', entreprise = '', secteur = 'autre',
+      telephone = '', email = '', site = '', ville = '', logo_url = '',
+      palette = [], banniere_texte = '', banniere_lien = '', cta = 'Nous contacter',
+      destinataire_nom = '', destinataire_email = '', objet_mail = '', corps_mail = '',
+    } = req.body;
+
+    if (!nom) return res.status(400).json({ error: 'Le nom est obligatoire' });
+
+    const nomComplet = [prenom, nom].filter(Boolean).join(' ');
+    const paletteJson = JSON.stringify(palette.length ? palette : []);
+
+    const insertResult = await pgPool.query(
+      `INSERT INTO pipeline_clients
+        (nom, prenom, titre, entreprise, secteur, telephone, email, site, ville, logo_url,
+         palette, banniere_texte, banniere_lien, cta,
+         destinataire_nom, destinataire_email, objet_mail, corps_mail, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,'en_cours')
+       RETURNING *`,
+      [nomComplet, prenom, titre, entreprise, secteur, telephone, email, site, ville, logo_url,
+       paletteJson, banniere_texte, banniere_lien, cta,
+       destinataire_nom, destinataire_email, objet_mail, corps_mail]
+    );
+    const client = insertResult.rows[0];
+    const clientId: string = client.id;
+    const hostedBase = getPublicBaseUrl(req);
+
+    // Génération async — on renvoie l'ID immédiatement
+    (async () => {
+      try {
+        const { generateCompleteExport } = await import('./services/signature-export-complete');
+        const { renderSignatureWithModules } = await import('./services/signature-module-orchestrator');
+        const { buildDemoMailHtml } = await import('./services/demo-mail-builder');
+        const { buildCopierCollerHtml } = await import('./services/copier-coller-builder');
+
+        const SECTOR_PALETTES: Record<string, string[]> = {
+          medecine: ['#0ea5e9','#f0f9ff','#ffffff'], medical: ['#0ea5e9','#f0f9ff','#ffffff'], sante: ['#0ea5e9','#f0f9ff','#ffffff'],
+          juridique: ['#1e293b','#f8fafc','#e2e8f0'], droit: ['#1e293b','#f8fafc','#e2e8f0'],
+          immobilier: ['#d97706','#fffbeb','#ffffff'],
+          finance: ['#0f766e','#f0fdf4','#ffffff'], banque: ['#0f766e','#f0fdf4','#ffffff'],
+          tech: ['#7c3aed','#faf5ff','#ffffff'], informatique: ['#7c3aed','#faf5ff','#ffffff'],
+          creatif: ['#db2777','#fdf2f8','#ffffff'], marketing: ['#db2777','#fdf2f8','#ffffff'],
+          autre: ['#334155','#f8fafc','#e2e8f0'],
+        };
+
+        const effectivePalette = palette.length >= 3 ? palette : (SECTOR_PALETTES[secteur] || SECTOR_PALETTES['autre']);
+
+        const meta = {
+          nom: nomComplet, titre, entreprise, email, telephone, site,
+          adresse: '', ville, code_postal: '', note: 0,
+          logo_url, secteur,
+          palette: effectivePalette,
+          cta, banniere_texte, banniere_lien,
+        };
+
+        const signatureHtml = renderSignatureWithModules(secteur, meta, { tier: 'ultra' }).html;
+        const result = await generateCompleteExport(secteur, signatureHtml, meta, hostedBase);
+
+        const sigId = result.signatureId;
+        const gifUrl = `${hostedBase}/api/sig/${sigId}.gif`;
+        const EXPORTS_DIR = path.join(process.cwd(), 'exports');
+        const DEMO_DIR   = path.join(EXPORTS_DIR, 'demo');
+        await fs.promises.mkdir(DEMO_DIR, { recursive: true });
+
+        const demoHtml = buildDemoMailHtml({
+          signatureId: sigId, nomClient: nomComplet, titreClient: titre,
+          entrepriseClient: entreprise, emailClient: email, secteur,
+          gifUrl, palette: effectivePalette,
+          destinataireNom: destinataire_nom, destinataireEmail: destinataire_email,
+          objetMail: objet_mail, corpsMail: corps_mail,
+        });
+
+        const copierHtml = buildCopierCollerHtml({
+          nomClient: nomComplet, gifUrl, palette: effectivePalette, signatureId: sigId,
+        });
+
+        const demoToken  = clientId.replace(/-/g, '').slice(0, 12);
+        const demoPath   = path.join(DEMO_DIR, `${demoToken}.html`);
+        const copierPath = path.join(DEMO_DIR, `${demoToken}-copier.html`);
+
+        await Promise.all([
+          fs.promises.writeFile(demoPath,   demoHtml,   'utf-8'),
+          fs.promises.writeFile(copierPath, copierHtml, 'utf-8'),
+          fs.promises.writeFile(path.join(EXPORTS_DIR, `${sigId}-config.json`), JSON.stringify(meta, null, 2), 'utf-8'),
+          fs.promises.writeFile(path.join(EXPORTS_DIR, result.zip.filename), result.zip.buffer),
+        ]);
+
+        const demoUrl = `${hostedBase}/api/demo/${demoToken}`;
+        const zipUrl  = `${hostedBase}/api/signature/download/${sigId}`;
+
+        await pgPool.query(
+          `UPDATE pipeline_clients
+           SET status='livre', signature_id=$1, gif_url=$2, demo_url=$3, zip_url=$4, updated_at=NOW()
+           WHERE id=$5`,
+          [sigId, gifUrl, demoUrl, zipUrl, clientId]
+        );
+        log(`Pipeline terminé pour ${nomComplet} — ID: ${sigId}`, 'pipeline');
+      } catch (err: any) {
+        await pgPool.query(
+          `UPDATE pipeline_clients SET status='erreur', error=$1, updated_at=NOW() WHERE id=$2`,
+          [err.message, clientId]
+        );
+        log(`Pipeline erreur pour ${nomComplet}: ${err.message}`, 'pipeline');
+      }
+    })();
+
+    return res.json({ clientId, status: 'en_cours' });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/** Statut d'un client */
+router.get('/pipeline/clients/:id', async (req, res) => {
+  try {
+    const result = await pgPool.query(
+      'SELECT * FROM pipeline_clients WHERE id=$1', [req.params.id]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Client introuvable' });
+    return res.json(result.rows[0]);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/** Mise à jour bannière d'un client */
+router.patch('/pipeline/clients/:id/banner', async (req, res) => {
+  try {
+    const { banniere_texte, banniere_lien } = req.body;
+    const clientRes = await pgPool.query('SELECT * FROM pipeline_clients WHERE id=$1', [req.params.id]);
+    const client = clientRes.rows[0];
+    if (!client) return res.status(404).json({ error: 'Client introuvable' });
+    if (!client.signature_id) return res.status(400).json({ error: 'Signature pas encore générée' });
+
+    const { buildAnimatedGif } = await import('./services/signature-export-complete');
+    const configPath = path.join(process.cwd(), 'exports', `${client.signature_id}-config.json`);
+    const meta = JSON.parse(await fs.promises.readFile(configPath, 'utf-8'));
+    meta.banniere_texte = (banniere_texte || '').trim();
+    meta.banniere_lien  = (banniere_lien  || '').trim();
+
+    const gifBuffer = await buildAnimatedGif(meta);
+    const gifHostPath = path.join(process.cwd(), 'exports', 'hosted', `${client.signature_id}.gif`);
+    await Promise.all([
+      fs.promises.writeFile(gifHostPath, gifBuffer),
+      fs.promises.writeFile(configPath, JSON.stringify(meta, null, 2), 'utf-8'),
+    ]);
+
+    await pgPool.query(
+      `UPDATE pipeline_clients SET banniere_texte=$1, banniere_lien=$2, updated_at=NOW() WHERE id=$3`,
+      [meta.banniere_texte, meta.banniere_lien, req.params.id]
+    );
+
+    return res.json({ success: true, message: 'Bannière mise à jour' });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/** Supprimer un client */
+router.delete('/pipeline/clients/:id', async (req, res) => {
+  try {
+    await pgPool.query('DELETE FROM pipeline_clients WHERE id=$1', [req.params.id]);
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/** Sert le mail de démo public */
+router.get('/demo/:token', async (req, res) => {
+  const { token } = req.params;
+  if (!/^[a-f0-9]{12}$/.test(token)) return res.status(400).send('Token invalide');
+  const demoPath = path.join(process.cwd(), 'exports', 'demo', `${token}.html`);
+  try {
+    const html = await fs.promises.readFile(demoPath, 'utf-8');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    return res.send(html);
+  } catch {
+    return res.status(404).send('Démo introuvable');
+  }
+});
+
+/** Sert la page copier-coller publique */
+router.get('/demo/:token/copier', async (req, res) => {
+  const { token } = req.params;
+  if (!/^[a-f0-9]{12}$/.test(token)) return res.status(400).send('Token invalide');
+  const copierPath = path.join(process.cwd(), 'exports', 'demo', `${token}-copier.html`);
+  try {
+    const html = await fs.promises.readFile(copierPath, 'utf-8');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    return res.send(html);
+  } catch {
+    return res.status(404).send('Page copier-coller introuvable');
   }
 });
 

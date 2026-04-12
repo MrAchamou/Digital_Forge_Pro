@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Activity,
+  Layers,
 } from "lucide-react";
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { path: "/library", label: "Neural Library", icon: Database, color: "#00D4FF" },
   { path: "/studio", label: "Générateur Signatures", icon: Mail, color: "#FF006E" },
   { path: "/export", label: "Export Studio", icon: Package, color: "#00b894" },
+  { path: "/pipeline", label: "Livraisons clients", icon: Layers, color: "#f59e0b" },
   { path: "/expansion", label: "AI Expansion", icon: Brain, color: "#7C3AED" },
   { path: "/preview", label: "Reality Preview", icon: Eye, color: "#00D4FF" },
   { path: "/status", label: "System Matrix", icon: BarChart3, color: "#FF006E" },

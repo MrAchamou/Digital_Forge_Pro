@@ -1,0 +1,218 @@
+Génie. Un seul livrable universel — le client l'installe où il veut. Voilà comment on structure ça.
+
+---
+
+**LE LIVRABLE UNIVERSEL — ce qu'on livre**
+
+Un seul dossier ZIP, propre, professionnel :
+
+```
+📦 signature-jean-martin.zip
+│
+├── 📄 INSTALLER-MA-SIGNATURE.pdf
+│       → Guide visuel universel
+│       → 1 page par client mail
+│       → Captures d'écran annotées
+│
+├── 🖼️  signature-jean-martin.gif
+│       → Le fichier GIF (backup local)
+│
+├── 🔗  MON-LIEN-PERMANENT.txt
+│       → Une seule ligne :
+│          https://cdn.livesign.io/sig/jean-martin.gif
+│
+└── 📋  COPIER-COLLER.html
+        → Fichier HTML à ouvrir dans le browser
+        → Contient le code prêt à copier
+           pour chaque client mail
+```
+
+---
+
+**LE README — la pièce centrale**
+
+Le PDF `INSTALLER-MA-SIGNATURE.pdf` est universel parce qu'il repose sur **un seul principe** qui marche partout :
+
+> *"Dans n'importe quel client mail, une signature = une image + un lien. Rien de plus."*
+
+```
+┌─────────────────────────────────────────────┐
+│   INSTALLER VOTRE SIGNATURE VIVANTE         │
+│                                             │
+│   PRINCIPE UNIVERSEL                        │
+│   ─────────────────                         │
+│   Votre signature est une image hébergée    │
+│   en ligne. Vous l'installez une seule      │
+│   fois. Elle se met à jour automatiquement. │
+│                                             │
+│   VOTRE LIEN PERSONNEL                      │
+│   ─────────────────────                     │
+│   https://cdn.livesign.io/sig/[nom].gif     │
+│                                             │
+│   ① GMAIL        → page 2                  │
+│   ② OUTLOOK      → page 3                  │
+│   ③ APPLE MAIL   → page 4                  │
+│   ④ YAHOO MAIL   → page 5                  │
+│   ⑤ THUNDERBIRD  → page 6                  │
+│   ⑥ AUTRE        → page 7 (méthode HTML)   │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+La méthode HTML de la page 7 est le **filet de sécurité universel** — elle marche sur n'importe quel client mail sans exception :
+
+```html
+<img src="https://cdn.livesign.io/sig/jean-martin.gif"
+     width="600" alt="Signature Jean Martin"
+     style="display:block;border:0;">
+```
+
+Un client avec un mail exotique copie ce code dans le HTML de sa signature. Terminé.
+
+---
+
+**Maintenant — le mail de démo qui pousse à l'achat**
+
+Voilà la psychologie exacte qu'on doit déclencher chez le prospect quand il ouvre ce mail :
+
+```
+Seconde 1 : "C'est pour moi — mon nom, mon logo"
+Seconde 3 : "C'est vivant — ça bouge"
+Seconde 5 : "C'est professionnel — vraiment pro"
+Seconde 8 : "Je veux ça"
+Seconde 10 : "Combien ça coûte ?"
+```
+
+**On ne doit jamais dépasser la seconde 10 sans lui donner le prix.**
+
+---
+
+**LA STRUCTURE DU MAIL DE DÉMO**
+
+Ce n'est pas un mail commercial. C'est un **vrai mail simulé** — comme si le prospect l'avait déjà envoyé à l'un de ses clients. Il se voit dans la peau de quelqu'un qui utilise déjà le produit.
+
+```
+DE :      Jean Martin <jean.martin@cabinet-martin.com>
+À :       Un Client <client@exemple.com>
+OBJET :   Suite à notre consultation du [date]
+
+─────────────────────────────────────────────────────
+
+Bonjour [Prénom],
+
+Comme convenu lors de notre rendez-vous, 
+je vous transmets le récapitulatif de votre 
+consultation ainsi que les prochaines étapes.
+
+N'hésitez pas à me contacter pour toute question.
+
+Cordialement,
+
+[SA SIGNATURE VIVANTE ICI — animée, complète]
+
+─────────────────────────────────────────────────────
+```
+
+Le corps du mail est **neutre et crédible** — adapté au secteur du prospect. Pour un médecin c'est une consultation. Pour un avocat c'est un dossier. Pour un agent immobilier c'est une visite. Le prospect se projette immédiatement.
+
+---
+
+**LE VRAI MAIL QUE TOI TU ENVOIES AU PROSPECT**
+
+Ce mail-là est court. Très court. La curiosité fait le travail.
+
+```
+DE :      Toi
+À :       Dr Jean Martin
+OBJET :   J'ai créé votre signature — regardez ça
+
+─────────────────────────────────────────────
+
+Bonjour Dr Martin,
+
+J'ai imaginé à quoi ressemblerait 
+votre signature email si elle était vivante.
+
+Voici comment vos patients vous verraient 
+dans chaque mail que vous leur envoyez :
+
+👇
+
+[CAPTURE ANIMÉE OU LIEN VERS LE MAIL SIMULÉ]
+
+C'est fait à votre nom, avec vos couleurs.
+Dites-moi ce que vous changeriez.
+
+─────────────────────────────────────────────
+```
+
+**Trois éléments qui rendent ce mail irrésistible :**
+
+**1. L'objet** — *"J'ai créé votre signature"* — il ne peut pas ne pas ouvrir. C'est personnel, c'est déjà fait, c'est pour lui.
+
+**2. "Dites-moi ce que vous changeriez"** — ce n'est pas "voulez-vous acheter ?". C'est une invitation à collaborer. La résistance commerciale tombe. Il répond pour corriger un détail — et là il est engagé.
+
+**3. Zéro prix dans ce mail** — le prix arrive seulement quand il répond. Et à ce moment il est déjà séduit.
+
+---
+
+**LE SCRIPT DE RÉPONSE quand il dit "j'aime bien"**
+
+```
+"Super ! Je peux vous livrer la version finale 
+avec toutes vos infos exactes en 48h.
+
+C'est 137€ en one-shot — logo redesigné inclus,
+fichier GIF + guide d'installation pour Gmail 
+et Outlook.
+
+Et si vous voulez pouvoir changer la bannière 
+du bas selon vos actualités — nouvelle offre, 
+événement, actu cabinet — c'est 19€/mois 
+et vous m'envoyez juste un message.
+
+On y va ?"
+```
+
+Une seule question fermée à la fin. Pas de choix complexe. Juste : on y va ?
+
+---
+
+**LE FORMAT DE PRÉSENTATION DU MAIL SIMULÉ**
+
+Pour que le prospect voie son mail simulé de la façon la plus réaliste possible, on lui envoie **une capture HTML** — une page web qui ressemble exactement à Gmail ou Outlook avec son mail dedans. Il clique sur le lien, il voit :
+
+```
+┌─────────────────────────────────────────────────────┐
+│  ← → ⟳    gmail.com                           🔒   │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  ┌───────────────────────────────────────────────┐  │
+│  │ ◉ Jean Martin                    10:34        │  │
+│  │   À : patient@exemple.com                     │  │
+│  │                                               │  │
+│  │   Suite à notre consultation                  │  │
+│  │                                               │  │
+│  │   Bonjour Marie,                              │  │
+│  │                                               │  │
+│  │   Comme convenu, voici le récapitulatif...    │  │
+│  │                                               │  │
+│  │   Cordialement,                               │  │
+│  │                                               │  │
+│  │   ┌─────────────────────────────────────┐    │  │
+│  │   │                                     │    │  │
+│  │   │   [SIGNATURE VIVANTE ANIMÉE]        │    │  │
+│  │   │                                     │    │  │
+│  │   └─────────────────────────────────────┘    │  │
+│  └───────────────────────────────────────────────┘  │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+C'est une page HTML statique hébergée sur ton serveur. Le lien que tu envoies au prospect ouvre ça dans son navigateur. Il voit son mail — son vrai nom, sa vraie spécialité, son vrai numéro — avec sa signature qui s'anime en direct.
+
+**C'est le moment "wow" qui vend.**
+
+---
+
+On construit cette page HTML maintenant ? Je la génère complète — interface Gmail simulée, corps de mail adapté par secteur, signature vivante en bas. Tu n'as plus qu'à remplacer les variables pour chaque prospect.
