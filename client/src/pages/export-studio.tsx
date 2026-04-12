@@ -476,11 +476,11 @@ function escapeSvgText(value: string) {
 
 // ─── renderLiveEffectPreview ─────────────────────────────────────────────────
 // Reproduit EXACTEMENT les effets du moteur GIF (gif-effect-engine.ts) en SMIL.
-// Coordonnées absolues identiques : avatar cx=55,cy=95 | zone contenu x=110-590
+// Coordonnées absolues identiques : avatar cx=60,cy=90 | zone contenu x=110-590
 // PAS de clippage de zone : chaque effet couvre la pleine carte 600×190.
 // ─────────────────────────────────────────────────────────────────────────────
 function renderLiveEffectPreview(effectId: string, accent: string, textColor: string, layerIndex: number = 0): string {
-  const AX = 55, AY = 95; // avatar center — same position as SVG preview
+  const AX = 60, AY = 90; // avatar center — identique au moteur GIF
   const seed = (i: number, s: number) => ((i * 137.508 + s * 31.41) % 1);
   const TAU = Math.PI * 2;
 
@@ -596,10 +596,10 @@ function renderLiveEffectPreview(effectId: string, accent: string, textColor: st
     // ── 6. NEON GLOW — bord lumineux pleine carte + 4 orbes de coin (idem GIF) ──
     case 'neonGlow': {
       body = `
-        <rect x="1" y="1" width="598" height="188" rx="10" fill="none" stroke="${accent}" stroke-width="2" opacity="0">
+        <rect x="1" y="1" width="598" height="178" rx="10" fill="none" stroke="${accent}" stroke-width="2" opacity="0">
           <animate attributeName="opacity" values="0.06;0.14;0.06" dur="1.8s" repeatCount="indefinite"/>
         </rect>
-        <rect x="3" y="3" width="594" height="184" rx="9" fill="none" stroke="${accent}" stroke-width="1" opacity="0">
+        <rect x="3" y="3" width="594" height="174" rx="9" fill="none" stroke="${accent}" stroke-width="1" opacity="0">
           <animate attributeName="opacity" values="0.03;0.08;0.03" dur="2.1s" begin="0.3s" repeatCount="indefinite"/>
         </rect>
         <circle cx="10" cy="10" r="8" fill="${accent}" opacity="0">
@@ -608,10 +608,10 @@ function renderLiveEffectPreview(effectId: string, accent: string, textColor: st
         <circle cx="590" cy="10" r="8" fill="${accent}" opacity="0">
           <animate attributeName="opacity" values="0.06;0.18;0.06" dur="2.1s" begin="0.5s" repeatCount="indefinite"/>
         </circle>
-        <circle cx="590" cy="180" r="8" fill="${accent}" opacity="0">
+        <circle cx="590" cy="170" r="8" fill="${accent}" opacity="0">
           <animate attributeName="opacity" values="0.04;0.14;0.04" dur="2.1s" begin="1s" repeatCount="indefinite"/>
         </circle>
-        <circle cx="10" cy="180" r="8" fill="${accent}" opacity="0">
+        <circle cx="10" cy="170" r="8" fill="${accent}" opacity="0">
           <animate attributeName="opacity" values="0.05;0.17;0.05" dur="2.1s" begin="0.8s" repeatCount="indefinite"/>
         </circle>`;
       break;
@@ -832,7 +832,7 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
       <stop offset="0%" stop-color="${accent}"/>
       <stop offset="100%" stop-color="${accent}66"/>
     </linearGradient>
-    <clipPath id="lp-avatar-clip"><circle cx="55" cy="95" r="40"/></clipPath>
+    <clipPath id="lp-avatar-clip"><circle cx="60" cy="90" r="40"/></clipPath>
     <filter id="lp-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     <filter id="lp-soft"><feGaussianBlur stdDeviation="2"/></filter>
   </defs>
@@ -855,18 +855,18 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
   </rect>
 
   <!-- Halo derrière avatar -->
-  <circle cx="55" cy="95" r="48" fill="${accent}" opacity="0.08" filter="url(#lp-soft)">
+  <circle cx="60" cy="90" r="48" fill="${accent}" opacity="0.08" filter="url(#lp-soft)">
     <animate attributeName="r" values="44;50;44" dur="3s" repeatCount="indefinite"/>
     <animate attributeName="opacity" values="0.06;0.13;0.06" dur="3s" repeatCount="indefinite"/>
   </circle>
 
   <!-- Avatar -->
   ${logoPreview
-    ? `<image href="${logoPreview}" x="15" y="55" width="80" height="80" clip-path="url(#lp-avatar-clip)" preserveAspectRatio="xMidYMid slice"/>`
-    : `<circle cx="55" cy="95" r="40" fill="url(#lp-avatar-grad)" opacity="0.9"/>
-       <text x="55" y="101" text-anchor="middle" font-size="26" font-weight="700" fill="${textColor}" font-family="system-ui,sans-serif">${initiale}</text>`
+    ? `<image href="${logoPreview}" x="20" y="50" width="80" height="80" clip-path="url(#lp-avatar-clip)" preserveAspectRatio="xMidYMid slice"/>`
+    : `<circle cx="60" cy="90" r="40" fill="url(#lp-avatar-grad)" opacity="0.9"/>
+       <text x="60" y="96" text-anchor="middle" font-size="26" font-weight="700" fill="${textColor}" font-family="system-ui,sans-serif">${initiale}</text>`
   }
-  <circle cx="55" cy="95" r="40" fill="none" stroke="${accent}" stroke-width="1.5" opacity="0.6">
+  <circle cx="60" cy="90" r="40" fill="none" stroke="${accent}" stroke-width="1.5" opacity="0.6">
     <animate attributeName="opacity" values="0.4;0.9;0.4" dur="3s" repeatCount="indefinite"/>
   </circle>
 
