@@ -339,6 +339,85 @@ const EFFECT_CATALOG: { id: string; label: string; icon: string; vibe: string }[
 
 const MAX_EFFECTS_PER_ZONE = 3;
 
+const COMBINATION_PRESETS: {
+  id: string;
+  name: string;
+  icon: string;
+  tagline: string;
+  color: string;
+  zoneEffects: ZoneEffectsMap;
+}[] = [
+  {
+    id: 'corporate-glow',
+    name: 'Corporate Glow',
+    icon: '🏛️',
+    tagline: 'Sobre, premium, lisible',
+    color: '#0ea5e9',
+    zoneEffects: {
+      fond: ['sparkleAura'],
+      avatar: ['neonGlow'],
+      nom: ['neuralPulse'],
+      contact: ['echoTrail'],
+      cta: ['neonGlow'],
+    },
+  },
+  {
+    id: 'tech-pulse',
+    name: 'Tech Pulse',
+    icon: '⚡',
+    tagline: 'Nerveux, digital, startup',
+    color: '#6366f1',
+    zoneEffects: {
+      fond: ['neuralPulse', 'glitchScan'],
+      avatar: ['orbitalRings', 'electricArcs'],
+      nom: ['neonGlow'],
+      contact: ['particleStream'],
+      cta: ['electricArcs', 'neonGlow'],
+    },
+  },
+  {
+    id: 'luxury-crystal',
+    name: 'Luxury Crystal',
+    icon: '💎',
+    tagline: 'Luxe, reflets, confiance',
+    color: '#38bdf8',
+    zoneEffects: {
+      fond: ['crystalFacets', 'stellarDrift'],
+      avatar: ['crystalFacets', 'sparkleAura'],
+      nom: ['neonGlow', 'echoTrail'],
+      cta: ['sparkleAura'],
+    },
+  },
+  {
+    id: 'organic-flow',
+    name: 'Organic Flow',
+    icon: '🌿',
+    tagline: 'Naturel, fluide, humain',
+    color: '#22c55e',
+    zoneEffects: {
+      fond: ['waveDistortion', 'particleStream'],
+      avatar: ['magneticField'],
+      nom: ['echoTrail'],
+      contact: ['sparkleAura'],
+      cta: ['waveDistortion'],
+    },
+  },
+  {
+    id: 'sales-impact',
+    name: 'Sales Impact',
+    icon: '🎯',
+    tagline: 'CTA fort, conversion',
+    color: '#f59e0b',
+    zoneEffects: {
+      fond: ['stellarDrift'],
+      avatar: ['orbitalRings'],
+      nom: ['electricArcs'],
+      contact: ['neuralPulse'],
+      cta: ['electricArcs', 'particleStream', 'neonGlow'],
+    },
+  },
+];
+
 // ── Palettes par secteur (mirroir du serveur) ─────────────────────────────────
 
 const SECTOR_PALETTES: Record<string, [string, string, string]> = {
@@ -666,6 +745,7 @@ export default function ExportStudio() {
   const [copiedTag, setCopiedTag] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
   const [zoneEffects, setZoneEffects] = useState<ZoneEffectsMap>({});
+  const [selectedCombinationPreset, setSelectedCombinationPreset] = useState<string | null>(null);
   const prevSectorRef = useRef(form.sectorId);
 
   useEffect(() => {
@@ -688,6 +768,7 @@ export default function ExportStudio() {
   const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }));
 
   const toggleZoneEffect = (zone: ZoneName, effectId: string) => {
+    setSelectedCombinationPreset(null);
     setZoneEffects(prev => {
       const current = prev[zone] ?? [];
       if (current.includes(effectId)) {
@@ -697,6 +778,22 @@ export default function ExportStudio() {
       if (current.length >= MAX_EFFECTS_PER_ZONE) return prev;
       return { ...prev, [zone]: [...current, effectId] };
     });
+  };
+
+  const applyCombinationPreset = (presetId: string) => {
+    const preset = COMBINATION_PRESETS.find(p => p.id === presetId);
+    if (!preset) return;
+    const nextEffects = Object.fromEntries(
+      Object.entries(preset.zoneEffects).map(([zone, effects]) => [zone, [...(effects ?? [])]])
+    ) as ZoneEffectsMap;
+    setZoneEffects(nextEffects);
+    setSelectedCombinationPreset(preset.id);
+    setComposerOpen(true);
+  };
+
+  const clearZoneEffects = () => {
+    setZoneEffects({});
+    setSelectedCombinationPreset(null);
   };
 
   const totalEffectsSelected = Object.values(zoneEffects).flat().length;
@@ -933,6 +1030,11 @@ export default function ExportStudio() {
                         {totalEffectsSelected} actif{totalEffectsSelected > 1 ? 's' : ''}
                       </span>
                     )}
+                    {selectedCombinationPreset && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-green-400/10 text-green-300 border border-green-400/20">
+                        Pack {COMBINATION_PRESETS.find(p => p.id === selectedCombinationPreset)?.name}
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] text-white/25">Empiler jusqu'à 3 effets par zone</span>
@@ -950,6 +1052,69 @@ export default function ExportStudio() {
                       className="overflow-hidden border-t border-white/[0.06]"
                     >
                       <div className="p-4 space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-[10px] text-white/45 uppercase tracking-wider font-semibold">Packs de combinaison</p>
+                              <p className="text-[9px] text-white/25">Applique automatiquement des effets cohérents sur toutes les zones</p>
+                            </div>
+                            {totalEffectsSelected > 0 && (
+                              <button
+                                type="button"
+                                onClick={clearZoneEffects}
+                                data-testid="btn-clear-effect-pack"
+                                className="text-[10px] text-white/30 hover:text-red-300 transition-colors"
+                              >
+                                Vider les effets
+                              </button>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-5 gap-2">
+                            {COMBINATION_PRESETS.map(preset => {
+                              const isActive = selectedCombinationPreset === preset.id;
+                              return (
+                                <button
+                                  key={preset.id}
+                                  type="button"
+                                  onClick={() => applyCombinationPreset(preset.id)}
+                                  data-testid={`btn-effect-pack-${preset.id}`}
+                                  className={`relative p-2 rounded-xl border text-left transition-all ${
+                                    isActive
+                                      ? 'bg-white/[0.08] scale-[1.02]'
+                                      : 'bg-white/[0.025] hover:bg-white/[0.05]'
+                                  }`}
+                                  style={{ borderColor: isActive ? `${preset.color}80` : 'rgba(255,255,255,0.08)' }}
+                                >
+                                  <div
+                                    className="absolute inset-0 rounded-xl opacity-10"
+                                    style={{ background: `linear-gradient(135deg, ${preset.color}, transparent)` }}
+                                  />
+                                  <div className="relative flex items-center gap-2">
+                                    <span className="text-base">{preset.icon}</span>
+                                    <div className="min-w-0">
+                                      <p className="text-[10px] font-bold text-white/75 truncate">{preset.name}</p>
+                                      <p className="text-[8px] text-white/30 truncate">{preset.tagline}</p>
+                                    </div>
+                                  </div>
+                                  <div className="relative mt-2 flex gap-0.5">
+                                    {COMPOSER_ZONES.map(zone => {
+                                      const count = preset.zoneEffects[zone.id]?.length ?? 0;
+                                      return (
+                                        <span
+                                          key={zone.id}
+                                          title={`${zone.label}: ${count} effet${count > 1 ? 's' : ''}`}
+                                          className="h-1.5 flex-1 rounded-full"
+                                          style={{ background: count > 0 ? zone.color : 'rgba(255,255,255,0.08)', opacity: count > 0 ? Math.min(1, 0.35 + count * 0.22) : 1 }}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
                         {COMPOSER_ZONES.map(zone => {
                           const selected = zoneEffects[zone.id] ?? [];
                           return (
