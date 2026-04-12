@@ -939,6 +939,47 @@ function getPublicBaseUrl(req: express.Request): string {
   return `${req.protocol}://${req.get('host')}`;
 }
 
+/** Sert la signature CSS animée en live (rendu temps réel depuis la config).
+ *  URL : /api/sig/{signatureId}/live
+ *  Retourne une page HTML standalone avec la signature CSS-animée complète.
+ */
+router.get('/sig/:id/live', async (req, res) => {
+  const { id } = req.params;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(id)) {
+    return res.status(400).send('ID invalide');
+  }
+  const configPath = path.join(process.cwd(), 'exports', `${id}-config.json`);
+  try {
+    const meta = JSON.parse(await fs.promises.readFile(configPath, 'utf-8'));
+    const { renderSignatureWithModules } = await import('./services/signature-module-orchestrator');
+    const { html: sigHtml } = renderSignatureWithModules(meta.secteur || 'autre', meta, { tier: 'ultra' });
+    const accent = meta.palette?.[0] || '#6366f1';
+    const page = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Signature — ${meta.nom || ''}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:transparent;overflow:hidden;display:flex;align-items:flex-start;justify-content:flex-start}
+  .sig-wrap{transform-origin:top left;display:inline-block}
+</style>
+</head>
+<body>
+<div class="sig-wrap">${sigHtml}</div>
+</body>
+</html>`;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('X-Frame-Options', 'ALLOWALL');
+    res.setHeader('Cache-Control', 'no-cache');
+    return res.send(page);
+  } catch {
+    return res.status(404).send('Config signature introuvable');
+  }
+});
+
 /** Sert les GIF/SVG/PNG hébergés des signatures générées.
  *  URL : /api/sig/{signatureId}.{gif|svg|png}
  *  Les fichiers sont stockés dans exports/hosted/ lors de la génération.
@@ -2554,7 +2595,7 @@ router.post('/pipeline/generate', async (req, res) => {
           destinataireNom: destinataire_nom, destinataireEmail: destinataire_email,
           objetMail: objet_mail, corpsMail: corps_mail,
         });
-        const copierHtml = buildCopierCollerHtml({ nomClient: nomComplet, gifUrl, palette: effectivePalette, signatureId: sigId });
+        const copierHtml = buildCopierCollerHtml({ nomClient: nomComplet, gifUrl, palette: effectivePalette, signatureId: sigId, signatureHtml });
 
         const demoToken  = clientId.replace(/-/g, '').slice(0, 12);
         await Promise.all([

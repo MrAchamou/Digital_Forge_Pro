@@ -753,13 +753,21 @@ function ClientCard({ client, onDelete }: { client: PipelineClient; onDelete: (i
                 </div>
               )}
 
-              {/* GIF preview */}
-              {client.gif_url && (
+              {/* Aperçu signature animée CSS live */}
+              {client.signature_id && (
                 <div>
-                  <p className="text-[9px] text-white/35 uppercase tracking-wider mb-2">Aperçu signature</p>
-                  <img src={client.gif_url} alt={`Signature ${client.nom}`}
-                    className="max-w-sm w-full rounded-xl border border-white/[0.08] bg-white/[0.02]"
-                  />
+                  <p className="text-[9px] text-white/35 uppercase tracking-wider mb-2">
+                    Aperçu signature <span className="text-forge-cyan/60 normal-case">· animé CSS</span>
+                  </p>
+                  <div className="max-w-sm w-full rounded-xl border border-white/[0.08] bg-white overflow-hidden" style={{ height: '220px' }}>
+                    <iframe
+                      src={`/api/sig/${client.signature_id}/live`}
+                      title={`Signature ${client.nom}`}
+                      className="w-full h-full"
+                      style={{ border: 'none', display: 'block' }}
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
               )}
 
