@@ -412,10 +412,10 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
     phase: (i * 0.52) % (2 * Math.PI),
   }));
 
-  const TOTAL   = 48;
-  const PH_BUILD = 16;   // frames 0-15
-  const PH_LIVE  = 36;   // frames 16-35
-  // frames 36-47 → SHINE
+  const TOTAL   = 24;
+  const PH_BUILD = 10;   // frames 0-9
+  const PH_LIVE  = 24;   // frames 10-23 (boucle légère)
+  // Réduit à 24 frames pour garder le GIF sous 400KB
 
   const frames: Buffer[] = [];
 
@@ -636,8 +636,8 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
     const encoder = new GifEncoder(600, 220, 'neuquant', true, frames.length);
 
     encoder.setRepeat(0);    // boucle infinie
-    encoder.setDelay(65);    // 65ms/frame → ~15fps fluide
-    encoder.setQuality(5);   // 1=best/lent, 20=fast/rough — bon compromis
+    encoder.setDelay(90);    // 90ms/frame → ~11fps (léger, toujours fluide)
+    encoder.setQuality(18);  // 1=best/lent, 30=fast/rough — optimisé pour poids email
     encoder.start();
 
     for (const framePng of frames) {
@@ -736,48 +736,18 @@ function buildInlineTable(meta: ExportMetadata): string {
 </table>`;
 }
 
-export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hostedGifUrl?: string, animatedSvg?: string): string {
+// ── Gmail ne supporte pas les SVG inline (ils sont supprimés par le moteur Gmail).
+// La stratégie correcte pour Gmail :
+//  1. Si un GIF hébergé est disponible : afficher l'image GIF animée + table inline en dessous
+//  2. Sinon : table inline-styles uniquement (100% compatible, texte cliquable)
+// Le SVG animé reste disponible séparément pour Apple Mail et le web.
+export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hostedGifUrl?: string, _animatedSvg?: string): string {
   const { nom = '', entreprise = '', telephone = '', email = '', site = '', palette = [], cta = 'Nous contacter' } = meta;
   const [bg, accent] = palette.length >= 2 ? palette : ['#0f172a', '#6366f1'];
 
-  const linksRow = `
-  <tr>
-    <td style="padding:6px 0 0;">
-      <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;">
-        <tr>
-          ${telephone ? `<td style="padding-right:14px;"><a href="tel:${escXml(telephone)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9990; ${escXml(telephone)}</a></td>` : ''}
-          ${email ? `<td style="padding-right:14px;"><a href="mailto:${escXml(email)}" style="font-size:11px;color:${accent};text-decoration:none;">&#9993; ${escXml(email)}</a></td>` : ''}
-          ${site ? `<td style="padding-right:14px;"><a href="${escXml(site)}" style="font-size:11px;color:${accent};text-decoration:none;">&#127760; ${escXml(site.replace(/^https?:\/\//, ''))}</a></td>` : ''}
-          ${cta && site ? `<td><a href="${escXml(site)}" style="display:inline-block;font-size:11px;font-weight:700;color:#ffffff;background:${accent};padding:5px 12px;border-radius:4px;text-decoration:none;">${escXml(cta)}</a></td>` : ''}
-        </tr>
-      </table>
-    </td>
-  </tr>`;
-
-  // ── Priorité 1 : SVG animé embarqué inline (meilleure qualité, toutes animations)
-  // Compatible Apple Mail, Thunderbird, webmails modernes. Pour Gmail web, le SVG
-  // est accepté dans les signatures configurées dans Paramètres → Signature.
-  if (animatedSvg) {
-    return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
-<body style="margin:0;padding:0;background:${bg};">
-<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;background:${bg};border-radius:10px;">
-  <tr>
-    <td style="padding:0;line-height:0;font-size:0;">
-      ${animatedSvg}
-    </td>
-  </tr>${linksRow}
-</table>
-<!-- EffectForge AI — ${escXml(nom)} — SVG animé inline -->
-</body>
-</html>`;
-  }
-
-  // ── Priorité 2 : GIF hébergé (fallback pour les environnements sans SVG)
+  // ── Priorité 1 : GIF hébergé + table inline (animation visible + texte toujours présent)
+  // Le GIF externe fonctionne dans Gmail si l'affichage des images est activé.
+  // La table inline sert de fallback immédiat si les images sont bloquées.
   if (hostedGifUrl) {
     return `<!DOCTYPE html>
 <html lang="fr">
@@ -785,31 +755,36 @@ export function buildGmailHtml(meta: ExportMetadata, _signatureHtml: string, hos
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-<body style="margin:0;padding:0;background:${bg};">
-<table cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;font-family:Arial,Helvetica,sans-serif;background:${bg};border-radius:10px;">
+<body style="margin:0;padding:0;background:transparent;">
+<table cellpadding="0" cellspacing="0" border="0" style="max-width:620px;width:100%;font-family:Arial,Helvetica,sans-serif;">
   <tr>
-    <td style="padding:0;">
+    <td style="padding:0 0 8px 0;line-height:0;font-size:0;">
       <img src="${hostedGifUrl}" width="600" height="220"
         style="display:block;max-width:100%;border:0;border-radius:8px;"
         alt="${escXml(nom)} — ${escXml(entreprise)}" />
     </td>
-  </tr>${linksRow}
+  </tr>
+  <tr>
+    <td style="padding:0;">
+      ${buildInlineTable(meta)}
+    </td>
+  </tr>
 </table>
-<!-- EffectForge AI — ${escXml(nom)} — animated via hosted GIF -->
+<!-- EffectForge AI — ${escXml(nom)} — GIF animé + table inline Gmail-safe -->
 </body>
 </html>`;
   }
 
-  // ── Priorité 3 : table statique inline-styles (pas d'animation)
+  // ── Priorité 2 : table inline-styles uniquement (compatible 100% des clients email)
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-<body style="margin:0;padding:0;background:${bg};">
+<body style="margin:0;padding:0;background:transparent;">
 ${buildInlineTable(meta)}
-<!-- EffectForge AI — ${escXml(nom)} -->
+<!-- EffectForge AI — ${escXml(nom)} — table inline Gmail-safe -->
 </body>
 </html>`;
 }
@@ -875,10 +850,7 @@ export function buildOutlookHtml(meta: ExportMetadata, pngBase64: string): strin
 <![endif]-->
 
 <!--[if !mso]><!-->
-<div style="max-width:620px;">
-  <img src="data:image/png;base64,${pngBase64}" alt="Signature ${escXml(nom)} — ${escXml(entreprise)}"
-    width="620" style="display:block;max-width:100%;border:0;" />
-</div>
+${buildInlineTable(meta)}
 <!--<![endif]-->
 
 </body>
@@ -935,6 +907,14 @@ export function buildUniversalHtml(
   body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;}
   a{color:${accent};text-decoration:none;}
   .sig-animated{display:block;max-width:100%;border:0;}
+  @media only screen and (max-width:480px){
+    .sig-wrap{width:100%!important;max-width:100%!important;}
+    .sig-avatar-cell{display:none!important;width:0!important;padding:0!important;overflow:hidden!important;}
+    .sig-sep-cell{display:none!important;width:0!important;padding:0!important;}
+    .sig-content{padding:12px!important;}
+    .sig-name{font-size:16px!important;}
+    .sig-gif{width:100%!important;height:auto!important;}
+  }
 </style>
 </head>
 <body>
@@ -1004,7 +984,8 @@ ${hostedGifUrl ? `
 
 export function buildInstallationGuide(
   meta: ExportMetadata,
-  signatureId: string
+  signatureId: string,
+  animatedSvg?: string,
 ): string {
   const { nom = '', entreprise = '', secteur = '', palette = [] } = meta;
   const [bg, accent, textColor] = palette.length >= 3 ? palette : ['#0f172a', '#6366f1', '#e8e8ff'];
@@ -1016,7 +997,7 @@ export function buildInstallationGuide(
       color: '#EA4335',
       steps: [
         'Ouvrez Gmail → Paramètres (⚙️) → "Voir tous les paramètres"',
-        'Onglet <strong>Général</strong> → section <strong>Signature</strong>',
+        'Onglet <strong>Général</strong> → section <strong>Signature</strong> → cliquez <strong>Créer</strong>',
         'Cliquez <strong>Créer une signature</strong>, donnez-lui un nom',
         'Cliquez sur l\'icône <strong>HTML</strong> (&lt;&gt;) dans l\'éditeur de signature',
         'Copiez-collez le contenu du fichier <code>signature-gmail.html</code>',
@@ -1126,8 +1107,17 @@ export function buildInstallationGuide(
   </div>
 
   <div style="background:${bg};border-radius:12px;padding:20px;margin-bottom:32px;text-align:center;">
-    <p style="color:${textColor};font-size:13px;opacity:0.7;margin-bottom:8px;">Aperçu de votre signature</p>
+    <p style="color:${textColor};font-size:13px;opacity:0.7;margin-bottom:12px;">Aperçu de votre signature animée</p>
     <div style="display:inline-block;border-radius:8px;overflow:hidden;max-width:100%;">
+      ${animatedSvg
+        ? `<img src="data:image/svg+xml;base64,${Buffer.from(animatedSvg).toString('base64')}"
+            alt="Signature animée ${escXml(nom)}" width="600" height="220"
+            style="display:block;max-width:100%;border-radius:8px;" />`
+        : `<div style="width:600px;max-width:100%;height:80px;background:${accent}18;border-radius:8px;
+            display:flex;align-items:center;justify-content:center;color:${accent};font-size:13px;">
+            Aperçu disponible dans l'application
+           </div>`
+      }
     </div>
   </div>
 
@@ -1143,13 +1133,13 @@ export function buildInstallationGuide(
       </tr>
     </thead>
     <tbody>
-      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-gmail.html</code></td><td style="padding:10px 14px;">Gmail, Webmail</td><td style="padding:10px 14px;color:#059669;">✅ CSS Animé</td></tr>
-      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-outlook.htm</code></td><td style="padding:10px 14px;">Outlook (Windows/Mac)</td><td style="padding:10px 14px;color:#0078D4;">✅ MSO Compatible</td></tr>
-      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-apple-mail.html</code></td><td style="padding:10px 14px;">Apple Mail, Thunderbird</td><td style="padding:10px 14px;color:#059669;">✅ CSS Animé</td></tr>
-      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-universelle.html</code></td><td style="padding:10px 14px;">Copier-coller universel</td><td style="padding:10px 14px;color:#6366f1;">✅ Multi-client</td></tr>
-      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-animee.svg</code></td><td style="padding:10px 14px;">Embed &lt;img&gt; SVG animé</td><td style="padding:10px 14px;color:#059669;">✅ SMIL Natif</td></tr>
-      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-animee.gif</code></td><td style="padding:10px 14px;">GIF animé universel</td><td style="padding:10px 14px;color:#f59e0b;">✅ Outlook (1er frame)</td></tr>
-      <tr><td style="padding:10px 14px;"><code>signature-statique.png</code></td><td style="padding:10px 14px;">Fallback image</td><td style="padding:10px 14px;color:#6b7280;">✅ Universel</td></tr>
+      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-gmail.html</code></td><td style="padding:10px 14px;">Gmail, Yahoo Mail, Webmail</td><td style="padding:10px 14px;color:#059669;">✅ GIF animé + table inline (100% compatible)</td></tr>
+      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-outlook.htm</code></td><td style="padding:10px 14px;">Outlook Windows &amp; Mac</td><td style="padding:10px 14px;color:#0078D4;">✅ MSO — table statique professionnelle</td></tr>
+      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-apple-mail.html</code></td><td style="padding:10px 14px;">Apple Mail, Thunderbird</td><td style="padding:10px 14px;color:#059669;">✅ SVG + CSS animé (pleine fidélité)</td></tr>
+      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-universelle.html</code></td><td style="padding:10px 14px;">Copier-coller tous clients</td><td style="padding:10px 14px;color:#6366f1;">✅ Multi-client — MSO + GIF + responsive</td></tr>
+      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-animee.svg</code></td><td style="padding:10px 14px;">Site web, réseaux sociaux</td><td style="padding:10px 14px;color:#059669;">✅ SMIL — animations complètes</td></tr>
+      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:10px 14px;"><code>signature-animee.gif</code></td><td style="padding:10px 14px;">Email animé universel</td><td style="padding:10px 14px;color:#f59e0b;">✅ Compatible tous clients email</td></tr>
+      <tr><td style="padding:10px 14px;"><code>signature-statique.png</code></td><td style="padding:10px 14px;">Fallback image statique</td><td style="padding:10px 14px;color:#6b7280;">✅ Universel — aucune dépendance</td></tr>
     </tbody>
   </table>
 
@@ -1675,7 +1665,7 @@ export async function generateCompleteExport(
   const outlookHtml   = buildOutlookHtml(meta, pngBase64);
   const appleHtml     = buildAppleMailHtml(meta, signatureHtml);
   const universalHtml = buildUniversalHtml(meta, hostedGifUrl);
-  const guideHtml     = buildInstallationGuide(meta, signatureId);
+  const guideHtml     = buildInstallationGuide(meta, signatureId, animatedSvg);
 
   const zip = await buildCompleteZip({
     signatureId, nom: meta.nom || 'signature',

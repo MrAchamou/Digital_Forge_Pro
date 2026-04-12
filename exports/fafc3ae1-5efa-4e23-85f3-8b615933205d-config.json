@@ -1,0 +1,16 @@
+{
+  "nom": "Sophie Lefebvre",
+  "titre": "Consultante Marketing Digital",
+  "entreprise": "Agence Lumière",
+  "email": "sophie@agence-lumiere.fr",
+  "telephone": "+33 6 12 34 56 78",
+  "site": "https://agence-lumiere.fr",
+  "adresse": "",
+  "ville": "",
+  "code_postal": "",
+  "note": 5,
+  "logo_url": "",
+  "secteur": "tech",
+  "palette": [],
+  "cta": "Prendre rendez-vous"
+}
