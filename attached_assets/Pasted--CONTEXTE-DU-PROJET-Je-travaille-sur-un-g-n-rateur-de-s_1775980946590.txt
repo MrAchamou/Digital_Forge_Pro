@@ -1,0 +1,190 @@
+# CONTEXTE DU PROJET
+
+Je travaille sur un générateur de signatures email animées premium.
+J'ai déjà une architecture stable que tu NE DOIS PAS modifier.
+
+RÈGLE ABSOLUE N°1 :
+Les fichiers suivants sont INTOUCHABLES. Ne jamais les modifier,
+réécrire, "améliorer" ou déplacer :
+  - BaseEffect.js        → classe de base de tous les effets
+  - effects/*.js          → les 55 effets existants
+  - VarianceEngine.ts     → moteur génétique créatif
+
+RÈGLE ABSOLUE N°2 :
+Si tu dois modifier un fichier existant pour résoudre un problème,
+ARRÊTE et demande-moi confirmation avant.
+
+RÈGLE ABSOLUE N°3 :
+Ta seule mission = créer le GifRenderer.
+Rien d'autre ne doit changer dans le projet.
+
+---
+
+# DÉPENDANCES — installer exactement celles-ci
+
+npm install canvas           # Canvas API Node.js (émule le browser parfaitement)
+npm install gif-encoder-2     # Encodeur GIF avec Floyd-Steinberg dithering
+npm install express           # Serveur HTTP
+npm install cloudinary        # Hébergement CDN des GIFs générés
+npm install pg                # PostgreSQL
+npm install md5               # Cache par hash des paramètres
+npm install typescript ts-node # TypeScript
+
+# NE PAS installer d'autres libs canvas ou gif sans me demander
+
+---
+
+# Créer : src/browser-shim.ts
+# Ce fichier permet aux 55 effets (écrits pour le browser)
+# de tourner côté serveur SANS les modifier
+
+import { createCanvas } from 'canvas';
+
+// Shim global minimal — ne rien ajouter d'autre
+(global as any).document = {
+  createElement: (tag: string) => {
+    if (tag === 'canvas') return createCanvas(600, 200);
+    return {};
+  }
+};
+
+(global as any).window = global;
+(global as any).requestAnimationFrame = (cb: Function) => cb(16.67);
+
+---
+
+# Créer : src/GifRenderer.ts
+# Voici EXACTEMENT ce que ce fichier doit faire :
+
+ÉTAPE 1 — Initialisation du Canvas haute résolution
+  - Créer un canvas NodeCanvas en 1200x400 (rendu 2x)
+  - Appliquer ctx.scale(2, 2) pour résolution Retina
+  - Créer un canvas de sortie 600x200 (taille finale signature)
+
+ÉTAPE 2 — Instanciation de l'effet
+  - Importer l'effet demandé via EffectFactory (voir ci-dessous)
+  - Appeler effect.initialize(canvas, element)
+  - L'élément (element) contient : x, y, width, height, content, opacity, rotation
+
+ÉTAPE 3 — Boucle de rendu avec timing organique
+  - Nombre de frames : 80 frames à 25 FPS
+  - DeltaTime avec micro-variation naturelle :
+      const jitter = 0.98 + Math.random() * 0.04;
+      const deltaTime = (1000 / 25) * jitter;
+  - À chaque frame : effect.update(deltaTime) → effect.render(ctx)
+  - Downscale du canvas 2x vers 600x200 avant capture de frame
+
+ÉTAPE 4 — Encodage GIF de qualité maximale
+  - Utiliser gif-encoder-2 avec ces paramètres EXACTS :
+      encoder.setQuality(1)      → qualité maximale
+      encoder.setDither(true)    → Floyd-Steinberg dithering
+      encoder.setRepeat(0)       → boucle infinie
+      encoder.setDelay(40)       → 25 FPS (40ms par frame)
+  - Seamless loop : démarrer le cycle de l'effet à son point naturel
+    de début (t=0 du cycle physiologique) pour que frame 1 = frame 80
+
+ÉTAPE 5 — Upload et cache
+  - Calculer cacheKey = md5(userId + effectId + JSON.stringify(params))
+  - Si cacheKey existe en DB → retourner l'URL directement (0ms)
+  - Sinon → upload buffer GIF vers Cloudinary
+  - Stocker en DB : { userId, cacheKey, gifUrl, params, createdAt }
+  - Retourner l'URL Cloudinary
+
+---
+
+# Créer : src/EffectFactory.ts
+# CE fichier est le SEUL endroit qui connaît les 55 effets
+# Ne jamais mettre cette logique ailleurs
+
+import { BreathingObjectEffect } from '../effects/breathing-object-effect';
+// ... importer les 55 effets de la même façon
+
+const EFFECTS_REGISTRY = {
+  'organic-life-respiration-041': BreathingObjectEffect,
+  // ... les 54 autres avec leur id exact comme clé
+};
+
+export function createEffect(effectId: string, config: any) {
+  const EffectClass = EFFECTS_REGISTRY[effectId];
+  if (!EffectClass) throw new Error(`Effet inconnu: ${effectId}`);
+  return new EffectClass(config);
+}
+
+---
+
+# Créer : src/routes/generate.ts
+
+POST /api/generate
+Content-Type: application/json
+
+# Body attendu :
+{
+  "userId":   "string",
+  "effectId": "organic-life-respiration-041",
+  "element": {
+    "x": 0, "y": 0,
+    "width": 300, "height": 200,
+    "content": "Jean Dupont",
+    "opacity": 1,
+    "rotation": 0
+  },
+  "params": {
+    "vitesse": 1,
+    "intensite": 0.6,
+    "amplitude": 0.15
+  }
+}
+
+# Réponse attendue :
+{
+  "url": "https://res.cloudinary.com/livesign/sig_abc123.gif",
+  "cached": false,
+  "generationMs": 2840
+}
+
+---
+
+src/
+  browser-shim.ts       ← créer en premier, importer en premier
+  GifRenderer.ts        ← le moteur principal
+  EffectFactory.ts      ← registre des 55 effets
+  routes/
+    generate.ts         ← POST /api/generate
+  db/
+    schema.sql          ← table signatures_cache
+  server.ts             ← Express app entry point
+
+# NE PAS créer de dossiers ou fichiers en dehors de src/
+# NE PAS toucher aux dossiers : effects/, BaseEffect.js, VarianceEngine.ts
+
+---
+
+-- Créer : src/db/schema.sql
+
+CREATE TABLE IF NOT EXISTS signatures_cache (
+  id          SERIAL PRIMARY KEY,
+  user_id     VARCHAR(255) NOT NULL,
+  cache_key   VARCHAR(32) NOT NULL UNIQUE,  -- MD5 hash
+  gif_url     TEXT NOT NULL,
+  effect_id   VARCHAR(100),
+  params      JSONB,
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_cache_key ON signatures_cache(cache_key);
+CREATE INDEX idx_user_id   ON signatures_cache(user_id);
+
+---
+
+1. Installer les dépendances npm listées ci-dessus
+2. Créer browser-shim.ts
+3. Créer EffectFactory.ts (avec import de BreathingObjectEffect en test)
+4. Créer GifRenderer.ts
+5. Créer la route generate.ts
+6. Créer server.ts et tester avec un appel POST simple
+7. Vérifier que le GIF généré boucle proprement
+8. Ajouter le cache MD5 + Cloudinary
+9. Compléter EffectFactory avec les 55 effets
+
+À chaque étape : tester avant de passer à la suivante.
+Si une étape échoue : corriger SANS toucher aux fichiers protégés.
