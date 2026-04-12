@@ -483,6 +483,41 @@ export function selectEffectsForSector(secteur: string): EffectFn[] {
   return effectNames.map(n => ALL_EFFECTS[n]).filter(Boolean);
 }
 
+// ── Zones géométriques de la signature (coordonnées absolues GIF 600×220) ────
+
+export interface ZoneBounds {
+  shape: 'rect' | 'circle';
+  x?: number; y?: number; w?: number; h?: number;   // pour rect
+  cx?: number; cy?: number; r?: number;              // pour circle
+}
+
+export const SIGNATURE_ZONES: Record<string, ZoneBounds> = {
+  fond:     { shape: 'rect',   x: 0,   y: 0,   w: 600, h: 220 },   // fond entier
+  avatar:   { shape: 'circle', cx: 60, cy: 110, r: 52 },            // cercle avatar
+  nom:      { shape: 'rect',   x: 120, y: 44,   w: 380, h: 62 },   // nom + titre
+  contact:  { shape: 'rect',   x: 120, y: 106,  w: 310, h: 80 },   // contacts
+  cta:      { shape: 'rect',   x: 372, y: 126,  w: 160, h: 50 },   // bouton CTA
+};
+
+// Mapping nom public → clé interne de ALL_EFFECTS
+export const EFFECT_DISPLAY_NAMES: Record<string, string> = {
+  neuralPulse:    'Neural Pulse',
+  sparkleAura:    'Sparkle Aura',
+  orbitalRings:   'Orbital Rings',
+  electricArcs:   'Electric Arcs',
+  waveDistortion: 'Wave Distortion',
+  neonGlow:       'Neon Glow',
+  particleStream: 'Particle Stream',
+  glitchScan:     'Glitch Scan',
+  crystalFacets:  'Crystal Facets',
+  magneticField:  'Magnetic Field',
+  echoTrail:      'Echo Trail',
+  stellarDrift:   'Stellar Drift',
+};
+
+// Type pour la combinaison d'effets par zone
+export type ZoneEffectsMap = Partial<Record<keyof typeof SIGNATURE_ZONES, string[]>>;
+
 // ─── Fonction principale : génère les fragments SVG d'effets pour une frame ──
 
 export function renderEffectLayer(
@@ -493,6 +528,66 @@ export function renderEffectLayer(
     try { return fn(ctx); }
     catch { return ''; }
   }).join('\n');
+}
+
+// ─── Rendu d'effets clippés par zone (Zone Effect Composer) ──────────────────
+
+export function renderZonedEffects(
+  zoneEffects: ZoneEffectsMap,
+  ctx: EffectCtx,
+  frameIdx: number,
+): string {
+  const parts: string[] = [];
+
+  Object.entries(zoneEffects).forEach(([zoneName, effectIds]) => {
+    if (!effectIds || effectIds.length === 0) return;
+    const zone = SIGNATURE_ZONES[zoneName];
+    if (!zone) return;
+
+    const clipId = `zone-clip-${zoneName}-${frameIdx}`;
+
+    // Générer le clipPath selon la géométrie de la zone
+    let clipShape: string;
+    if (zone.shape === 'circle') {
+      clipShape = `<circle cx="${zone.cx}" cy="${zone.cy}" r="${zone.r}" />`;
+    } else {
+      clipShape = `<rect x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" />`;
+    }
+
+    // Rendre chaque effet de la zone et le clipper
+    const effectSvgs = effectIds.map(effectId => {
+      const effectFn = ALL_EFFECTS[effectId];
+      if (!effectFn) return '';
+      try {
+        const svgFragment = effectFn(ctx);
+        if (!svgFragment.trim()) return '';
+        // Intensité réduite quand multiple effets (évite la surcharge visuelle)
+        const opacity = effectIds.length > 1 ? 0.65 : 0.85;
+        return `<g opacity="${opacity}">${svgFragment}</g>`;
+      } catch { return ''; }
+    }).filter(Boolean).join('\n');
+
+    if (!effectSvgs) return;
+
+    parts.push(`
+      <defs><clipPath id="${clipId}">${clipShape}</clipPath></defs>
+      <g clip-path="url(#${clipId})">${effectSvgs}</g>
+    `);
+  });
+
+  return parts.join('\n');
+}
+
+// ─── Résoudre un ZoneEffectsMap depuis les noms envoyés par le client ────────
+
+export function resolveZoneEffects(raw: ZoneEffectsMap): ZoneEffectsMap {
+  const resolved: ZoneEffectsMap = {};
+  for (const [zone, ids] of Object.entries(raw)) {
+    if (!ids) continue;
+    const valid = ids.filter(id => ALL_EFFECTS[id]);
+    if (valid.length > 0) resolved[zone as keyof typeof SIGNATURE_ZONES] = valid.slice(0, 3);
+  }
+  return resolved;
 }
 
 // ─── Construit un EffectCtx depuis les paramètres de frame ───────────────────

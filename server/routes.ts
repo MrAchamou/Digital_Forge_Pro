@@ -988,6 +988,7 @@ router.post('/signature/full-export', async (req, res) => {
       secteur:     sectorId,
       palette:     data.palette     || [],
       cta:         data.cta         || '',
+      zoneEffects: data.zoneEffects || undefined,
     };
 
     const hostedBaseUrl = getPublicBaseUrl(req);

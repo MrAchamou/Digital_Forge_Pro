@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { log } from '../vite';
 import type { SectorConfig } from './signature-renderer';
-import { selectEffectsForSector, renderEffectLayer, buildEffectCtx } from './gif-effect-engine';
+import { selectEffectsForSector, renderEffectLayer, renderZonedEffects, resolveZoneEffects, buildEffectCtx, type ZoneEffectsMap } from './gif-effect-engine';
 import { buildLogoLivingSystem, buildLogoGifFrame } from './logo-living-system';
 import { buildCorpNameLivingSystem } from './corp-name-living-system';
 import { buildCTALivingSystem } from './cta-living-system';
@@ -50,6 +50,7 @@ export interface ExportMetadata {
   secteur: string;
   palette: string[];
   cta?: string;
+  zoneEffects?: ZoneEffectsMap;
   [key: string]: any;
 }
 
@@ -391,9 +392,17 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
   // ─ Helper : couleur accent avec alpha
   const aRgba = (alpha: number) => `rgba(${ar},${ag2},${ab},${alpha.toFixed(2)})`;
 
-  // ─ Sélection des effets SVG selon le secteur de la signature
+  // ─ Sélection des effets SVG : zone-based si fourni, sinon auto par secteur
   const activeEffects = selectEffectsForSector(meta.secteur || '');
-  log(`GIF Effects actifs: ${activeEffects.length} effets pour secteur "${meta.secteur}"`, 'export-complete');
+  const resolvedZoneEffects = meta.zoneEffects ? resolveZoneEffects(meta.zoneEffects) : null;
+  const hasZoneEffects = resolvedZoneEffects && Object.keys(resolvedZoneEffects).length > 0;
+  if (hasZoneEffects) {
+    const zoneCount = Object.keys(resolvedZoneEffects!).length;
+    const effectCount = Object.values(resolvedZoneEffects!).flat().length;
+    log(`GIF Zone Effects: ${zoneCount} zones, ${effectCount} effets combinés`, 'export-complete');
+  } else {
+    log(`GIF Effects actifs: ${activeEffects.length} effets pour secteur "${meta.secteur}"`, 'export-complete');
+  }
 
   // ─ Positions Y séquentielles (GIF) — espacement 17px, zéro chevauchement
   const _DGIF = 17, _Y0GIF = 113;
@@ -501,13 +510,15 @@ export async function buildAnimatedGif(meta: ExportMetadata): Promise<Buffer> {
     // ── Ligne séparatrice horizontale
     const lineX2  = inBuild ? 112 + eBuild * 456 : 568;
 
-    // ── Effets SVG premium (GIF Effect Engine)
+    // ── Effets SVG premium (GIF Effect Engine — Zone Composer ou secteur auto)
     const effectCtx = buildEffectCtx({
       frameIdx: i, totalFrames: TOTAL,
       phaseBuildup: PH_BUILD, phaseLive: PH_LIVE,
       accent, bg, textColor,
     });
-    const effectLayerSvg = renderEffectLayer(activeEffects, effectCtx);
+    const effectLayerSvg = hasZoneEffects
+      ? renderZonedEffects(resolvedZoneEffects!, effectCtx, i)
+      : renderEffectLayer(activeEffects, effectCtx);
 
     const frameSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
       viewBox="0 0 600 220" width="600" height="220">

@@ -7,7 +7,7 @@ import {
   Download, Mail, Smartphone, Monitor, Globe, Zap,
   CheckCircle, Loader2, ExternalLink, Copy, Package,
   Sparkles, ChevronDown, ChevronRight, Eye, Upload, X, Star,
-  Palette, RotateCcw
+  Palette, RotateCcw, Layers
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -309,6 +309,36 @@ const LIVESIGN_PRESETS = [
   },
 ];
 
+// ── Effect Composer — zones et catalogue d'effets ─────────────────────────────
+
+type ZoneName = 'fond' | 'avatar' | 'nom' | 'contact' | 'cta';
+type ZoneEffectsMap = Partial<Record<ZoneName, string[]>>;
+
+const COMPOSER_ZONES: { id: ZoneName; label: string; icon: string; desc: string; color: string }[] = [
+  { id: 'fond',    label: 'Fond',          icon: '🌌', desc: 'Arrière-plan complet (600×220)', color: '#6366f1' },
+  { id: 'avatar',  label: 'Avatar',        icon: '👤', desc: 'Cercle logo / initiales',       color: '#00d4ff' },
+  { id: 'nom',     label: 'Nom & Titre',   icon: '✍️', desc: 'Zone texte principal',          color: '#a855f7' },
+  { id: 'contact', label: 'Contacts',      icon: '📋', desc: 'Infos tél / email / adresse',   color: '#22c55e' },
+  { id: 'cta',     label: 'Bouton CTA',    icon: '🎯', desc: 'Bouton call-to-action',         color: '#f59e0b' },
+];
+
+const EFFECT_CATALOG: { id: string; label: string; icon: string; vibe: string }[] = [
+  { id: 'neuralPulse',    label: 'Neural Pulse',    icon: '🧠', vibe: 'Réseau' },
+  { id: 'sparkleAura',    label: 'Sparkle Aura',    icon: '✨', vibe: 'Étoiles' },
+  { id: 'orbitalRings',   label: 'Orbital Rings',   icon: '🔄', vibe: 'Anneaux' },
+  { id: 'electricArcs',   label: 'Electric Arcs',   icon: '⚡', vibe: 'Éclairs' },
+  { id: 'waveDistortion', label: 'Wave Distortion', icon: '〰', vibe: 'Vagues' },
+  { id: 'neonGlow',       label: 'Neon Glow',       icon: '💫', vibe: 'Lueur' },
+  { id: 'particleStream', label: 'Particle Stream', icon: '🌊', vibe: 'Flux' },
+  { id: 'glitchScan',     label: 'Glitch Scan',     icon: '📡', vibe: 'Scanner' },
+  { id: 'crystalFacets',  label: 'Crystal Facets',  icon: '💎', vibe: 'Cristaux' },
+  { id: 'magneticField',  label: 'Magnetic Field',  icon: '🔮', vibe: 'Magnétique' },
+  { id: 'echoTrail',      label: 'Echo Trail',      icon: '👁', vibe: 'Écho' },
+  { id: 'stellarDrift',   label: 'Stellar Drift',   icon: '⭐', vibe: 'Cosmique' },
+];
+
+const MAX_EFFECTS_PER_ZONE = 3;
+
 // ── Palettes par secteur (mirroir du serveur) ─────────────────────────────────
 
 const SECTOR_PALETTES: Record<string, [string, string, string]> = {
@@ -545,6 +575,8 @@ export default function ExportStudio() {
   const [selectedPreset, setSelectedPreset] = useState<string>('pulse');
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedTag, setCopiedTag] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [zoneEffects, setZoneEffects] = useState<ZoneEffectsMap>({});
   const prevSectorRef = useRef(form.sectorId);
 
   useEffect(() => {
@@ -565,6 +597,20 @@ export default function ExportStudio() {
   };
 
   const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  const toggleZoneEffect = (zone: ZoneName, effectId: string) => {
+    setZoneEffects(prev => {
+      const current = prev[zone] ?? [];
+      if (current.includes(effectId)) {
+        const next = current.filter(e => e !== effectId);
+        return { ...prev, [zone]: next };
+      }
+      if (current.length >= MAX_EFFECTS_PER_ZONE) return prev;
+      return { ...prev, [zone]: [...current, effectId] };
+    });
+  };
+
+  const totalEffectsSelected = Object.values(zoneEffects).flat().length;
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -618,6 +664,9 @@ export default function ExportStudio() {
       });
     } else {
       if (!form.nom) return toast({ title: 'Le nom est requis', variant: 'destructive' });
+      const cleanZoneEffects = Object.fromEntries(
+        Object.entries(zoneEffects).filter(([, v]) => v && v.length > 0)
+      );
       manualExport.mutate({
         sectorId: activePreset.sectorId,
         data: {
@@ -627,6 +676,7 @@ export default function ExportStudio() {
           cta: form.cta,
           palette: effectivePalette,
           preset: selectedPreset,
+          ...(Object.keys(cleanZoneEffects).length > 0 ? { zoneEffects: cleanZoneEffects } : {}),
           ...(form.note ? { note: parseFloat(form.note) } : {}),
           ...(logoPreview ? { logo_url: logoPreview } : {}),
         },
@@ -770,6 +820,133 @@ export default function ExportStudio() {
                   })}
                 </div>
                 <p className="text-[10px] text-white/25 mt-2">{activePreset.tagline}</p>
+              </div>
+
+              {/* ── Effect Composer ─────────────────────────────────────── */}
+              <div className="rounded-xl border border-white/[0.08] overflow-hidden">
+                {/* Header cliquable */}
+                <button
+                  type="button"
+                  onClick={() => setComposerOpen(o => !o)}
+                  data-testid="btn-toggle-composer"
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.03] transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-md bg-forge-purple/20 flex items-center justify-center">
+                      <Layers size={12} className="text-forge-purple" />
+                    </div>
+                    <span className="text-xs font-semibold text-white/70">Compositeur d'effets par zone</span>
+                    {totalEffectsSelected > 0 && (
+                      <span
+                        className="px-1.5 py-0.5 rounded-full text-[9px] font-bold"
+                        style={{ background: '#6366f120', color: '#a5b4fc', border: '1px solid #6366f130' }}
+                      >
+                        {totalEffectsSelected} actif{totalEffectsSelected > 1 ? 's' : ''}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/25">Empiler jusqu'à 3 effets par zone</span>
+                    {composerOpen ? <ChevronDown size={13} className="text-white/40" /> : <ChevronRight size={13} className="text-white/40" />}
+                  </div>
+                </button>
+
+                {/* Corps — zones */}
+                <AnimatePresence>
+                  {composerOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden border-t border-white/[0.06]"
+                    >
+                      <div className="p-4 space-y-4">
+                        {COMPOSER_ZONES.map(zone => {
+                          const selected = zoneEffects[zone.id] ?? [];
+                          return (
+                            <div key={zone.id} className="space-y-2">
+                              {/* Zone header */}
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="w-5 h-5 rounded-md flex items-center justify-center text-[10px]"
+                                  style={{ background: `${zone.color}18`, border: `1px solid ${zone.color}30` }}
+                                >
+                                  {zone.icon}
+                                </div>
+                                <span className="text-xs font-semibold" style={{ color: zone.color }}>{zone.label}</span>
+                                <span className="text-[9px] text-white/25">{zone.desc}</span>
+                                {selected.length >= MAX_EFFECTS_PER_ZONE && (
+                                  <span className="ml-auto text-[9px] text-amber-400/70">Max {MAX_EFFECTS_PER_ZONE} atteint</span>
+                                )}
+                              </div>
+
+                              {/* Grille d'effets */}
+                              <div className="flex flex-wrap gap-1.5">
+                                {EFFECT_CATALOG.map(effect => {
+                                  const isSelected = selected.includes(effect.id);
+                                  const isDisabled = !isSelected && selected.length >= MAX_EFFECTS_PER_ZONE;
+                                  return (
+                                    <button
+                                      key={effect.id}
+                                      type="button"
+                                      onClick={() => !isDisabled && toggleZoneEffect(zone.id, effect.id)}
+                                      data-testid={`btn-effect-${zone.id}-${effect.id}`}
+                                      className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-all ${
+                                        isDisabled ? 'opacity-25 cursor-not-allowed' : 'cursor-pointer'
+                                      }`}
+                                      style={{
+                                        background: isSelected ? `${zone.color}20` : 'rgba(255,255,255,0.04)',
+                                        color: isSelected ? zone.color : 'rgba(255,255,255,0.4)',
+                                        border: `1px solid ${isSelected ? `${zone.color}50` : 'rgba(255,255,255,0.08)'}`,
+                                        transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+                                      }}
+                                    >
+                                      <span>{effect.icon}</span>
+                                      <span>{effect.label}</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Effets sélectionnés */}
+                              {selected.length > 0 && (
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-[9px] text-white/25">Actifs :</span>
+                                  {selected.map((effectId, idx) => {
+                                    const ef = EFFECT_CATALOG.find(e => e.id === effectId);
+                                    return (
+                                      <div
+                                        key={effectId}
+                                        className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                                        style={{ background: `${zone.color}15`, color: zone.color, border: `1px solid ${zone.color}30` }}
+                                      >
+                                        <span>{idx + 1}.</span>
+                                        <span>{ef?.icon} {ef?.label}</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleZoneEffect(zone.id, effectId)}
+                                          className="ml-0.5 hover:opacity-100 opacity-60"
+                                        >
+                                          <X size={8} />
+                                        </button>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+
+                        {totalEffectsSelected === 0 && (
+                          <p className="text-[10px] text-white/20 text-center py-2">
+                            Clique sur les effets pour les assigner à chaque zone · Sans sélection = preset automatique
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* ── Logo Upload ─────────────────────────────────────────── */}
