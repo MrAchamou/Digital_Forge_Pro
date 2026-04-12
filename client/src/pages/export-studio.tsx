@@ -474,121 +474,279 @@ function escapeSvgText(value: string) {
   }[char] ?? char));
 }
 
-function renderLiveEffectPreview(effectId: string, zone: ZoneName, index: number, accent: string, textColor: string) {
-  const rects: Record<ZoneName, { x: number; y: number; w: number; h: number; cx: number; cy: number; r?: number }> = {
-    fond:    { x: 0,   y: 0,   w: 600, h: 190, cx: 300, cy: 95 },
-    avatar:  { x: 10,  y: 50,  w: 90,  h: 90,  cx: 55,  cy: 95, r: 45 },
-    nom:     { x: 106, y: 32,  w: 260, h: 70,  cx: 236, cy: 67 },
-    contact: { x: 106, y: 106, w: 330, h: 52,  cx: 271, cy: 132 },
-    cta:     { x: 106, y: 154, w: 210, h: 34,  cx: 211, cy: 171 },
-  };
-  const z = rects[zone];
-  const delay = (index * 0.35).toFixed(2);
-  const op = zone === 'fond' ? 0.20 : 0.68;
-  const clipId = `live-zone-${zone}-${index}-${effectId}`;
-  const clip = zone === 'avatar'
-    ? `<clipPath id="${clipId}"><circle cx="${z.cx}" cy="${z.cy}" r="${z.r ?? 45}"/></clipPath>`
-    : `<clipPath id="${clipId}"><rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="10"/></clipPath>`;
-
-  const n = zone === 'fond' ? 14 : 7;
+// ─── renderLiveEffectPreview ─────────────────────────────────────────────────
+// Reproduit EXACTEMENT les effets du moteur GIF (gif-effect-engine.ts) en SMIL.
+// Coordonnées absolues identiques : avatar cx=55,cy=95 | zone contenu x=110-590
+// PAS de clippage de zone : chaque effet couvre la pleine carte 600×190.
+// ─────────────────────────────────────────────────────────────────────────────
+function renderLiveEffectPreview(effectId: string, accent: string, textColor: string, layerIndex: number = 0): string {
+  const AX = 55, AY = 95; // avatar center — same position as SVG preview
   const seed = (i: number, s: number) => ((i * 137.508 + s * 31.41) % 1);
-  const px = (i: number) => z.x + 8 + seed(i, 3) * Math.max(8, z.w - 16);
-  const py = (i: number) => z.y + 8 + seed(i, 7) * Math.max(8, z.h - 16);
-  const starPath = (cx: number, cy: number, r: number) => {
-    const arm = r * 2.8;
-    const rh = r * 0.32;
-    return `M${cx},${(cy - arm).toFixed(1)} L${(cx + rh).toFixed(1)},${cy} L${cx},${(cy + arm).toFixed(1)} L${(cx - rh).toFixed(1)},${cy} Z`;
+  const TAU = Math.PI * 2;
+
+  const starPath4 = (x: number, y: number, r: number) => {
+    const arm = (r * 2.5).toFixed(1);
+    const rh  = (r * 0.3).toFixed(1);
+    return `M${x},${(y - parseFloat(arm)).toFixed(1)} L${(x + parseFloat(rh)).toFixed(1)},${y} L${x},${(y + parseFloat(arm)).toFixed(1)} L${(x - parseFloat(rh)).toFixed(1)},${y} Z`;
   };
 
-  const stars = Array.from({ length: n }, (_, i) => {
-    const x = px(i), y = py(i);
-    const r = 0.8 + seed(i, 5) * 1.8;
-    const dur = (1.8 + seed(i, 2) * 2.5).toFixed(2);
-    const del = (seed(i, 11) * 3).toFixed(2);
-    return `<path d="${starPath(x, y, r)}" fill="${accent}" opacity="0">
-      <animate attributeName="opacity" values="0;${op};0" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
-    </path>`;
-  }).join('');
+  let body = '';
 
-  const wavePath = `M${z.x - 10},${z.cy} C${z.x + z.w * 0.2},${z.cy - 16} ${z.x + z.w * 0.4},${z.cy + 16} ${z.x + z.w * 0.6},${z.cy} S${z.x + z.w * 0.85},${z.cy - 14} ${z.x + z.w + 10},${z.cy}`;
-  const wavePath2 = `M${z.x - 10},${z.cy + 5} C${z.x + z.w * 0.2},${z.cy + 20} ${z.x + z.w * 0.4},${z.cy - 18} ${z.x + z.w * 0.6},${z.cy + 4} S${z.x + z.w * 0.85},${z.cy + 16} ${z.x + z.w + 10},${z.cy - 2}`;
+  switch (effectId) {
 
-  const rx1 = Math.max(20, z.w * 0.33), ry1 = Math.max(10, z.h * 0.24);
-  const rx2 = Math.max(14, z.w * 0.22), ry2 = Math.max(7, z.h * 0.16);
-  const sat1x = `${(z.cx + rx1).toFixed(1)};${(z.cx - rx1).toFixed(1)};${(z.cx + rx1).toFixed(1)}`;
-  const sat1y = `${z.cy};${z.cy};${z.cy}`;
+    // ── 1. NEURAL PULSE — réseau de nœuds synaptiques (même coords que GIF) ──
+    case 'neuralPulse': {
+      const nodes = [
+        { x: 140, y: 30 }, { x: 280, y: 20 }, { x: 400, y: 35 },
+        { x: 520, y: 25 }, { x: 180, y: 160 }, { x: 330, y: 155 },
+        { x: 460, y: 165 }, { x: 565, y: 150 },
+      ];
+      const edges = [[0,1],[1,2],[2,3],[1,5],[2,5],[4,5],[5,6],[6,7],[3,6],[0,4]];
+      const lines = edges.map(([a, b], ei) =>
+        `<line x1="${nodes[a].x}" y1="${nodes[a].y}" x2="${nodes[b].x}" y2="${nodes[b].y}" stroke="${accent}" stroke-width="0.6" opacity="0.08">
+          <animate attributeName="opacity" values="0.06;0.28;0.06" dur="${(1.8 + ei * 0.15).toFixed(1)}s" begin="${(ei * 0.1).toFixed(2)}s" repeatCount="indefinite"/>
+        </line>`
+      ).join('');
+      const dots = nodes.map((n, i) =>
+        `<circle cx="${n.x}" cy="${n.y}" r="1.5" fill="${accent}" opacity="0">
+          <animate attributeName="r" values="1;3;1" dur="${(2.4 + i * 0.28).toFixed(1)}s" begin="${(i * 0.22).toFixed(2)}s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0;0.7;0.15;0.7;0" dur="${(2.4 + i * 0.28).toFixed(1)}s" begin="${(i * 0.22).toFixed(2)}s" repeatCount="indefinite"/>
+        </circle>`
+      ).join('');
+      const pulse = `<circle cx="${AX}" cy="${AY}" r="3.5" fill="${accent}" opacity="0.85"/>
+        <circle cx="${AX}" cy="${AY}" r="9" fill="none" stroke="${accent}" stroke-width="1.4" opacity="0">
+          <animate attributeName="r" values="9;44;9" dur="2.2s" begin="${(layerIndex * 0.35).toFixed(2)}s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0;0.6" dur="2.2s" begin="${(layerIndex * 0.35).toFixed(2)}s" repeatCount="indefinite"/>
+        </circle>`;
+      body = lines + dots + pulse;
+      break;
+    }
 
-  const nodesX = [z.x+z.w*0.08, z.x+z.w*0.22, z.x+z.w*0.38, z.x+z.w*0.55, z.x+z.w*0.72, z.x+z.w*0.88];
-  const nodesY = [z.y+z.h*0.3,  z.y+z.h*0.7,  z.y+z.h*0.25, z.y+z.h*0.75, z.y+z.h*0.3,  z.y+z.h*0.65];
-  const edges = [[0,1],[1,2],[2,3],[3,4],[4,5],[1,3],[2,4]];
-  const nodeLines = edges.map(([a,b]) => `<line x1="${nodesX[a].toFixed(0)}" y1="${nodesY[a].toFixed(0)}" x2="${nodesX[b].toFixed(0)}" y2="${nodesY[b].toFixed(0)}" stroke="${accent}" stroke-width="0.7" opacity="0.3"/>`).join('');
-  const nodeDots = nodesX.map((nx, i) => `<circle cx="${nx.toFixed(0)}" cy="${nodesY[i].toFixed(0)}" r="2.2" fill="${accent}" opacity="0"><animate attributeName="opacity" values="0;0.7;0.2;0.7;0" dur="${(2.4 + i * 0.3).toFixed(1)}s" begin="${(i * 0.22).toFixed(2)}s" repeatCount="indefinite"/></circle>`).join('');
+    // ── 2. SPARKLE AURA — 24 étoiles scintillantes (seededPoints GIF identiques) ──
+    case 'sparkleAura': {
+      body = Array.from({ length: 24 }, (_, i) => {
+        const x = 110 + seed(i, 7) * 480;
+        const y = 5   + seed(i, 3) * 170;
+        const r    = 0.8 + seed(i, 5) * 1.8;
+        const dur  = (1.6 + seed(i, 2) * 2.5).toFixed(2);
+        const del  = (seed(i, 11) * 3).toFixed(2);
+        return `<path d="${starPath4(x, y, r)}" fill="${accent}" opacity="0">
+          <animate attributeName="opacity" values="0;0.7;0" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+        </path>`;
+      }).join('');
+      break;
+    }
 
-  const FACETS = [
-    { fx: z.x + z.w * 0.82, fy: z.y + z.h * 0.18, s: Math.min(z.w, z.h) * 0.18 },
-    { fx: z.x + z.w * 0.92, fy: z.y + z.h * 0.55, s: Math.min(z.w, z.h) * 0.13 },
-    { fx: z.x + z.w * 0.78, fy: z.y + z.h * 0.82, s: Math.min(z.w, z.h) * 0.15 },
-  ];
-  const facetPolys = FACETS.map((f, fi) => {
-    const pts = [
-      `${f.fx.toFixed(0)},${(f.fy - f.s).toFixed(0)}`,
-      `${(f.fx + f.s * 0.7).toFixed(0)},${(f.fy - f.s * 0.3).toFixed(0)}`,
-      `${(f.fx + f.s * 0.7).toFixed(0)},${(f.fy + f.s * 0.5).toFixed(0)}`,
-      `${f.fx.toFixed(0)},${(f.fy + f.s).toFixed(0)}`,
-      `${(f.fx - f.s * 0.7).toFixed(0)},${(f.fy + f.s * 0.5).toFixed(0)}`,
-      `${(f.fx - f.s * 0.7).toFixed(0)},${(f.fy - f.s * 0.3).toFixed(0)}`,
-    ].join(' ');
-    return `<polygon points="${pts}" fill="${accent}" stroke="${accent}" stroke-width="0.5" opacity="0.05">
-      <animate attributeName="opacity" values="0.03;0.18;0.03" dur="${(2.2 + fi * 0.6).toFixed(1)}s" begin="${delay}s" repeatCount="indefinite"/>
-    </polygon>`;
-  }).join('');
+    // ── 3. ORBITAL RINGS — 3 anneaux autour de l'avatar (même rayon que GIF) ──
+    case 'orbitalRings': {
+      const rings = [
+        { rx: 56, ry: 18, tilt: 0,   dur: '4.5s', rev: false, op: 0.30, dotR: 2.5 },
+        { rx: 62, ry: 22, tilt: 60,  dur: '6.4s', rev: true,  op: 0.20, dotR: 2.0 },
+        { rx: 70, ry: 14, tilt: 120, dur: '3.2s', rev: false, op: 0.15, dotR: 1.8 },
+      ];
+      body = rings.map(ring => {
+        const satX = `${(AX + ring.rx).toFixed(1)};${(AX - ring.rx).toFixed(1)};${(AX + ring.rx).toFixed(1)}`;
+        const satY = `${AY};${AY};${AY}`;
+        return `<ellipse cx="${AX}" cy="${AY}" rx="${ring.rx}" ry="${ring.ry}" fill="none"
+            stroke="${accent}" stroke-width="0.8" opacity="${(ring.op * 0.6).toFixed(2)}"
+            transform="rotate(${ring.tilt},${AX},${AY})"/>
+          <circle r="${ring.dotR}" fill="${accent}" opacity="${(ring.op * 2.5).toFixed(2)}">
+            <animate attributeName="cx" values="${satX}" dur="${ring.dur}" ${ring.rev ? 'keyTimes="0;0.5;1" calcMode="linear"' : ''} repeatCount="indefinite"/>
+            <animate attributeName="cy" values="${satY}" dur="${ring.dur}" repeatCount="indefinite"/>
+          </circle>`;
+      }).join('');
+      break;
+    }
 
-  const fieldLines = [0, 1, 2, 3, 4].map(i => {
-    const ang = (i / 5) * Math.PI * 2;
-    const r1 = 56 + i * 4, r2 = 90 + i * 12;
-    const sx = (z.cx + r1 * Math.cos(ang)).toFixed(1);
-    const sy = (z.cy + r1 * Math.sin(ang)).toFixed(1);
-    const ex = (z.cx + r2 * Math.cos(ang + 0.8)).toFixed(1);
-    const ey = (z.cy + r2 * Math.sin(ang + 0.8)).toFixed(1);
-    const cpx = (z.cx + (r1 + r2) / 2 * Math.cos(ang + 0.4) + 20).toFixed(1);
-    const cpy = (z.cy + (r1 + r2) / 2 * Math.sin(ang + 0.4)).toFixed(1);
-    return `<path d="M${sx},${sy} Q${cpx},${cpy} ${ex},${ey}" fill="none" stroke="${accent}" stroke-width="0.7" opacity="0.25">
-      <animate attributeName="opacity" values="0.1;0.35;0.1" dur="${(2.5 + i * 0.4).toFixed(1)}s" begin="${(i * 0.3).toFixed(2)}s" repeatCount="indefinite"/>
-    </path>`;
-  }).join('');
+    // ── 4. ELECTRIC ARCS — Q-bezier du bord avatar vers la zone contenu ──
+    case 'electricArcs': {
+      const targets = [
+        { ex: 130, ey: 50 }, { ex: 200, ey: 80 },
+        { ex: 130, ey: 130 }, { ex: 180, ey: 110 },
+      ];
+      body = targets.map((t, i) => {
+        const ang = Math.atan2(t.ey - AY, t.ex - AX);
+        const sx  = (AX + 52 * Math.cos(ang)).toFixed(1);
+        const sy  = (AY + 52 * Math.sin(ang)).toFixed(1);
+        const cx1 = ((parseFloat(sx) + t.ex) / 2 + 10).toFixed(1);
+        const cy1 = ((parseFloat(sy) + t.ey) / 2 - 12).toFixed(1);
+        return `<path d="M${sx},${sy} Q${cx1},${cy1} ${t.ex},${t.ey}"
+          fill="none" stroke="${accent}" stroke-width="1" stroke-linecap="round" opacity="0">
+          <animate attributeName="opacity" values="0;0.6;0;0.45;0" dur="${(1.3 + i * 0.2).toFixed(1)}s" begin="${(i * 0.25).toFixed(2)}s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="0 120;60 30;0 120" dur="${(1.3 + i * 0.2).toFixed(1)}s" begin="${(i * 0.25).toFixed(2)}s" repeatCount="indefinite"/>
+        </path>`;
+      }).join('');
+      break;
+    }
 
-  const echoes = [1, 2, 3].map(i => `<rect x="${i * 5}" y="${(z.cy - 15 * (0.9 ** i)).toFixed(0)}" width="2" height="${(30 * (0.9 ** i)).toFixed(0)}" fill="${accent}" rx="1" opacity="0">
-    <animate attributeName="opacity" values="0;${(0.04 - i * 0.01).toFixed(3)};0" dur="${(2.1 + i * 0.3).toFixed(1)}s" begin="${(i * 0.08).toFixed(2)}s" repeatCount="indefinite"/>
-  </rect>`).join('');
+    // ── 5. WAVE DISTORTION — 5 ondes de x=110 à x=590, même amplitude que GIF ──
+    case 'waveDistortion': {
+      body = Array.from({ length: 5 }, (_, li) => {
+        const baseY = 20 + li * 35;
+        const w1 = `M110,${baseY} Q195,${baseY - 10} 280,${baseY} Q365,${baseY + 10} 450,${baseY} Q520,${baseY - 7} 590,${baseY}`;
+        const w2 = `M110,${baseY + 4} Q195,${baseY + 18} 280,${baseY + 3} Q365,${baseY - 15} 450,${baseY + 5} Q520,${baseY + 11} 590,${baseY + 2}`;
+        const op = (0.08 + li * 0.015).toFixed(3);
+        return `<path d="${w1}" fill="none" stroke="${accent}" stroke-width="0.7" opacity="${op}">
+          <animate attributeName="d" values="${w1};${w2};${w1}" dur="${(2.8 + li * 0.4).toFixed(1)}s" begin="${(li * 0.3).toFixed(2)}s" repeatCount="indefinite"/>
+        </path>`;
+      }).join('');
+      break;
+    }
 
-  const glitchH = Math.min(6, z.h * 0.08);
-  const driftStars = Array.from({ length: Math.min(n, 12) }, (_, i) => {
-    const sx = (z.x + 12 + seed(i, 3) * (z.w - 24)).toFixed(1);
-    const sy = (z.y + 4 + seed(i, 7) * (z.h - 8)).toFixed(1);
-    const dx = (seed(i, 13) * 40).toFixed(1);
-    const dur = (3.5 + seed(i, 9) * 4).toFixed(1);
-    return `<circle cx="${sx}" cy="${sy}" r="${(seed(i, 5) * 1.2 + 0.4).toFixed(1)}" fill="${accent}" opacity="0">
-      <animate attributeName="cx" values="${sx};${(parseFloat(sx) + parseFloat(dx)).toFixed(1)};${sx}" dur="${dur}s" begin="${(seed(i, 11) * 3).toFixed(2)}s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0;0.22;0" dur="${dur}s" begin="${(seed(i, 11) * 3).toFixed(2)}s" repeatCount="indefinite"/>
-    </circle>`;
-  }).join('');
+    // ── 6. NEON GLOW — bord lumineux pleine carte + 4 orbes de coin (idem GIF) ──
+    case 'neonGlow': {
+      body = `
+        <rect x="1" y="1" width="598" height="188" rx="10" fill="none" stroke="${accent}" stroke-width="2" opacity="0">
+          <animate attributeName="opacity" values="0.06;0.14;0.06" dur="1.8s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="3" y="3" width="594" height="184" rx="9" fill="none" stroke="${accent}" stroke-width="1" opacity="0">
+          <animate attributeName="opacity" values="0.03;0.08;0.03" dur="2.1s" begin="0.3s" repeatCount="indefinite"/>
+        </rect>
+        <circle cx="10" cy="10" r="8" fill="${accent}" opacity="0">
+          <animate attributeName="opacity" values="0.08;0.24;0.08" dur="2.1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="590" cy="10" r="8" fill="${accent}" opacity="0">
+          <animate attributeName="opacity" values="0.06;0.18;0.06" dur="2.1s" begin="0.5s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="590" cy="180" r="8" fill="${accent}" opacity="0">
+          <animate attributeName="opacity" values="0.04;0.14;0.04" dur="2.1s" begin="1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="10" cy="180" r="8" fill="${accent}" opacity="0">
+          <animate attributeName="opacity" values="0.05;0.17;0.05" dur="2.1s" begin="0.8s" repeatCount="indefinite"/>
+        </circle>`;
+      break;
+    }
 
-  const body: Record<string, string> = {
-    neuralPulse: `${nodeLines}${nodeDots}<circle cx="${z.cx}" cy="${z.cy}" r="3.5" fill="${accent}" opacity="0.85"/><circle cx="${z.cx}" cy="${z.cy}" r="9" fill="none" stroke="${accent}" stroke-width="1.4" opacity="0"><animate attributeName="r" values="9;${Math.min(z.w, z.h) * 0.44};9" dur="2.2s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.6;0;0.6" dur="2.2s" begin="${delay}s" repeatCount="indefinite"/></circle>`,
-    sparkleAura: stars,
-    orbitalRings: `<ellipse cx="${z.cx}" cy="${z.cy}" rx="${rx1}" ry="${ry1}" fill="none" stroke="${accent}" stroke-width="1.2" opacity="${op * 0.6}" stroke-dasharray="4 3"><animateTransform attributeName="transform" type="rotate" from="0 ${z.cx} ${z.cy}" to="360 ${z.cx} ${z.cy}" dur="4.5s" repeatCount="indefinite"/></ellipse><ellipse cx="${z.cx}" cy="${z.cy}" rx="${rx2}" ry="${ry2}" fill="none" stroke="${textColor}" stroke-width="0.7" opacity="0.3" stroke-dasharray="3 4"><animateTransform attributeName="transform" type="rotate" from="360 ${z.cx} ${z.cy}" to="0 ${z.cx} ${z.cy}" dur="3s" repeatCount="indefinite"/></ellipse><circle r="2.8" fill="${accent}" opacity="${op}"><animateMotion dur="4.5s" repeatCount="indefinite"><mpath/></animateMotion><animate attributeName="cx" values="${sat1x}" dur="4.5s" repeatCount="indefinite"/><animate attributeName="cy" values="${sat1y}" dur="4.5s" repeatCount="indefinite"/></circle>`,
-    electricArcs: `<polyline points="${z.x+4},${z.cy} ${z.x+z.w*0.18},${z.y+6} ${z.x+z.w*0.33},${z.y+z.h-6} ${z.x+z.w*0.50},${z.cy-10} ${z.x+z.w*0.68},${z.cy+12} ${z.x+z.w-4},${z.cy-3}" fill="none" stroke="${accent}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0"><animate attributeName="opacity" values="0;${op};0;${op * 0.6};0" dur="1.35s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="stroke-dasharray" values="0 300;120 60;0 300" dur="1.35s" begin="${delay}s" repeatCount="indefinite"/></polyline>`,
-    waveDistortion: `<path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="1.8" opacity="${op * 0.7}"><animate attributeName="d" values="${wavePath};${wavePath2};${wavePath}" dur="2.8s" begin="${delay}s" repeatCount="indefinite"/></path><path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="0.7" opacity="${op * 0.25}" transform="translate(0,10)"><animate attributeName="d" values="${wavePath};${wavePath2};${wavePath}" dur="3.5s" begin="${delay}s" repeatCount="indefinite"/></path>`,
-    neonGlow: `<rect x="${z.x + 3}" y="${z.y + 3}" width="${Math.max(20, z.w - 6)}" height="${Math.max(12, z.h - 6)}" rx="10" fill="none" stroke="${accent}" stroke-width="1.8" opacity="0" filter="url(#lp-glow)"><animate attributeName="opacity" values="0.25;${op};0.25" dur="1.8s" begin="${delay}s" repeatCount="indefinite"/></rect><rect x="${z.x + 7}" y="${z.y + 7}" width="${Math.max(16, z.w - 14)}" height="${Math.max(8, z.h - 14)}" rx="8" fill="none" stroke="${accent}" stroke-width="0.8" opacity="0"><animate attributeName="opacity" values="0.1;${op * 0.5};0.1" dur="2.1s" begin="${delay}s" repeatCount="indefinite"/></rect>`,
-    particleStream: `<path d="${wavePath}" fill="none" stroke="${accent}" stroke-width="0.8" opacity="0.18"/>${stars}`,
-    glitchScan: `<rect x="${z.x}" y="${z.y}" width="${z.w}" height="${glitchH}" fill="${accent}" opacity="0"><animate attributeName="y" values="${z.y};${z.y + z.h - glitchH};${z.y}" dur="1.7s" begin="${delay}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.45;0.1;0.5;0" dur="1.7s" begin="${delay}s" repeatCount="indefinite"/></rect><rect x="${z.x + 40}" y="${z.cy - 0.5}" width="${z.w * 0.35}" height="1" fill="${textColor}" opacity="0.3"><animate attributeName="x" values="${z.x+40};${z.x+z.w*0.5};${z.x+40}" dur="0.85s" begin="${delay}s" repeatCount="indefinite"/></rect>`,
-    crystalFacets: `${facetPolys}<polygon points="${z.cx},${z.y+5} ${z.x+z.w-6},${z.cy} ${z.cx},${z.y+z.h-5} ${z.x+6},${z.cy}" fill="${accent}" opacity="0.06" stroke="${accent}" stroke-width="0.9"><animate attributeName="opacity" values="0.04;0.16;0.04" dur="2.6s" begin="${delay}s" repeatCount="indefinite"/></polygon><line x1="${z.cx}" y1="${z.y+5}" x2="${z.cx}" y2="${z.y+z.h-5}" stroke="${accent}" stroke-width="0.4" opacity="0.3"/><line x1="${z.x+6}" y1="${z.cy}" x2="${z.x+z.w-6}" y2="${z.cy}" stroke="${accent}" stroke-width="0.4" opacity="0.3"/>`,
-    magneticField: fieldLines,
-    echoTrail: echoes,
-    stellarDrift: driftStars,
-  };
+    // ── 7. PARTICLE STREAM — 18 particules orbitant en LIVE (seededPoints GIF) ──
+    case 'particleStream': {
+      body = Array.from({ length: 18 }, (_, i) => {
+        const x  = 110 + seed(i, 42) * 480;
+        const y  = 10  + seed(i, 17) * 160;
+        const sz = (0.8 + seed(i, 5) * 2.2).toFixed(1);
+        const dx = (Math.sin(i * 2.3) * 6).toFixed(1);
+        const dy = (Math.cos(i * 1.7) * 4).toFixed(1);
+        const dur = (2.5 + seed(i, 9) * 3).toFixed(1);
+        const del = (seed(i, 3) * 3).toFixed(2);
+        const op  = (0.1 + seed(i, 11) * 0.32).toFixed(2);
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz}" fill="${accent}" opacity="0">
+          <animate attributeName="cx" values="${x.toFixed(1)};${(x + parseFloat(dx)).toFixed(1)};${x.toFixed(1)}" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+          <animate attributeName="cy" values="${y.toFixed(1)};${(y + parseFloat(dy)).toFixed(1)};${y.toFixed(1)}" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0;${op};0" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+        </circle>`;
+      }).join('');
+      break;
+    }
 
-  return `${clip}<g clip-path="url(#${clipId})" data-live-effect="${effectId}" opacity="${zone === 'fond' ? 1 : 0.92}">${body[effectId] ?? stars}</g>`;
+    // ── 8. GLITCH SCAN — barres horizontales qui scannent (idem GIF) ──
+    case 'glitchScan': {
+      body = Array.from({ length: 4 }, (_, i) => {
+        const y0 = 15 + i * 40;
+        const h  = 1 + (i % 3);
+        const xShift = i % 2 === 0 ? 5 : -5;
+        return `<rect x="110" y="${y0}" width="460" height="${h}" fill="${accent}" rx="1" opacity="0">
+          <animate attributeName="y" values="${y0};${y0 + 130};${y0}" dur="${(3.2 + i * 0.5).toFixed(1)}s" begin="${(i * 0.4).toFixed(2)}s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0;0.42;0.1;0.5;0" dur="${(1.7 + i * 0.22).toFixed(1)}s" begin="${(i * 0.4).toFixed(2)}s" repeatCount="indefinite"/>
+          <animate attributeName="x" values="110;${110 + xShift};110" dur="${(1.7 + i * 0.22).toFixed(1)}s" begin="${(i * 0.4).toFixed(2)}s" repeatCount="indefinite"/>
+        </rect>`;
+      }).join('');
+      break;
+    }
+
+    // ── 9. CRYSTAL FACETS — 6 facettes côté droit (positions exactes du GIF) ──
+    case 'crystalFacets': {
+      const FACETS = [
+        { x: 490, y: 25,  s: 22, angle: 15 },
+        { x: 555, y: 60,  s: 16, angle: 45 },
+        { x: 510, y: 85,  s: 18, angle: -20 },
+        { x: 560, y: 110, s: 14, angle: 60 },
+        { x: 530, y: 140, s: 20, angle: 30 },
+        { x: 480, y: 155, s: 12, angle: -45 },
+      ];
+      body = FACETS.map((f, fi) => {
+        const a = f.angle * Math.PI / 180;
+        const pts = [
+          [f.x, f.y - f.s], [f.x + f.s*0.7, f.y - f.s*0.3],
+          [f.x + f.s*0.7, f.y + f.s*0.5], [f.x, f.y + f.s],
+          [f.x - f.s*0.7, f.y + f.s*0.5], [f.x - f.s*0.7, f.y - f.s*0.3],
+        ].map(([px, py]) => {
+          const dx = px - f.x, dy = py - f.y;
+          return `${(f.x + dx*Math.cos(a) - dy*Math.sin(a)).toFixed(1)},${(f.y + dx*Math.sin(a) + dy*Math.cos(a)).toFixed(1)}`;
+        }).join(' ');
+        const dur = (2.2 + fi * 0.55).toFixed(1);
+        return `<polygon points="${pts}" fill="${accent}" stroke="${accent}" stroke-width="0.5" opacity="0.04">
+          <animate attributeName="opacity" values="0.02;0.14;0.02" dur="${dur}s" begin="${(fi * 0.18).toFixed(2)}s" repeatCount="indefinite"/>
+          <animateTransform attributeName="transform" type="rotate" values="0 ${f.x} ${f.y};5 ${f.x} ${f.y};0 ${f.x} ${f.y}" dur="${(dur)}s" begin="${(fi * 0.18).toFixed(2)}s" repeatCount="indefinite"/>
+        </polygon>`;
+      }).join('');
+      break;
+    }
+
+    // ── 10. MAGNETIC FIELD — lignes de champ courbées depuis avatar (idem GIF) ──
+    case 'magneticField': {
+      body = Array.from({ length: 5 }, (_, i) => {
+        const ang = (i / 5) * TAU;
+        const r1 = 58 + i * 4, r2 = 90 + i * 12;
+        const sx  = (AX + r1 * Math.cos(ang)).toFixed(1);
+        const sy  = (AY + r1 * Math.sin(ang)).toFixed(1);
+        const ex  = (AX + r2 * Math.cos(ang + 0.8)).toFixed(1);
+        const ey  = (AY + r2 * Math.sin(ang + 0.8)).toFixed(1);
+        const cpx = (AX + (r1 + r2) / 2 * Math.cos(ang + 0.4) + 20).toFixed(1);
+        const cpy = (AY + (r1 + r2) / 2 * Math.sin(ang + 0.4)).toFixed(1);
+        return `<path d="M${sx},${sy} Q${cpx},${cpy} ${ex},${ey}" fill="none"
+          stroke="${accent}" stroke-width="0.7" opacity="0.08">
+          <animate attributeName="opacity" values="0.05;0.3;0.05" dur="${(2.5 + i * 0.4).toFixed(1)}s" begin="${(i * 0.3).toFixed(2)}s" repeatCount="indefinite"/>
+        </path>`;
+      }).join('');
+      break;
+    }
+
+    // ── 11. ECHO TRAIL — copies fantômes de la barre accent (idem GIF) ──
+    case 'echoTrail': {
+      body = [1, 2, 3].map(i => {
+        const h  = (30 + 150 * 0.5).toFixed(0); // ~105px (milieu de cycle)
+        const y0 = ((190 - parseInt(h)) / 2).toFixed(0);
+        const op = (0.04 - i * 0.01).toFixed(3);
+        return `<rect x="${i * 6}" y="${y0}" width="2" height="${h}" fill="${accent}" rx="1" opacity="0">
+          <animate attributeName="opacity" values="0;${op};0" dur="${(2.1 + i * 0.3).toFixed(1)}s" begin="${(i * 0.08).toFixed(2)}s" repeatCount="indefinite"/>
+          <animate attributeName="height" values="20;${h};20" dur="${(2.1 + i * 0.3).toFixed(1)}s" begin="${(i * 0.08).toFixed(2)}s" repeatCount="indefinite"/>
+          <animate attributeName="y" values="${Math.round(190/2 - 10)};${y0};${Math.round(190/2 - 10)}" dur="${(2.1 + i * 0.3).toFixed(1)}s" begin="${(i * 0.08).toFixed(2)}s" repeatCount="indefinite"/>
+        </rect>`;
+      }).join('');
+      break;
+    }
+
+    // ── 12. STELLAR DRIFT — 30 micro-étoiles qui dérivent (seededPoints GIF) ──
+    case 'stellarDrift': {
+      body = Array.from({ length: 30 }, (_, i) => {
+        const x   = 110 + seed(i, 99) * 480;
+        const y   = 5   + seed(i, 77) * 170;
+        const sz  = (seed(i, 5) * 0.6 + 0.3).toFixed(1);
+        const dx  = (seed(i, 13) * 40).toFixed(1);
+        const dur = (3.5 + seed(i, 9) * 4).toFixed(1);
+        const del = (seed(i, 11) * 3).toFixed(2);
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz}" fill="${accent}" opacity="0">
+          <animate attributeName="cx" values="${x.toFixed(1)};${(x + parseFloat(dx)).toFixed(1)};${x.toFixed(1)}" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0;0.22;0" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+        </circle>`;
+      }).join('');
+      break;
+    }
+
+    // ── Fallback ─────────────────────────────────────────────────────────────
+    default: {
+      body = Array.from({ length: 14 }, (_, i) => {
+        const x = 110 + seed(i, 7) * 480, y = 5 + seed(i, 3) * 170;
+        const r = 0.8 + seed(i, 5) * 1.8;
+        const dur = (1.8 + seed(i, 2) * 2.5).toFixed(2);
+        const del = (seed(i, 11) * 3).toFixed(2);
+        return `<path d="${starPath4(x, y, r)}" fill="${accent}" opacity="0">
+          <animate attributeName="opacity" values="0;0.6;0" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>
+        </path>`;
+      }).join('');
+    }
+  }
+
+  return `<g data-live-effect="${effectId}" opacity="0.92">${body}</g>`;
 }
 
 function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, cta, note, sectorId, logoPreview, paletteOverride, zoneEffects = {} }: LivePreviewProps) {
@@ -636,8 +794,11 @@ function LiveSignaturePreview({ nom, titre, entreprise, telephone, email, site, 
     (ids ?? []).map((effectId, index) => ({ zone: zone as ZoneName, effectId, index }))
   );
 
-  const liveEffectLayers = selectedEffectEntries.map(({ zone, effectId, index }) =>
-    renderLiveEffectPreview(effectId, zone, index, accent, textColor)
+  // Dédupliquer : chaque effet est rendu UNE FOIS à l'échelle de la pleine carte
+  // (identique au moteur GIF — pas de clippage par zone)
+  const uniqueEffects = Array.from(new Set(selectedEffectEntries.map(e => e.effectId)));
+  const liveEffectLayers = uniqueEffects.map((effectId, i) =>
+    renderLiveEffectPreview(effectId, accent, textColor, i)
   ).join('');
 
   const activeEffectLabels = selectedEffectEntries.map(({ zone, effectId }) => {
